@@ -28,9 +28,13 @@ import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.item.UpdateItem;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.ForeignKeyConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
@@ -208,6 +212,8 @@ public interface SqlVisitor<T> {
     T visit(InsertSource item);
 
     T visit(DefaultValues item);
+    
+    T visit(ReferencesItem item);
 
     T visit(TableDefinition item);
 
@@ -218,4 +224,11 @@ public interface SqlVisitor<T> {
     T visit(NotNullConstraint constraint);
 
     T visit(UniqueConstraint constraint);
+
+    T visit(ForeignKeyConstraint constraint);
+
+    T visit(CheckConstraint constraint);
+
+    T visit(DefaultConstraint constraint);
+
 }
