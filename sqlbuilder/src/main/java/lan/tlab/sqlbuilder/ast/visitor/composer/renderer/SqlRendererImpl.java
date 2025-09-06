@@ -28,9 +28,13 @@ import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.item.UpdateItem;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.ForeignKeyConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
@@ -125,9 +129,11 @@ import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.ColumnDef
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.DefaultValuesRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.InsertSourceRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.InsertValueRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.ReferencesItemRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.TableDefinitionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.TableRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.UpdateItemRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.ForeignKeyConstraintRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.NotNullConstraintRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.PrimaryKeyDefinitionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.UniqueConstraintRenderStrategy;
@@ -161,20 +167,17 @@ public class SqlRendererImpl implements SqlRenderer {
     private final DeleteStatementRenderStrategy deleteStatementStrategy = new DeleteStatementRenderStrategy();
 
     @Default
-    private final CreateTableStatementRenderStrategy createTableStatementStrategy =
-            new CreateTableStatementRenderStrategy();
+    private final CreateTableStatementRenderStrategy createTableStatementStrategy = new CreateTableStatementRenderStrategy();
 
     // clause
     @Default
     private final SelectRenderStrategy selectStrategy = new SelectRenderStrategy();
 
     @Default
-    private final AggregationFunctionProjectionRenderStrategy aggregationFunctionProjectionStrategy =
-            new AggregationFunctionProjectionRenderStrategy();
+    private final AggregationFunctionProjectionRenderStrategy aggregationFunctionProjectionStrategy = new AggregationFunctionProjectionRenderStrategy();
 
     @Default
-    private final ScalarExpressionProjectionRenderStrategy scalarExpressionProjectionStrategy =
-            new ScalarExpressionProjectionRenderStrategy();
+    private final ScalarExpressionProjectionRenderStrategy scalarExpressionProjectionStrategy = new ScalarExpressionProjectionRenderStrategy();
 
     @Default
     private final FromRenderStrategy fromStrategy = new FromRenderStrategy();
@@ -347,6 +350,9 @@ public class SqlRendererImpl implements SqlRenderer {
 
     @Default
     private final DefaultValuesRenderStrategy defaultValuesStrategy = new DefaultValuesRenderStrategy();
+    
+    @Default
+    private final ReferencesItemRenderStrategy referencesItemStrategy = new ReferencesItemRenderStrategy();
 
     @Default
     private final TableDefinitionRenderStrategy tableDefinitionStrategy = new TableDefinitionRenderStrategy();
@@ -363,6 +369,9 @@ public class SqlRendererImpl implements SqlRenderer {
 
     @Default
     private final UniqueConstraintRenderStrategy uniqueConstraintStrategy = new UniqueConstraintRenderStrategy();
+
+    @Default
+    private final ForeignKeyConstraintRenderStrategy foreignKeyConstraintStrategy = new ForeignKeyConstraintRenderStrategy();
 
     // statements
     @Override
@@ -686,6 +695,11 @@ public class SqlRendererImpl implements SqlRenderer {
     public String visit(DefaultValues item) {
         return defaultValuesStrategy.render(item, this);
     }
+    
+    @Override
+    public String visit(ReferencesItem item) {
+        return referencesItemStrategy.render(item, this);
+    }
 
     @Override
     public String visit(TableDefinition item) {
@@ -711,4 +725,22 @@ public class SqlRendererImpl implements SqlRenderer {
     public String visit(UniqueConstraint constraint) {
         return uniqueConstraintStrategy.render(constraint, this);
     }
+
+    @Override
+    public String visit(ForeignKeyConstraint constraint) {
+        return foreignKeyConstraintStrategy.render(constraint, this);
+    }
+
+    @Override
+    public String visit(CheckConstraint constraint) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visit(DefaultConstraint constraint) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
