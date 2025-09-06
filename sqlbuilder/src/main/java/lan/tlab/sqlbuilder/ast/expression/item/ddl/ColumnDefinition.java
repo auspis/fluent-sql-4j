@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.visitor.Visitable;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.Singular;
 
 @Builder
 @Getter
@@ -14,10 +15,11 @@ public class ColumnDefinition implements Visitable {
     private static final String YYYY_MM_DD = "YYYY-MM-dd";
 
     private final String name;
+    @Singular
     private final List<Constraint> constraints;
 
     @Default
-    private final Type type = Type.STRING;
+    private final Type type = Type.VARCHAR;
 
     // TODO: aaa - move the following fields in a "ColumnMetadata" class
     @Deprecated
@@ -28,21 +30,30 @@ public class ColumnDefinition implements Visitable {
     private final String businessFormat = "";
 
     public enum Type {
-        STRING,
-        INTEGER,
-        DATE
+        // numbers
+        INTEGER, SMALLINT, BIGINT, DECIMAL, NUMERIC, FLOAT, REAL, DOUBLE_PRECISION,
+        // strings
+        CHAR, VARCHAR, CHARACTER, CHARACTER_VARYING,
+        // binary
+        BINARY, VARBINARY,
+        // dates
+        DATE, TIME, TIMESTAMP, TIME_WITH_TIME_ZONE, TIMESTAMP_WITH_TIME_ZONE,
+        // boolean
+        BOOLEAN,
+        // others
+        INTERVAL, XML, ARRAY, MULTISET, ROW, UDT
     }
-
+    
     public static ColumnDefinition nullObject() {
         return builder().build();
     }
 
     public static ColumnDefinition string(String name) {
-        return columnBuilder(name, name, Type.STRING).build();
+        return columnBuilder(name, name, Type.VARCHAR).build();
     }
 
     public static ColumnDefinition string(String businessName, String name) {
-        return columnBuilder(businessName, name, Type.STRING).build();
+        return columnBuilder(businessName, name, Type.VARCHAR).build();
     }
 
     public static ColumnDefinition integer(String name) {
