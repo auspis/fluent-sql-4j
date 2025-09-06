@@ -133,6 +133,8 @@ import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.Reference
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.TableDefinitionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.TableRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.UpdateItemRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.CheckConstraintRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.DefaultConstraintRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.ForeignKeyConstraintRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.NotNullConstraintRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.PrimaryKeyDefinitionRenderStrategy;
@@ -372,6 +374,12 @@ public class SqlRendererImpl implements SqlRenderer {
 
     @Default
     private final ForeignKeyConstraintRenderStrategy foreignKeyConstraintStrategy = new ForeignKeyConstraintRenderStrategy();
+    
+    @Default
+    private final CheckConstraintRenderStrategy checkConstraintStrategy = new CheckConstraintRenderStrategy();
+    
+    @Default
+    private final DefaultConstraintRenderStrategy defaultConstraintStrategy = new DefaultConstraintRenderStrategy();
 
     // statements
     @Override
@@ -733,14 +741,12 @@ public class SqlRendererImpl implements SqlRenderer {
 
     @Override
     public String visit(CheckConstraint constraint) {
-        // TODO Auto-generated method stub
-        return null;
+        return checkConstraintStrategy.render(constraint, this);
     }
 
     @Override
     public String visit(DefaultConstraint constraint) {
-        // TODO Auto-generated method stub
-        return null;
+        return defaultConstraintStrategy.render(constraint, this);
     }
 
 }
