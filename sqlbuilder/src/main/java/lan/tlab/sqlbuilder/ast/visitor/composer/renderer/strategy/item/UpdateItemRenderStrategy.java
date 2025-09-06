@@ -1,0 +1,12 @@
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item;
+
+import lan.tlab.sqlbuilder.ast.expression.item.UpdateItem;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
+
+public class UpdateItemRenderStrategy implements SqlItemRenderStrategy {
+
+    public String render(UpdateItem item, SqlRenderer sqlRenderer) {
+        return String.format(
+                "%s = %s", item.getColumn().accept(sqlRenderer), item.getValue().accept(sqlRenderer));
+    }
+}

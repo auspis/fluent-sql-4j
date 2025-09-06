@@ -1,0 +1,35 @@
+package lan.tlab.sqlbuilder.ast.clause.groupby;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+import lan.tlab.sqlbuilder.ast.clause.Clause;
+import lan.tlab.sqlbuilder.ast.expression.Expression;
+import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+public class GroupBy implements Clause {
+
+    @Default
+    private final List<Expression> groupingExpressions = new ArrayList<>();
+
+    public static GroupBy of(Expression... expressions) {
+        return of(Stream.of(expressions).toList());
+    }
+
+    public static GroupBy of(List<Expression> expressions) {
+        return new GroupBy(expressions);
+    }
+
+    @Override
+    public <T> T accept(SqlVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+}
