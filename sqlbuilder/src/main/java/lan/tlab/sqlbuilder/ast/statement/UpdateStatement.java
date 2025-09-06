@@ -1,0 +1,26 @@
+package lan.tlab.sqlbuilder.ast.statement;
+
+import java.util.List;
+import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.expression.item.UpdateItem;
+import lan.tlab.sqlbuilder.ast.expression.set.TableExpression;
+import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+
+@Builder
+@Getter
+public class UpdateStatement implements DataManipulationStatement {
+
+    private final TableExpression table;
+    private final List<UpdateItem> set;
+
+    @Default
+    private final Where where = Where.builder().build();
+
+    @Override
+    public <T> T accept(SqlVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+}

@@ -1,0 +1,39 @@
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class PrimaryKeyDefinitionRenderStrategyTest {
+
+    private PrimaryKeyDefinitionRenderStrategy strategy;
+    private SqlRenderer renderer;
+
+    @BeforeEach
+    void setUp() {
+        strategy = new PrimaryKeyDefinitionRenderStrategy();
+        renderer = SqlRendererFactory.standardSql2008();
+    }
+
+    @Test
+    void singleColumn() {
+        PrimaryKey pk = PrimaryKey.builder().column("id").build();
+
+        String sql = strategy.render(pk, renderer);
+        assertThat(sql).isEqualTo("PRIMARY KEY (\"id\")");
+    }
+
+    @Test
+    void composite() {
+        PrimaryKey pk =
+                PrimaryKey.builder().columns(List.of("author_id", "book_id")).build();
+
+        String sql = strategy.render(pk, renderer);
+        assertThat(sql).isEqualTo("PRIMARY KEY (\"author_id\", \"book_id\")");
+    }
+}
