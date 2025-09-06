@@ -1,24 +1,19 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item;
 
+import java.util.stream.Collectors;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition.Type;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 
 public class ColumnDefinitionRenderStrategy implements SqlItemRenderStrategy {
 
     public String render(ColumnDefinition item, SqlRenderer sqlRenderer) {
-        StringBuilder builder = new StringBuilder();
-
-        // Rende il nome della colonna
-        builder.append(sqlRenderer.getEscapeStrategy().apply(item.getName()));
-
-        // Rende il tipo di dato
-        builder.append(" ").append(item.getType());
-
-        // Aggiunge i vincoli
-        if (item.isNotNull()) {
-            builder.append(" NOT NULL");
-        }
-
-        return builder.toString();
+        String columnName = sqlRenderer.getEscapeStrategy().apply(item.getName());
+        Type type = item.getType();
+        String constraints = item.getConstraints()
+                .stream()
+                .map(c -> c.accept(sqlRenderer))
+                .collect(Collectors.joining(", "));
+        return String.format("%s %s %s", columnName, type, constraints).trim();
     }
 }
