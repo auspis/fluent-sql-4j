@@ -1,0 +1,64 @@
+package lan.tlab.sqlbuilder.ast.expression.item.ddl;
+
+import java.util.List;
+import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitable;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+
+@Builder
+@Getter
+public class ColumnDefinition implements Visitable {
+
+    private static final String YYYY_MM_DD = "YYYY-MM-dd";
+
+    private final String name;
+    private final List<Constraint> constraints;
+
+    @Default
+    private final Type type = Type.STRING;
+
+    // TODO: aaa - move the following fields in a "ColumnMetadata" class
+    @Deprecated
+    private final String businessName;
+
+    @Deprecated
+    @Default
+    private final String businessFormat = "";
+
+    public enum Type {
+        STRING,
+        INTEGER,
+        DATE
+    }
+
+    public static ColumnDefinition nullObject() {
+        return builder().build();
+    }
+
+    public static ColumnDefinition string(String name) {
+        return columnBuilder(name, name, Type.STRING).build();
+    }
+
+    public static ColumnDefinition string(String businessName, String name) {
+        return columnBuilder(businessName, name, Type.STRING).build();
+    }
+
+    public static ColumnDefinition integer(String name) {
+        return columnBuilder(name, name, Type.INTEGER).build();
+    }
+
+    public static ColumnDefinition date(String name) {
+        return columnBuilder(name, name, Type.DATE).businessFormat(YYYY_MM_DD).build();
+    }
+
+    private static ColumnDefinitionBuilder columnBuilder(String businessName, String name, Type type) {
+        return builder().businessName(businessName).name(name).type(type);
+    }
+
+    @Override
+    public <T> T accept(SqlVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+}

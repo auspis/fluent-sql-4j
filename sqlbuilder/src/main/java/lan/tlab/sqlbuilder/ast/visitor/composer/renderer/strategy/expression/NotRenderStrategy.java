@@ -1,0 +1,11 @@
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression;
+
+import lan.tlab.sqlbuilder.ast.expression.bool.logical.Not;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
+
+public class NotRenderStrategy implements ExpressionRenderStrategy {
+
+    public String render(Not expression, SqlRenderer sqlRenderer) {
+        return String.format("NOT (%s)", expression.getExpression().accept(sqlRenderer));
+    }
+}
