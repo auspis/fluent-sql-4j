@@ -1,0 +1,192 @@
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.statement;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.util.List;
+import lan.tlab.sqlbuilder.ast.clause.from.From;
+import lan.tlab.sqlbuilder.ast.clause.selection.Select;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
+import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertSource;
+import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
+import lan.tlab.sqlbuilder.ast.expression.item.Table;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
+import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
+import lan.tlab.sqlbuilder.ast.expression.set.SetExpression;
+import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
+import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
+import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class InsertStatementRenderStrategyTest {
+
+    private InsertStatementRenderStrategy strategy;
+    private SqlRenderer renderer;
+
+    @BeforeEach
+    public void setUp() {
+        strategy = new InsertStatementRenderStrategy();
+        renderer = SqlRendererFactory.standardSql2008();
+    }
+
+    @Test
+    void ok() {
+        InsertStatement statement = InsertStatement.builder()
+                .table(new Table("Logs"))
+                .columns(List.of(
+                        ColumnReference.of("Logs", "message"),
+                        ColumnReference.of("Logs", "statusCode"),
+                        ColumnReference.of("Logs", "createdAt")))
+                .data(InsertValues.of(Literal.of("Success"), Literal.of(200), Literal.of(LocalDate.of(2025, 8, 28))))
+                .build();
+
+        String sql = strategy.render(statement, renderer);
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+			INSERT INTO \"Logs\" \
+			(\"Logs\".\"message\", \"Logs\".\"statusCode\", \"Logs\".\"createdAt\") \
+			VALUES ('Success', 200, '2025-08-28')\
+			""");
+    }
+
+    @Test
+    void noColumns() {
+        InsertStatement statement = InsertStatement.builder()
+                .table(new Table("Logs"))
+                .data(InsertValues.of(Literal.of("Success"), Literal.of(200), Literal.of(LocalDate.of(2025, 8, 28))))
+                .build();
+
+        String sql = strategy.render(statement, renderer);
+
+        assertThat(sql).isEqualTo("""
+			INSERT INTO \"Logs\" VALUES ('Success', 200, '2025-08-28')\
+			""");
+    }
+
+    @Test
+    void defaultValues() {
+        InsertStatement statement =
+                InsertStatement.builder().table(new Table("Logs")).build();
+
+        String sql = strategy.render(statement, renderer);
+        assertThat(sql).isEqualTo("INSERT INTO \"Logs\" DEFAULT VALUES");
+    }
+
+    @Test
+    void valuesAndFunctions() {
+        InsertStatement statement = InsertStatement.builder()
+                .table(new Table("Logs"))
+                .columns(List.of(
+                        ColumnReference.of("Logs", "message"),
+                        ColumnReference.of("Logs", "statusCode"),
+                        ColumnReference.of("Logs", "createdAt")))
+                .data(InsertValues.of(Literal.of("Success"), Literal.of(200), new CurrentDate()))
+                .build();
+
+        String sql = strategy.render(statement, renderer);
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+			INSERT INTO \"Logs\" \
+			(\"Logs\".\"message\", \"Logs\".\"statusCode\", \"Logs\".\"createdAt\") \
+			VALUES ('Success', 200, CURRENT_DATE())\
+			""");
+    }
+
+    @Test
+    void fromSelect() {
+        SelectStatement select = SelectStatement.builder()
+                .select(Select.builder()
+                        .projection(new ScalarExpressionProjection(ColumnReference.of("Logs", "message")))
+                        .build())
+                .from(From.fromTable("Logs"))
+                .build();
+
+        InsertStatement statement = InsertStatement.builder()
+                .table(new Table("Archive"))
+                .data(new InsertSource(select))
+                .build();
+
+        String sql = strategy.render(statement, renderer);
+        assertThat(sql)
+                .isEqualTo("""
+			INSERT INTO \"Archive\" \
+			SELECT \"Logs\".\"message\" FROM \"Logs\"\
+			""");
+    }
+
+    @Test
+    void fromSubquery() {
+        SelectStatement select1 = SelectStatement.builder()
+                .select(Select.builder()
+                        .projection(new ScalarExpressionProjection(ColumnReference.of("Customer_current", "id")))
+                        .projection(new ScalarExpressionProjection(ColumnReference.of("Customer_current", "name")))
+                        .build())
+                .from(From.fromTable("Customer_current"))
+                .build();
+        SelectStatement select2 = SelectStatement.builder()
+                .select(Select.builder()
+                        .projection(new ScalarExpressionProjection(ColumnReference.of("Customer_previous", "id")))
+                        .projection(new ScalarExpressionProjection(ColumnReference.of("Customer_previous", "name")))
+                        .build())
+                .from(From.fromTable("Customer_previous"))
+                .build();
+
+        SetExpression union = UnionExpression.union(select1, select2);
+
+        InsertStatement statement = InsertStatement.builder()
+                .table(new Table("Archive"))
+                .columns(List.of(ColumnReference.of("Archive", "id"), ColumnReference.of("Archive", "name")))
+                .data(new InsertSource(union))
+                .build();
+
+        String sql = strategy.render(statement, renderer);
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+			INSERT INTO \"Archive\" (\"Archive\".\"id\", \"Archive\".\"name\") \
+			(\
+			(SELECT \"Customer_current\".\"id\", \"Customer_current\".\"name\" FROM \"Customer_current\") \
+			UNION \
+			(SELECT \"Customer_previous\".\"id\", \"Customer_previous\".\"name\" FROM \"Customer_previous\")\
+			)\
+			""");
+    }
+
+    @Test
+    void insertWithSpecialTableName() {
+        InsertStatement statement = InsertStatement.builder()
+                .table(new Table("Order"))
+                .data(InsertValues.of(Literal.of("Test")))
+                .build();
+
+        String sql = strategy.render(statement, renderer);
+        assertThat(sql).isEqualTo("INSERT INTO \"Order\" VALUES ('Test')");
+    }
+
+    @Test
+    void specialColumnNames() {
+        InsertStatement statement = InsertStatement.builder()
+                .table(new Table("Logs"))
+                .columns(List.of(ColumnReference.of("Logs", "select"), ColumnReference.of("Logs", "from")))
+                .data(InsertValues.of(Literal.of("A"), Literal.of("B")))
+                .build();
+
+        String sql = strategy.render(statement, renderer);
+        assertThat(sql)
+                .isEqualTo(
+                        """
+			INSERT INTO \"Logs\" \
+			(\"Logs\".\"select\", \"Logs\".\"from\") \
+			VALUES ('A', 'B')\
+			""");
+    }
+}
