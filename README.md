@@ -1,62 +1,67 @@
-# r4j - Repository 4 Java
+# r4j - Repo4J
 
-## install GIT hook
+## Project structure
 
-To reduce conflicts an hook is provided to automatically format code with spotless on each commit.
+The project is split into Maven modules:
+- `sqlbuilder`: contains the main code and unit tests
+- `test-integration`: contains only integration tests (slow, using Testcontainers)
+
+## Install GIT hook
+
+To reduce conflicts, a hook is provided to automatically format code with Spotless on each commit.
 
 ```bash
 ./mvnw process-resources
 ```
 
-## manually format code
+## Manually format code
 
 ```bash
 ./mvnw spotless:apply
 ```
 
-**Note**: the **git-build-hook-maven-plugin** is configured to automatically install a hook to format the code as soon as the `validate` phase is invoked (eg `./mvnw verify -DskipTests`).
+## Run tests
 
-## run tests
-
-* the **maven-surefire-plugin** is configured to:
-  * skip integration tests
-  * skip unit tests if the property `skip.unit.tests` is `true`
-* the **maven-failsafe-plugin** is configured to run only integration tests
-* the **integration tests** are those whose file name ends in **IT.java**
-
-### run only unit tests
+### To run unit  tests
 
 ```bash
-./mvnw -am -pl :sqlbuilder test
+./mvnw test
 ```
+
+### To run all tests (unit + integration)
 
 ```bash
-./mvnw -am -pl :sqlbuilder package
+./mvnw verify
 ```
+
+## Integration test naming convention
+
+Integration tests must use the `*IT.java` suffix (e.g. `MyFeatureIT.java`).
+This is required for the Maven Failsafe Plugin to detect and execute them correctly.
+
+## How to run only integration tests
+
+To run only the integration tests (without running unit tests in other modules):
 
 ```bash
-./mvnw -am -pl :sqlbuilder install
+./mvnw verify -pl test-integration -am -DskipTests
 ```
 
-### run only integration tests
+This will:
+- Build all required modules (using `-am`)
+- Skip unit tests in dependencies (using `-DskipTests`)
+- Run only the integration tests in `test-integration` (using Failsafe)
 
-```bash
-./mvnw -am -pl :sqlbuilder verify -Dskip.unit.tests=true
-```
+### Technical details
 
-or
-
-```bash
-./mvnw -am -pl :sqlbuilder integration-test -Dskip.unit.tests=true
-```
-
-### run unit and integration tests
-
-```bash
-./mvnw -am -pl :sqlbuilder verify
-```
-
-```bash
-./mvnw -am -pl :sqlbuilder integration-test
-```
+- Running `./mvnw test` will execute **only the unit tests** in the `sqlbuilder` module.
+- Integration tests are **NOT** executed, because they are in a separate module (`test-integration`) that contains only tests and no production code.
+- Integration tests are located only in the `test-integration` module.
+- The `test-integration` module depends on `sqlbuilder` and contains all the necessary dependencies for testing (JUnit, Testcontainers, etc).
+- The standard build cycle (`test`, `package`, `install`) on `sqlbuilder` excludes integration tests.
+- The build cycle on `test-integration` runs only the integration tests.
+- Integration tests must be named with the `*IT.java` suffix.
+- The Maven Failsafe Plugin is configured to run only these tests in the `test-integration` module.
+- Surefire is configured to exclude `*IT.java` files.
+- This ensures a clear separation between unit and integration tests.
 
