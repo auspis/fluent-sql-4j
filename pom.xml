@@ -8,6 +8,7 @@
 
   <modules>
     <module>sqlbuilder</module>
+    <module>test-integration</module>
   </modules>
 
   <properties>
