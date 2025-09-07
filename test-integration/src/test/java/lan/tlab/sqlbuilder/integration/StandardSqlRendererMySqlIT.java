@@ -108,10 +108,10 @@ public class StandardSqlRendererMySqlIT {
         assertThat(sql)
                 .isEqualTo(
                         """
-    				SELECT `Customer`.`name` \
-    				FROM `Customer` \
-    				WHERE `Customer`.`name` != 'Alice'\
-    				""");
+        				SELECT `Customer`.`name` \
+        				FROM `Customer` \
+        				WHERE `Customer`.`name` != 'Alice'\
+        				""");
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             assertThat(rs.next()).isTrue();
