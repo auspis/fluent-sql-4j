@@ -13,8 +13,8 @@ public class Index implements SqlItem {
 
     private final String name;
     private final List<String> columnNames;
-    
-    public Index(String name, String ... columns) {
+
+    public Index(String name, String... columns) {
         this(name, Stream.of(columns).toList());
     }
 

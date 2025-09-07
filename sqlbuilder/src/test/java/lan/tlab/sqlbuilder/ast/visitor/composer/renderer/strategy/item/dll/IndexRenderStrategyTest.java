@@ -1,11 +1,12 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Index;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class IndexRenderStrategyTest {
 
@@ -31,5 +32,4 @@ class IndexRenderStrategyTest {
         String sql = strategy.render(index, renderer);
         assertThat(sql).isEqualTo("INDEX \"idx_name_age\" (\"name\", \"age\")");
     }
-
 }

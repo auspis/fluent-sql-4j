@@ -25,10 +25,7 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
         if (indexes == null || indexes.isEmpty()) {
             return "";
         }
-        return ", " + indexes
-                .stream()
-                .map(sqlRenderer::visit)
-                .collect(Collectors.joining(", "));
+        return ", " + indexes.stream().map(sqlRenderer::visit).collect(Collectors.joining(", "));
     }
 
     private String primaryKey(PrimaryKey primaryKey, SqlRenderer sqlRenderer) {
