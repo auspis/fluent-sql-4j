@@ -24,5 +24,4 @@ public class TestTableFactory {
                 .column(ColumnDefinitionBuilder.integer("level").build())
                 .build();
     }
-
 }

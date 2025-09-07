@@ -13,8 +13,6 @@ public class IndexRenderStrategy implements SqlItemRenderStrategy {
         return String.format(
                 "INDEX %s (%s)",
                 escapeStrategy.apply(index.getName()),
-                index.getColumnNames().stream()
-                        .map(escapeStrategy::apply)
-                        .collect(Collectors.joining(", ")));
+                index.getColumnNames().stream().map(escapeStrategy::apply).collect(Collectors.joining(", ")));
     }
 }

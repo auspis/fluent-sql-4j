@@ -16,8 +16,10 @@ import lombok.experimental.Tolerate;
 public class ColumnDefinition implements Visitable {
 
     private final String name;
+
     @Default
     private final DataType type = DataType.VARCHAR_255;
+
     @Singular
     private final List<Constraint> constraints;
 
@@ -25,9 +27,8 @@ public class ColumnDefinition implements Visitable {
         return builder().build();
     }
 
-
     public static class ColumnDefinitionBuilder {
-        
+
         public static ColumnDefinitionBuilder integer(String name) {
             return builder(name, DataType.INTEGER);
         }
@@ -39,19 +40,15 @@ public class ColumnDefinition implements Visitable {
         public static ColumnDefinitionBuilder date(String name) {
             return builder(name, DataType.DATE);
         }
-        
     }
-    
+
     @Tolerate
     public static ColumnDefinitionBuilder builder(String name, DataType type) {
-        return builder()
-                .name(name)
-                .type(type);
+        return builder().name(name).type(type);
     }
 
     @Override
     public <T> T accept(SqlVisitor<T> visitor) {
         return visitor.visit(this);
     }
-
 }

@@ -21,9 +21,10 @@ public class TableDefinition implements Visitable {
     private final List<ColumnDefinition> columns;
 
     private final PrimaryKey primaryKey;
+
     @Singular
     private final List<Index> indexes;
-    
+
     @Override
     public <T> T accept(SqlVisitor<T> visitor) {
         return visitor.visit(this);

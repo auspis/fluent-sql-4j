@@ -215,7 +215,7 @@ public interface SqlVisitor<T> {
     T visit(InsertSource item);
 
     T visit(DefaultValues item);
-    
+
     T visit(ReferencesItem item);
 
     T visit(TableDefinition item);
@@ -239,7 +239,4 @@ public interface SqlVisitor<T> {
     T visit(CheckConstraint constraint);
 
     T visit(DefaultConstraint constraint);
-
-
-
 }

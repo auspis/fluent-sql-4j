@@ -9,8 +9,8 @@ public class ParameterizedDataTypeRenderStrategy implements SqlItemRenderStrateg
 
     public String render(ParameterizedDataType type, SqlRenderer sqlRenderer) {
         return String.format(
-                "%s(%s)", 
-                type.getName(), 
+                "%s(%s)",
+                type.getName(),
                 type.getParameters().stream()
                         .map(param -> param.accept(sqlRenderer))
                         .collect(Collectors.joining(", ")));
