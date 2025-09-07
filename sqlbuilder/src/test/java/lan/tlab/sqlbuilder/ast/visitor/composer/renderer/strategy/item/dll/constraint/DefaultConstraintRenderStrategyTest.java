@@ -1,13 +1,13 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.DefaultConstraintRenderStrategy;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class DefaultConstraintRenderStrategyTest {
 
@@ -26,7 +26,7 @@ class DefaultConstraintRenderStrategyTest {
         String sql = strategy.render(constraint, renderer);
         assertThat(sql).isEqualTo("DEFAULT 'def-val'");
     }
-    
+
     @Test
     void number() {
         DefaultConstraint constraint = new DefaultConstraint(Literal.of(42));

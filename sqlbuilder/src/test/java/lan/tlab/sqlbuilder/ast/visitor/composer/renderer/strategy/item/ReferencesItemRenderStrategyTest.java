@@ -1,12 +1,13 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.ReferencesItemRenderStrategy;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ReferencesItemRenderStrategyTest {
 
@@ -25,7 +26,7 @@ class ReferencesItemRenderStrategyTest {
         String sql = strategy.render(item, renderer);
         assertThat(sql).isEqualTo("REFERENCES \"order_product\" (\"order_id\")");
     }
-    
+
     @Test
     void manyColumns() {
         ReferencesItem item = new ReferencesItem("order_product", "order_id", "product_id");

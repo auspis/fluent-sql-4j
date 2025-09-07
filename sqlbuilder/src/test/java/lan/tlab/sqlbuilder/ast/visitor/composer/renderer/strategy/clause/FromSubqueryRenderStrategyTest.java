@@ -1,8 +1,7 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.clause;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSubquery;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
@@ -13,6 +12,8 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class FromSubqueryRenderStrategyTest {
 
@@ -41,8 +42,7 @@ class FromSubqueryRenderStrategyTest {
         SelectStatement subquery = SelectStatement.builder()
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("Customer", "db_name"), new As("name")),
-                        new ScalarExpressionProjection(ColumnReference.of("Customer", "score"), new As("score"))
-                 ))
+                        new ScalarExpressionProjection(ColumnReference.of("Customer", "score"), new As("score"))))
                 .from(From.builder().source(new Table("Customer")).build())
                 .build();
         FromSubquery fromSubquery = FromSubquery.of(subquery, "tmp");

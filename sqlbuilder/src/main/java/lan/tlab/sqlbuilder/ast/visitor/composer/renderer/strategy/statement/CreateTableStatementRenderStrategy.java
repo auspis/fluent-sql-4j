@@ -6,8 +6,6 @@ import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 public class CreateTableStatementRenderStrategy implements StatementRenderStrategy {
 
     public String render(CreateTableStatement statement, SqlRenderer sqlRenderer) {
-        return String.format(
-                "CREATE TABLE %s",
-                statement.getTableDefinition().accept(sqlRenderer));
+        return String.format("CREATE TABLE %s", statement.getTableDefinition().accept(sqlRenderer));
     }
 }

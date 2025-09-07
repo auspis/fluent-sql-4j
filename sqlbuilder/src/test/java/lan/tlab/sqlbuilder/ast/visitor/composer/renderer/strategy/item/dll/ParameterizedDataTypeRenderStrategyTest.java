@@ -1,15 +1,16 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.SimpleDataType;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ParameterizedDataTypeRenderStrategyTest {
 
@@ -32,7 +33,7 @@ class ParameterizedDataTypeRenderStrategyTest {
         sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("CHARACTER VARYING(255)");
     }
-    
+
     @Test
     void character() {
         ParameterizedDataType dataType = new ParameterizedDataType("CHARACTER", List.of(Literal.of(5)));
@@ -50,21 +51,21 @@ class ParameterizedDataTypeRenderStrategyTest {
         String sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("DECIMAL(10, 2)");
     }
-    
+
     @Test
     void numeric() {
         ParameterizedDataType dataType = new ParameterizedDataType("NUMERIC", List.of(Literal.of(5), Literal.of(2)));
         String sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("NUMERIC(5, 2)");
     }
-    
+
     @Test
     void binary() {
         ParameterizedDataType dataType = new ParameterizedDataType("BINARY", List.of(Literal.of(16)));
         String sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("BINARY(16)");
     }
-    
+
     @Test
     void varbinary() {
         ParameterizedDataType dataType = new ParameterizedDataType("VARBINARY", List.of(Literal.of(128)));
@@ -78,14 +79,14 @@ class ParameterizedDataTypeRenderStrategyTest {
         String sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("INTERVAL(3)");
     }
-    
+
     @Test
     void timeWithTimeZone() {
         ParameterizedDataType dataType = new ParameterizedDataType("TIME WITH TIME ZONE", List.of(Literal.of(3)));
         String sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("TIME WITH TIME ZONE(3)");
     }
-    
+
     @Test
     void timestampWithTimeZone() {
         ParameterizedDataType dataType = new ParameterizedDataType("TIMESTAMP WITH TIME ZONE", List.of(Literal.of(3)));
@@ -97,11 +98,11 @@ class ParameterizedDataTypeRenderStrategyTest {
     void array() {
         ParameterizedDataType varcharType = new ParameterizedDataType("VARCHAR", List.of(Literal.of(50)));
         ParameterizedDataType arrayType = new ParameterizedDataType("ARRAY", List.of(varcharType, Literal.of(10)));
-            
+
         String sql = strategy.render(arrayType, renderer);
         assertThat(sql).isEqualTo("ARRAY(VARCHAR(50), 10)");
     }
-    
+
     @Test
     void multiset() {
         SimpleDataType integerType = new SimpleDataType("INTEGER");
@@ -109,7 +110,7 @@ class ParameterizedDataTypeRenderStrategyTest {
         String sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("MULTISET(INTEGER)");
     }
-    
+
     @Test
     void row() {
         ParameterizedDataType varchar100Type = new ParameterizedDataType("VARCHAR", List.of(Literal.of(100)));
@@ -118,5 +119,4 @@ class ParameterizedDataTypeRenderStrategyTest {
         String sql = strategy.render(dataType, renderer);
         assertThat(sql).isEqualTo("ROW(VARCHAR(100), VARCHAR(50))");
     }
-
 }

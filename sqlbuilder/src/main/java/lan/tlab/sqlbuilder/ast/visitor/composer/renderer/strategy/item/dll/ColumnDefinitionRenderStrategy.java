@@ -10,10 +10,8 @@ public class ColumnDefinitionRenderStrategy implements SqlItemRenderStrategy {
     public String render(ColumnDefinition item, SqlRenderer sqlRenderer) {
         String columnName = sqlRenderer.getEscapeStrategy().apply(item.getName());
         String type = item.getType().accept(sqlRenderer);
-        String constraints = item.getConstraints()
-                .stream()
-                .map(c -> c.accept(sqlRenderer))
-                .collect(Collectors.joining(", "));
+        String constraints =
+                item.getConstraints().stream().map(c -> c.accept(sqlRenderer)).collect(Collectors.joining(", "));
         return String.format("%s %s %s", columnName, type, constraints).trim();
     }
 }

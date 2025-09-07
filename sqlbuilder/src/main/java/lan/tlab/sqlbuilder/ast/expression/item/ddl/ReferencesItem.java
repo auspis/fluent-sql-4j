@@ -10,11 +10,11 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class ReferencesItem implements SqlItem {
-    
+
     private final String table;
     private final List<String> columns;
-    
-    public ReferencesItem(String table, String ... columns) {
+
+    public ReferencesItem(String table, String... columns) {
         this(table, Stream.of(columns).toList());
     }
 
@@ -22,5 +22,4 @@ public class ReferencesItem implements SqlItem {
     public <T> T accept(SqlVisitor<T> visitor) {
         return visitor.visit(this);
     }
-
 }

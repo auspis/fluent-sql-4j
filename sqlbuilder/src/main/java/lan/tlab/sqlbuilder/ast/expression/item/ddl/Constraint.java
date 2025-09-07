@@ -19,10 +19,10 @@ public interface Constraint extends SqlItem {
         @Singular
         private final List<String> columns;
 
-        public PrimaryKey(String ... columns) {
+        public PrimaryKey(String... columns) {
             this(Stream.of(columns).toList());
         }
-        
+
         @Override
         public <T> T accept(SqlVisitor<T> visitor) {
             return visitor.visit(this);
@@ -68,7 +68,7 @@ public interface Constraint extends SqlItem {
     @AllArgsConstructor
     @Getter
     public static class CheckConstraint implements Constraint {
-        private final BooleanExpression expression; 
+        private final BooleanExpression expression;
 
         @Override
         public <T> T accept(SqlVisitor<T> visitor) {

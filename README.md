@@ -1,9 +1,14 @@
-# wiki
+# r4j - Repository 4 Java
 
-* [monorepo](./data/WIKI/MONOREPO/README.md)
-* [deploy](./data/WIKI/DEPLOY/README.md)
+## install GIT hook
 
-## format code
+To reduce conflicts an hook is provided to automatically format code with spotless on each commit.
+
+```bash
+./mvnw process-resources
+```
+
+## manually format code
 
 ```bash
 ./mvnw spotless:apply

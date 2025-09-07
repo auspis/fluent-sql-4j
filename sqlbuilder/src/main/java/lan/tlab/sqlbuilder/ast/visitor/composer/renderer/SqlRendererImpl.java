@@ -175,17 +175,20 @@ public class SqlRendererImpl implements SqlRenderer {
     private final DeleteStatementRenderStrategy deleteStatementStrategy = new DeleteStatementRenderStrategy();
 
     @Default
-    private final CreateTableStatementRenderStrategy createTableStatementStrategy = new CreateTableStatementRenderStrategy();
+    private final CreateTableStatementRenderStrategy createTableStatementStrategy =
+            new CreateTableStatementRenderStrategy();
 
     // clause
     @Default
     private final SelectRenderStrategy selectStrategy = new SelectRenderStrategy();
 
     @Default
-    private final AggregationFunctionProjectionRenderStrategy aggregationFunctionProjectionStrategy = new AggregationFunctionProjectionRenderStrategy();
+    private final AggregationFunctionProjectionRenderStrategy aggregationFunctionProjectionStrategy =
+            new AggregationFunctionProjectionRenderStrategy();
 
     @Default
-    private final ScalarExpressionProjectionRenderStrategy scalarExpressionProjectionStrategy = new ScalarExpressionProjectionRenderStrategy();
+    private final ScalarExpressionProjectionRenderStrategy scalarExpressionProjectionStrategy =
+            new ScalarExpressionProjectionRenderStrategy();
 
     @Default
     private final FromRenderStrategy fromStrategy = new FromRenderStrategy();
@@ -358,7 +361,7 @@ public class SqlRendererImpl implements SqlRenderer {
 
     @Default
     private final DefaultValuesRenderStrategy defaultValuesStrategy = new DefaultValuesRenderStrategy();
-    
+
     @Default
     private final ReferencesItemRenderStrategy referencesItemStrategy = new ReferencesItemRenderStrategy();
 
@@ -367,16 +370,17 @@ public class SqlRendererImpl implements SqlRenderer {
 
     @Default
     private final ColumnDefinitionRenderStrategy columnDefinitionStrategy = new ColumnDefinitionRenderStrategy();
-    
+
     @Default
     private final SimpleDataTypeRenderStrategy simpleDataTypeStrategy = new SimpleDataTypeRenderStrategy();
-    
+
     @Default
-    private final ParameterizedDataTypeRenderStrategy parameterizedDataTypeStrategy = new ParameterizedDataTypeRenderStrategy();
+    private final ParameterizedDataTypeRenderStrategy parameterizedDataTypeStrategy =
+            new ParameterizedDataTypeRenderStrategy();
 
     @Default
     private final PrimaryKeyRenderStrategy primaryKeyStrategy = new PrimaryKeyRenderStrategy();
-    
+
     @Default
     private final IndexRenderStrategy indexStrategy = new IndexRenderStrategy();
 
@@ -387,11 +391,12 @@ public class SqlRendererImpl implements SqlRenderer {
     private final UniqueConstraintRenderStrategy uniqueConstraintStrategy = new UniqueConstraintRenderStrategy();
 
     @Default
-    private final ForeignKeyConstraintRenderStrategy foreignKeyConstraintStrategy = new ForeignKeyConstraintRenderStrategy();
-    
+    private final ForeignKeyConstraintRenderStrategy foreignKeyConstraintStrategy =
+            new ForeignKeyConstraintRenderStrategy();
+
     @Default
     private final CheckConstraintRenderStrategy checkConstraintStrategy = new CheckConstraintRenderStrategy();
-    
+
     @Default
     private final DefaultConstraintRenderStrategy defaultConstraintStrategy = new DefaultConstraintRenderStrategy();
 
@@ -717,7 +722,7 @@ public class SqlRendererImpl implements SqlRenderer {
     public String visit(DefaultValues item) {
         return defaultValuesStrategy.render(item, this);
     }
-    
+
     @Override
     public String visit(ReferencesItem item) {
         return referencesItemStrategy.render(item, this);
@@ -732,12 +737,12 @@ public class SqlRendererImpl implements SqlRenderer {
     public String visit(ColumnDefinition item) {
         return columnDefinitionStrategy.render(item, this);
     }
-    
+
     @Override
     public String visit(SimpleDataType type) {
         return simpleDataTypeStrategy.render(type, this);
     }
-    
+
     @Override
     public String visit(ParameterizedDataType type) {
         return parameterizedDataTypeStrategy.render(type, this);
@@ -747,7 +752,7 @@ public class SqlRendererImpl implements SqlRenderer {
     public String visit(PrimaryKey item) {
         return primaryKeyStrategy.render(item, this);
     }
-    
+
     @Override
     public String visit(Index index) {
         return indexStrategy.render(index, this);
@@ -777,5 +782,4 @@ public class SqlRendererImpl implements SqlRenderer {
     public String visit(DefaultConstraint constraint) {
         return defaultConstraintStrategy.render(constraint, this);
     }
-
 }

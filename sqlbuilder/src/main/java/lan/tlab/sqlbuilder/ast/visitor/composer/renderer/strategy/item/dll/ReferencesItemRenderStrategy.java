@@ -12,10 +12,7 @@ public class ReferencesItemRenderStrategy implements SqlItemRenderStrategy {
         EscapeStrategy escapeStrategy = sqlRenderer.getEscapeStrategy();
         return String.format(
                 "REFERENCES %s (%s)",
-                escapeStrategy.apply(item.getTable()), 
-                item.getColumns()
-                        .stream()
-                        .map(c -> escapeStrategy.apply(c))
-                        .collect(Collectors.joining(", ")));
+                escapeStrategy.apply(item.getTable()),
+                item.getColumns().stream().map(c -> escapeStrategy.apply(c)).collect(Collectors.joining(", ")));
     }
 }
