@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.ReferencesItemRenderStrategy;
 
 class ReferencesItemRenderStrategyTest {
 

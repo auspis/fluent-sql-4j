@@ -1,9 +1,10 @@
-package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item;
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll;
 
 import java.util.stream.Collectors;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.escape.EscapeStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.SqlItemRenderStrategy;
 
 public class ReferencesItemRenderStrategy implements SqlItemRenderStrategy {
 
