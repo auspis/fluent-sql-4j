@@ -13,6 +13,7 @@ import lombok.Getter;
 public class ColumnReference implements ScalarExpression {
 
     private final String table;
+
     @Default
     private final String column = "";
 
