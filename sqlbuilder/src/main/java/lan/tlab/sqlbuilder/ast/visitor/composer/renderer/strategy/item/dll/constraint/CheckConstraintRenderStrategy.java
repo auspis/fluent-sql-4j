@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint;
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint;
 
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;

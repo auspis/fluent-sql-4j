@@ -34,6 +34,9 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.ForeignKeyConstrai
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.SimpleDataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Index;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
@@ -125,20 +128,23 @@ import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression.Una
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression.UnaryStringRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression.UnionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.AsRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.ColumnDefinitionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.DefaultValuesRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.InsertSourceRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.InsertValueRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.ReferencesItemRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.TableDefinitionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.TableRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.UpdateItemRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.CheckConstraintRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.DefaultConstraintRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.ForeignKeyConstraintRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.NotNullConstraintRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.PrimaryKeyDefinitionRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint.UniqueConstraintRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.ColumnDefinitionRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.IndexRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.ParameterizedDataTypeRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.ReferencesItemRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.SimpleDataTypeRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.TableDefinitionRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.CheckConstraintRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.DefaultConstraintRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.ForeignKeyConstraintRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.NotNullConstraintRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.PrimaryKeyRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.UniqueConstraintRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.statement.CreateTableStatementRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.statement.DeleteStatementRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.statement.InsertStatementRenderStrategy;
@@ -361,10 +367,18 @@ public class SqlRendererImpl implements SqlRenderer {
 
     @Default
     private final ColumnDefinitionRenderStrategy columnDefinitionStrategy = new ColumnDefinitionRenderStrategy();
+    
+    @Default
+    private final SimpleDataTypeRenderStrategy simpleDataTypeStrategy = new SimpleDataTypeRenderStrategy();
+    
+    @Default
+    private final ParameterizedDataTypeRenderStrategy parameterizedDataTypeStrategy = new ParameterizedDataTypeRenderStrategy();
 
     @Default
-    private final PrimaryKeyDefinitionRenderStrategy primaryKeyDefinitionStrategy =
-            new PrimaryKeyDefinitionRenderStrategy();
+    private final PrimaryKeyRenderStrategy primaryKeyStrategy = new PrimaryKeyRenderStrategy();
+    
+    @Default
+    private final IndexRenderStrategy indexStrategy = new IndexRenderStrategy();
 
     @Default
     private final NotNullConstraintRenderStrategy notNullConstraintStrategy = new NotNullConstraintRenderStrategy();
@@ -718,10 +732,25 @@ public class SqlRendererImpl implements SqlRenderer {
     public String visit(ColumnDefinition item) {
         return columnDefinitionStrategy.render(item, this);
     }
+    
+    @Override
+    public String visit(SimpleDataType type) {
+        return simpleDataTypeStrategy.render(type, this);
+    }
+    
+    @Override
+    public String visit(ParameterizedDataType type) {
+        return parameterizedDataTypeStrategy.render(type, this);
+    }
 
     @Override
     public String visit(PrimaryKey item) {
-        return primaryKeyDefinitionStrategy.render(item, this);
+        return primaryKeyStrategy.render(item, this);
+    }
+    
+    @Override
+    public String visit(Index index) {
+        return indexStrategy.render(index, this);
     }
 
     @Override

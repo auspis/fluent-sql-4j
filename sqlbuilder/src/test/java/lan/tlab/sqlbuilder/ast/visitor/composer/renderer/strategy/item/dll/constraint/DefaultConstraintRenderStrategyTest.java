@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint;
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +7,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.DefaultConstraintRenderStrategy;
 
 class DefaultConstraintRenderStrategyTest {
 
