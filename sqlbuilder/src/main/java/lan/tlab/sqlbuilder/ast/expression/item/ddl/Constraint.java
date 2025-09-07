@@ -7,19 +7,22 @@ import lan.tlab.sqlbuilder.ast.expression.item.SqlItem;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
 
 public interface Constraint extends SqlItem {
 
-    @Builder
+    @AllArgsConstructor
     @Getter
     public static class PrimaryKey implements Constraint {
         @Singular
         private final List<String> columns;
 
+        public PrimaryKey(String ... columns) {
+            this(Stream.of(columns).toList());
+        }
+        
         @Override
         public <T> T accept(SqlVisitor<T> visitor) {
             return visitor.visit(this);

@@ -20,10 +20,10 @@ public class TableDefinition implements Visitable {
     @Singular
     private final List<ColumnDefinition> columns;
 
-    private final PrimaryKey primaryKey; // Null if no PK
-    // TODO: aaaa - implement indexes
-    // Add a list for other table-level constraints like indices
-
+    private final PrimaryKey primaryKey;
+    @Singular
+    private final List<Index> indexes;
+    
     @Deprecated
     public ColumnDefinition getColumnByBusinessName(String value) {
         return columns.stream()

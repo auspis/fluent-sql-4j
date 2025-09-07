@@ -1,10 +1,11 @@
-package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.constraint;
+package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.constraint.NotNullConstraintRenderStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

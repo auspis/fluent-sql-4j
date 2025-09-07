@@ -2,10 +2,10 @@ package lan.tlab.sqlbuilder.ast.statement;
 
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Builder
+@AllArgsConstructor
 @Getter
 public class CreateTableStatement implements Statement {
 

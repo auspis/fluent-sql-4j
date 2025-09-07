@@ -7,19 +7,20 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.Singular;
+import lombok.experimental.Tolerate;
 
-@Builder
+@Builder()
 @Getter
 public class ColumnDefinition implements Visitable {
 
-    private static final String YYYY_MM_DD = "YYYY-MM-dd";
+//    private static final String YYYY_MM_DD = "YYYY-MM-dd";
 
     private final String name;
+    @Default
+    private final DataType type = DataType.VARCHAR_255;
     @Singular
     private final List<Constraint> constraints;
 
-    @Default
-    private final Type type = Type.VARCHAR;
 
     // TODO: aaa - move the following fields in a "ColumnMetadata" class
     @Deprecated
@@ -28,48 +29,60 @@ public class ColumnDefinition implements Visitable {
     @Deprecated
     @Default
     private final String businessFormat = "";
-
-    public enum Type {
-        // numbers
-        INTEGER, SMALLINT, BIGINT, DECIMAL, NUMERIC, FLOAT, REAL, DOUBLE_PRECISION,
-        // strings
-        CHAR, VARCHAR, CHARACTER, CHARACTER_VARYING,
-        // binary
-        BINARY, VARBINARY,
-        // dates
-        DATE, TIME, TIMESTAMP, TIME_WITH_TIME_ZONE, TIMESTAMP_WITH_TIME_ZONE,
-        // boolean
-        BOOLEAN,
-        // others
-        INTERVAL, XML, ARRAY, MULTISET, ROW, UDT
-    }
     
+
     public static ColumnDefinition nullObject() {
         return builder().build();
     }
 
-    public static ColumnDefinition string(String name) {
-        return columnBuilder(name, name, Type.VARCHAR).build();
-    }
 
-    public static ColumnDefinition string(String businessName, String name) {
-        return columnBuilder(businessName, name, Type.VARCHAR).build();
-    }
+//    public static ColumnDefinition string(String name) {
+//        return columnBuilder(name, name, DataType.VARCHAR_255).build();
+//    }
+//
+//    public static ColumnDefinition string(String businessName, String name) {
+//        return columnBuilder(businessName, name, DataType.VARCHAR_255).build();
+//    }
+//
+//    public static ColumnDefinition integer(String name) {
+//        return columnBuilder(name, name, DataType.INTEGER).build();
+//    }
+//
+//    public static ColumnDefinition date(String name) {
+//        return columnBuilder(name, name, Type.DATE).businessFormat(YYYY_MM_DD).build();
+//    }
+//
+//    private static ColumnDefinitionBuilder columnBuilder(String businessName, String name, Type type) {
+//        return builder().businessName(businessName).name(name).type(type);
+//    }
 
-    public static ColumnDefinition integer(String name) {
-        return columnBuilder(name, name, Type.INTEGER).build();
-    }
+    public static class ColumnDefinitionBuilder {
+        
+        public static ColumnDefinitionBuilder integer(String name) {
+            return builder(name, DataType.INTEGER);
+        }
 
-    public static ColumnDefinition date(String name) {
-        return columnBuilder(name, name, Type.DATE).businessFormat(YYYY_MM_DD).build();
-    }
+        public static ColumnDefinitionBuilder varchar(String name) {
+            return builder(name, DataType.VARCHAR_255);
+        }
 
-    private static ColumnDefinitionBuilder columnBuilder(String businessName, String name, Type type) {
-        return builder().businessName(businessName).name(name).type(type);
+        public static ColumnDefinitionBuilder date(String name) {
+            return builder(name, DataType.DATE).businessFormat("YYYY-MM-dd");
+        }
+        
+    }
+    
+    @Tolerate
+    public static ColumnDefinitionBuilder builder(String name, DataType type) {
+        return builder()
+                .name(name)
+                .businessName(name)
+                .type(type);
     }
 
     @Override
     public <T> T accept(SqlVisitor<T> visitor) {
         return visitor.visit(this);
     }
+
 }
