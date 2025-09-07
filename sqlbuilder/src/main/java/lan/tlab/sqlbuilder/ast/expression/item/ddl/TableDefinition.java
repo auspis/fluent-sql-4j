@@ -24,14 +24,6 @@ public class TableDefinition implements Visitable {
     @Singular
     private final List<Index> indexes;
     
-    @Deprecated
-    public ColumnDefinition getColumnByBusinessName(String value) {
-        return columns.stream()
-                .filter(c -> c.getBusinessName().equals(value))
-                .findFirst()
-                .orElse(ColumnDefinition.nullObject());
-    }
-
     @Override
     public <T> T accept(SqlVisitor<T> visitor) {
         return visitor.visit(this);

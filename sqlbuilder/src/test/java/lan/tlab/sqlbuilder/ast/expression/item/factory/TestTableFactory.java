@@ -8,8 +8,8 @@ public class TestTableFactory {
     public static TableDefinition customer() {
         return TableDefinition.builder()
                 .name("Customer")
-                .column(ColumnDefinitionBuilder.varchar("name").businessName("db_name").build())
-                .column(ColumnDefinitionBuilder.varchar("surname").businessName("db_surname").build())
+                .column(ColumnDefinitionBuilder.varchar("db_name").build())
+                .column(ColumnDefinitionBuilder.varchar("db_surname").build())
                 .column(ColumnDefinitionBuilder.integer("score").build())
                 .column(ColumnDefinitionBuilder.integer("rating").build())
                 .column(ColumnDefinitionBuilder.date("birthdate").build())

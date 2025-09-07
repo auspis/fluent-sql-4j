@@ -1,10 +1,10 @@
 package lan.tlab.sqlbuilder.ast.expression.scalar;
 
-import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 
 @Builder
@@ -13,11 +13,8 @@ import lombok.Getter;
 public class ColumnReference implements ScalarExpression {
 
     private final String table;
-    private final String column;
-
-    public static ColumnReference of(TableDefinition table, String name) {
-        return of(table.getName(), table.getColumnByBusinessName(name).getName());
-    }
+    @Default
+    private final String column = "";
 
     public static ColumnReference of(String table, String name) {
         return builder().table(table).column(name).build();
