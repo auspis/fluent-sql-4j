@@ -13,6 +13,7 @@ public interface DataType extends SqlItem {
     ParameterizedDataType VARCHAR_255 = new ParameterizedDataType("VARCHAR", List.of(Literal.of(255)));
     SimpleDataType INTEGER = new SimpleDataType("INTEGER");
     SimpleDataType DATE = new SimpleDataType("DATE");
+    SimpleDataType TIMESTAMP = new SimpleDataType("TIMESTAMP");
 
     @AllArgsConstructor
     @Getter

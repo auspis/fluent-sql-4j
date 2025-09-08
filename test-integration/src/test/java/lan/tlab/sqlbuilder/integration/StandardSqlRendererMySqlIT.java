@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
@@ -15,8 +16,15 @@ import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
+import lan.tlab.sqlbuilder.ast.expression.item.Table;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
@@ -45,17 +53,27 @@ public class StandardSqlRendererMySqlIT {
         mysql.start();
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
         renderer = SqlRendererFactory.mysql();
-        // TODO: create table from Table object
+        // Create table using CreateTableStatement and renderer
+        CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
+                .table(new Table("Customer"))
+                .columns(List.of(
+                        ColumnDefinitionBuilder.integer("id").build(),
+                        ColumnDefinitionBuilder.varchar("name").build(),
+                        ColumnDefinitionBuilder.integer("score").build(),
+                        ColumnDefinition.builder("createdAt", DataType.TIMESTAMP)
+                                .build()))
+                .primaryKey(new PrimaryKey("id"))
+                .build());
+        String createTableSql = createTable.accept(renderer);
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute(
-                    "CREATE TABLE Customer (id INT PRIMARY KEY, name VARCHAR(255), score INTEGER, createdAt TIMESTAMP)");
+            stmt.execute(createTableSql);
             // TODO: support this kind of insert in InsertStatement
             stmt.execute(
                     """
-            	INSERT INTO Customer VALUES \
-            	(1, 'Alice', 400, '2025-08-31 23:23:23'), \
-            	(2, 'Bob', 500, '2025-08-31 23:23:24')
-            	""");
+                INSERT INTO Customer VALUES \
+                (1, 'Alice', 400, '2025-08-31 23:23:23'), \
+                (2, 'Bob', 500, '2025-08-31 23:23:24')
+                """);
         }
     }
 
