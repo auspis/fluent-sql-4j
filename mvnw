@@ -32,7 +32,10 @@
 #       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
 #   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 # ----------------------------------------------------------------------------
-JAVA_HOME=/usr/lib/jvm/temurin-21-jdk-amd64
+# Set default JAVA_HOME if not already set by environment (e.g., GitHub Actions)
+if [ -z "$JAVA_HOME" ]; then
+  JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+fi
 
 if [ -z "$MAVEN_SKIP_RC" ] ; then
 
