@@ -67,13 +67,21 @@ public class StandardSqlRendererMySqlIT {
         String createTableSql = createTable.accept(renderer);
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSql);
-            // TODO: support this kind of insert in InsertStatement
-            stmt.execute(
-                    """
-                INSERT INTO Customer VALUES \
-                (1, 'Alice', 400, '2025-08-31 23:23:23'), \
-                (2, 'Bob', 500, '2025-08-31 23:23:24')
-                """);
+            // Inserimento dati tramite InsertStatement e renderer
+            var insertAlice = lan.tlab.sqlbuilder.ast.statement.InsertStatement.builder()
+                    .table(new Table("Customer"))
+                    .data(lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues.of(
+                            Literal.of(1), Literal.of("Alice"), Literal.of(400), Literal.of("2025-08-31 23:23:23")))
+                    .build();
+            var insertBob = lan.tlab.sqlbuilder.ast.statement.InsertStatement.builder()
+                    .table(new Table("Customer"))
+                    .data(lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues.of(
+                            Literal.of(2), Literal.of("Bob"), Literal.of(500), Literal.of("2025-08-31 23:23:24")))
+                    .build();
+            String insertAliceSql = insertAlice.accept(renderer);
+            String insertBobSql = insertBob.accept(renderer);
+            stmt.execute(insertAliceSql);
+            stmt.execute(insertBobSql);
         }
     }
 
