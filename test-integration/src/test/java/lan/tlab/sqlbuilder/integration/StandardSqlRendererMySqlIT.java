@@ -25,6 +25,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
+import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
@@ -67,21 +68,19 @@ public class StandardSqlRendererMySqlIT {
         String createTableSql = createTable.accept(renderer);
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSql);
-            // Inserimento dati tramite InsertStatement e renderer
-            var insertAlice = lan.tlab.sqlbuilder.ast.statement.InsertStatement.builder()
+
+            InsertStatement insertAlice = InsertStatement.builder()
                     .table(new Table("Customer"))
                     .data(lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues.of(
                             Literal.of(1), Literal.of("Alice"), Literal.of(400), Literal.of("2025-08-31 23:23:23")))
                     .build();
-            var insertBob = lan.tlab.sqlbuilder.ast.statement.InsertStatement.builder()
+            InsertStatement insertBob = InsertStatement.builder()
                     .table(new Table("Customer"))
                     .data(lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues.of(
                             Literal.of(2), Literal.of("Bob"), Literal.of(500), Literal.of("2025-08-31 23:23:24")))
                     .build();
-            String insertAliceSql = insertAlice.accept(renderer);
-            String insertBobSql = insertBob.accept(renderer);
-            stmt.execute(insertAliceSql);
-            stmt.execute(insertBobSql);
+            stmt.execute(insertAlice.accept(renderer));
+            stmt.execute(insertBob.accept(renderer));
         }
     }
 
