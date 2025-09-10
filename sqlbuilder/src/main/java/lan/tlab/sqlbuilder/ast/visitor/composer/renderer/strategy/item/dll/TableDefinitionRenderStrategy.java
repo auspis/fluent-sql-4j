@@ -2,6 +2,7 @@ package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Index;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
@@ -16,9 +17,17 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
         builder.append(" (");
         builder.append(item.getColumns().stream().map(sqlRenderer::visit).collect(Collectors.joining(", ")));
         builder.append(primaryKey(item.getPrimaryKey(), sqlRenderer));
+        builder.append(constraints(item.getConstraints(), sqlRenderer));
         builder.append(indexes(item.getIndexes(), sqlRenderer));
         builder.append(")");
         return builder.toString();
+    }
+
+    private String constraints(List<Constraint> constraints, SqlRenderer sqlRenderer) {
+        if (constraints == null || constraints.isEmpty()) {
+            return "";
+        }
+        return ", " + constraints.stream().map(c -> c.accept(sqlRenderer)).collect(Collectors.joining(", "));
     }
 
     private String indexes(List<Index> indexes, SqlRenderer sqlRenderer) {

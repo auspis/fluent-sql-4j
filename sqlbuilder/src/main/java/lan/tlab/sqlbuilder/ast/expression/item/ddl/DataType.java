@@ -14,6 +14,7 @@ public interface DataType extends SqlItem {
     SimpleDataType INTEGER = new SimpleDataType("INTEGER");
     SimpleDataType DATE = new SimpleDataType("DATE");
     SimpleDataType TIMESTAMP = new SimpleDataType("TIMESTAMP");
+    SimpleDataType BOOLEAN = new SimpleDataType("BOOLEAN");
 
     @AllArgsConstructor
     @Getter
