@@ -230,6 +230,10 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
+# VSCode settings (configurazioni locali)
+.vscode/
+.vscode/settings.json
+
 
 /target/
 **/target/
