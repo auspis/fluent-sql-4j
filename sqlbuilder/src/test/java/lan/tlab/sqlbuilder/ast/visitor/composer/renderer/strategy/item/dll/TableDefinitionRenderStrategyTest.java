@@ -119,7 +119,7 @@ class TableDefinitionRenderStrategyTest {
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
                         ColumnDefinitionBuilder.varchar("email").build()))
-                .index(new Index("idx_email", "name"))
+                .index(new Index("idx_name", "name"))
                 .index(new Index("idx_email", "email"))
                 .build();
 
@@ -132,7 +132,7 @@ class TableDefinitionRenderStrategyTest {
                 "id" INTEGER, \
                 "name" VARCHAR(255), \
                 "email" VARCHAR(255), \
-                INDEX "idx_email" ("name"), \
+                INDEX "idx_name" ("name"), \
                 INDEX "idx_email" ("email")\
                 )\
                 """);

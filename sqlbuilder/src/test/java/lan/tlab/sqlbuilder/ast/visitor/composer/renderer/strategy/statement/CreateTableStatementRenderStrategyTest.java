@@ -166,7 +166,8 @@ class CreateTableStatementRenderStrategyTest {
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name")
                                 .notNullConstraint(new NotNullConstraint())
-                                .build()))
+                                .build(),
+                        ColumnDefinitionBuilder.integer("age").build()))
                 .constraint(new CheckConstraint(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
                 .build());
 
@@ -179,6 +180,7 @@ class CreateTableStatementRenderStrategyTest {
                 (\
                 "id" INTEGER, \
                 "name" VARCHAR(255) NOT NULL, \
+                "age" INTEGER, \
                 PRIMARY KEY ("id"), \
                 CHECK ("age" > 18)\
                 )\
@@ -193,7 +195,7 @@ class CreateTableStatementRenderStrategyTest {
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
                         ColumnDefinitionBuilder.varchar("email").build()))
-                .index(new Index("idx_email", "name"))
+                .index(new Index("idx_name", "name"))
                 .index(new Index("idx_email", "email"))
                 .build());
 
@@ -206,7 +208,7 @@ class CreateTableStatementRenderStrategyTest {
                 "id" INTEGER, \
                 "name" VARCHAR(255), \
                 "email" VARCHAR(255), \
-                INDEX "idx_email" ("name"), \
+                INDEX "idx_name" ("name"), \
                 INDEX "idx_email" ("email")\
                 )\
                 """);
