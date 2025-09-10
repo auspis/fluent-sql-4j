@@ -1,12 +1,12 @@
 package lan.tlab.sqlbuilder.ast.expression.item.ddl;
 
-import java.util.List;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.Visitable;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
-import lombok.Singular;
 import lombok.ToString;
 import lombok.experimental.Tolerate;
 
@@ -20,8 +20,8 @@ public class ColumnDefinition implements Visitable {
     @Default
     private final DataType type = DataType.VARCHAR_255;
 
-    @Singular
-    private final List<Constraint> constraints;
+    private final NotNullConstraint notNullConstraint;
+    private final DefaultConstraint defaultConstraint;
 
     public static ColumnDefinition nullObject() {
         return builder().build();
@@ -39,6 +39,10 @@ public class ColumnDefinition implements Visitable {
 
         public static ColumnDefinitionBuilder date(String name) {
             return builder(name, DataType.DATE);
+        }
+
+        public static ColumnDefinitionBuilder bool(String name) {
+            return builder(name, DataType.BOOLEAN);
         }
     }
 

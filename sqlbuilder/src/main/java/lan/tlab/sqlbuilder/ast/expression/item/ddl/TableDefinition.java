@@ -23,6 +23,9 @@ public class TableDefinition implements Visitable {
     private final PrimaryKey primaryKey;
 
     @Singular
+    private final List<Constraint> constraints;
+
+    @Singular
     private final List<Index> indexes;
 
     @Override
