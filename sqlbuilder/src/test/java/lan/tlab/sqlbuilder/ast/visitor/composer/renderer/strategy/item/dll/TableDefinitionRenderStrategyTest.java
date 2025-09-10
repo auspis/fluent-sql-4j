@@ -47,7 +47,7 @@ class TableDefinitionRenderStrategyTest {
     }
 
     @Test
-    void withPrimaryKeyAndConstraint() {
+    void withPrimaryKeyAndNotNull() {
         PrimaryKey pk = new PrimaryKey("id");
         TableDefinition tableDef = TableDefinition.builder()
                 .table(new Table("my_table"))
