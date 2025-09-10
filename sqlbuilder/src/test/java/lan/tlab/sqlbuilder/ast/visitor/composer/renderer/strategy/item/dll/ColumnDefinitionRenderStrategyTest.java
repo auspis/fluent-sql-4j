@@ -62,28 +62,4 @@ class ColumnDefinitionRenderStrategyTest {
         String sql = strategy.render(column, renderer);
         assertThat(sql).isEqualTo("\"name\" VARCHAR(255) NOT NULL DEFAULT 'def-val'");
     }
-
-    // TODO: movo to TableDefinitionRenderStrategyTest
-    // @Test
-    // void constraints() {
-    //     ColumnDefinition column = ColumnDefinition.builder("age", DataType.INTEGER)
-    //     .constraint(new NotNullConstraint())
-    //             .constraint(new CheckConstraint(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
-    //             .build();
-
-    //             String sql = strategy.render(column, renderer);
-    //     assertThat(sql).isEqualTo("\"age\" INTEGER NOT NULL, CHECK (\"age\" > 18)");
-    // }
-
-    // TODO: movo to TableDefinitionRenderStrategyTest
-    // @Test
-    // void notNullAndUnique() {
-    //     ColumnDefinition column = ColumnDefinition.ColumnDefinitionBuilder.varchar("name")
-    //         .notNullConstraint(new NotNullConstraint())
-    //         .constraint(new Constraint.UniqueConstraint())
-    //         .build();
-
-    //     String sql = strategy.render(column, renderer);
-    //     assertThat(sql).isEqualTo("\"name\" VARCHAR(255) NOT NULL UNIQUE");
-    // }
 }

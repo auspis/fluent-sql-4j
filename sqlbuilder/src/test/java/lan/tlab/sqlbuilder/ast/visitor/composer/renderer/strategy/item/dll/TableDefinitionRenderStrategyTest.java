@@ -3,12 +3,17 @@ package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Index;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
+import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +60,7 @@ class TableDefinitionRenderStrategyTest {
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name")
-                                .constraint(new NotNullConstraint())
+                                .notNullConstraint(new NotNullConstraint())
                                 .build()))
                 .build();
 
@@ -69,6 +74,39 @@ class TableDefinitionRenderStrategyTest {
                 "id" INTEGER, \
                 "name" VARCHAR(255) NOT NULL, \
                 PRIMARY KEY ("id")\
+                )\
+                """);
+    }
+
+    @Test
+    void constraints() {
+        PrimaryKey pk = new PrimaryKey("id");
+        TableDefinition tableDef = TableDefinition.builder()
+                .table(new Table("my_table"))
+                .primaryKey(pk)
+                .columns(List.of(
+                        ColumnDefinitionBuilder.integer("id").build(),
+                        ColumnDefinitionBuilder.varchar("name").build(),
+                        ColumnDefinitionBuilder.varchar("email").build(),
+                        ColumnDefinitionBuilder.integer("age").build()))
+                .constraint(new UniqueConstraint("email"))
+                .constraint(new CheckConstraint(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
+                .build();
+
+        String sql = strategy.render(tableDef, renderer);
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                "my_table" \
+                (\
+                "id" INTEGER, \
+                "name" VARCHAR(255), \
+                "email" VARCHAR(255), \
+                "age" INTEGER, \
+                PRIMARY KEY ("id"), \
+                UNIQUE ("email"), \
+                CHECK ("age" > 18)\
                 )\
                 """);
     }
