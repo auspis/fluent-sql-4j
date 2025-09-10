@@ -58,6 +58,8 @@ This repository is a multi-module Java project managed with Maven. It is structu
 - make sure you are in the root folder or `cd` to it
 - Use `./mvnw clean test` at the root to run unit tests
 - Use `./mvnw clean verify` at the root to run all tests (unit and integration)
+- The project is a multi module maven project, so in some cases you may need to add -am to compile dependencies
+- When you need to run integration tests try to run only the needed ones
 - Integration tests are located in `test-integration/`
 
 ## Additional Notes
