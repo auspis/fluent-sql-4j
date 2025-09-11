@@ -31,10 +31,31 @@ class ExtractDatePartRenderStrategyTest {
     }
 
     @Test
+    void month_columnReference() {
+        ExtractDatePart func = ExtractDatePart.month(ColumnReference.of("Customer", "birthdate"));
+        String sql = strategy.render(func, sqlRenderer);
+        assertThat(sql).isEqualTo("MONTH(\"Customer\".\"birthdate\")");
+    }
+
+    @Test
+    void day_columnReference() {
+        ExtractDatePart func = ExtractDatePart.day(ColumnReference.of("Customer", "birthdate"));
+        String sql = strategy.render(func, sqlRenderer);
+        assertThat(sql).isEqualTo("DAY(\"Customer\".\"birthdate\")");
+    }
+
+    @Test
     void year_literal() {
         ExtractDatePart func = ExtractDatePart.year(Literal.of("2023-01-15"));
         String sql = strategy.render(func, sqlRenderer);
         assertThat(sql).isEqualTo("YEAR('2023-01-15')");
+    }
+
+    @Test
+    void month_literal() {
+        ExtractDatePart func = ExtractDatePart.month(Literal.of("2023-01-15"));
+        String sql = strategy.render(func, sqlRenderer);
+        assertThat(sql).isEqualTo("MONTH('2023-01-15')");
     }
 
     @Test
@@ -43,5 +64,13 @@ class ExtractDatePartRenderStrategyTest {
         ExtractDatePart func = ExtractDatePart.year(currentTs);
         String sql = strategy.render(func, sqlRenderer);
         assertThat(sql).isEqualTo("YEAR(CURRENT_TIMESTAMP())");
+    }
+
+    @Test
+    void day_expression() {
+        ScalarExpression currentTs = new CurrentDateTime();
+        ExtractDatePart func = ExtractDatePart.day(currentTs);
+        String sql = strategy.render(func, sqlRenderer);
+        assertThat(sql).isEqualTo("DAY(CURRENT_TIMESTAMP())");
     }
 }
