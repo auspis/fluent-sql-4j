@@ -7,6 +7,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.SqlItem;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
@@ -15,6 +16,7 @@ public interface Constraint extends SqlItem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public static class PrimaryKey implements Constraint {
         @Singular
         private final List<String> columns;
@@ -30,6 +32,7 @@ public interface Constraint extends SqlItem {
     }
 
     @NoArgsConstructor
+    @EqualsAndHashCode
     public static class NotNullConstraint implements Constraint {
         @Override
         public <T> T accept(SqlVisitor<T> visitor) {
@@ -39,6 +42,7 @@ public interface Constraint extends SqlItem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public class UniqueConstraint implements Constraint {
 
         private final List<String> columns;
@@ -55,6 +59,7 @@ public interface Constraint extends SqlItem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public static class ForeignKeyConstraint implements Constraint {
         private final List<String> columns;
         private final ReferencesItem references;
@@ -67,6 +72,7 @@ public interface Constraint extends SqlItem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public static class CheckConstraint implements Constraint {
         private final BooleanExpression expression;
 
@@ -78,6 +84,7 @@ public interface Constraint extends SqlItem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public static class DefaultConstraint implements Constraint {
         private final ScalarExpression value;
 

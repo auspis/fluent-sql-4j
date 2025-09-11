@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ColumnDefinitionRenderStrategyTest {
-
     private ColumnDefinitionRenderStrategy strategy;
     private SqlRenderer renderer;
 
@@ -30,6 +29,13 @@ class ColumnDefinitionRenderStrategyTest {
                 ColumnDefinition.builder("id", DataType.INTEGER).build();
         String sql = strategy.render(column, renderer);
         assertThat(sql).isEqualTo("\"id\" INTEGER");
+    }
+
+    @Test
+    void nullObject() {
+        ColumnDefinition column = ColumnDefinition.nullObject();
+        String sql = strategy.render(column, renderer);
+        assertThat(sql).isBlank();
     }
 
     @Test

@@ -6,13 +6,13 @@ import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.Visitable;
 import lombok.Builder;
 import lombok.Builder.Default;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.experimental.Tolerate;
 
 @Builder
 @Getter
-@ToString
+@EqualsAndHashCode
 public class ColumnDefinition implements Visitable {
 
     private final String name;
