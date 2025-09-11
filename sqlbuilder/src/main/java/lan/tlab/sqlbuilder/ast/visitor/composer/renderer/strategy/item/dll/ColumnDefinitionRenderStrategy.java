@@ -9,6 +9,10 @@ import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.SqlItemRe
 public class ColumnDefinitionRenderStrategy implements SqlItemRenderStrategy {
 
     public String render(ColumnDefinition item, SqlRenderer sqlRenderer) {
+        if (item.equals(ColumnDefinition.nullObject())) {
+            return "";
+        }
+
         String columnName = sqlRenderer.getEscapeStrategy().apply(item.getName());
         String type = item.getType().accept(sqlRenderer);
         String constraints = Stream.of(item.getNotNullConstraint(), item.getDefaultConstraint())

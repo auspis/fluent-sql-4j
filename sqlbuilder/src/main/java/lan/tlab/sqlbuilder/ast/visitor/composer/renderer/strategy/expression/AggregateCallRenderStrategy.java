@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 
 public class AggregateCallRenderStrategy implements ExpressionRenderStrategy {
 
+    // FIXME: add separate strategies for different aggregate functions
     public String render(AggregateCall expression, SqlRenderer sqlRenderer) {
         return switch (expression) {
             case AggregateCallImpl e ->

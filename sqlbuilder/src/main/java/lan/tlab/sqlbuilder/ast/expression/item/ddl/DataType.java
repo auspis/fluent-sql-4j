@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.SqlItem;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 public interface DataType extends SqlItem {
@@ -18,6 +19,7 @@ public interface DataType extends SqlItem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public static class SimpleDataType implements DataType {
         private final String name;
 
@@ -29,6 +31,7 @@ public interface DataType extends SqlItem {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public static class ParameterizedDataType implements DataType {
         private final String name;
         private final List<Expression> parameters;
