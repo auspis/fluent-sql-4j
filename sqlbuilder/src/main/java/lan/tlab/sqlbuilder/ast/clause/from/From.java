@@ -17,10 +17,6 @@ public class From implements Clause {
     @Singular
     private final List<FromSource> sources;
 
-    public static From fromTable(Table table) {
-        return fromTable(table.getName());
-    }
-
     public static From fromTable(String name) {
         return From.builder().source(new Table(name)).build();
     }
