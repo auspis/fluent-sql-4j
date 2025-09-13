@@ -206,4 +206,223 @@ class PreparedSqlVisitorTest {
                 .isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"name\" = ?) OR ((\"id\" > ?) AND (\"id\" < ?))");
         assertThat(result.parameters()).containsExactly("Alice", 10, 20);
     }
+
+    @Test
+    void testSelectWhereNot() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(new lan.tlab.sqlbuilder.ast.expression.bool.logical.Not(
+                        Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT (\"name\" = ?)");
+        assertThat(result.parameters()).containsExactly("Alice");
+    }
+
+    @Test
+    void testSelectWhereIsNull() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(
+                        new lan.tlab.sqlbuilder.ast.expression.bool.IsNull(ColumnReference.of("User", "email"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" WHERE \"email\" IS NULL");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectWhereIsNotNull() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(
+                        new lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull(ColumnReference.of("User", "email"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" WHERE \"email\" IS NOT NULL");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectWhereNotAnd() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(new lan.tlab.sqlbuilder.ast.expression.bool.logical.Not(
+                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.and(
+                                Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
+                                Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT ((\"id\" > ?) AND (\"id\" < ?))");
+        assertThat(result.parameters()).containsExactly(10, 20);
+    }
+
+    @Test
+    void testSelectWhereNotOr() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(new lan.tlab.sqlbuilder.ast.expression.bool.logical.Not(
+                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
+                                Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
+                                Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob"))))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT ((\"name\" = ?) OR (\"name\" = ?))");
+        assertThat(result.parameters()).containsExactly("Alice", "Bob");
+    }
+
+    @Test
+    void testSelectCount() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.count(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectSum() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.sum(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectAvg() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.avg(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectMin() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.min(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT MIN(\"id\") FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectMax() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.max(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT MAX(\"id\") FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectCountGroupBy() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.count(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectSumGroupBy() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.sum(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectAvgGroupBy() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.avg(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") FROM \"User\" GROUP BY \"email\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectMinGroupBy() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.min(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT MIN(\"id\") FROM \"User\" GROUP BY \"email\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectMaxGroupBy() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.max(
+                                ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT MAX(\"id\") FROM \"User\" GROUP BY \"email\"");
+        assertThat(result.parameters()).isEmpty();
+    }
 }
