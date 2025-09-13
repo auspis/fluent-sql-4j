@@ -5,13 +5,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
+import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
+import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
+import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
+import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.Expression;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
+import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
+import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
+import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
+import lan.tlab.sqlbuilder.ast.expression.bool.logical.Not;
+import lan.tlab.sqlbuilder.ast.expression.item.As;
+import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import org.junit.jupiter.api.Test;
@@ -37,7 +49,7 @@ class PreparedSqlVisitorTest {
                 ColumnReference.of("User", "name"),
                 ColumnReference.of("User", "email"));
         List<Expression> values = List.of(Literal.of(user.id), Literal.of(user.name), Literal.of(user.email));
-        var insertValues = new lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues(values);
+        var insertValues = new InsertValues(values);
         return InsertStatement.builder()
                 .table(table)
                 .columns(columns)
@@ -164,7 +176,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.and(
+                .where(Where.of(AndOr.and(
                         Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
                         Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20)))))
                 .build();
@@ -179,7 +191,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
+                .where(Where.of(AndOr.or(
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob")))))
                 .build();
@@ -194,9 +206,9 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
+                .where(Where.of(AndOr.or(
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
-                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.and(
+                        AndOr.and(
                                 Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
                                 Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
                 .build();
@@ -212,8 +224,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(new lan.tlab.sqlbuilder.ast.expression.bool.logical.Not(
-                        Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")))))
+                .where(Where.of(new Not(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -226,8 +237,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(
-                        new lan.tlab.sqlbuilder.ast.expression.bool.IsNull(ColumnReference.of("User", "email"))))
+                .where(Where.of(new IsNull(ColumnReference.of("User", "email"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -240,8 +250,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(
-                        new lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull(ColumnReference.of("User", "email"))))
+                .where(Where.of(new IsNotNull(ColumnReference.of("User", "email"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -254,10 +263,9 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(new lan.tlab.sqlbuilder.ast.expression.bool.logical.Not(
-                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.and(
-                                Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
-                                Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
+                .where(Where.of(new Not(AndOr.and(
+                        Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
+                        Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -270,10 +278,9 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(new lan.tlab.sqlbuilder.ast.expression.bool.logical.Not(
-                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
-                                Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
-                                Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob"))))))
+                .where(Where.of(new Not(AndOr.or(
+                        Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
+                        Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob"))))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -284,9 +291,8 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectCount() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.count(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -298,9 +304,8 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectSum() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.sum(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -312,9 +317,8 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectAvg() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.avg(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -326,9 +330,8 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectMin() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.min(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -340,9 +343,8 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectMax() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.max(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -354,11 +356,10 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectCountGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.count(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
-                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -369,11 +370,10 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectSumGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.sum(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
-                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -384,11 +384,10 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectAvgGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.avg(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
-                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -399,11 +398,10 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectMinGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.min(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
-                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -414,11 +412,10 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectMaxGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.max(
-                                ColumnReference.of("User", "id")))))
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
-                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -430,12 +427,8 @@ class PreparedSqlVisitorTest {
     void testSelectScalarProjectionWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
-                        new ScalarExpressionProjection(
-                                ColumnReference.of("User", "id"),
-                                new lan.tlab.sqlbuilder.ast.expression.item.As("userId")),
-                        new ScalarExpressionProjection(
-                                ColumnReference.of("User", "name"),
-                                new lan.tlab.sqlbuilder.ast.expression.item.As("userName"))))
+                        new ScalarExpressionProjection(ColumnReference.of("User", "id"), new As("userId")),
+                        new ScalarExpressionProjection(ColumnReference.of("User", "name"), new As("userName"))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -447,8 +440,7 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectScalarProjectionWithAliasAndWhere() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(
-                        ColumnReference.of("User", "id"), new lan.tlab.sqlbuilder.ast.expression.item.As("userId"))))
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"), new As("userId"))))
                 .from(From.of(new Table("User")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice"))))
                 .build();
@@ -461,10 +453,8 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectAggregationProjectionWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.count(
-                                ColumnReference.of("User", "id")),
-                        new lan.tlab.sqlbuilder.ast.expression.item.As("totalUsers"))))
+                .select(Select.of(new AggregationFunctionProjection(
+                        AggregateCall.count(ColumnReference.of("User", "id")), new As("totalUsers"))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -476,12 +466,10 @@ class PreparedSqlVisitorTest {
     @Test
     void testSelectAggregationProjectionWithAliasGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.sum(
-                                ColumnReference.of("User", "id")),
-                        new lan.tlab.sqlbuilder.ast.expression.item.As("sumId"))))
+                .select(Select.of(new AggregationFunctionProjection(
+                        AggregateCall.sum(ColumnReference.of("User", "id")), new As("sumId"))))
                 .from(From.of(new Table("User")))
-                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -493,14 +481,10 @@ class PreparedSqlVisitorTest {
     void testSelectMultipleAggregationProjectionsWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
-                        new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                                lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.avg(
-                                        ColumnReference.of("User", "id")),
-                                new lan.tlab.sqlbuilder.ast.expression.item.As("avgId")),
-                        new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
-                                lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.max(
-                                        ColumnReference.of("User", "id")),
-                                new lan.tlab.sqlbuilder.ast.expression.item.As("maxId"))))
+                        new AggregationFunctionProjection(
+                                AggregateCall.avg(ColumnReference.of("User", "id")), new As("avgId")),
+                        new AggregationFunctionProjection(
+                                AggregateCall.max(ColumnReference.of("User", "id")), new As("maxId"))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
@@ -514,8 +498,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
-                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.asc(ColumnReference.of("User", "id"))))
+                .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -528,8 +511,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
-                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.desc(ColumnReference.of("User", "id"))))
+                .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -542,8 +524,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
-                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.by(ColumnReference.of("User", "id"))))
+                .orderBy(OrderBy.of(Sorting.by(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -558,9 +539,9 @@ class PreparedSqlVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("User", "id")),
                         new ScalarExpressionProjection(ColumnReference.of("User", "name"))))
                 .from(From.of(new Table("User")))
-                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
-                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.asc(ColumnReference.of("User", "id")),
-                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.desc(ColumnReference.of("User", "name"))))
+                .orderBy(OrderBy.of(
+                        Sorting.asc(ColumnReference.of("User", "id")),
+                        Sorting.desc(ColumnReference.of("User", "name"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
@@ -574,12 +555,79 @@ class PreparedSqlVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
-                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
-                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.desc(ColumnReference.of("User", "id"))))
+                .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         PreparedSqlResult result = visitor.visit(selectStmt);
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? ORDER BY \"id\" DESC");
         assertThat(result.parameters()).containsExactly(10);
+    }
+
+    @Test
+    void testSelectLimitOnly() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .pagination(Pagination.builder().perPage(10).build())
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" LIMIT 10");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectLimitAndOffset() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .pagination(Pagination.builder().perPage(10).page(2).build())
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" LIMIT 10 OFFSET 20");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectWhereLimitOffset() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
+                .pagination(Pagination.builder().perPage(5).page(1).build())
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? LIMIT 5 OFFSET 5");
+        assertThat(result.parameters()).containsExactly(100);
+    }
+
+    @Test
+    void testSelectOrderByLimitOffset() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
+                .pagination(Pagination.builder().perPage(3).page(2).build())
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC LIMIT 3 OFFSET 6");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectGroupByLimitOffset() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .pagination(Pagination.builder().perPage(2).page(3).build())
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" GROUP BY \"email\" LIMIT 2 OFFSET 6");
+        assertThat(result.parameters()).isEmpty();
     }
 }
