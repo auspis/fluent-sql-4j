@@ -7,4 +7,16 @@
     <version>1.0</version>
   </parent>
   <artifactId>spike</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>lan.tlab</groupId>
+      <artifactId>sqlbuilder</artifactId>
+    </dependency>
+  </dependencies>
 </project>
