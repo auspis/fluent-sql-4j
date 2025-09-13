@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.from.source.FromSource;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.Projection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
+import lan.tlab.sqlbuilder.ast.expression.bool.Like;
 import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.DefaultValues;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertSource;
@@ -72,12 +74,23 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             whereResult = visit(stmt.getWhere());
             whereClause = " WHERE " + whereResult.sql();
         }
-        String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause;
+        // GROUP BY ... (optional)
+        PreparedSqlResult groupByResult = null;
+        String groupByClause = "";
+        if (stmt.getGroupBy() != null
+                && !stmt.getGroupBy().getGroupingExpressions().isEmpty()) {
+            groupByResult = stmt.getGroupBy().accept(this);
+            groupByClause = " GROUP BY " + groupByResult.sql();
+        }
+        String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause;
         List<Object> allParams = new ArrayList<>();
         allParams.addAll(selectResult.parameters());
         allParams.addAll(fromResult.parameters());
         if (whereResult != null) {
             allParams.addAll(whereResult.parameters());
+        }
+        if (groupByResult != null) {
+            allParams.addAll(groupByResult.parameters());
         }
         return new PreparedSqlResult(sql, allParams);
     }
@@ -163,7 +176,18 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(AggregationFunctionProjection aggregationFunctionProjection) {
-        throw new UnsupportedOperationException();
+        // The AggregationFunctionProjection wraps an AggregateCall (e.g., COUNT, SUM, etc.)
+        var expr = aggregationFunctionProjection.getExpression();
+        PreparedSqlResult exprResult = expr.accept(this);
+        String sql = exprResult.sql();
+        // Handle alias if present
+        String alias = aggregationFunctionProjection.getAs() != null
+                ? aggregationFunctionProjection.getAs().getName()
+                : null;
+        if (alias != null && !alias.isBlank()) {
+            sql += " AS \"" + alias + "\"";
+        }
+        return new PreparedSqlResult(sql, exprResult.parameters());
     }
 
     @Override
@@ -187,7 +211,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var source : clause.getSources()) {
-            PreparedSqlResult res = visit((lan.tlab.sqlbuilder.ast.clause.from.source.FromSource) source);
+            PreparedSqlResult res = visit(source);
             sqlParts.add(res.sql());
             params.addAll(res.parameters());
         }
@@ -207,7 +231,15 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy clause) {
-        throw new UnsupportedOperationException();
+        List<String> exprSqls = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        for (var expr : clause.getGroupingExpressions()) {
+            PreparedSqlResult res = ((lan.tlab.sqlbuilder.ast.expression.Expression) expr).accept(this);
+            exprSqls.add(res.sql());
+            params.addAll(res.parameters());
+        }
+        String sql = String.join(", ", exprSqls);
+        return new PreparedSqlResult(sql, params);
     }
 
     @Override
@@ -247,17 +279,14 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull expression) {
-        throw new UnsupportedOperationException();
+        String col = expression.getExpression().accept(this).sql();
+        return new PreparedSqlResult(col + " IS NOT NULL", List.of());
     }
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.IsNull expression) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.Like expression) {
-        throw new UnsupportedOperationException();
+        String col = expression.getExpression().accept(this).sql();
+        return new PreparedSqlResult(col + " IS NULL", List.of());
     }
 
     @Override
@@ -279,7 +308,9 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.logical.Not expression) {
-        throw new UnsupportedOperationException();
+        PreparedSqlResult inner = expression.getExpression().accept(this);
+        String sql = "NOT (" + inner.sql() + ")";
+        return new PreparedSqlResult(sql, inner.parameters());
     }
 
     @Override
@@ -511,7 +542,42 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall expression) {
-        throw new UnsupportedOperationException();
+        // Handle SQL generation for aggregate functions (COUNT, SUM, AVG, MIN, MAX)
+        // The AggregateCallImpl should expose the operator and argument
+        // We'll assume the interface provides getOperator() and getArgument()
+        String functionName = null;
+        String argumentSql = null;
+        List<Object> params = new ArrayList<>();
+        try {
+            var operatorField = expression.getClass().getDeclaredField("operator");
+            operatorField.setAccessible(true);
+            var operator = operatorField.get(expression);
+            functionName = operator.toString();
+            // Normalize to SQL function names
+            functionName = switch (functionName) {
+                case "COUNT" -> "COUNT";
+                case "SUM" -> "SUM";
+                case "AVG" -> "AVG";
+                case "MIN" -> "MIN";
+                case "MAX" -> "MAX";
+                default -> throw new UnsupportedOperationException("Unknown aggregate function: " + functionName);
+            };
+            var argumentField = expression.getClass().getDeclaredField("expression");
+            argumentField.setAccessible(true);
+            var argument = argumentField.get(expression);
+            if (argument == null) {
+                argumentSql = "*";
+            } else {
+                PreparedSqlResult argResult =
+                        ((lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression) argument).accept(this);
+                argumentSql = argResult.sql();
+                params.addAll(argResult.parameters());
+            }
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("AggregateCall reflection failed", e);
+        }
+        String sql = functionName + "(" + argumentSql + ")";
+        return new PreparedSqlResult(sql, params);
     }
 
     @Override
@@ -546,10 +612,12 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     // Handle FromSource dispatch for FROM clause
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.from.source.FromSource source) {
-        if (source instanceof Table table) {
-            return visit(table);
-        }
-        throw new UnsupportedOperationException("Unsupported FromSource type: " + source.getClass());
+    public PreparedSqlResult visit(FromSource source) {
+        return source.accept(this);
+    }
+
+    @Override
+    public PreparedSqlResult visit(Like expression) {
+        throw new UnsupportedOperationException("Unsupported FromSource type: " + expression.getClass());
     }
 }
