@@ -262,7 +262,19 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr expression) {
-        throw new UnsupportedOperationException();
+        String operator =
+                expression.getOperator() == lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator.AND
+                        ? "AND"
+                        : "OR";
+        List<String> sqlParts = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        for (BooleanExpression expr : expression.getOperands()) {
+            PreparedSqlResult res = expr.accept(this);
+            sqlParts.add("(" + res.sql() + ")");
+            params.addAll(res.parameters());
+        }
+        String sql = String.join(" " + operator + " ", sqlParts);
+        return new PreparedSqlResult(sql, params);
     }
 
     @Override
