@@ -1,0 +1,116 @@
+
+
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato DISTINCT: SELECT DISTINCT ...
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+
+
+
+
+
+
+
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato Subquery: SELECT ... FROM (SELECT ...) AS sub
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato IN, BETWEEN, LIKE: WHERE "name" IN (?, ?), WHERE "id" BETWEEN ? AND ?, WHERE "name" LIKE ?
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato Funzioni/scalar expressions: SELECT LENGTH("name") ...
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato GROUP BY e HAVING: SELECT ... GROUP BY ... HAVING ...
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato SELECT con più tabelle (FROM t1, t2)
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato Aggregazioni
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato DISTINCT
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato ORDER BY
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato LIMIT/OFFSET
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato JOIN
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato Subquery
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato IN, BETWEEN, LIKE
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato Funzioni/scalar expressions
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato GROUP BY, HAVING
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+genera tutti i test per tutti gli scenari della select quando viene usato Multi-table FROM
+---
+verifica  che i test siano verdi
+rispetta sempre lo standart SQL 2008
+
+
+
