@@ -37,7 +37,7 @@
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>tesy-integration</artifactId>
+        <artifactId>test-integration</artifactId>
         <version>1.0</version>
       </dependency>
 
