@@ -773,4 +773,117 @@ class PreparedSqlVisitorTest {
                         "SELECT \"id\", \"name\", \"value\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" LEFT JOIN \"t3\" ON \"t2\".\"id\" = \"t3\".\"t2_id\"");
         assertThat(result.parameters()).isEmpty();
     }
+
+    @Test
+    void testSelectCountGroupByHaving() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(1))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") > ?");
+        assertThat(result.parameters()).containsExactly(1);
+    }
+
+    @Test
+    void testSelectSumGroupByHavingAnd() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.and(
+                                Comparison.gt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10)),
+                                Comparison.lt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(100)))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\" HAVING (SUM(\"id\") > ?) AND (SUM(\"id\") < ?)");
+        assertThat(result.parameters()).containsExactly(10, 100);
+    }
+
+    @Test
+    void testSelectAvgGroupByHavingOr() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
+                                Comparison.lt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(5)),
+                                Comparison.gt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(50)))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT AVG(\"id\") FROM \"User\" GROUP BY \"email\" HAVING (AVG(\"id\") < ?) OR (AVG(\"id\") > ?)");
+        assertThat(result.parameters()).containsExactly(5, 50);
+    }
+
+    @Test
+    void testSelectGroupByHavingWithAlias() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new AggregationFunctionProjection(
+                        AggregateCall.count(ColumnReference.of("User", "id")), new As("total"))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        Comparison.gte(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(2))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT COUNT(\"id\") AS \"total\" FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") >= ?");
+        assertThat(result.parameters()).containsExactly(2);
+    }
+
+    @Test
+    void testSelectGroupByMultipleColumnsHaving() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email"), ColumnReference.of("User", "name")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        Comparison.ne(AggregateCall.max(ColumnReference.of("User", "id")), Literal.of(0))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo("SELECT MAX(\"id\") FROM \"User\" GROUP BY \"email\", \"name\" HAVING MAX(\"id\") <> ?");
+        assertThat(result.parameters()).containsExactly(0);
+    }
+
+    @Test
+    void testSelectGroupByHavingWithWhereOrderByLimit() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        Comparison.lt(AggregateCall.min(ColumnReference.of("User", "id")), Literal.of(100))))
+                .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "email"))))
+                .pagination(Pagination.builder().perPage(5).page(1).build())
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT MIN(\"id\") FROM \"User\" WHERE \"id\" > ? GROUP BY \"email\" HAVING MIN(\"id\") < ? ORDER BY \"email\" DESC LIMIT 5 OFFSET 5");
+        assertThat(result.parameters()).containsExactly(10, 100);
+    }
 }

@@ -82,6 +82,15 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             groupByResult = stmt.getGroupBy().accept(this);
             groupByClause = " GROUP BY " + groupByResult.sql();
         }
+        // HAVING ... (optional, after GROUP BY)
+        PreparedSqlResult havingResult = null;
+        String havingClause = "";
+        if (stmt.getHaving() != null && stmt.getHaving().getCondition() != null) {
+            havingResult = visit(stmt.getHaving());
+            if (!havingResult.sql().isBlank()) {
+                havingClause = " HAVING " + havingResult.sql();
+            }
+        }
         // ORDER BY ... (optional)
         PreparedSqlResult orderByResult = null;
         String orderByClause = "";
@@ -103,7 +112,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             }
         }
         String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause
-                + orderByClause + paginationClause;
+                + havingClause + orderByClause + paginationClause;
         List<Object> allParams = new ArrayList<>();
         allParams.addAll(selectResult.parameters());
         allParams.addAll(fromResult.parameters());
@@ -112,6 +121,9 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         }
         if (groupByResult != null) {
             allParams.addAll(groupByResult.parameters());
+        }
+        if (havingResult != null) {
+            allParams.addAll(havingResult.parameters());
         }
         if (orderByResult != null) {
             allParams.addAll(orderByResult.parameters());
@@ -351,7 +363,10 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having clause) {
-        throw new UnsupportedOperationException();
+        if (clause.getCondition() == null || clause.getCondition() instanceof NullBooleanExpression) {
+            return new PreparedSqlResult("", List.of());
+        }
+        return clause.getCondition().accept(this);
     }
 
     @Override
