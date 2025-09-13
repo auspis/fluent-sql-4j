@@ -59,31 +59,40 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     public PreparedSqlResult visit(SelectStatement stmt) {
         parameters.clear();
         // SELECT ...
-        String selectClause = stmt.getSelect().accept(this).sql();
+        PreparedSqlResult selectResult = stmt.getSelect().accept(this);
         // FROM ...
-        String fromClause = stmt.getFrom().accept(this).sql();
+        PreparedSqlResult fromResult = stmt.getFrom().accept(this);
         // WHERE ... (optional)
+        PreparedSqlResult whereResult = null;
         String whereClause = "";
         if (stmt.getWhere() != null
                 && stmt.getWhere().getCondition() != null
                 && !(stmt.getWhere().getCondition()
                         instanceof lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression)) {
-            PreparedSqlResult whereResult = visit(stmt.getWhere());
+            whereResult = visit(stmt.getWhere());
             whereClause = " WHERE " + whereResult.sql();
         }
-        String sql = "SELECT " + selectClause + " FROM " + fromClause + whereClause;
-        return new PreparedSqlResult(sql, List.copyOf(parameters));
+        String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause;
+        List<Object> allParams = new ArrayList<>();
+        allParams.addAll(selectResult.parameters());
+        allParams.addAll(fromResult.parameters());
+        if (whereResult != null) {
+            allParams.addAll(whereResult.parameters());
+        }
+        return new PreparedSqlResult(sql, allParams);
     }
 
     @Override
     public PreparedSqlResult visit(Select select) {
-        // Only support ColumnReference projections for now
         List<String> cols = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
         for (Projection p : select.getProjections()) {
-            cols.add(p.accept(this).sql());
+            PreparedSqlResult res = p.accept(this);
+            cols.add(res.sql());
+            params.addAll(res.parameters());
         }
         String sql = String.join(", ", cols);
-        return new PreparedSqlResult(sql, List.of());
+        return new PreparedSqlResult(sql, params);
     }
 
     @Override
@@ -160,7 +169,15 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.from.From clause) {
-        throw new UnsupportedOperationException();
+        List<String> sqlParts = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        for (var source : clause.getSources()) {
+            PreparedSqlResult res = visit((lan.tlab.sqlbuilder.ast.clause.from.source.FromSource) source);
+            sqlParts.add(res.sql());
+            params.addAll(res.parameters());
+        }
+        String sql = String.join(", ", sqlParts);
+        return new PreparedSqlResult(sql, params);
     }
 
     @Override
@@ -472,19 +489,40 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(InsertValues item) {
-        // TODO Auto-generated method stub
-        return null;
+        // InsertValues holds a list of value expressions (e.g., literals)
+        List<String> placeholders = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        for (var expr : item.getValueExpressions()) {
+            if (expr instanceof Literal<?> literal) {
+                placeholders.add("?");
+                params.add(literal.getValue());
+            } else {
+                // Fallback for non-literal expressions
+                placeholders.add("?");
+                params.add(null);
+            }
+        }
+        String sql = String.join(", ", placeholders);
+        return new PreparedSqlResult(sql, params);
     }
 
     @Override
     public PreparedSqlResult visit(InsertSource item) {
-        // TODO Auto-generated method stub
-        return null;
+        // InsertSource is a parent type, delegate to the actual subtype
+        return item.accept(this);
     }
 
     @Override
     public PreparedSqlResult visit(DefaultValues item) {
-        // TODO Auto-generated method stub
-        return null;
+        // For SQL DEFAULT VALUES
+        return new PreparedSqlResult("DEFAULT VALUES", List.of());
+    }
+
+    // Handle FromSource dispatch for FROM clause
+    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.from.source.FromSource source) {
+        if (source instanceof Table table) {
+            return visit(table);
+        }
+        throw new UnsupportedOperationException("Unsupported FromSource type: " + source.getClass());
     }
 }
