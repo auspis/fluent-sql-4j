@@ -82,7 +82,15 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             groupByResult = stmt.getGroupBy().accept(this);
             groupByClause = " GROUP BY " + groupByResult.sql();
         }
-        String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause;
+        // ORDER BY ... (optional)
+        PreparedSqlResult orderByResult = null;
+        String orderByClause = "";
+        if (stmt.getOrderBy() != null && !stmt.getOrderBy().getSortings().isEmpty()) {
+            orderByResult = stmt.getOrderBy().accept(this);
+            orderByClause = " ORDER BY " + orderByResult.sql();
+        }
+        String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause
+                + orderByClause;
         List<Object> allParams = new ArrayList<>();
         allParams.addAll(selectResult.parameters());
         allParams.addAll(fromResult.parameters());
@@ -91,6 +99,9 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         }
         if (groupByResult != null) {
             allParams.addAll(groupByResult.parameters());
+        }
+        if (orderByResult != null) {
+            allParams.addAll(orderByResult.parameters());
         }
         return new PreparedSqlResult(sql, allParams);
     }
@@ -249,12 +260,27 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy clause) {
-        throw new UnsupportedOperationException();
+        List<String> sqlParts = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        for (var sorting : clause.getSortings()) {
+            PreparedSqlResult res = visit(sorting);
+            sqlParts.add(res.sql());
+            params.addAll(res.parameters());
+        }
+        String sql = String.join(", ", sqlParts);
+        return new PreparedSqlResult(sql, params);
     }
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.orderby.Sorting sorting) {
-        throw new UnsupportedOperationException();
+        PreparedSqlResult exprResult =
+                ((lan.tlab.sqlbuilder.ast.expression.Expression) sorting.getExpression()).accept(this);
+        String sql = exprResult.sql();
+        String order = sorting.getSortOrder().getSqlKeyword();
+        if (!order.isEmpty()) {
+            sql += " " + order;
+        }
+        return new PreparedSqlResult(sql, exprResult.parameters());
     }
 
     @Override
