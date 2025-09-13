@@ -11,6 +11,8 @@ import lan.tlab.sqlbuilder.ast.clause.selection.projection.Projection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
+import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
+import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.Like;
 import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.DefaultValues;
@@ -172,26 +174,32 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     private PreparedSqlResult visit(BooleanExpression expr, boolean qualify) {
-        if (expr instanceof Comparison cmp) {
-            return visitComparisonWithQualify(cmp, qualify);
-        } else if (expr instanceof lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr andOr) {
-            List<String> sqlParts = new ArrayList<>();
-            List<Object> params = new ArrayList<>();
-            for (BooleanExpression op : andOr.getOperands()) {
-                PreparedSqlResult res = visit(op, qualify);
-                sqlParts.add("(" + res.sql() + ")");
-                params.addAll(res.parameters());
+        switch (expr) {
+            case Comparison cmp -> {
+                return visitComparisonWithQualify(cmp, qualify);
             }
-            String operator = andOr.getOperator() == lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator.AND
-                    ? "AND"
-                    : "OR";
-            return new PreparedSqlResult(String.join(" " + operator + " ", sqlParts), params);
-        } else if (expr instanceof lan.tlab.sqlbuilder.ast.expression.bool.logical.Not not) {
-            PreparedSqlResult inner = visit(not.getExpression(), qualify);
-            return new PreparedSqlResult("NOT (" + inner.sql() + ")", inner.parameters());
-        } else {
-            // Fallback: visita normale
-            return expr.accept(this);
+            case lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr andOr -> {
+                List<String> sqlParts = new ArrayList<>();
+                List<Object> params = new ArrayList<>();
+                for (BooleanExpression op : andOr.getOperands()) {
+                    PreparedSqlResult res = visit(op, qualify);
+                    sqlParts.add("(" + res.sql() + ")");
+                    params.addAll(res.parameters());
+                }
+                String operator =
+                        andOr.getOperator() == lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator.AND
+                                ? "AND"
+                                : "OR";
+                return new PreparedSqlResult(String.join(" " + operator + " ", sqlParts), params);
+            }
+            case lan.tlab.sqlbuilder.ast.expression.bool.logical.Not not -> {
+                PreparedSqlResult inner = visit(not.getExpression(), qualify);
+                return new PreparedSqlResult("NOT (" + inner.sql() + ")", inner.parameters());
+            }
+            case null, default -> {
+                // Fallback: visita normale
+                return expr.accept(this);
+            }
         }
     }
 
@@ -210,16 +218,14 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         if (cmp.getLhs() instanceof ColumnReference colLhs) {
             lhs = visit(colLhs, qualify).sql();
         } else {
-            lhs = ((lan.tlab.sqlbuilder.ast.expression.Expression) cmp.getLhs())
-                    .accept(this)
-                    .sql();
+            lhs = cmp.getLhs().accept(this).sql();
         }
         String rhsSql;
         List<Object> params = new ArrayList<>();
         if (cmp.getRhs() instanceof ColumnReference colRhs) {
             rhsSql = visit(colRhs, qualify).sql();
         } else {
-            PreparedSqlResult rhsResult = ((lan.tlab.sqlbuilder.ast.expression.Expression) cmp.getRhs()).accept(this);
+            PreparedSqlResult rhsResult = cmp.getRhs().accept(this);
             rhsSql = rhsResult.sql();
             params.addAll(rhsResult.parameters());
         }
@@ -353,7 +359,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         List<String> exprSqls = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var expr : clause.getGroupingExpressions()) {
-            PreparedSqlResult res = ((lan.tlab.sqlbuilder.ast.expression.Expression) expr).accept(this);
+            PreparedSqlResult res = expr.accept(this);
             exprSqls.add(res.sql());
             params.addAll(res.parameters());
         }
@@ -384,8 +390,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.orderby.Sorting sorting) {
-        PreparedSqlResult exprResult =
-                ((lan.tlab.sqlbuilder.ast.expression.Expression) sorting.getExpression()).accept(this);
+        PreparedSqlResult exprResult = sorting.getExpression().accept(this);
         String sql = exprResult.sql();
         String order = sorting.getSortOrder().getSqlKeyword();
         if (!order.isEmpty()) {
@@ -412,18 +417,6 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     @Override
     public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.In expression) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull expression) {
-        String col = expression.getExpression().accept(this).sql();
-        return new PreparedSqlResult(col + " IS NOT NULL", List.of());
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.IsNull expression) {
-        String col = expression.getExpression().accept(this).sql();
-        return new PreparedSqlResult(col + " IS NULL", List.of());
     }
 
     @Override
@@ -756,5 +749,17 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     @Override
     public PreparedSqlResult visit(Like expression) {
         throw new UnsupportedOperationException("Unsupported FromSource type: " + expression.getClass());
+    }
+
+    @Override
+    public PreparedSqlResult visit(IsNull expr) {
+        PreparedSqlResult inner = expr.getExpression().accept(this);
+        return new PreparedSqlResult(inner.sql() + " IS NULL", inner.parameters());
+    }
+
+    @Override
+    public PreparedSqlResult visit(IsNotNull expr) {
+        PreparedSqlResult inner = expr.getExpression().accept(this);
+        return new PreparedSqlResult(inner.sql() + " IS NOT NULL", inner.parameters());
     }
 }
