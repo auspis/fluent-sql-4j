@@ -6,14 +6,5 @@
     <artifactId>r4j</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>sqlbuilder</artifactId>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
+  <artifactId>spike</artifactId>
 </project>
