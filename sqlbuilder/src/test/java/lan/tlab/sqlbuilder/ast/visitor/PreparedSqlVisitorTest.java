@@ -886,4 +886,101 @@ class PreparedSqlVisitorTest {
                         "SELECT MIN(\"id\") FROM \"User\" WHERE \"id\" > ? GROUP BY \"email\" HAVING MIN(\"id\") < ? ORDER BY \"email\" DESC LIMIT 5 OFFSET 5");
         assertThat(result.parameters()).containsExactly(10, 100);
     }
+
+    @Test
+    void testSelectGroupByHavingIsNull() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        new IsNull(AggregateCall.max(ColumnReference.of("User", "email")))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo("SELECT MAX(\"email\") FROM \"User\" GROUP BY \"name\" HAVING MAX(\"email\") IS NULL");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectGroupByHavingIsNotNull() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        new IsNotNull(AggregateCall.max(ColumnReference.of("User", "email")))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo("SELECT MAX(\"email\") FROM \"User\" GROUP BY \"name\" HAVING MAX(\"email\") IS NOT NULL");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectGroupByHavingBetween() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        new lan.tlab.sqlbuilder.ast.expression.bool.Between(
+                                AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10), Literal.of(100))))
+                .build();
+        // NOTA: il visitor lancia UnsupportedOperationException per Between, quindi qui ci aspettiamo eccezione
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        try {
+            visitor.visit(selectStmt);
+            throw new AssertionError("Expected UnsupportedOperationException for BETWEEN in HAVING");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+    }
+
+    @Test
+    void testSelectGroupByHavingIn() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        new lan.tlab.sqlbuilder.ast.expression.bool.In(
+                                AggregateCall.count(ColumnReference.of("User", "id")),
+                                List.of(Literal.of(1), Literal.of(2), Literal.of(3)))))
+                .build();
+        // NOTA: il visitor lancia UnsupportedOperationException per In, quindi qui ci aspettiamo eccezione
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        try {
+            visitor.visit(selectStmt);
+            throw new AssertionError("Expected UnsupportedOperationException for IN in HAVING");
+        } catch (UnsupportedOperationException e) {
+            // ok
+        }
+    }
+
+    @Test
+    void testSelectGroupByHavingNotNested() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .from(From.of(new Table("User")))
+                .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
+                .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
+                        new Not(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
+                                Comparison.lt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(5)),
+                                Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(50))))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING NOT ((COUNT(\"id\") < ?) OR (COUNT(\"id\") > ?))");
+        assertThat(result.parameters()).containsExactly(5, 50);
+    }
 }
