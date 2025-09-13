@@ -89,8 +89,21 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             orderByResult = stmt.getOrderBy().accept(this);
             orderByClause = " ORDER BY " + orderByResult.sql();
         }
+        // PAGINATION (LIMIT/OFFSET)
+        String paginationClause = "";
+        if (stmt.getPagination() != null && stmt.getPagination().getPerPage() != null) {
+            Integer perPage = stmt.getPagination().getPerPage();
+            Integer page = stmt.getPagination().getPage();
+            if (perPage != null) {
+                paginationClause = " LIMIT " + perPage;
+                if (page != null && page > 0) {
+                    int offset = page * perPage;
+                    paginationClause += " OFFSET " + offset;
+                }
+            }
+        }
         String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause
-                + orderByClause;
+                + orderByClause + paginationClause;
         List<Object> allParams = new ArrayList<>();
         allParams.addAll(selectResult.parameters());
         allParams.addAll(fromResult.parameters());
