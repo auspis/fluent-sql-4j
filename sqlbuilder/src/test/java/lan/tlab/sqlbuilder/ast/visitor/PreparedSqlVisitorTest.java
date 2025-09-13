@@ -508,4 +508,78 @@ class PreparedSqlVisitorTest {
         assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") AS \"avgId\", MAX(\"id\") AS \"maxId\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
+
+    @Test
+    void testSelectOrderByIdAsc() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
+                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.asc(ColumnReference.of("User", "id"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectOrderByIdDesc() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
+                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.desc(ColumnReference.of("User", "id"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" DESC");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectOrderByIdDefault() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
+                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.by(ColumnReference.of("User", "id"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectOrderByMultipleColumns() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("User", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("User", "name"))))
+                .from(From.of(new Table("User")))
+                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
+                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.asc(ColumnReference.of("User", "id")),
+                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.desc(ColumnReference.of("User", "name"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"User\" ORDER BY \"id\" ASC, \"name\" DESC");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectOrderByWithWhere() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
+                .orderBy(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy.of(
+                        lan.tlab.sqlbuilder.ast.clause.orderby.Sorting.desc(ColumnReference.of("User", "id"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? ORDER BY \"id\" DESC");
+        assertThat(result.parameters()).containsExactly(10);
+    }
 }
