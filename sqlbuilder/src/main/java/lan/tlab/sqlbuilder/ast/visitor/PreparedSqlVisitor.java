@@ -86,6 +86,10 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     public PreparedSqlResult visit(Select select) {
         List<String> cols = new ArrayList<>();
         List<Object> params = new ArrayList<>();
+        if (select.getProjections().isEmpty()) {
+            // No projections: SELECT *
+            return new PreparedSqlResult("*", List.of());
+        }
         for (Projection p : select.getProjections()) {
             PreparedSqlResult res = p.accept(this);
             cols.add(res.sql());
@@ -97,7 +101,12 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(Table table) {
-        return new PreparedSqlResult("\"" + table.getName() + "\"", List.of());
+        String sql = "\"" + table.getName() + "\"";
+        String alias = table.getAs() != null ? table.getAs().getName() : null;
+        if (alias != null && !alias.isBlank()) {
+            sql += " AS " + alias;
+        }
+        return new PreparedSqlResult(sql, List.of());
     }
 
     @Override
@@ -116,13 +125,19 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(Comparison cmp) {
-        // Only support EQUALS for now
-        if (cmp.getOperator() != Comparison.ComparisonOperator.EQUALS) {
-            throw new UnsupportedOperationException("Only EQUALS operator is supported in WHERE");
+        String operator;
+        switch (cmp.getOperator()) {
+            case EQUALS -> operator = "=";
+            case NOT_EQUALS -> operator = "<>";
+            case GREATER_THAN -> operator = ">";
+            case GREATER_THAN_OR_EQUALS -> operator = ">=";
+            case LESS_THAN -> operator = "<";
+            case LESS_THAN_OR_EQUALS -> operator = "<=";
+            default -> throw new UnsupportedOperationException("Operator not supported: " + cmp.getOperator());
         }
         String lhs = visit((ColumnReference) cmp.getLhs()).sql();
         PreparedSqlResult rhsResult = visit((Literal<?>) cmp.getRhs());
-        return new PreparedSqlResult(lhs + " = ?", rhsResult.parameters());
+        return new PreparedSqlResult(lhs + " " + operator + " ?", rhsResult.parameters());
     }
 
     @Override
