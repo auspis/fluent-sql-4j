@@ -69,4 +69,93 @@ class PreparedSqlVisitorTest {
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"User\" WHERE \"id\" = ?");
         assertThat(result.parameters()).containsExactly(1);
     }
+
+    @Test
+    void testSelectAllColumns() {
+        SelectStatement selectStmt =
+                SelectStatement.builder().from(From.of(new Table("users"))).build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectWithTableAlias() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("u", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("u", "name"))))
+                .from(From.fromTable("users", "u"))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"users\" AS u");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectWhereGreaterThan() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ?");
+        assertThat(result.parameters()).containsExactly(10);
+    }
+
+    @Test
+    void testSelectWhereLessThan() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.lt(ColumnReference.of("User", "id"), Literal.of(5))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" < ?");
+        assertThat(result.parameters()).containsExactly(5);
+    }
+
+    @Test
+    void testSelectWhereGreaterThanOrEquals() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.gte(ColumnReference.of("User", "id"), Literal.of(7))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" >= ?");
+        assertThat(result.parameters()).containsExactly(7);
+    }
+
+    @Test
+    void testSelectWhereLessThanOrEquals() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.lte(ColumnReference.of("User", "id"), Literal.of(3))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" <= ?");
+        assertThat(result.parameters()).containsExactly(3);
+    }
+
+    @Test
+    void testSelectWhereNotEquals() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.ne(ColumnReference.of("User", "id"), Literal.of(99))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" <> ?");
+        assertThat(result.parameters()).containsExactly(99);
+    }
 }
