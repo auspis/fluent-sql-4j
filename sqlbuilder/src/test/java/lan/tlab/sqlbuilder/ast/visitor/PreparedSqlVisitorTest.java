@@ -630,4 +630,147 @@ class PreparedSqlVisitorTest {
         assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" GROUP BY \"email\" LIMIT 2 OFFSET 6");
         assertThat(result.parameters()).isEmpty();
     }
+
+    @Test
+    void testSelectInnerJoin() {
+        var t1 = new Table("t1");
+        var t2 = new Table("t2");
+        var join = new lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin(
+                t1,
+                lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.INNER,
+                t2,
+                Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
+        SelectStatement stmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
+                .from(From.of(join))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(stmt);
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectLeftJoinWithWhere() {
+        var t1 = new Table("t1");
+        var t2 = new Table("t2");
+        var join = new lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin(
+                t1,
+                lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
+                t2,
+                Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
+        SelectStatement stmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
+                .from(From.of(join))
+                .where(Where.of(Comparison.gt(ColumnReference.of("t1", "id"), Literal.of(10))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(stmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT \"id\", \"name\" FROM \"t1\" LEFT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" WHERE \"id\" > ?");
+        assertThat(result.parameters()).containsExactly(10);
+    }
+
+    @Test
+    void testSelectRightJoinWithOrderBy() {
+        var t1 = new Table("t1");
+        var t2 = new Table("t2");
+        var join = new lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin(
+                t1,
+                lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.RIGHT,
+                t2,
+                Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
+        SelectStatement stmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
+                .from(From.of(join))
+                .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("t2", "name"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(stmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT \"id\", \"name\" FROM \"t1\" RIGHT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" ORDER BY \"name\" ASC");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectFullJoinWithGroupBy() {
+        var t1 = new Table("t1");
+        var t2 = new Table("t2");
+        var join = new lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin(
+                t1,
+                lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.FULL,
+                t2,
+                Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
+        SelectStatement stmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
+                .from(From.of(join))
+                .groupBy(GroupBy.of(ColumnReference.of("t1", "id")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(stmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT \"id\", \"name\" FROM \"t1\" FULL JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" GROUP BY \"id\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectCrossJoinWithLimitOffset() {
+        var t1 = new Table("t1");
+        var t2 = new Table("t2");
+        var join = new lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin(
+                t1, lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.CROSS, t2, null);
+        SelectStatement stmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
+                .from(From.of(join))
+                .pagination(Pagination.builder().perPage(5).page(1).build())
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(stmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" CROSS JOIN \"t2\" LIMIT 5 OFFSET 5");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectMultipleJoins() {
+        var t1 = new Table("t1");
+        var t2 = new Table("t2");
+        var t3 = new Table("t3");
+        var join1 = new lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin(
+                t1,
+                lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.INNER,
+                t2,
+                Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
+        var join2 = new lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin(
+                join1,
+                lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
+                t3,
+                Comparison.eq(ColumnReference.of("t2", "id"), ColumnReference.of("t3", "t2_id")));
+        SelectStatement stmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("t2", "name")),
+                        new ScalarExpressionProjection(ColumnReference.of("t3", "value"))))
+                .from(From.of(join2))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(stmt);
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT \"id\", \"name\", \"value\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" LEFT JOIN \"t3\" ON \"t2\".\"id\" = \"t3\".\"t2_id\"");
+        assertThat(result.parameters()).isEmpty();
+    }
 }
