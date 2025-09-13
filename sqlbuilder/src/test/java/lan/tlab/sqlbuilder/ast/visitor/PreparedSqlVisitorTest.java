@@ -158,4 +158,52 @@ class PreparedSqlVisitorTest {
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" <> ?");
         assertThat(result.parameters()).containsExactly(99);
     }
+
+    @Test
+    void testSelectWhereAnd() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.and(
+                        Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
+                        Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20)))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"id\" > ?) AND (\"id\" < ?)");
+        assertThat(result.parameters()).containsExactly(10, 20);
+    }
+
+    @Test
+    void testSelectWhereOr() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
+                        Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
+                        Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob")))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"name\" = ?) OR (\"name\" = ?)");
+        assertThat(result.parameters()).containsExactly("Alice", "Bob");
+    }
+
+    @Test
+    void testSelectWhereAndOrNested() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.or(
+                        Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
+                        lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr.and(
+                                Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
+                                Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"name\" = ?) OR ((\"id\" > ?) AND (\"id\" < ?))");
+        assertThat(result.parameters()).containsExactly("Alice", 10, 20);
+    }
 }
