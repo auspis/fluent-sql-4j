@@ -425,4 +425,87 @@ class PreparedSqlVisitorTest {
         assertThat(result.sql()).isEqualTo("SELECT MAX(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
+
+    @Test
+    void testSelectScalarProjectionWithAlias() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(
+                                ColumnReference.of("User", "id"),
+                                new lan.tlab.sqlbuilder.ast.expression.item.As("userId")),
+                        new ScalarExpressionProjection(
+                                ColumnReference.of("User", "name"),
+                                new lan.tlab.sqlbuilder.ast.expression.item.As("userName"))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" AS \"userId\", \"name\" AS \"userName\" FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectScalarProjectionWithAliasAndWhere() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        ColumnReference.of("User", "id"), new lan.tlab.sqlbuilder.ast.expression.item.As("userId"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice"))))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" AS \"userId\" FROM \"User\" WHERE \"name\" = ?");
+        assertThat(result.parameters()).containsExactly("Alice");
+    }
+
+    @Test
+    void testSelectAggregationProjectionWithAlias() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.count(
+                                ColumnReference.of("User", "id")),
+                        new lan.tlab.sqlbuilder.ast.expression.item.As("totalUsers"))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") AS \"totalUsers\" FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectAggregationProjectionWithAliasGroupBy() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                        lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.sum(
+                                ColumnReference.of("User", "id")),
+                        new lan.tlab.sqlbuilder.ast.expression.item.As("sumId"))))
+                .from(From.of(new Table("User")))
+                .groupBy(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy.of(ColumnReference.of("User", "email")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") AS \"sumId\" FROM \"User\" GROUP BY \"email\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectMultipleAggregationProjectionsWithAlias() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                                lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.avg(
+                                        ColumnReference.of("User", "id")),
+                                new lan.tlab.sqlbuilder.ast.expression.item.As("avgId")),
+                        new lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection(
+                                lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall.max(
+                                        ColumnReference.of("User", "id")),
+                                new lan.tlab.sqlbuilder.ast.expression.item.As("maxId"))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedSqlVisitor visitor = new PreparedSqlVisitor();
+        PreparedSqlResult result = visitor.visit(selectStmt);
+        assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") AS \"avgId\", MAX(\"id\") AS \"maxId\" FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
+    }
 }
