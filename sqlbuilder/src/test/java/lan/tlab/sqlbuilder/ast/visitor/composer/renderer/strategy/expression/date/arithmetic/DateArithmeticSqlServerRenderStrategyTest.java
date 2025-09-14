@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentD
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArithmetic;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval.IntervalUnit;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression.DateArithmeticRenderStrategy;
@@ -29,7 +30,7 @@ class DateArithmeticSqlServerRenderStrategyTest {
     void add() {
         DateArithmetic exp = DateArithmetic.add(
                 ColumnReference.of("my_table", "start_date"), Interval.of(Literal.of(7), IntervalUnit.DAY));
-        String sql = strategy.render(exp, renderer);
+        String sql = strategy.render(exp, renderer, new AstContext());
         assertThat(sql).isEqualTo("DATEADD(DAY, 7, [my_table].[start_date])");
     }
 
@@ -39,7 +40,7 @@ class DateArithmeticSqlServerRenderStrategyTest {
                 DateArithmetic.add(
                         ColumnReference.of("my_table", "start_date"), Interval.of(Literal.of(1), IntervalUnit.YEAR)),
                 Interval.of(Literal.of(7), IntervalUnit.DAY));
-        String sql = strategy.render(exp, renderer);
+        String sql = strategy.render(exp, renderer, new AstContext());
         assertThat(sql).isEqualTo("DATEADD(DAY, 7, DATEADD(YEAR, 1, [my_table].[start_date]))");
     }
 
@@ -47,14 +48,14 @@ class DateArithmeticSqlServerRenderStrategyTest {
     void subtract() {
         DateArithmetic exp = DateArithmetic.subtract(
                 ColumnReference.of("my_table", "start_date"), Interval.of(Literal.of(7), IntervalUnit.DAY));
-        String sql = strategy.render(exp, renderer);
+        String sql = strategy.render(exp, renderer, new AstContext());
         assertThat(sql).isEqualTo("DATEADD(DAY, -7, [my_table].[start_date])");
     }
 
     @Test
     void subtract_currrentDate() {
         DateArithmetic exp = DateArithmetic.subtract(new CurrentDate(), Interval.of(Literal.of(7), IntervalUnit.DAY));
-        String sql = strategy.render(exp, renderer);
+        String sql = strategy.render(exp, renderer, new AstContext());
         assertThat(sql).isEqualTo("DATEADD(DAY, -7, CURRENT_DATE())");
     }
 }

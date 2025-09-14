@@ -12,6 +12,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,28 +32,28 @@ class BinaryArithmeticExpressionRenderStrategyTest {
     @Test
     void addition_literal() {
         BinaryArithmeticExpression expression = ArithmeticExpression.addition(Literal.of(5), Literal.of(23));
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(5 + 23)");
     }
 
     @Test
     void subtraction_literal() {
         BinaryArithmeticExpression expression = ArithmeticExpression.subtraction(Literal.of(5), Literal.of(23));
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(5 - 23)");
     }
 
     @Test
     void division_literal() {
         BinaryArithmeticExpression expression = ArithmeticExpression.division(Literal.of(10), Literal.of(2));
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(10 / 2)");
     }
 
     @Test
     void modulo_literal() {
         BinaryArithmeticExpression expression = ArithmeticExpression.modulo(Literal.of(10), Literal.of(2));
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(10 % 2)");
     }
 
@@ -61,7 +62,7 @@ class BinaryArithmeticExpressionRenderStrategyTest {
         BinaryArithmeticExpressionRenderStrategy strategy = new BinaryArithmeticExpressionRenderStrategy();
         BinaryArithmeticExpression expression =
                 ArithmeticExpression.subtraction(ColumnReference.of("Customer", "score"), Literal.of(10));
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(\"Customer\".\"score\" - 10)");
     }
 
@@ -78,7 +79,7 @@ class BinaryArithmeticExpressionRenderStrategyTest {
                 .build();
         BinaryArithmeticExpression expression =
                 ArithmeticExpression.multiplication(ColumnReference.of("Customer", "score"), subquery);
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(\"Customer\".\"score\" * (SELECT MAX(\"Risk\".\"value\") FROM \"Risk\"))");
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.expression.item.UpdateItem;
 import lan.tlab.sqlbuilder.ast.expression.set.TableExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -20,7 +21,7 @@ public class UpdateStatement implements DataManipulationStatement {
     private final Where where = Where.builder().build();
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
         return visitor.visit(this);
     }
 }

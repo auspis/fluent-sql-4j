@@ -27,6 +27,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.AfterAll;
@@ -65,7 +66,7 @@ public class StandardSqlRendererMySqlIT {
                                 .build()))
                 .primaryKey(new PrimaryKey("id"))
                 .build());
-        String createTableSql = createTable.accept(renderer);
+        String createTableSql = createTable.accept(renderer, new AstContext());
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSql);
 
@@ -79,8 +80,8 @@ public class StandardSqlRendererMySqlIT {
                     .data(lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues.of(
                             Literal.of(2), Literal.of("Bob"), Literal.of(500), Literal.of("2025-08-31 23:23:24")))
                     .build();
-            stmt.execute(insertAlice.accept(renderer));
-            stmt.execute(insertBob.accept(renderer));
+            stmt.execute(insertAlice.accept(renderer, new AstContext()));
+            stmt.execute(insertBob.accept(renderer, new AstContext()));
         }
     }
 
@@ -101,7 +102,7 @@ public class StandardSqlRendererMySqlIT {
                         Sorting.asc(ColumnReference.of("Customer", "createdAt"))))
                 .pagination(Pagination.builder().perPage(5).build())
                 .build();
-        String sql = statement.accept(renderer);
+        String sql = statement.accept(renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -128,7 +129,7 @@ public class StandardSqlRendererMySqlIT {
                 .from(From.fromTable("Customer"))
                 .where(Where.of(Comparison.ne(ColumnReference.of("Customer", "name"), Literal.of("Alice"))))
                 .build();
-        String sql = statement.accept(renderer);
+        String sql = statement.accept(renderer, new AstContext());
         System.out.println(sql);
         assertThat(sql)
                 .isEqualTo(

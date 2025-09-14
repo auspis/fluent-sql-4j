@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProje
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,14 +26,14 @@ class ScalarExpressionProjectionRenderStrategyTest {
     @Test
     void columnReference() {
         ScalarExpressionProjection projection = new ScalarExpressionProjection(ColumnReference.of("Customer", "name"));
-        String sql = strategy.render(projection, sqlRenderer);
+        String sql = strategy.render(projection, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("\"Customer\".\"name\"");
     }
 
     @Test
     void literalWithAlias() {
         ScalarExpressionProjection projection = new ScalarExpressionProjection(Literal.of(23), "age");
-        String sql = strategy.render(projection, sqlRenderer);
+        String sql = strategy.render(projection, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("23 AS age");
     }
 
@@ -40,7 +41,7 @@ class ScalarExpressionProjectionRenderStrategyTest {
     void castColumnToVarchar() {
         ScalarExpressionProjection projection =
                 new ScalarExpressionProjection(Cast.of(ColumnReference.of("Customer", "id"), "VARCHAR(255)"), "strId");
-        String sql = strategy.render(projection, sqlRenderer);
+        String sql = strategy.render(projection, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("CAST(\"Customer\".\"id\" AS VARCHAR(255)) AS strId");
     }
 }

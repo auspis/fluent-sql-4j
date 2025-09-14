@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ class AggregationFunctionProjectionRenderStrategyTest {
     void ok() {
         AggregationFunctionProjection function =
                 new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("Customer", "score")));
-        String sql = strategy.render(function, sqlRenderer);
+        String sql = strategy.render(function, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("MAX(\"Customer\".\"score\")");
     }
 
@@ -33,7 +34,7 @@ class AggregationFunctionProjectionRenderStrategyTest {
     void as() {
         AggregationFunctionProjection function = new AggregationFunctionProjection(
                 AggregateCall.max(ColumnReference.of("Customer", "score")), "topScore");
-        String sql = strategy.render(function, sqlRenderer);
+        String sql = strategy.render(function, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("MAX(\"Customer\".\"score\") AS topScore");
     }
 }

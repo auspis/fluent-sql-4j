@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProje
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.set.IntersectExpression;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ class IntersectRenderStrategyTest {
                 .build();
 
         IntersectExpression intersect = IntersectExpression.intersect(select1, select2);
-        String sql = strategy.render(intersect, sqlRenderer);
+        String sql = strategy.render(intersect, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -66,7 +67,7 @@ class IntersectRenderStrategyTest {
                 .build();
 
         IntersectExpression intersect = IntersectExpression.intersectAll(select1, select2);
-        String sql = strategy.render(intersect, sqlRenderer);
+        String sql = strategy.render(intersect, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

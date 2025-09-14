@@ -2,13 +2,14 @@ package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.cons
 
 import java.util.stream.Collectors;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.escape.EscapeStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.SqlItemRenderStrategy;
 
 public class PrimaryKeyRenderStrategy implements SqlItemRenderStrategy {
 
-    public String render(PrimaryKey item, SqlRenderer sqlRenderer) {
+    public String render(PrimaryKey item, SqlRenderer sqlRenderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = sqlRenderer.getEscapeStrategy();
         String columns =
                 item.getColumns().stream().map(c -> escapeStrategy.apply(c)).collect(Collectors.joining(", "));

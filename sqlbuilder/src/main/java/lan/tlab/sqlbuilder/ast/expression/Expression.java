@@ -1,5 +1,6 @@
 package lan.tlab.sqlbuilder.ast.expression;
 
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.Visitable;
 
@@ -10,5 +11,5 @@ import lan.tlab.sqlbuilder.ast.visitor.Visitable;
 public interface Expression extends Visitable {
 
     @Override
-    <T> T accept(SqlVisitor<T> visitor);
+    <T> T accept(SqlVisitor<T> visitor, AstContext ctx);
 }

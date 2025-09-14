@@ -75,6 +75,7 @@ import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.clause.FromRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.clause.FromSubqueryRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.clause.GroupByRenderStrategy;
@@ -400,386 +401,388 @@ public class SqlRendererImpl implements SqlRenderer {
     @Default
     private final DefaultConstraintRenderStrategy defaultConstraintStrategy = new DefaultConstraintRenderStrategy();
 
+    private final AstContext ctx;
+
     // statements
     @Override
-    public String visit(SelectStatement statement) {
-        return selectStatementStrategy.render(statement, this);
+    public String visit(SelectStatement statement, AstContext ctx) {
+        return selectStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
     public String visit(InsertStatement statement) {
-        return insertStatementStrategy.render(statement, this);
+        return insertStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
     public String visit(UpdateStatement statement) {
-        return updateStatementStrategy.render(statement, this);
+        return updateStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
     public String visit(DeleteStatement statement) {
-        return deleteStatementStrategy.render(statement, this);
+        return deleteStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
     public String visit(CreateTableStatement statement) {
-        return createTableStatementStrategy.render(statement, this);
+        return createTableStatementStrategy.render(statement, this, ctx);
     }
 
     // clause
     @Override
-    public String visit(Select clause) {
-        return selectStrategy.render(clause, this);
+    public String visit(Select clause, AstContext ctx) {
+        return selectStrategy.render(clause, this, ctx);
     }
 
     @Override
-    public String visit(AggregationFunctionProjection projection) {
-        return aggregationFunctionProjectionStrategy.render(projection, this);
+    public String visit(AggregationFunctionProjection projection, AstContext ctx) {
+        return aggregationFunctionProjectionStrategy.render(projection, this, ctx);
     }
 
     @Override
-    public String visit(ScalarExpressionProjection projection) {
-        return scalarExpressionProjectionStrategy.render(projection, this);
+    public String visit(ScalarExpressionProjection projection, AstContext ctx) {
+        return scalarExpressionProjectionStrategy.render(projection, this, ctx);
     }
 
     @Override
-    public String visit(From clause) {
-        return fromStrategy.render(clause, this);
+    public String visit(From clause, AstContext ctx) {
+        return fromStrategy.render(clause, this, ctx);
     }
 
     @Override
-    public String visit(OnJoin onJoin) {
-        return onJoinStrategy.render(onJoin, this);
+    public String visit(OnJoin onJoin, AstContext ctx) {
+        return onJoinStrategy.render(onJoin, this, ctx);
     }
 
     @Override
     public String visit(FromSubquery fromSubquery) {
-        return fromSubqueryStrategy.render(fromSubquery, this);
+        return fromSubqueryStrategy.render(fromSubquery, this, ctx);
     }
 
     @Override
-    public String visit(Where clause) {
-        return whereStrategy.render(clause, this);
+    public String visit(Where clause, AstContext ctx) {
+        return whereStrategy.render(clause, this, ctx);
     }
 
     @Override
-    public String visit(GroupBy clause) {
-        return groupByStrategy.render(clause, this);
+    public String visit(GroupBy clause, AstContext ctx) {
+        return groupByStrategy.render(clause, this, ctx);
     }
 
     @Override
-    public String visit(Having clause) {
-        return havingStrategy.render(clause, this);
+    public String visit(Having clause, AstContext ctx) {
+        return havingStrategy.render(clause, this, ctx);
     }
 
     @Override
-    public String visit(OrderBy clause) {
-        return orderByStrategy.render(clause, this);
+    public String visit(OrderBy clause, AstContext ctx) {
+        return orderByStrategy.render(clause, this, ctx);
     }
 
     @Override
-    public String visit(Sorting sorting) {
-        return sortingStrategy.render(sorting, this);
+    public String visit(Sorting sorting, AstContext ctx) {
+        return sortingStrategy.render(sorting, this, ctx);
     }
 
     @Override
-    public String visit(Pagination clause) {
-        return paginationStrategy.render(clause, this);
+    public String visit(Pagination clause, AstContext ctx) {
+        return paginationStrategy.render(clause, this, ctx);
     }
 
     // boolean expressions
     @Override
     public String visit(NullBooleanExpression expression) {
-        return nullScalarExpressionStrategy.render(expression, this);
+        return nullScalarExpressionStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(Between expression) {
-        return betweenStrategy.render(expression, this);
+        return betweenStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(Comparison expression) {
-        return comparisonStrategy.render(expression, this);
+    public String visit(Comparison expression, AstContext ctx) {
+        return comparisonStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(In expression) {
-        return inStrategy.render(expression, this);
+        return inStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(IsNotNull expression) {
-        return isNotNullStrategy.render(expression, this);
+    public String visit(IsNotNull expression, AstContext ctx) {
+        return isNotNullStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(IsNull expression) {
-        return isNullStrategy.render(expression, this);
+    public String visit(IsNull expression, AstContext ctx) {
+        return isNullStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(Like expression) {
-        return likeStrategy.render(expression, this);
+        return likeStrategy.render(expression, this, ctx);
     }
 
     // boolean expressions - logical
     @Override
-    public String visit(AndOr expression) {
-        return andOrStrategy.render(expression, this);
+    public String visit(AndOr expression, AstContext ctx) {
+        return andOrStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(Not expression) {
-        return notStrategy.render(expression, this);
+    public String visit(Not expression, AstContext ctx) {
+        return notStrategy.render(expression, this, ctx);
     }
 
     // scalar expressions
     @Override
-    public String visit(AggregateCall expression) {
-        return aggregateCallStrategy.render(expression, this);
+    public String visit(AggregateCall expression, AstContext ctx) {
+        return aggregateCallStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(ColumnReference expression) {
-        return columnReferenceStrategy.render(expression, this);
+        return columnReferenceStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(Literal<?> expression) {
-        return literalStrategy.render(expression, this);
+        return literalStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(ScalarSubquery expression) {
-        return scalarSubqueryStrategy.render(expression, this);
+        return scalarSubqueryStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(Interval interval) {
-        return intervalStrategy.render(interval, this);
+        return intervalStrategy.render(interval, this, ctx);
     }
 
     @Override
     public String visit(BinaryArithmeticExpression expression) {
-        return binaryArithmeticExpressionStrategy.render(expression, this);
+        return binaryArithmeticExpressionStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(UnaryArithmeticExpression expression) {
-        return unaryArithmeticExpressionStrategy.render(expression, this);
+        return unaryArithmeticExpressionStrategy.render(expression, this, ctx);
     }
 
     // functionCall
     @Override
     public String visit(Cast functionCall) {
-        return castStrategy.render(functionCall, this);
+        return castStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Concat functionCall) {
-        return concatStrategy.render(functionCall, this);
+        return concatStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(CurrentDate functionCall) {
-        return currentDateStrategy.render(functionCall, this);
+        return currentDateStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(CurrentDateTime functionCall) {
-        return currentDateTimeStrategy.render(functionCall, this);
+        return currentDateTimeStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(DateArithmetic functionCall) {
-        return dateArithmeticStrategy.render(functionCall, this);
+        return dateArithmeticStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(ExtractDatePart functionCall) {
-        return extractDatePartStrategy.render(functionCall, this);
+        return extractDatePartStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Left functionCall) {
-        return leftStrategy.render(functionCall, this);
+        return leftStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Length functionCall) {
-        return lengthStrategy.render(functionCall, this);
+        return lengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(CharLength functionCall) {
-        return charLengthStrategy.render(functionCall, this);
+        return charLengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(CharacterLength functionCall) {
-        return characterLengthStrategy.render(functionCall, this);
+        return characterLengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(DataLength functionCall) {
-        return dataLengthStrategy.render(functionCall, this);
+        return dataLengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Mod functionCall) {
-        return modStrategy.render(functionCall, this);
+        return modStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(NullScalarExpression interval) {
-        return nullScalarExpressionStrategy.render(interval, this);
+        return nullScalarExpressionStrategy.render(interval, this, ctx);
     }
 
     @Override
     public String visit(Power functionCall) {
-        return powerStrategy.render(functionCall, this);
+        return powerStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Replace functionCall) {
-        return replaceStrategy.render(functionCall, this);
+        return replaceStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Round functionCall) {
-        return roundStrategy.render(functionCall, this);
+        return roundStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Substring functionCall) {
-        return substringStrategy.render(functionCall, this);
+        return substringStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(Trim functionCall) {
-        return trimStrategy.render(functionCall, this);
+        return trimStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(UnaryNumeric functionCall) {
-        return unaryNumericStrategy.render(functionCall, this);
+        return unaryNumericStrategy.render(functionCall, this, ctx);
     }
 
     @Override
     public String visit(UnaryString functionCall) {
-        return unaryStringStrategy.render(functionCall, this);
+        return unaryStringStrategy.render(functionCall, this, ctx);
     }
 
     // set expressions
     @Override
     public String visit(NullSetExpression expression) {
-        return nullSetExpressionStrategy.render(expression, this);
+        return nullSetExpressionStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(ExceptExpression expression) {
-        return exceptStrategy.render(expression, this);
+        return exceptStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(IntersectExpression expression) {
-        return intersectStrategy.render(expression, this);
+        return intersectStrategy.render(expression, this, ctx);
     }
 
     @Override
     public String visit(UnionExpression expression) {
-        return unionStrategy.render(expression, this);
+        return unionStrategy.render(expression, this, ctx);
     }
 
     // sql items
     @Override
     public String visit(Table item) {
-        return tableStrategy.render(item, this);
+        return tableStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(As item) {
-        return asStrategy.render(item, this);
+        return asStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(UpdateItem item) {
-        return updateItemStrategy.render(item, this);
+        return updateItemStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(InsertValues item) {
-        return insertValueStrategy.render(item, this);
+        return insertValueStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(InsertSource item) {
-        return insertSourceStrategy.render(item, this);
+    public String visit(InsertSource item, AstContext ctx) {
+        return insertSourceStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(DefaultValues item) {
-        return defaultValuesStrategy.render(item, this);
+        return defaultValuesStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(ReferencesItem item) {
-        return referencesItemStrategy.render(item, this);
+        return referencesItemStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(TableDefinition item) {
-        return tableDefinitionStrategy.render(item, this);
+        return tableDefinitionStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(ColumnDefinition item) {
-        return columnDefinitionStrategy.render(item, this);
+        return columnDefinitionStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(SimpleDataType type) {
-        return simpleDataTypeStrategy.render(type, this);
+        return simpleDataTypeStrategy.render(type, this, ctx);
     }
 
     @Override
     public String visit(ParameterizedDataType type) {
-        return parameterizedDataTypeStrategy.render(type, this);
+        return parameterizedDataTypeStrategy.render(type, this, ctx);
     }
 
     @Override
     public String visit(PrimaryKey item) {
-        return primaryKeyStrategy.render(item, this);
+        return primaryKeyStrategy.render(item, this, ctx);
     }
 
     @Override
     public String visit(Index index) {
-        return indexStrategy.render(index, this);
+        return indexStrategy.render(index, this, ctx);
     }
 
     @Override
     public String visit(NotNullConstraint constraint) {
-        return notNullConstraintStrategy.render(constraint, this);
+        return notNullConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
     public String visit(UniqueConstraint constraint) {
-        return uniqueConstraintStrategy.render(constraint, this);
+        return uniqueConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
     public String visit(ForeignKeyConstraint constraint) {
-        return foreignKeyConstraintStrategy.render(constraint, this);
+        return foreignKeyConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
     public String visit(CheckConstraint constraint) {
-        return checkConstraintStrategy.render(constraint, this);
+        return checkConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
     public String visit(DefaultConstraint constraint) {
-        return defaultConstraintStrategy.render(constraint, this);
+        return defaultConstraintStrategy.render(constraint, this, ctx);
     }
 }

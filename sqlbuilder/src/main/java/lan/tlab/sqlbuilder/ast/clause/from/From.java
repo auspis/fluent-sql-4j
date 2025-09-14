@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import lan.tlab.sqlbuilder.ast.clause.Clause;
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSource;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class From implements Clause {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
     }
 }
