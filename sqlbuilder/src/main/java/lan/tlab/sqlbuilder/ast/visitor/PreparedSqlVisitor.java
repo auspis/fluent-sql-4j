@@ -206,10 +206,9 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         return new PreparedSqlResult(sql, List.of());
     }
 
-    // RIMOSSO: private boolean forceQualification = false;
-
-    // Overload privato per qualificazione colonne
-    private PreparedSqlResult visit(ColumnReference col, boolean qualify) {
+    @Override
+    public PreparedSqlResult visit(ColumnReference col, AstContext ctx) {
+        boolean qualify = ctx != null && ctx.getScope() == AstContext.Scope.JOIN_ON;
         String sql;
         if (qualify && col.getTable() != null && !col.getTable().isBlank()) {
             sql = "\"" + col.getTable() + "\".\"" + col.getColumn() + "\"";
@@ -219,37 +218,8 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         return new PreparedSqlResult(sql, List.of());
     }
 
-    private PreparedSqlResult visit(BooleanExpression expr, boolean qualify, AstContext ctx) {
-        switch (expr) {
-            case Comparison cmp -> {
-                return visitComparisonWithQualify(cmp, qualify, ctx);
-            }
-            case lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr andOr -> {
-                List<String> sqlParts = new ArrayList<>();
-                List<Object> params = new ArrayList<>();
-                for (BooleanExpression op : andOr.getOperands()) {
-                    PreparedSqlResult res = visit(op, qualify, ctx);
-                    sqlParts.add("(" + res.sql() + ")");
-                    params.addAll(res.parameters());
-                }
-                String operator =
-                        andOr.getOperator() == lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator.AND
-                                ? "AND"
-                                : "OR";
-                return new PreparedSqlResult(String.join(" " + operator + " ", sqlParts), params);
-            }
-            case lan.tlab.sqlbuilder.ast.expression.bool.logical.Not not -> {
-                PreparedSqlResult inner = visit(not.getExpression(), qualify, ctx);
-                return new PreparedSqlResult("NOT (" + inner.sql() + ")", inner.parameters());
-            }
-            case null, default -> {
-                // Fallback: visita normale
-                return expr.accept(this, ctx);
-            }
-        }
-    }
-
-    private PreparedSqlResult visitComparisonWithQualify(Comparison cmp, boolean qualify, AstContext ctx) {
+    @Override
+    public PreparedSqlResult visit(Comparison cmp, AstContext ctx) {
         String operator;
         switch (cmp.getOperator()) {
             case EQUALS -> operator = "=";
@@ -260,33 +230,24 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             case LESS_THAN_OR_EQUALS -> operator = "<=";
             default -> throw new UnsupportedOperationException("Operator not supported: " + cmp.getOperator());
         }
+        boolean qualify = ctx != null && ctx.getScope() == AstContext.Scope.JOIN_ON;
         String lhs;
         if (cmp.getLhs() instanceof ColumnReference colLhs) {
-            lhs = visit(colLhs, qualify).sql();
+            PreparedSqlResult lhsResult = visit(colLhs, ctx.copy());
+            lhs = lhsResult.sql();
         } else {
             lhs = cmp.getLhs().accept(this, ctx).sql();
         }
         String rhsSql;
         List<Object> params = new ArrayList<>();
         if (cmp.getRhs() instanceof ColumnReference colRhs) {
-            rhsSql = visit(colRhs, qualify).sql();
+            rhsSql = visit(colRhs, ctx.copy()).sql();
         } else {
             PreparedSqlResult rhsResult = cmp.getRhs().accept(this, ctx);
             rhsSql = rhsResult.sql();
             params.addAll(rhsResult.parameters());
         }
         return new PreparedSqlResult(lhs + " " + operator + " " + rhsSql, params);
-    }
-
-    @Override
-    public PreparedSqlResult visit(ColumnReference col, AstContext ctx) {
-        return visit(col, false);
-    }
-
-    @Override
-    public PreparedSqlResult visit(Comparison cmp, AstContext ctx) {
-        // Default: non qualificare mai, tranne se richiesto esplicitamente
-        return visitComparisonWithQualify(cmp, false, ctx);
     }
 
     @Override
@@ -386,8 +347,9 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         // ON condition (not for CROSS JOIN)
         if (join.getType() != lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.CROSS) {
             if (join.getOnCondition() != null) {
-                // Passa il flag di qualificazione alle Comparison e sotto-espressioni
-                PreparedSqlResult onResult = visit(join.getOnCondition(), true, ctx);
+                // Passa il contesto con scope JOIN_ON
+                PreparedSqlResult onResult =
+                        join.getOnCondition().accept(this, new AstContext(AstContext.Scope.JOIN_ON));
                 sql.append(" ON ").append(onResult.sql());
                 params.addAll(onResult.parameters());
             }
