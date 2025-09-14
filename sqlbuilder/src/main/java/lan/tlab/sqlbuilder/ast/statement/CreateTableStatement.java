@@ -1,6 +1,7 @@
 package lan.tlab.sqlbuilder.ast.statement;
 
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,7 @@ public class CreateTableStatement implements Statement {
     private final TableDefinition tableDefinition;
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
         return visitor.visit(this);
     }
 }

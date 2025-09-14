@@ -17,6 +17,7 @@ import lan.tlab.sqlbuilder.ast.expression.set.SetExpression;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,7 @@ class InsertStatementRenderStrategyTest {
                 .data(InsertValues.of(Literal.of("Success"), Literal.of(200), Literal.of(LocalDate.of(2025, 8, 28))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
 
         assertThat(sql)
                 .isEqualTo(
@@ -62,7 +63,7 @@ class InsertStatementRenderStrategyTest {
                 .data(InsertValues.of(Literal.of("Success"), Literal.of(200), Literal.of(LocalDate.of(2025, 8, 28))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
 
         assertThat(sql).isEqualTo("""
 			INSERT INTO \"Logs\" VALUES ('Success', 200, '2025-08-28')\
@@ -74,7 +75,7 @@ class InsertStatementRenderStrategyTest {
         InsertStatement statement =
                 InsertStatement.builder().table(new Table("Logs")).build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("INSERT INTO \"Logs\" DEFAULT VALUES");
     }
 
@@ -89,7 +90,7 @@ class InsertStatementRenderStrategyTest {
                 .data(InsertValues.of(Literal.of("Success"), Literal.of(200), new CurrentDate()))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
 
         assertThat(sql)
                 .isEqualTo(
@@ -114,7 +115,7 @@ class InsertStatementRenderStrategyTest {
                 .data(new InsertSource(select))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo("""
 			INSERT INTO \"Archive\" \
@@ -147,7 +148,7 @@ class InsertStatementRenderStrategyTest {
                 .data(new InsertSource(union))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
 
         assertThat(sql)
                 .isEqualTo(
@@ -168,7 +169,7 @@ class InsertStatementRenderStrategyTest {
                 .data(InsertValues.of(Literal.of("Test")))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("INSERT INTO \"Order\" VALUES ('Test')");
     }
 
@@ -180,7 +181,7 @@ class InsertStatementRenderStrategyTest {
                 .data(InsertValues.of(Literal.of("A"), Literal.of("B")))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

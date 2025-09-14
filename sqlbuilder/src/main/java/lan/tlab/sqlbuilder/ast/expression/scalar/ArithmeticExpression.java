@@ -1,5 +1,6 @@
 package lan.tlab.sqlbuilder.ast.expression.scalar;
 
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,7 +63,7 @@ public interface ArithmeticExpression extends ScalarExpression {
         private final ScalarExpression rhs;
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }
@@ -75,7 +76,7 @@ public interface ArithmeticExpression extends ScalarExpression {
         private final ScalarExpression expression;
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }

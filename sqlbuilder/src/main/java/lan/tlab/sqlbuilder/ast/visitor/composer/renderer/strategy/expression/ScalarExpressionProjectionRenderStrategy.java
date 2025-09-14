@@ -1,15 +1,16 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression;
 
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 
 public class ScalarExpressionProjectionRenderStrategy implements ExpressionRenderStrategy {
 
-    public String render(ScalarExpressionProjection projection, SqlRenderer sqlRenderer) {
+    public String render(ScalarExpressionProjection projection, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                         "%s %s",
-                        projection.getExpression().accept(sqlRenderer),
-                        projection.getAs().accept(sqlRenderer))
+                        projection.getExpression().accept(sqlRenderer, ctx),
+                        projection.getAs().accept(sqlRenderer, ctx))
                 .trim();
     }
 }

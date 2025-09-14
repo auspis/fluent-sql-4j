@@ -10,6 +10,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ class FromSubqueryRenderStrategyTest {
                 .from(From.builder().source(new Table("Customer")).build())
                 .build();
         FromSubquery fromSubquery = FromSubquery.of(subquery, As.nullObject());
-        String sql = strategy.render(fromSubquery, sqlRenderer);
+        String sql = strategy.render(fromSubquery, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(SELECT * FROM \"Customer\")");
     }
 
@@ -46,7 +47,7 @@ class FromSubqueryRenderStrategyTest {
                 .from(From.builder().source(new Table("Customer")).build())
                 .build();
         FromSubquery fromSubquery = FromSubquery.of(subquery, "tmp");
-        String sql = strategy.render(fromSubquery, sqlRenderer);
+        String sql = strategy.render(fromSubquery, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

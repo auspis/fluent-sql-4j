@@ -15,6 +15,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.PreparedSqlResult;
 import lan.tlab.sqlbuilder.ast.visitor.PreparedSqlVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
@@ -81,7 +82,7 @@ public class SpikeObjectToJdbcMain {
                     .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                     .build();
             PreparedSqlVisitor selectVisitor = new PreparedSqlVisitor();
-            PreparedSqlResult selectResult = selectVisitor.visit(selectStmt);
+            PreparedSqlResult selectResult = selectVisitor.visit(selectStmt, new AstContext());
             String selectSql = selectResult.sql();
             System.out.println("SQL select: " + selectSql);
             System.out.println("Parameters: " + selectResult.parameters());

@@ -7,6 +7,7 @@ import lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ class OnJoinStrategyRenderStrategyTest {
                 new Table("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
-        String sql = strategy.render(onJoin, standardSql2008);
+        String sql = strategy.render(onJoin, standardSql2008, new AstContext());
         assertThat(sql)
                 .isEqualTo("\"Customer\" AS c INNER JOIN \"Address\" AS a ON \"c\".\"id\" = \"a\".\"customer_id\"");
     }
@@ -44,7 +45,7 @@ class OnJoinStrategyRenderStrategyTest {
                 new Table("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
-        String sql = strategy.render(onJoin, standardSql2008);
+        String sql = strategy.render(onJoin, standardSql2008, new AstContext());
         assertThat(sql)
                 .isEqualTo("\"Customer\" AS c LEFT JOIN \"Address\" AS a ON \"c\".\"id\" = \"a\".\"customer_id\"");
     }
@@ -57,7 +58,7 @@ class OnJoinStrategyRenderStrategyTest {
                 new Table("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
-        String sql = strategy.render(onJoin, standardSql2008);
+        String sql = strategy.render(onJoin, standardSql2008, new AstContext());
         assertThat(sql)
                 .isEqualTo("\"Customer\" AS c FULL JOIN \"Address\" AS a ON \"c\".\"id\" = \"a\".\"customer_id\"");
     }
@@ -70,7 +71,7 @@ class OnJoinStrategyRenderStrategyTest {
                 new Table("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
-        String sql = strategy.render(onJoin, standardSql2008);
+        String sql = strategy.render(onJoin, standardSql2008, new AstContext());
         assertThat(sql)
                 .isEqualTo("\"Customer\" AS c CROSS JOIN \"Address\" AS a ON \"c\".\"id\" = \"a\".\"customer_id\"");
     }

@@ -2,6 +2,7 @@ package lan.tlab.sqlbuilder.ast.expression.item;
 
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSource;
 import lan.tlab.sqlbuilder.ast.expression.set.TableExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class Table implements SqlItem, TableExpression, FromSource {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
         return visitor.visit(this);
     }
 }

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +27,14 @@ class InsertValueRenderStrategyTest {
     void ok() {
         InsertValues item = InsertValues.of(
                 Literal.of("Success"), Literal.of(200), new CurrentDate(), Literal.of(LocalDate.of(2025, 8, 28)));
-        String sql = strategy.render(item, renderer);
+        String sql = strategy.render(item, renderer, new AstContext());
         assertThat(sql).isEqualTo("VALUES ('Success', 200, CURRENT_DATE(), '2025-08-28')");
     }
 
     @Test
     void empty() {
         InsertValues item = InsertValues.of();
-        String sql = strategy.render(item, renderer);
+        String sql = strategy.render(item, renderer, new AstContext());
         assertThat(sql).isEqualTo("");
     }
 }

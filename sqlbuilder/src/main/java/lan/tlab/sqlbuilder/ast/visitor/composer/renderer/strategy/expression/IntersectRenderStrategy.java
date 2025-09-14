@@ -1,17 +1,18 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression;
 
 import lan.tlab.sqlbuilder.ast.expression.set.IntersectExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 
 public class IntersectRenderStrategy implements ExpressionRenderStrategy {
 
-    public String render(IntersectExpression expression, SqlRenderer sqlRenderer) {
+    public String render(IntersectExpression expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "((%s) %s (%s))",
-                expression.getLeftSetExpression().accept(sqlRenderer),
+                expression.getLeftSetExpression().accept(sqlRenderer, ctx),
                 expression.getType().equals(IntersectExpression.IntersectType.INTERSECT_ALL)
                         ? "INTERSECT ALL"
                         : "INTERSECT",
-                expression.getRightSetExpression().accept(sqlRenderer));
+                expression.getRightSetExpression().accept(sqlRenderer, ctx));
     }
 }

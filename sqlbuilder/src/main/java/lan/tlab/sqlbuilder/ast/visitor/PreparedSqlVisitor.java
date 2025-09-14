@@ -3,24 +3,70 @@ package lan.tlab.sqlbuilder.ast.visitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lan.tlab.sqlbuilder.ast.clause.conditional.having.Having;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSource;
+import lan.tlab.sqlbuilder.ast.clause.from.source.FromSubquery;
+import lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin;
+import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
+import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
+import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
+import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.Projection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
+import lan.tlab.sqlbuilder.ast.expression.bool.Between;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
+import lan.tlab.sqlbuilder.ast.expression.bool.In;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.Like;
 import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
+import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
+import lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator;
+import lan.tlab.sqlbuilder.ast.expression.bool.logical.Not;
+import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.DefaultValues;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertSource;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
+import lan.tlab.sqlbuilder.ast.expression.item.UpdateItem;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.expression.scalar.NullScalarExpression;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArithmetic;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractDatePart;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Mod;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Power;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Round;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.UnaryNumeric;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharLength;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharacterLength;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.DataLength;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Replace;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Substring;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Trim;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.UnaryString;
+import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
+import lan.tlab.sqlbuilder.ast.expression.set.ExceptExpression;
+import lan.tlab.sqlbuilder.ast.expression.set.IntersectExpression;
+import lan.tlab.sqlbuilder.ast.expression.set.NullSetExpression;
+import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
@@ -60,12 +106,12 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(SelectStatement stmt) {
+    public PreparedSqlResult visit(SelectStatement stmt, AstContext ctx) {
         parameters.clear();
         // SELECT ...
-        PreparedSqlResult selectResult = stmt.getSelect().accept(this);
+        PreparedSqlResult selectResult = stmt.getSelect().accept(this, ctx);
         // FROM ...
-        PreparedSqlResult fromResult = stmt.getFrom().accept(this);
+        PreparedSqlResult fromResult = stmt.getFrom().accept(this, ctx);
         // WHERE ... (optional)
         PreparedSqlResult whereResult = null;
         String whereClause = "";
@@ -73,7 +119,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
                 && stmt.getWhere().getCondition() != null
                 && !(stmt.getWhere().getCondition()
                         instanceof lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression)) {
-            whereResult = visit(stmt.getWhere());
+            whereResult = visit(stmt.getWhere(), ctx);
             whereClause = " WHERE " + whereResult.sql();
         }
         // GROUP BY ... (optional)
@@ -81,14 +127,14 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         String groupByClause = "";
         if (stmt.getGroupBy() != null
                 && !stmt.getGroupBy().getGroupingExpressions().isEmpty()) {
-            groupByResult = stmt.getGroupBy().accept(this);
+            groupByResult = stmt.getGroupBy().accept(this, ctx);
             groupByClause = " GROUP BY " + groupByResult.sql();
         }
         // HAVING ... (optional, after GROUP BY)
         PreparedSqlResult havingResult = null;
         String havingClause = "";
         if (stmt.getHaving() != null && stmt.getHaving().getCondition() != null) {
-            havingResult = visit(stmt.getHaving());
+            havingResult = visit(stmt.getHaving(), ctx);
             if (!havingResult.sql().isBlank()) {
                 havingClause = " HAVING " + havingResult.sql();
             }
@@ -97,7 +143,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         PreparedSqlResult orderByResult = null;
         String orderByClause = "";
         if (stmt.getOrderBy() != null && !stmt.getOrderBy().getSortings().isEmpty()) {
-            orderByResult = stmt.getOrderBy().accept(this);
+            orderByResult = stmt.getOrderBy().accept(this, ctx);
             orderByClause = " ORDER BY " + orderByResult.sql();
         }
         // PAGINATION (LIMIT/OFFSET)
@@ -134,7 +180,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(Select select) {
+    public PreparedSqlResult visit(Select select, AstContext ctx) {
         List<String> cols = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         if (select.getProjections().isEmpty()) {
@@ -142,7 +188,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             return new PreparedSqlResult("*", List.of());
         }
         for (Projection p : select.getProjections()) {
-            PreparedSqlResult res = p.accept(this);
+            PreparedSqlResult res = p.accept(this, ctx);
             cols.add(res.sql());
             params.addAll(res.parameters());
         }
@@ -173,16 +219,16 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         return new PreparedSqlResult(sql, List.of());
     }
 
-    private PreparedSqlResult visit(BooleanExpression expr, boolean qualify) {
+    private PreparedSqlResult visit(BooleanExpression expr, boolean qualify, AstContext ctx) {
         switch (expr) {
             case Comparison cmp -> {
-                return visitComparisonWithQualify(cmp, qualify);
+                return visitComparisonWithQualify(cmp, qualify, ctx);
             }
             case lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr andOr -> {
                 List<String> sqlParts = new ArrayList<>();
                 List<Object> params = new ArrayList<>();
                 for (BooleanExpression op : andOr.getOperands()) {
-                    PreparedSqlResult res = visit(op, qualify);
+                    PreparedSqlResult res = visit(op, qualify, ctx);
                     sqlParts.add("(" + res.sql() + ")");
                     params.addAll(res.parameters());
                 }
@@ -193,17 +239,17 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
                 return new PreparedSqlResult(String.join(" " + operator + " ", sqlParts), params);
             }
             case lan.tlab.sqlbuilder.ast.expression.bool.logical.Not not -> {
-                PreparedSqlResult inner = visit(not.getExpression(), qualify);
+                PreparedSqlResult inner = visit(not.getExpression(), qualify, ctx);
                 return new PreparedSqlResult("NOT (" + inner.sql() + ")", inner.parameters());
             }
             case null, default -> {
                 // Fallback: visita normale
-                return expr.accept(this);
+                return expr.accept(this, ctx);
             }
         }
     }
 
-    private PreparedSqlResult visitComparisonWithQualify(Comparison cmp, boolean qualify) {
+    private PreparedSqlResult visitComparisonWithQualify(Comparison cmp, boolean qualify, AstContext ctx) {
         String operator;
         switch (cmp.getOperator()) {
             case EQUALS -> operator = "=";
@@ -218,14 +264,14 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         if (cmp.getLhs() instanceof ColumnReference colLhs) {
             lhs = visit(colLhs, qualify).sql();
         } else {
-            lhs = cmp.getLhs().accept(this).sql();
+            lhs = cmp.getLhs().accept(this, ctx).sql();
         }
         String rhsSql;
         List<Object> params = new ArrayList<>();
         if (cmp.getRhs() instanceof ColumnReference colRhs) {
             rhsSql = visit(colRhs, qualify).sql();
         } else {
-            PreparedSqlResult rhsResult = cmp.getRhs().accept(this);
+            PreparedSqlResult rhsResult = cmp.getRhs().accept(this, ctx);
             rhsSql = rhsResult.sql();
             params.addAll(rhsResult.parameters());
         }
@@ -238,18 +284,18 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(Comparison cmp) {
+    public PreparedSqlResult visit(Comparison cmp, AstContext ctx) {
         // Default: non qualificare mai, tranne se richiesto esplicitamente
-        return visitComparisonWithQualify(cmp, false);
+        return visitComparisonWithQualify(cmp, false, ctx);
     }
 
     @Override
-    public PreparedSqlResult visit(Where where) {
+    public PreparedSqlResult visit(Where where, AstContext ctx) {
         BooleanExpression cond = where.getCondition();
         if (cond instanceof NullBooleanExpression) {
             return new PreparedSqlResult("", List.of());
         }
-        return cond.accept(this);
+        return cond.accept(this, ctx);
     }
 
     @Override
@@ -274,10 +320,10 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(AggregationFunctionProjection aggregationFunctionProjection) {
+    public PreparedSqlResult visit(AggregationFunctionProjection aggregationFunctionProjection, AstContext ctx) {
         // The AggregationFunctionProjection wraps an AggregateCall (e.g., COUNT, SUM, etc.)
         var expr = aggregationFunctionProjection.getExpression();
-        PreparedSqlResult exprResult = expr.accept(this);
+        PreparedSqlResult exprResult = expr.accept(this, ctx);
         String sql = exprResult.sql();
         // Handle alias if present
         String alias = aggregationFunctionProjection.getAs() != null
@@ -290,10 +336,10 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(ScalarExpressionProjection scalarExpressionProjection) {
+    public PreparedSqlResult visit(ScalarExpressionProjection scalarExpressionProjection, AstContext ctx) {
         // Visit the underlying scalar expression
         var expr = scalarExpressionProjection.getExpression();
-        PreparedSqlResult exprResult = expr.accept(this);
+        PreparedSqlResult exprResult = expr.accept(this, ctx);
         String sql = exprResult.sql();
         // Handle alias if present
         String alias = scalarExpressionProjection.getAs() != null
@@ -306,11 +352,11 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.from.From clause) {
+    public PreparedSqlResult visit(From clause, AstContext ctx) {
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var source : clause.getSources()) {
-            PreparedSqlResult res = visit(source);
+            PreparedSqlResult res = visit(source, ctx);
             sqlParts.add(res.sql());
             params.addAll(res.parameters());
         }
@@ -319,10 +365,10 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin join) {
+    public PreparedSqlResult visit(OnJoin join, AstContext ctx) {
         // Visit left and right sources
-        PreparedSqlResult leftResult = visit(join.getLeft());
-        PreparedSqlResult rightResult = visit(join.getRight());
+        PreparedSqlResult leftResult = visit(join.getLeft(), ctx);
+        PreparedSqlResult rightResult = visit(join.getRight(), ctx);
         String joinType;
         switch (join.getType()) {
             case INNER -> joinType = "INNER JOIN";
@@ -341,7 +387,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
         if (join.getType() != lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.CROSS) {
             if (join.getOnCondition() != null) {
                 // Passa il flag di qualificazione alle Comparison e sotto-espressioni
-                PreparedSqlResult onResult = visit(join.getOnCondition(), true);
+                PreparedSqlResult onResult = visit(join.getOnCondition(), true, ctx);
                 sql.append(" ON ").append(onResult.sql());
                 params.addAll(onResult.parameters());
             }
@@ -350,16 +396,16 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.from.source.FromSubquery fromSubquery) {
+    public PreparedSqlResult visit(FromSubquery fromSubquery) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy clause) {
+    public PreparedSqlResult visit(GroupBy clause, AstContext ctx) {
         List<String> exprSqls = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var expr : clause.getGroupingExpressions()) {
-            PreparedSqlResult res = expr.accept(this);
+            PreparedSqlResult res = expr.accept(this, ctx);
             exprSqls.add(res.sql());
             params.addAll(res.parameters());
         }
@@ -368,19 +414,19 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having clause) {
+    public PreparedSqlResult visit(Having clause, AstContext ctx) {
         if (clause.getCondition() == null || clause.getCondition() instanceof NullBooleanExpression) {
             return new PreparedSqlResult("", List.of());
         }
-        return clause.getCondition().accept(this);
+        return clause.getCondition().accept(this, ctx);
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy clause) {
+    public PreparedSqlResult visit(OrderBy clause, AstContext ctx) {
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var sorting : clause.getSortings()) {
-            PreparedSqlResult res = visit(sorting);
+            PreparedSqlResult res = visit(sorting, ctx);
             sqlParts.add(res.sql());
             params.addAll(res.parameters());
         }
@@ -389,8 +435,8 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.orderby.Sorting sorting) {
-        PreparedSqlResult exprResult = sorting.getExpression().accept(this);
+    public PreparedSqlResult visit(Sorting sorting, AstContext ctx) {
+        PreparedSqlResult exprResult = sorting.getExpression().accept(this, ctx);
         String sql = exprResult.sql();
         String order = sorting.getSortOrder().getSqlKeyword();
         if (!order.isEmpty()) {
@@ -400,35 +446,32 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.clause.pagination.Pagination clause) {
+    public PreparedSqlResult visit(Pagination clause, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression expression) {
+    public PreparedSqlResult visit(NullBooleanExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.Between expression) {
+    public PreparedSqlResult visit(Between expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.In expression) {
+    public PreparedSqlResult visit(In expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr expression) {
-        String operator =
-                expression.getOperator() == lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator.AND
-                        ? "AND"
-                        : "OR";
+    public PreparedSqlResult visit(AndOr expression, AstContext ctx) {
+        String operator = expression.getOperator() == LogicalOperator.AND ? "AND" : "OR";
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (BooleanExpression expr : expression.getOperands()) {
-            PreparedSqlResult res = expr.accept(this);
+            PreparedSqlResult res = expr.accept(this, ctx);
             sqlParts.add("(" + res.sql() + ")");
             params.addAll(res.parameters());
         }
@@ -437,172 +480,159 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.bool.logical.Not expression) {
-        PreparedSqlResult inner = expression.getExpression().accept(this);
+    public PreparedSqlResult visit(Not expression, AstContext ctx) {
+        PreparedSqlResult inner = expression.getExpression().accept(this, ctx);
         String sql = "NOT (" + inner.sql() + ")";
         return new PreparedSqlResult(sql, inner.parameters());
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression expression) {
+    public PreparedSqlResult visit(BinaryArithmeticExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression expression) {
+    public PreparedSqlResult visit(UnaryArithmeticExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast functionCall) {
+    public PreparedSqlResult visit(Cast functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat functionCall) {
+    public PreparedSqlResult visit(Concat functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate functionCall) {
+    public PreparedSqlResult visit(CurrentDate functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime functionCall) {
+    public PreparedSqlResult visit(CurrentDateTime functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArithmetic functionCall) {
+    public PreparedSqlResult visit(DateArithmetic functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractDatePart functionCall) {
+    public PreparedSqlResult visit(ExtractDatePart functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left functionCall) {
+    public PreparedSqlResult visit(Left functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length functionCall) {
+    public PreparedSqlResult visit(Length functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharLength functionCall) {
+    public PreparedSqlResult visit(CharLength functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharacterLength functionCall) {
+    public PreparedSqlResult visit(CharacterLength functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.DataLength functionCall) {
+    public PreparedSqlResult visit(DataLength functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Mod functionCall) {
+    public PreparedSqlResult visit(Mod functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.NullScalarExpression expression) {
+    public PreparedSqlResult visit(NullScalarExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Power functionCall) {
+    public PreparedSqlResult visit(Power functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Replace functionCall) {
+    public PreparedSqlResult visit(Replace functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Round functionCall) {
+    public PreparedSqlResult visit(Round functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Substring functionCall) {
+    public PreparedSqlResult visit(Substring functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Trim functionCall) {
+    public PreparedSqlResult visit(Trim functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.UnaryNumeric functionCall) {
+    public PreparedSqlResult visit(UnaryNumeric functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.UnaryString functionCall) {
+    public PreparedSqlResult visit(UnaryString functionCall) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.set.NullSetExpression expression) {
+    public PreparedSqlResult visit(NullSetExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.set.ExceptExpression expression) {
+    public PreparedSqlResult visit(ExceptExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.set.IntersectExpression expression) {
+    public PreparedSqlResult visit(IntersectExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.set.UnionExpression expression) {
+    public PreparedSqlResult visit(UnionExpression expression) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.As item) {
+    public PreparedSqlResult visit(As item) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.UpdateItem item) {
+    public PreparedSqlResult visit(UpdateItem item) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem item) {
+    public PreparedSqlResult visit(ReferencesItem item) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition item) {
+    public PreparedSqlResult visit(TableDefinition item) {
         throw new UnsupportedOperationException();
     }
 
@@ -665,13 +695,12 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval interval) {
+    public PreparedSqlResult visit(Interval interval) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall expression) {
+    public PreparedSqlResult visit(AggregateCall expression, AstContext ctx) {
         // Handle SQL generation for aggregate functions (COUNT, SUM, AVG, MIN, MAX)
         // The AggregateCallImpl should expose the operator and argument
         // We'll assume the interface provides getOperator() and getArgument()
@@ -698,8 +727,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
             if (argument == null) {
                 argumentSql = "*";
             } else {
-                PreparedSqlResult argResult =
-                        ((lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression) argument).accept(this);
+                PreparedSqlResult argResult = ((ScalarExpression) argument).accept(this, ctx);
                 argumentSql = argResult.sql();
                 params.addAll(argResult.parameters());
             }
@@ -730,9 +758,9 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(InsertSource item) {
+    public PreparedSqlResult visit(InsertSource item, AstContext ctx) {
         // InsertSource is a parent type, delegate to the actual subtype
-        return item.accept(this);
+        return item.accept(this, ctx);
     }
 
     @Override
@@ -742,8 +770,8 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     // Handle FromSource dispatch for FROM clause
-    public PreparedSqlResult visit(FromSource source) {
-        return source.accept(this);
+    public PreparedSqlResult visit(FromSource source, AstContext ctx) {
+        return source.accept(this, ctx);
     }
 
     @Override
@@ -752,14 +780,14 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(IsNull expr) {
-        PreparedSqlResult inner = expr.getExpression().accept(this);
+    public PreparedSqlResult visit(IsNull expr, AstContext ctx) {
+        PreparedSqlResult inner = expr.getExpression().accept(this, ctx);
         return new PreparedSqlResult(inner.sql() + " IS NULL", inner.parameters());
     }
 
     @Override
-    public PreparedSqlResult visit(IsNotNull expr) {
-        PreparedSqlResult inner = expr.getExpression().accept(this);
+    public PreparedSqlResult visit(IsNotNull expr, AstContext ctx) {
+        PreparedSqlResult inner = expr.getExpression().accept(this, ctx);
         return new PreparedSqlResult(inner.sql() + " IS NOT NULL", inner.parameters());
     }
 }

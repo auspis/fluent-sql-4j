@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ class IsNotNullRenderStrategyTest {
     @Test
     void ok() {
         IsNotNull exp = new IsNotNull(ColumnReference.of("Customer", "name"));
-        String sql = strategy.render(exp, sqlRenderer);
+        String sql = strategy.render(exp, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("\"Customer\".\"name\" IS NOT NULL");
     }
 }

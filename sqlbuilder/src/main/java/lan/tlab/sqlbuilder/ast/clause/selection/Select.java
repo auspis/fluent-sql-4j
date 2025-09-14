@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.sqlbuilder.ast.clause.Clause;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.Projection;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +33,7 @@ public class Select implements Clause {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
     }
 }

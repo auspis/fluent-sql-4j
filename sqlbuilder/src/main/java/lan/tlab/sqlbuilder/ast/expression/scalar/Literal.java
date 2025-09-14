@@ -2,6 +2,7 @@ package lan.tlab.sqlbuilder.ast.expression.scalar;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ public class Literal<R> implements ScalarExpression {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
         return visitor.visit(this);
     }
 }

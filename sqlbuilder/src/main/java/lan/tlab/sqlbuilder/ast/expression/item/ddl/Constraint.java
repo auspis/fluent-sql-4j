@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.item.SqlItem;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -26,7 +27,7 @@ public interface Constraint extends SqlItem {
         }
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }
@@ -35,7 +36,7 @@ public interface Constraint extends SqlItem {
     @EqualsAndHashCode
     public static class NotNullConstraint implements Constraint {
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }
@@ -52,7 +53,7 @@ public interface Constraint extends SqlItem {
         }
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }
@@ -65,7 +66,7 @@ public interface Constraint extends SqlItem {
         private final ReferencesItem references;
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }
@@ -77,7 +78,7 @@ public interface Constraint extends SqlItem {
         private final BooleanExpression expression;
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }
@@ -89,7 +90,7 @@ public interface Constraint extends SqlItem {
         private final ScalarExpression value;
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }

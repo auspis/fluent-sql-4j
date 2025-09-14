@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.UnaryString;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,7 @@ class SubstringRenderStrategyTest {
     @Test
     void ok() {
         Substring func = Substring.of(ColumnReference.of("Customer", "name"), 5);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SUBSTRING(\"Customer\".\"name\", 5)");
     }
 
@@ -35,21 +36,21 @@ class SubstringRenderStrategyTest {
     void columnReference() {
         SubstringRenderStrategy strategy = new SubstringRenderStrategy();
         Substring substring = Substring.of(ColumnReference.of("Customer", "name"), 0, 3);
-        String sql = strategy.render(substring, sqlRenderer);
+        String sql = strategy.render(substring, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SUBSTRING(\"Customer\".\"name\", 0, 3)");
     }
 
     @Test
     void Length() {
         Substring func = Substring.of(ColumnReference.of("Customer", "name"), 5, 10);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SUBSTRING(\"Customer\".\"name\", 5, 10)");
     }
 
     @Test
     void literalStringExpression() {
         Substring func = Substring.of(Literal.of("Hello World"), 7);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SUBSTRING('Hello World', 7)");
     }
 
@@ -59,7 +60,7 @@ class SubstringRenderStrategyTest {
                 UnaryString.upper(ColumnReference.of("Customer", "name")),
                 Literal.of(3),
                 ArithmeticExpression.subtraction(new Length(ColumnReference.of("Product", "code")), Literal.of(2)));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SUBSTRING(UPPER(\"Customer\".\"name\"), 3, (LENGTH(\"Product\".\"code\") - 2))");
     }
 }
