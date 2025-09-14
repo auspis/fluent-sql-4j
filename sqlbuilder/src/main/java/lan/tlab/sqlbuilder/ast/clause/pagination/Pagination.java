@@ -26,6 +26,6 @@ public class Pagination implements Clause {
     }
 
     public boolean isActive() {
-        return Objects.isNull(perPage);
+        return !Objects.isNull(perPage);
     }
 }
