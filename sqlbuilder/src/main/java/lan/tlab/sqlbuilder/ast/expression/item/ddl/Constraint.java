@@ -28,7 +28,7 @@ public interface Constraint extends SqlItem {
 
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 
@@ -37,7 +37,7 @@ public interface Constraint extends SqlItem {
     public static class NotNullConstraint implements Constraint {
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 
@@ -54,7 +54,7 @@ public interface Constraint extends SqlItem {
 
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 
@@ -67,7 +67,7 @@ public interface Constraint extends SqlItem {
 
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 
@@ -79,7 +79,7 @@ public interface Constraint extends SqlItem {
 
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 
@@ -91,7 +91,7 @@ public interface Constraint extends SqlItem {
 
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 }

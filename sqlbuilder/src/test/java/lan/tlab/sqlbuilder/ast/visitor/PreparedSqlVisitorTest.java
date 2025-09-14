@@ -62,7 +62,7 @@ class PreparedSqlVisitorTest {
         User user = new User(1, "John", "john@example.com");
         InsertStatement insertStatement = buildInsertStatementFromUser(user);
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(insertStatement);
+        PreparedSqlResult result = visitor.visit(insertStatement, new AstContext());
         assertThat(result.sql()).isEqualTo("INSERT INTO \"User\" (\"id\", \"name\", \"email\") VALUES (?, ?, ?)");
         assertThat(result.parameters()).containsExactly(1, "John", "john@example.com");
     }
