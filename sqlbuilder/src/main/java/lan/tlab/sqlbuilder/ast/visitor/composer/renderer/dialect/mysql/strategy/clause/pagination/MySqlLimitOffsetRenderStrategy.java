@@ -9,7 +9,7 @@ public class MySqlLimitOffsetRenderStrategy implements PaginationRenderStrategy 
 
     @Override
     public String render(Pagination clause, SqlRenderer sqlRenderer, AstContext ctx) {
-        if (clause.isActive()) {
+        if (!clause.isActive()) {
             return "";
         }
 
