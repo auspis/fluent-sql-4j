@@ -14,6 +14,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.Index;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,7 @@ class TableDefinitionRenderStrategyTest {
                         ColumnDefinitionBuilder.varchar("name").build()))
                 .build();
 
-        String sql = strategy.render(tableDef, renderer);
+        String sql = strategy.render(tableDef, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -64,7 +65,7 @@ class TableDefinitionRenderStrategyTest {
                                 .build()))
                 .build();
 
-        String sql = strategy.render(tableDef, renderer);
+        String sql = strategy.render(tableDef, renderer, new AstContext());
 
         assertThat(sql)
                 .isEqualTo(
@@ -93,7 +94,7 @@ class TableDefinitionRenderStrategyTest {
                 .constraint(new CheckConstraint(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
                 .build();
 
-        String sql = strategy.render(tableDef, renderer);
+        String sql = strategy.render(tableDef, renderer, new AstContext());
 
         assertThat(sql)
                 .isEqualTo(
@@ -123,7 +124,7 @@ class TableDefinitionRenderStrategyTest {
                 .index(new Index("idx_email", "email"))
                 .build();
 
-        String sql = strategy.render(tableDef, renderer);
+        String sql = strategy.render(tableDef, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

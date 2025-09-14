@@ -10,6 +10,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.set.NullSetExpression;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,7 @@ class InsertSourceRenderStrategyTest {
                 .build();
         InsertSource item = new InsertSource(UnionExpression.union(select1, select2));
 
-        String sql = strategy.render(item, renderer);
+        String sql = strategy.render(item, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -59,7 +60,7 @@ class InsertSourceRenderStrategyTest {
     @Test
     void empty() {
         InsertSource item = new InsertSource(new NullSetExpression());
-        String sql = strategy.render(item, renderer);
+        String sql = strategy.render(item, renderer, new AstContext());
         assertThat(sql).isEqualTo("");
     }
 }

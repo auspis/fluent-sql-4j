@@ -2,11 +2,12 @@ package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression;
 
 import java.util.Objects;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 
 public class LiteralRenderStrategy implements ExpressionRenderStrategy {
 
-    public String render(Literal<?> literal, SqlRenderer sqlRenderer) {
+    public String render(Literal<?> literal, SqlRenderer sqlRenderer, AstContext ctx) {
         Object value = literal.getValue();
         if (Objects.isNull(value)) {
             return "null";

@@ -12,6 +12,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ class UnaryArithmeticExpressionRenderStrategyTest {
     @Test
     void negation() {
         UnaryArithmeticExpression expression = ArithmeticExpression.negation(Literal.of(10));
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(-10)");
     }
 
@@ -46,7 +47,7 @@ class UnaryArithmeticExpressionRenderStrategyTest {
                 .build();
 
         UnaryArithmeticExpression expression = ArithmeticExpression.negation(subquery);
-        String sql = strategy.render(expression, sqlRenderer);
+        String sql = strategy.render(expression, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(-(SELECT MAX(\"Risk\".\"value\") FROM \"Risk\"))");
     }
 }

@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,14 +28,14 @@ class ColumnDefinitionRenderStrategyTest {
     void ok() {
         ColumnDefinition column =
                 ColumnDefinition.builder("id", DataType.INTEGER).build();
-        String sql = strategy.render(column, renderer);
+        String sql = strategy.render(column, renderer, new AstContext());
         assertThat(sql).isEqualTo("\"id\" INTEGER");
     }
 
     @Test
     void nullObject() {
         ColumnDefinition column = ColumnDefinition.nullObject();
-        String sql = strategy.render(column, renderer);
+        String sql = strategy.render(column, renderer, new AstContext());
         assertThat(sql).isBlank();
     }
 
@@ -44,7 +45,7 @@ class ColumnDefinitionRenderStrategyTest {
                 .notNullConstraint(new NotNullConstraint())
                 .build();
 
-        String sql = strategy.render(column, renderer);
+        String sql = strategy.render(column, renderer, new AstContext());
         assertThat(sql).isEqualTo("\"name\" VARCHAR(255) NOT NULL");
     }
 
@@ -54,7 +55,7 @@ class ColumnDefinitionRenderStrategyTest {
                 .defaultConstraint(new DefaultConstraint(Literal.of("def-val")))
                 .build();
 
-        String sql = strategy.render(column, renderer);
+        String sql = strategy.render(column, renderer, new AstContext());
         assertThat(sql).isEqualTo("\"name\" VARCHAR(255) DEFAULT 'def-val'");
     }
 
@@ -65,7 +66,7 @@ class ColumnDefinitionRenderStrategyTest {
                 .defaultConstraint(new DefaultConstraint(Literal.of("def-val")))
                 .build();
 
-        String sql = strategy.render(column, renderer);
+        String sql = strategy.render(column, renderer, new AstContext());
         assertThat(sql).isEqualTo("\"name\" VARCHAR(255) NOT NULL DEFAULT 'def-val'");
     }
 }
