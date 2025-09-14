@@ -77,7 +77,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"User\" WHERE \"id\" = ?");
         assertThat(result.parameters()).containsExactly(1);
     }
@@ -87,7 +87,7 @@ class PreparedSqlVisitorTest {
         SelectStatement selectStmt =
                 SelectStatement.builder().from(From.of(new Table("users"))).build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -101,7 +101,7 @@ class PreparedSqlVisitorTest {
                 .from(From.fromTable("users", "u"))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"users\" AS u");
         assertThat(result.parameters()).isEmpty();
     }
@@ -114,7 +114,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ?");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -127,7 +127,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.lt(ColumnReference.of("User", "id"), Literal.of(5))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" < ?");
         assertThat(result.parameters()).containsExactly(5);
     }
@@ -140,7 +140,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.gte(ColumnReference.of("User", "id"), Literal.of(7))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" >= ?");
         assertThat(result.parameters()).containsExactly(7);
     }
@@ -153,7 +153,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.lte(ColumnReference.of("User", "id"), Literal.of(3))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" <= ?");
         assertThat(result.parameters()).containsExactly(3);
     }
@@ -166,7 +166,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.ne(ColumnReference.of("User", "id"), Literal.of(99))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" <> ?");
         assertThat(result.parameters()).containsExactly(99);
     }
@@ -181,7 +181,7 @@ class PreparedSqlVisitorTest {
                         Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20)))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"id\" > ?) AND (\"id\" < ?)");
         assertThat(result.parameters()).containsExactly(10, 20);
     }
@@ -196,7 +196,7 @@ class PreparedSqlVisitorTest {
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob")))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"name\" = ?) OR (\"name\" = ?)");
         assertThat(result.parameters()).containsExactly("Alice", "Bob");
     }
@@ -213,7 +213,7 @@ class PreparedSqlVisitorTest {
                                 Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"name\" = ?) OR ((\"id\" > ?) AND (\"id\" < ?))");
         assertThat(result.parameters()).containsExactly("Alice", 10, 20);
@@ -227,7 +227,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(new Not(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT (\"name\" = ?)");
         assertThat(result.parameters()).containsExactly("Alice");
     }
@@ -240,7 +240,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(new IsNull(ColumnReference.of("User", "email"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" WHERE \"email\" IS NULL");
         assertThat(result.parameters()).isEmpty();
     }
@@ -253,7 +253,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(new IsNotNull(ColumnReference.of("User", "email"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" WHERE \"email\" IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
     }
@@ -268,7 +268,7 @@ class PreparedSqlVisitorTest {
                         Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT ((\"id\" > ?) AND (\"id\" < ?))");
         assertThat(result.parameters()).containsExactly(10, 20);
     }
@@ -283,7 +283,7 @@ class PreparedSqlVisitorTest {
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob"))))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT ((\"name\" = ?) OR (\"name\" = ?))");
         assertThat(result.parameters()).containsExactly("Alice", "Bob");
     }
@@ -296,7 +296,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -309,7 +309,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -322,7 +322,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -335,7 +335,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MIN(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -348,7 +348,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MAX(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -362,7 +362,7 @@ class PreparedSqlVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -376,7 +376,7 @@ class PreparedSqlVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -390,7 +390,7 @@ class PreparedSqlVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -404,7 +404,7 @@ class PreparedSqlVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MIN(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -418,7 +418,7 @@ class PreparedSqlVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MAX(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -432,7 +432,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" AS \"userId\", \"name\" AS \"userName\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -445,7 +445,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" AS \"userId\" FROM \"User\" WHERE \"name\" = ?");
         assertThat(result.parameters()).containsExactly("Alice");
     }
@@ -458,7 +458,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") AS \"totalUsers\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -472,7 +472,7 @@ class PreparedSqlVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") AS \"sumId\" FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -488,7 +488,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(new Table("User")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") AS \"avgId\", MAX(\"id\") AS \"maxId\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -501,7 +501,7 @@ class PreparedSqlVisitorTest {
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC");
         assertThat(result.parameters()).isEmpty();
     }
@@ -514,7 +514,7 @@ class PreparedSqlVisitorTest {
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" DESC");
         assertThat(result.parameters()).isEmpty();
     }
@@ -527,7 +527,7 @@ class PreparedSqlVisitorTest {
                 .orderBy(OrderBy.of(Sorting.by(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -544,7 +544,7 @@ class PreparedSqlVisitorTest {
                         Sorting.desc(ColumnReference.of("User", "name"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"User\" ORDER BY \"id\" ASC, \"name\" DESC");
         assertThat(result.parameters()).isEmpty();
     }
@@ -558,7 +558,7 @@ class PreparedSqlVisitorTest {
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? ORDER BY \"id\" DESC");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -571,7 +571,7 @@ class PreparedSqlVisitorTest {
                 .pagination(Pagination.builder().perPage(10).build())
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" LIMIT 10");
         assertThat(result.parameters()).isEmpty();
     }
@@ -584,7 +584,7 @@ class PreparedSqlVisitorTest {
                 .pagination(Pagination.builder().perPage(10).page(2).build())
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" LIMIT 10 OFFSET 20");
         assertThat(result.parameters()).isEmpty();
     }
@@ -598,7 +598,7 @@ class PreparedSqlVisitorTest {
                 .pagination(Pagination.builder().perPage(5).page(1).build())
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? LIMIT 5 OFFSET 5");
         assertThat(result.parameters()).containsExactly(100);
     }
@@ -612,7 +612,7 @@ class PreparedSqlVisitorTest {
                 .pagination(Pagination.builder().perPage(3).page(2).build())
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC LIMIT 3 OFFSET 6");
         assertThat(result.parameters()).isEmpty();
     }
@@ -626,7 +626,7 @@ class PreparedSqlVisitorTest {
                 .pagination(Pagination.builder().perPage(2).page(3).build())
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" GROUP BY \"email\" LIMIT 2 OFFSET 6");
         assertThat(result.parameters()).isEmpty();
     }
@@ -647,7 +647,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(join))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(stmt);
+        PreparedSqlResult result = visitor.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\"");
         assertThat(result.parameters()).isEmpty();
@@ -670,7 +670,7 @@ class PreparedSqlVisitorTest {
                 .where(Where.of(Comparison.gt(ColumnReference.of("t1", "id"), Literal.of(10))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(stmt);
+        PreparedSqlResult result = visitor.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\" FROM \"t1\" LEFT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" WHERE \"id\" > ?");
@@ -694,7 +694,7 @@ class PreparedSqlVisitorTest {
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("t2", "name"))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(stmt);
+        PreparedSqlResult result = visitor.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\" FROM \"t1\" RIGHT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" ORDER BY \"name\" ASC");
@@ -718,7 +718,7 @@ class PreparedSqlVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("t1", "id")))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(stmt);
+        PreparedSqlResult result = visitor.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\" FROM \"t1\" FULL JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" GROUP BY \"id\"");
@@ -739,7 +739,7 @@ class PreparedSqlVisitorTest {
                 .pagination(Pagination.builder().perPage(5).page(1).build())
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(stmt);
+        PreparedSqlResult result = visitor.visit(stmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" CROSS JOIN \"t2\" LIMIT 5 OFFSET 5");
         assertThat(result.parameters()).isEmpty();
     }
@@ -767,7 +767,7 @@ class PreparedSqlVisitorTest {
                 .from(From.of(join2))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(stmt);
+        PreparedSqlResult result = visitor.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\", \"value\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" LEFT JOIN \"t3\" ON \"t2\".\"id\" = \"t3\".\"t2_id\"");
@@ -785,7 +785,7 @@ class PreparedSqlVisitorTest {
                         Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(1))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") > ?");
         assertThat(result.parameters()).containsExactly(1);
@@ -804,7 +804,7 @@ class PreparedSqlVisitorTest {
                                 Comparison.lt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(100)))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\" HAVING (SUM(\"id\") > ?) AND (SUM(\"id\") < ?)");
@@ -824,7 +824,7 @@ class PreparedSqlVisitorTest {
                                 Comparison.gt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(50)))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT AVG(\"id\") FROM \"User\" GROUP BY \"email\" HAVING (AVG(\"id\") < ?) OR (AVG(\"id\") > ?)");
@@ -842,7 +842,7 @@ class PreparedSqlVisitorTest {
                         Comparison.gte(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(2))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT COUNT(\"id\") AS \"total\" FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") >= ?");
@@ -860,7 +860,7 @@ class PreparedSqlVisitorTest {
                         Comparison.ne(AggregateCall.max(ColumnReference.of("User", "id")), Literal.of(0))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT MAX(\"id\") FROM \"User\" GROUP BY \"email\", \"name\" HAVING MAX(\"id\") <> ?");
         assertThat(result.parameters()).containsExactly(0);
@@ -880,7 +880,7 @@ class PreparedSqlVisitorTest {
                 .pagination(Pagination.builder().perPage(5).page(1).build())
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT MIN(\"id\") FROM \"User\" WHERE \"id\" > ? GROUP BY \"email\" HAVING MIN(\"id\") < ? ORDER BY \"email\" DESC LIMIT 5 OFFSET 5");
@@ -898,7 +898,7 @@ class PreparedSqlVisitorTest {
                         new IsNull(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT MAX(\"email\") FROM \"User\" GROUP BY \"name\" HAVING MAX(\"email\") IS NULL");
         assertThat(result.parameters()).isEmpty();
@@ -915,7 +915,7 @@ class PreparedSqlVisitorTest {
                         new IsNotNull(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT MAX(\"email\") FROM \"User\" GROUP BY \"name\" HAVING MAX(\"email\") IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -935,7 +935,7 @@ class PreparedSqlVisitorTest {
         // NOTA: il visitor lancia UnsupportedOperationException per Between, quindi qui ci aspettiamo eccezione
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         try {
-            visitor.visit(selectStmt);
+            visitor.visit(selectStmt, new AstContext());
             throw new AssertionError("Expected UnsupportedOperationException for BETWEEN in HAVING");
         } catch (UnsupportedOperationException e) {
             // ok
@@ -957,7 +957,7 @@ class PreparedSqlVisitorTest {
         // NOTA: il visitor lancia UnsupportedOperationException per In, quindi qui ci aspettiamo eccezione
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
         try {
-            visitor.visit(selectStmt);
+            visitor.visit(selectStmt, new AstContext());
             throw new AssertionError("Expected UnsupportedOperationException for IN in HAVING");
         } catch (UnsupportedOperationException e) {
             // ok
@@ -977,7 +977,7 @@ class PreparedSqlVisitorTest {
                                 Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(50))))))
                 .build();
         PreparedSqlVisitor visitor = new PreparedSqlVisitor();
-        PreparedSqlResult result = visitor.visit(selectStmt);
+        PreparedSqlResult result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING NOT ((COUNT(\"id\") < ?) OR (COUNT(\"id\") > ?))");

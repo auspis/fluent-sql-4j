@@ -16,6 +16,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.CountStar;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +39,7 @@ class SelectStatementRenderStrategyTest {
                 .from(From.builder().source(new Table("users")).build())
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("SELECT * FROM \"users\"");
     }
 
@@ -51,7 +52,7 @@ class SelectStatementRenderStrategyTest {
                 .from(From.fromTable("users", "u"))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("""
     		SELECT \"u\".\"id\", \"u\".\"name\" FROM \"users\" AS u\
     		""");
@@ -66,7 +67,7 @@ class SelectStatementRenderStrategyTest {
                         Comparison.eq(ColumnReference.of("products", "category"), Literal.of("electronics"))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -87,7 +88,7 @@ class SelectStatementRenderStrategyTest {
                 .having(Having.of(Comparison.gt(new CountStar(), Literal.of(10))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -105,7 +106,7 @@ class SelectStatementRenderStrategyTest {
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("orders", "orderDate"))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo("""
 			SELECT * \

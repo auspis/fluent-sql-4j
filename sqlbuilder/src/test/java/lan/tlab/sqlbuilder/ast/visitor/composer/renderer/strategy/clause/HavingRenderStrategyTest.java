@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,14 +28,14 @@ class HavingRenderStrategyTest {
     @Test
     void noGroupingFunctions() {
         Having having = Having.builder().build();
-        String sql = strategy.render(having, sqlRenderer);
+        String sql = strategy.render(having, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("");
     }
 
     @Test
     void ok() {
         Having having = Having.of(Comparison.gt(new Length(ColumnReference.of("Customer", "name")), Literal.of(1)));
-        String sql = strategy.render(having, sqlRenderer);
+        String sql = strategy.render(having, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("HAVING LENGTH(\"Customer\".\"name\") > 1");
     }
 
@@ -42,7 +43,7 @@ class HavingRenderStrategyTest {
     void aggregationFunction() {
         Having having =
                 Having.of(Comparison.gt(AggregateCall.sum(ColumnReference.of("Customer", "score")), Literal.of(10)));
-        String sql = strategy.render(having, sqlRenderer);
+        String sql = strategy.render(having, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("HAVING SUM(\"Customer\".\"score\") > 10");
     }
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ class ComparisonRenderStrategyTest {
     @Test
     void eq() {
         Comparison expression = Comparison.eq(ColumnReference.of("Customer", "name"), Literal.of("mario"));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
 
         assertThat(sql).isEqualTo("\"Customer\".\"name\" = 'mario'");
     }
@@ -26,7 +27,7 @@ class ComparisonRenderStrategyTest {
     void eq_columnReferences() {
         Comparison expression =
                 Comparison.eq(ColumnReference.of("Customer", "name"), ColumnReference.of("tmp", "name"));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
 
         assertThat(sql).isEqualTo("\"Customer\".\"name\" = \"tmp\".\"name\"");
     }
@@ -34,7 +35,7 @@ class ComparisonRenderStrategyTest {
     @Test
     void ne() {
         Comparison expression = Comparison.ne(ColumnReference.of("Customer", "name"), Literal.of("mario"));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
 
         assertThat(sql).isEqualTo("\"Customer\".\"name\" != 'mario'");
     }
@@ -42,7 +43,7 @@ class ComparisonRenderStrategyTest {
     @Test
     void lt() {
         Comparison expression = Comparison.lt(ColumnReference.of("Customer", "score"), Literal.of(400));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
 
         assertThat(sql).isEqualTo("\"Customer\".\"score\" < 400");
     }
@@ -51,7 +52,7 @@ class ComparisonRenderStrategyTest {
     void lt_columnReferences() {
         Comparison expression =
                 Comparison.lt(ColumnReference.of("Customer", "score"), ColumnReference.of("tmp", "score"));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
 
         assertThat(sql).isEqualTo("\"Customer\".\"score\" < \"tmp\".\"score\"");
     }
@@ -59,7 +60,7 @@ class ComparisonRenderStrategyTest {
     @Test
     void lte() {
         Comparison expression = Comparison.lte(ColumnReference.of("Customer", "score"), Literal.of(400));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
 
         assertThat(sql).isEqualTo("\"Customer\".\"score\" <= 400");
     }
@@ -67,14 +68,14 @@ class ComparisonRenderStrategyTest {
     @Test
     void gt() {
         Comparison expression = Comparison.gt(ColumnReference.of("Customer", "score"), Literal.of(500));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
         assertThat(sql).isEqualTo("\"Customer\".\"score\" > 500");
     }
 
     @Test
     void gte() {
         Comparison expression = Comparison.gte(ColumnReference.of("Customer", "score"), Literal.of(500));
-        String sql = strategy.render(expression, standardSql2008);
+        String sql = strategy.render(expression, standardSql2008, new AstContext());
         assertThat(sql).isEqualTo("\"Customer\".\"score\" >= 500");
     }
 }

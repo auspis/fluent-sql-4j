@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.InsertData;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.DefaultValues;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.set.TableExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -24,7 +25,7 @@ public class InsertStatement implements DataManipulationStatement {
     private final InsertData data = new DefaultValues();
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
         return visitor.visit(this);
     }
 }
