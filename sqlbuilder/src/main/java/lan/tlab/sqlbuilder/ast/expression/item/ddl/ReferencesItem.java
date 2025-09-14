@@ -3,6 +3,7 @@ package lan.tlab.sqlbuilder.ast.expression.item.ddl;
 import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.sqlbuilder.ast.expression.item.SqlItem;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class ReferencesItem implements SqlItem {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
         return visitor.visit(this);
     }
 }

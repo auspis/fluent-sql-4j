@@ -11,6 +11,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
 import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ class UpdateStatementRenderStrategyTest {
                 .where(Where.of(Comparison.eq(ColumnReference.of("Customer", "id"), Literal.of(123))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -54,7 +55,7 @@ class UpdateStatementRenderStrategyTest {
                 .set(List.of(UpdateItem.of("status", Literal.of("active"))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("UPDATE \"users\" SET \"status\" = 'active'");
     }
 }

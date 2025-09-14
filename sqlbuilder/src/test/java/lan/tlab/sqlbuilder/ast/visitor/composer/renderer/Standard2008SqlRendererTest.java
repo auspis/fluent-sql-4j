@@ -16,6 +16,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ class Standard2008SqlRendererTest {
                 .from(From.fromTable("Customer", "c"))
                 .build();
 
-        String sql = statement.accept(renderer);
+        String sql = statement.accept(renderer, new AstContext());
         assertThat(sql).isEqualTo("SELECT \"Customer\".\"name\" FROM \"Customer\" AS c");
     }
 
@@ -54,7 +55,7 @@ class Standard2008SqlRendererTest {
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("Customer", "name"))))
                 .build();
 
-        String sql = statement.accept(renderer);
+        String sql = statement.accept(renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

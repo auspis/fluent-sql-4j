@@ -1,5 +1,6 @@
 package lan.tlab.sqlbuilder.ast.expression.set;
 
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,7 @@ public class ExceptExpression implements SetExpression {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
         return visitor.visit(this);
     }
 }

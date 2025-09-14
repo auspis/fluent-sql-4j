@@ -4,6 +4,7 @@ import java.util.List;
 import lan.tlab.sqlbuilder.ast.expression.Expression;
 import lan.tlab.sqlbuilder.ast.expression.item.SqlItem;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,7 +25,7 @@ public interface DataType extends SqlItem {
         private final String name;
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }
@@ -37,7 +38,7 @@ public interface DataType extends SqlItem {
         private final List<Expression> parameters;
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor) {
+        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
             return visitor.visit(this);
         }
     }

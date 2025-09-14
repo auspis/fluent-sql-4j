@@ -2,6 +2,7 @@ package lan.tlab.sqlbuilder.ast.clause.from.source.join;
 
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSource;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class OnJoin implements FromSource {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
     }
 }

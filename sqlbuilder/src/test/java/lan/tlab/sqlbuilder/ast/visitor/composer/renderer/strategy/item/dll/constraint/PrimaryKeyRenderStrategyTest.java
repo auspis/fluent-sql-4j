@@ -3,6 +3,7 @@ package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.item.dll.cons
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ class PrimaryKeyRenderStrategyTest {
     void singleColumn() {
         PrimaryKey pk = new PrimaryKey("id");
 
-        String sql = strategy.render(pk, renderer);
+        String sql = strategy.render(pk, renderer, new AstContext());
         assertThat(sql).isEqualTo("PRIMARY KEY (\"id\")");
     }
 
@@ -31,7 +32,7 @@ class PrimaryKeyRenderStrategyTest {
     void composite() {
         PrimaryKey pk = new PrimaryKey("author_id", "book_id");
 
-        String sql = strategy.render(pk, renderer);
+        String sql = strategy.render(pk, renderer, new AstContext());
         assertThat(sql).isEqualTo("PRIMARY KEY (\"author_id\", \"book_id\")");
     }
 }

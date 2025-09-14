@@ -6,6 +6,7 @@ import java.util.List;
 import lan.tlab.sqlbuilder.ast.expression.bool.In;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,7 @@ class InRenderStrategyTest {
         In exp = new In(
                 ColumnReference.of("Customer", "score"), List.of(Literal.of(100), Literal.of(200), Literal.of(300)));
 
-        String sql = strategy.render(exp, sqlRenderer);
+        String sql = strategy.render(exp, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("\"Customer\".\"score\" IN(100, 200, 300)");
     }
 
@@ -36,7 +37,7 @@ class InRenderStrategyTest {
         In exp = new In(
                 ColumnReference.of("Customer", "name"), Literal.of("john0"), Literal.of("john1"), Literal.of("john2"));
 
-        String sql = strategy.render(exp, sqlRenderer);
+        String sql = strategy.render(exp, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("\"Customer\".\"name\" IN('john0', 'john1', 'john2')");
     }
 }

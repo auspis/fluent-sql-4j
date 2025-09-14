@@ -1,12 +1,13 @@
 package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression;
 
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 
 public class UnaryArithmeticExpressionRenderStrategy implements ExpressionRenderStrategy {
 
-    public String render(UnaryArithmeticExpression expression, SqlRenderer sqlRenderer) {
+    public String render(UnaryArithmeticExpression expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
-                "(%s%s)", expression.getOperator(), expression.getExpression().accept(sqlRenderer));
+                "(%s%s)", expression.getOperator(), expression.getExpression().accept(sqlRenderer, ctx));
     }
 }

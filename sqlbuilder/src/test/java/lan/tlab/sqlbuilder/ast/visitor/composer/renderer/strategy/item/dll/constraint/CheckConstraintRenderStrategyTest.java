@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,7 @@ class CheckConstraintRenderStrategyTest {
     void ok() {
         Comparison expr = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
         CheckConstraint constraint = new CheckConstraint(expr);
-        String sql = strategy.render(constraint, renderer);
+        String sql = strategy.render(constraint, renderer, new AstContext());
         assertThat(sql).isEqualTo("CHECK (\"age\" > 18)");
     }
 }

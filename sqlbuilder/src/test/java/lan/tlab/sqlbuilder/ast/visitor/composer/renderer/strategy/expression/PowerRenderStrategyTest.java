@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Power;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,21 +26,21 @@ class PowerRenderStrategyTest {
     @Test
     void ok() {
         Power func = Power.of(2, 3);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("POWER(2, 3)");
     }
 
     @Test
     void baseColumnBased() {
         Power func = Power.of(ColumnReference.of("my_table", "base_value"), 2);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("POWER(\"my_table\".\"base_value\", 2)");
     }
 
     @Test
     void exponentColumnBased() {
         Power func = Power.of(10, ColumnReference.of("my_table", "power_level"));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("POWER(10, \"my_table\".\"power_level\")");
     }
 
@@ -48,7 +49,7 @@ class PowerRenderStrategyTest {
         Power func = Power.of(
                 ArithmeticExpression.addition(ColumnReference.of("my_table", "x"), Literal.of(1)),
                 ArithmeticExpression.multiplication(ColumnReference.of("my_table", "y"), Literal.of(2)));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("POWER((\"my_table\".\"x\" + 1), (\"my_table\".\"y\" * 2))");
     }
 }
