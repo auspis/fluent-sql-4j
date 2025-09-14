@@ -81,13 +81,13 @@ public interface SqlVisitor<T> {
     // statements
     T visit(SelectStatement clause, AstContext ctx);
 
-    T visit(InsertStatement insertStatement);
+    T visit(InsertStatement insertStatement, AstContext ctx);
 
-    T visit(UpdateStatement updateStatement);
+    T visit(UpdateStatement updateStatement, AstContext ctx);
 
-    T visit(DeleteStatement deleteStatement);
+    T visit(DeleteStatement deleteStatement, AstContext ctx);
 
-    T visit(CreateTableStatement createTableStatement);
+    T visit(CreateTableStatement createTableStatement, AstContext ctx);
 
     // clause
     T visit(Select clause, AstContext ctx);
@@ -100,7 +100,7 @@ public interface SqlVisitor<T> {
 
     T visit(OnJoin onJoin, AstContext ctx);
 
-    T visit(FromSubquery fromSubquery);
+    T visit(FromSubquery fromSubquery, AstContext ctx);
 
     T visit(Where clause, AstContext ctx);
 
@@ -115,19 +115,19 @@ public interface SqlVisitor<T> {
     T visit(Pagination clause, AstContext ctx);
 
     // boolean expressions
-    T visit(NullBooleanExpression expression);
+    T visit(NullBooleanExpression expression, AstContext ctx);
 
-    T visit(Between expression);
+    T visit(Between expression, AstContext ctx);
 
     T visit(Comparison expression, AstContext ctx);
 
-    T visit(In expression);
+    T visit(In expression, AstContext ctx);
 
     T visit(IsNotNull expression, AstContext ctx);
 
     T visit(IsNull expression, AstContext ctx);
 
-    T visit(Like expression);
+    T visit(Like expression, AstContext ctx);
 
     // boolean expressions - logical
     T visit(AndOr expression, AstContext ctx);
@@ -140,103 +140,103 @@ public interface SqlVisitor<T> {
     // scalar expressions
     T visit(AggregateCall expression, AstContext ctx);
 
-    T visit(ColumnReference expression);
+    T visit(ColumnReference expression, AstContext ctx);
 
-    T visit(Interval interval);
+    T visit(Interval interval, AstContext ctx);
 
-    T visit(Literal<?> expression);
+    T visit(Literal<?> expression, AstContext ctx);
 
-    T visit(ScalarSubquery expression);
+    T visit(ScalarSubquery expression, AstContext ctx);
 
     // scalar expressions - arithmetic
-    T visit(BinaryArithmeticExpression expression);
+    T visit(BinaryArithmeticExpression expression, AstContext ctx);
 
-    T visit(UnaryArithmeticExpression expression);
+    T visit(UnaryArithmeticExpression expression, AstContext ctx);
 
     // scalar expressions - function calls
-    T visit(Cast functionCall);
+    T visit(Cast functionCall, AstContext ctx);
 
-    T visit(Concat functionCall);
+    T visit(Concat functionCall, AstContext ctx);
 
-    T visit(CurrentDate functionCall);
+    T visit(CurrentDate functionCall, AstContext ctx);
 
-    T visit(CurrentDateTime functionCall);
+    T visit(CurrentDateTime functionCall, AstContext ctx);
 
-    T visit(DateArithmetic functionCall);
+    T visit(DateArithmetic functionCall, AstContext ctx);
 
-    T visit(ExtractDatePart functionCall);
+    T visit(ExtractDatePart functionCall, AstContext ctx);
 
-    T visit(Left functionCall);
+    T visit(Left functionCall, AstContext ctx);
 
-    T visit(Length functionCall);
+    T visit(Length functionCall, AstContext ctx);
 
-    T visit(CharLength functionCall);
+    T visit(CharLength functionCall, AstContext ctx);
 
-    T visit(CharacterLength functionCall);
+    T visit(CharacterLength functionCall, AstContext ctx);
 
-    T visit(DataLength functionCall);
+    T visit(DataLength functionCall, AstContext ctx);
 
-    T visit(Mod functionCall);
+    T visit(Mod functionCall, AstContext ctx);
 
-    T visit(NullScalarExpression expression);
+    T visit(NullScalarExpression expression, AstContext ctx);
 
-    T visit(Power functionCall);
+    T visit(Power functionCall, AstContext ctx);
 
-    T visit(Replace functionCall);
+    T visit(Replace functionCall, AstContext ctx);
 
-    T visit(Round functionCall);
+    T visit(Round functionCall, AstContext ctx);
 
-    T visit(Substring functionCall);
+    T visit(Substring functionCall, AstContext ctx);
 
-    T visit(Trim functionCall);
+    T visit(Trim functionCall, AstContext ctx);
 
-    T visit(UnaryNumeric functionCall);
+    T visit(UnaryNumeric functionCall, AstContext ctx);
 
-    T visit(UnaryString functionCall);
+    T visit(UnaryString functionCall, AstContext ctx);
 
     // set expressions
-    T visit(NullSetExpression expression);
+    T visit(NullSetExpression expression, AstContext ctx);
 
-    T visit(ExceptExpression expression);
+    T visit(ExceptExpression expression, AstContext ctx);
 
-    T visit(IntersectExpression expression);
+    T visit(IntersectExpression expression, AstContext ctx);
 
-    T visit(UnionExpression expression);
+    T visit(UnionExpression expression, AstContext ctx);
 
     // sql items
-    T visit(Table item);
+    T visit(Table item, AstContext ctx);
 
-    T visit(As item);
+    T visit(As item, AstContext ctx);
 
-    T visit(UpdateItem item);
+    T visit(UpdateItem item, AstContext ctx);
 
-    T visit(InsertValues item);
+    T visit(InsertValues item, AstContext ctx);
 
     T visit(InsertSource item, AstContext ctx);
 
-    T visit(DefaultValues item);
+    T visit(DefaultValues item, AstContext ctx);
 
-    T visit(ReferencesItem item);
+    T visit(ReferencesItem item, AstContext ctx);
 
-    T visit(TableDefinition item);
+    T visit(TableDefinition item, AstContext ctx);
 
-    T visit(ColumnDefinition item);
+    T visit(ColumnDefinition item, AstContext ctx);
 
-    T visit(SimpleDataType type);
+    T visit(SimpleDataType type, AstContext ctx);
 
-    T visit(ParameterizedDataType type);
+    T visit(ParameterizedDataType type, AstContext ctx);
 
-    T visit(PrimaryKey item);
+    T visit(PrimaryKey item, AstContext ctx);
 
-    T visit(Index index);
+    T visit(Index index, AstContext ctx);
 
-    T visit(NotNullConstraint constraint);
+    T visit(NotNullConstraint constraint, AstContext ctx);
 
-    T visit(UniqueConstraint constraint);
+    T visit(UniqueConstraint constraint, AstContext ctx);
 
-    T visit(ForeignKeyConstraint constraint);
+    T visit(ForeignKeyConstraint constraint, AstContext ctx);
 
-    T visit(CheckConstraint constraint);
+    T visit(CheckConstraint constraint, AstContext ctx);
 
-    T visit(DefaultConstraint constraint);
+    T visit(DefaultConstraint constraint, AstContext ctx);
 }
