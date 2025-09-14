@@ -40,14 +40,14 @@ public class SpikeObjectToJdbcMain {
                 //                stmt.executeUpdate("CREATE TABLE \"users\" (\"id\" INT PRIMARY KEY, \"name\"
                 // VARCHAR(100), \"email\" VARCHAR(100))");
                 CreateTableStatement statement = new CreateTableStatement(userTableDefinition);
-                stmt.executeUpdate(sqlRenderer.visit(statement));
+                stmt.executeUpdate(sqlRenderer.visit(statement, new AstContext()));
                 System.out.println("Table User created.");
             }
             // 3. Insert a user
             User user = new User(1, "John", "john@example.com");
             InsertStatement insertStatement = InsertStatementBuilderFromObject.fromObject("User", user);
             PreparedSqlVisitor preparedVisitor = new PreparedSqlVisitor();
-            PreparedSqlResult preparedResult = preparedVisitor.visit(insertStatement);
+            PreparedSqlResult preparedResult = preparedVisitor.visit(insertStatement, new AstContext());
             String insertSql = preparedResult.sql();
             System.out.println("SQL insert: " + insertSql);
             try (var ps = conn.prepareStatement(insertSql)) {

@@ -77,7 +77,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     private final List<Object> parameters = new ArrayList<>();
 
     @Override
-    public PreparedSqlResult visit(InsertStatement stmt) {
+    public PreparedSqlResult visit(InsertStatement stmt, AstContext ctx) {
         // Table name
         Table table = (Table) stmt.getTable();
         String tableName = table.getName();
@@ -197,7 +197,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(Table table) {
+    public PreparedSqlResult visit(Table table, AstContext ctx) {
         String sql = "\"" + table.getName() + "\"";
         String alias = table.getAs() != null ? table.getAs().getName() : null;
         if (alias != null && !alias.isBlank()) {
@@ -279,7 +279,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(ColumnReference col) {
+    public PreparedSqlResult visit(ColumnReference col, AstContext ctx) {
         return visit(col, false);
     }
 
@@ -299,23 +299,23 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(Literal<?> literal) {
+    public PreparedSqlResult visit(Literal<?> literal, AstContext ctx) {
         parameters.add(literal.getValue());
         return new PreparedSqlResult("?", List.of(literal.getValue()));
     }
 
     @Override
-    public PreparedSqlResult visit(UpdateStatement updateStatement) {
+    public PreparedSqlResult visit(UpdateStatement updateStatement, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(DeleteStatement deleteStatement) {
+    public PreparedSqlResult visit(DeleteStatement deleteStatement, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(CreateTableStatement createTableStatement) {
+    public PreparedSqlResult visit(CreateTableStatement createTableStatement, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
@@ -396,7 +396,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(FromSubquery fromSubquery) {
+    public PreparedSqlResult visit(FromSubquery fromSubquery, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
@@ -451,17 +451,17 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(NullBooleanExpression expression) {
+    public PreparedSqlResult visit(NullBooleanExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Between expression) {
+    public PreparedSqlResult visit(Between expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(In expression) {
+    public PreparedSqlResult visit(In expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
@@ -487,215 +487,221 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(BinaryArithmeticExpression expression) {
+    public PreparedSqlResult visit(BinaryArithmeticExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(UnaryArithmeticExpression expression) {
+    public PreparedSqlResult visit(UnaryArithmeticExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Cast functionCall) {
+    public PreparedSqlResult visit(Cast functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Concat functionCall) {
+    public PreparedSqlResult visit(Concat functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(CurrentDate functionCall) {
+    public PreparedSqlResult visit(CurrentDate functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(CurrentDateTime functionCall) {
+    public PreparedSqlResult visit(CurrentDateTime functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(DateArithmetic functionCall) {
+    public PreparedSqlResult visit(DateArithmetic functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(ExtractDatePart functionCall) {
+    public PreparedSqlResult visit(ExtractDatePart functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Left functionCall) {
+    public PreparedSqlResult visit(Left functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Length functionCall) {
+    public PreparedSqlResult visit(Length functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(CharLength functionCall) {
+    public PreparedSqlResult visit(CharLength functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(CharacterLength functionCall) {
+    public PreparedSqlResult visit(CharacterLength functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(DataLength functionCall) {
+    public PreparedSqlResult visit(DataLength functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Mod functionCall) {
+    public PreparedSqlResult visit(Mod functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(NullScalarExpression expression) {
+    public PreparedSqlResult visit(NullScalarExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Power functionCall) {
+    public PreparedSqlResult visit(Power functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Replace functionCall) {
+    public PreparedSqlResult visit(Replace functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Round functionCall) {
+    public PreparedSqlResult visit(Round functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Substring functionCall) {
+    public PreparedSqlResult visit(Substring functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Trim functionCall) {
+    public PreparedSqlResult visit(Trim functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(UnaryNumeric functionCall) {
+    public PreparedSqlResult visit(UnaryNumeric functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(UnaryString functionCall) {
+    public PreparedSqlResult visit(UnaryString functionCall, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(NullSetExpression expression) {
+    public PreparedSqlResult visit(NullSetExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(ExceptExpression expression) {
+    public PreparedSqlResult visit(ExceptExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(IntersectExpression expression) {
+    public PreparedSqlResult visit(IntersectExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(UnionExpression expression) {
+    public PreparedSqlResult visit(UnionExpression expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(As item) {
+    public PreparedSqlResult visit(As item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(UpdateItem item) {
+    public PreparedSqlResult visit(UpdateItem item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(ReferencesItem item) {
+    public PreparedSqlResult visit(ReferencesItem item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(TableDefinition item) {
+    public PreparedSqlResult visit(TableDefinition item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition item) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.SimpleDataType type) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType type) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey item) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.Index index) {
+    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint constraint) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint constraint) {
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.SimpleDataType type, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.ForeignKeyConstraint constraint) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint constraint) {
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType type, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public PreparedSqlResult visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint constraint) {
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery expression) {
+    public PreparedSqlResult visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.Index index, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PreparedSqlResult visit(Interval interval) {
+    public PreparedSqlResult visit(
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint constraint, AstContext ctx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PreparedSqlResult visit(
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint constraint, AstContext ctx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PreparedSqlResult visit(
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.ForeignKeyConstraint constraint, AstContext ctx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PreparedSqlResult visit(
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint constraint, AstContext ctx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PreparedSqlResult visit(
+            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint constraint, AstContext ctx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PreparedSqlResult visit(
+            lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery expression, AstContext ctx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PreparedSqlResult visit(Interval interval, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
@@ -739,7 +745,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(InsertValues item) {
+    public PreparedSqlResult visit(InsertValues item, AstContext ctx) {
         // InsertValues holds a list of value expressions (e.g., literals)
         List<String> placeholders = new ArrayList<>();
         List<Object> params = new ArrayList<>();
@@ -764,7 +770,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(DefaultValues item) {
+    public PreparedSqlResult visit(DefaultValues item, AstContext ctx) {
         // For SQL DEFAULT VALUES
         return new PreparedSqlResult("DEFAULT VALUES", List.of());
     }
@@ -775,7 +781,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     }
 
     @Override
-    public PreparedSqlResult visit(Like expression) {
+    public PreparedSqlResult visit(Like expression, AstContext ctx) {
         throw new UnsupportedOperationException("Unsupported FromSource type: " + expression.getClass());
     }
 
