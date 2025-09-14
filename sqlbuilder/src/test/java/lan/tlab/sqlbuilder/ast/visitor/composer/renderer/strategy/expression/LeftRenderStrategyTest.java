@@ -7,6 +7,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +27,14 @@ class LeftRenderStrategyTest {
     @Test
     void ok() {
         Left func = Left.of(ColumnReference.of("Customer", "name"), 3);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LEFT(\"Customer\".\"name\", 3)");
     }
 
     @Test
     void withLiteralStringAndColumnLength() {
         Left func = Left.of(Literal.of("Some String"), ColumnReference.of("Customer", "prefix_length"));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LEFT('Some String', \"Customer\".\"prefix_length\")");
     }
 
@@ -43,7 +44,7 @@ class LeftRenderStrategyTest {
                 ColumnReference.of("Customer", "full_name"),
                 ArithmeticExpression.subtraction(
                         new Length(ColumnReference.of("Customer", "full_name")), Literal.of(5)));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LEFT(\"Customer\".\"full_name\", (LENGTH(\"Customer\".\"full_name\") - 5))");
     }
 }

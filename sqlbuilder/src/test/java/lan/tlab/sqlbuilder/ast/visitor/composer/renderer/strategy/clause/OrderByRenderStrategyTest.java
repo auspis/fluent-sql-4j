@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ class OrderByRenderStrategyTest {
     @Test
     void ok() {
         OrderBy clause = OrderBy.of(Sorting.asc(ColumnReference.of("Customer", "name")));
-        String sql = strategy.render(clause, sqlRenderer);
+        String sql = strategy.render(clause, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("ORDER BY \"Customer\".\"name\" ASC");
     }
 
@@ -35,7 +36,7 @@ class OrderByRenderStrategyTest {
                 Sorting.asc(ColumnReference.of("Customer", "last_name")),
                 Sorting.desc(ColumnReference.of("Customer", "first_name")),
                 Sorting.by(new Length(ColumnReference.of("Customer", "address"))));
-        String sql = strategy.render(clause, sqlRenderer);
+        String sql = strategy.render(clause, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         "ORDER BY \"Customer\".\"last_name\" ASC, \"Customer\".\"first_name\" DESC, LENGTH(\"Customer\".\"address\")");

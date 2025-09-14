@@ -3,11 +3,12 @@ package lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Trim.TrimMode;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 
 public class TrimRenderStrategy implements ExpressionRenderStrategy {
 
-    public String render(Trim functionCall, SqlRenderer sqlRenderer) {
+    public String render(Trim functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         TrimMode mode = functionCall.getMode();
         ScalarExpression charactersToRemove = functionCall.getCharactersToRemove();
         ScalarExpression stringExpression = functionCall.getStringExpression();
@@ -20,10 +21,10 @@ public class TrimRenderStrategy implements ExpressionRenderStrategy {
         }
 
         if (charactersToRemove != null) {
-            sb.append(charactersToRemove.accept(sqlRenderer)).append(" FROM ");
+            sb.append(charactersToRemove.accept(sqlRenderer, ctx)).append(" FROM ");
         }
 
-        sb.append(stringExpression.accept(sqlRenderer));
+        sb.append(stringExpression.accept(sqlRenderer, ctx));
         sb.append(")");
         return sb.toString();
     }

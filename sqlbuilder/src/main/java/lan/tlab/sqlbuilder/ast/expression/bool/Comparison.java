@@ -1,6 +1,7 @@
 package lan.tlab.sqlbuilder.ast.expression.bool;
 
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class Comparison implements BooleanExpression {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor) {
-        return visitor.visit(this);
+    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
     }
 }

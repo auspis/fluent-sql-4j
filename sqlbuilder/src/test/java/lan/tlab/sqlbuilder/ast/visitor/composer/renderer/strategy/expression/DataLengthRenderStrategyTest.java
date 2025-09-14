@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.DataLength;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ class DataLengthRenderStrategyTest {
         SqlRendererImpl sqlRenderer = SqlRendererFactory.sqlServer();
         DataLengthRenderStrategy strategy = DataLengthRenderStrategy.sqlServer();
         DataLength fun = new DataLength(ColumnReference.of("Customer", "name"));
-        String sql = strategy.render(fun, sqlRenderer);
+        String sql = strategy.render(fun, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("DATALENGTH([Customer].[name])");
     }
 
@@ -25,6 +26,6 @@ class DataLengthRenderStrategyTest {
         SqlRendererImpl sqlRenderer = SqlRendererFactory.standardSql2008();
         DataLengthRenderStrategy strategy = DataLengthRenderStrategy.standardSql2008();
         DataLength fun = new DataLength(ColumnReference.of("Customer", "name"));
-        assertThrows(UnsupportedOperationException.class, () -> strategy.render(fun, sqlRenderer));
+        assertThrows(UnsupportedOperationException.class, () -> strategy.render(fun, sqlRenderer, new AstContext()));
     }
 }

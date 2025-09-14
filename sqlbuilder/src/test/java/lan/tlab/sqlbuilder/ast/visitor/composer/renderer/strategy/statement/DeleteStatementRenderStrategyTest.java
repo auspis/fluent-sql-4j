@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ class DeleteStatementRenderStrategyTest {
                 .where(Where.of(Comparison.eq(ColumnReference.of("Customer", "status"), Literal.of("inactive"))))
                 .build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -45,7 +46,7 @@ class DeleteStatementRenderStrategyTest {
         DeleteStatement statement =
                 DeleteStatement.builder().table(new Table("Customer")).build();
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("DELETE FROM \"Customer\"");
     }
 }
