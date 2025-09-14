@@ -8,8 +8,9 @@ import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 public class UpdateStatementRenderStrategy implements StatementRenderStrategy {
 
     public String render(UpdateStatement statement, SqlRenderer sqlRenderer, AstContext ctx) {
-        String setList =
-                statement.getSet().stream().map(item -> sqlRenderer.visit(item)).collect(Collectors.joining(", "));
+        String setList = statement.getSet().stream()
+                .map(item -> sqlRenderer.visit(item, ctx))
+                .collect(Collectors.joining(", "));
         return String.format(
                         "UPDATE %s SET %s %s",
                         statement.getTable().accept(sqlRenderer, ctx),

@@ -410,22 +410,22 @@ public class SqlRendererImpl implements SqlRenderer {
     }
 
     @Override
-    public String visit(InsertStatement statement) {
+    public String visit(InsertStatement statement, AstContext ctx) {
         return insertStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
-    public String visit(UpdateStatement statement) {
+    public String visit(UpdateStatement statement, AstContext ctx) {
         return updateStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
-    public String visit(DeleteStatement statement) {
+    public String visit(DeleteStatement statement, AstContext ctx) {
         return deleteStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
-    public String visit(CreateTableStatement statement) {
+    public String visit(CreateTableStatement statement, AstContext ctx) {
         return createTableStatementStrategy.render(statement, this, ctx);
     }
 
@@ -456,7 +456,7 @@ public class SqlRendererImpl implements SqlRenderer {
     }
 
     @Override
-    public String visit(FromSubquery fromSubquery) {
+    public String visit(FromSubquery fromSubquery, AstContext ctx) {
         return fromSubqueryStrategy.render(fromSubquery, this, ctx);
     }
 
@@ -492,12 +492,12 @@ public class SqlRendererImpl implements SqlRenderer {
 
     // boolean expressions
     @Override
-    public String visit(NullBooleanExpression expression) {
+    public String visit(NullBooleanExpression expression, AstContext ctx) {
         return nullScalarExpressionStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(Between expression) {
+    public String visit(Between expression, AstContext ctx) {
         return betweenStrategy.render(expression, this, ctx);
     }
 
@@ -507,7 +507,7 @@ public class SqlRendererImpl implements SqlRenderer {
     }
 
     @Override
-    public String visit(In expression) {
+    public String visit(In expression, AstContext ctx) {
         return inStrategy.render(expression, this, ctx);
     }
 
@@ -522,7 +522,7 @@ public class SqlRendererImpl implements SqlRenderer {
     }
 
     @Override
-    public String visit(Like expression) {
+    public String visit(Like expression, AstContext ctx) {
         return likeStrategy.render(expression, this, ctx);
     }
 
@@ -544,175 +544,175 @@ public class SqlRendererImpl implements SqlRenderer {
     }
 
     @Override
-    public String visit(ColumnReference expression) {
+    public String visit(ColumnReference expression, AstContext ctx) {
         return columnReferenceStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(Literal<?> expression) {
+    public String visit(Literal<?> expression, AstContext ctx) {
         return literalStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(ScalarSubquery expression) {
+    public String visit(ScalarSubquery expression, AstContext ctx) {
         return scalarSubqueryStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(Interval interval) {
+    public String visit(Interval interval, AstContext ctx) {
         return intervalStrategy.render(interval, this, ctx);
     }
 
     @Override
-    public String visit(BinaryArithmeticExpression expression) {
+    public String visit(BinaryArithmeticExpression expression, AstContext ctx) {
         return binaryArithmeticExpressionStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(UnaryArithmeticExpression expression) {
+    public String visit(UnaryArithmeticExpression expression, AstContext ctx) {
         return unaryArithmeticExpressionStrategy.render(expression, this, ctx);
     }
 
     // functionCall
     @Override
-    public String visit(Cast functionCall) {
+    public String visit(Cast functionCall, AstContext ctx) {
         return castStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Concat functionCall) {
+    public String visit(Concat functionCall, AstContext ctx) {
         return concatStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(CurrentDate functionCall) {
+    public String visit(CurrentDate functionCall, AstContext ctx) {
         return currentDateStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(CurrentDateTime functionCall) {
+    public String visit(CurrentDateTime functionCall, AstContext ctx) {
         return currentDateTimeStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(DateArithmetic functionCall) {
+    public String visit(DateArithmetic functionCall, AstContext ctx) {
         return dateArithmeticStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(ExtractDatePart functionCall) {
+    public String visit(ExtractDatePart functionCall, AstContext ctx) {
         return extractDatePartStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Left functionCall) {
+    public String visit(Left functionCall, AstContext ctx) {
         return leftStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Length functionCall) {
+    public String visit(Length functionCall, AstContext ctx) {
         return lengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(CharLength functionCall) {
+    public String visit(CharLength functionCall, AstContext ctx) {
         return charLengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(CharacterLength functionCall) {
+    public String visit(CharacterLength functionCall, AstContext ctx) {
         return characterLengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(DataLength functionCall) {
+    public String visit(DataLength functionCall, AstContext ctx) {
         return dataLengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Mod functionCall) {
+    public String visit(Mod functionCall, AstContext ctx) {
         return modStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(NullScalarExpression interval) {
+    public String visit(NullScalarExpression interval, AstContext ctx) {
         return nullScalarExpressionStrategy.render(interval, this, ctx);
     }
 
     @Override
-    public String visit(Power functionCall) {
+    public String visit(Power functionCall, AstContext ctx) {
         return powerStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Replace functionCall) {
+    public String visit(Replace functionCall, AstContext ctx) {
         return replaceStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Round functionCall) {
+    public String visit(Round functionCall, AstContext ctx) {
         return roundStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Substring functionCall) {
+    public String visit(Substring functionCall, AstContext ctx) {
         return substringStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(Trim functionCall) {
+    public String visit(Trim functionCall, AstContext ctx) {
         return trimStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(UnaryNumeric functionCall) {
+    public String visit(UnaryNumeric functionCall, AstContext ctx) {
         return unaryNumericStrategy.render(functionCall, this, ctx);
     }
 
     @Override
-    public String visit(UnaryString functionCall) {
+    public String visit(UnaryString functionCall, AstContext ctx) {
         return unaryStringStrategy.render(functionCall, this, ctx);
     }
 
     // set expressions
     @Override
-    public String visit(NullSetExpression expression) {
+    public String visit(NullSetExpression expression, AstContext ctx) {
         return nullSetExpressionStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(ExceptExpression expression) {
+    public String visit(ExceptExpression expression, AstContext ctx) {
         return exceptStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(IntersectExpression expression) {
+    public String visit(IntersectExpression expression, AstContext ctx) {
         return intersectStrategy.render(expression, this, ctx);
     }
 
     @Override
-    public String visit(UnionExpression expression) {
+    public String visit(UnionExpression expression, AstContext ctx) {
         return unionStrategy.render(expression, this, ctx);
     }
 
     // sql items
     @Override
-    public String visit(Table item) {
+    public String visit(Table item, AstContext ctx) {
         return tableStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(As item) {
+    public String visit(As item, AstContext ctx) {
         return asStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(UpdateItem item) {
+    public String visit(UpdateItem item, AstContext ctx) {
         return updateItemStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(InsertValues item) {
+    public String visit(InsertValues item, AstContext ctx) {
         return insertValueStrategy.render(item, this, ctx);
     }
 
@@ -722,67 +722,67 @@ public class SqlRendererImpl implements SqlRenderer {
     }
 
     @Override
-    public String visit(DefaultValues item) {
+    public String visit(DefaultValues item, AstContext ctx) {
         return defaultValuesStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(ReferencesItem item) {
+    public String visit(ReferencesItem item, AstContext ctx) {
         return referencesItemStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(TableDefinition item) {
+    public String visit(TableDefinition item, AstContext ctx) {
         return tableDefinitionStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(ColumnDefinition item) {
+    public String visit(ColumnDefinition item, AstContext ctx) {
         return columnDefinitionStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(SimpleDataType type) {
+    public String visit(SimpleDataType type, AstContext ctx) {
         return simpleDataTypeStrategy.render(type, this, ctx);
     }
 
     @Override
-    public String visit(ParameterizedDataType type) {
+    public String visit(ParameterizedDataType type, AstContext ctx) {
         return parameterizedDataTypeStrategy.render(type, this, ctx);
     }
 
     @Override
-    public String visit(PrimaryKey item) {
+    public String visit(PrimaryKey item, AstContext ctx) {
         return primaryKeyStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(Index index) {
+    public String visit(Index index, AstContext ctx) {
         return indexStrategy.render(index, this, ctx);
     }
 
     @Override
-    public String visit(NotNullConstraint constraint) {
+    public String visit(NotNullConstraint constraint, AstContext ctx) {
         return notNullConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
-    public String visit(UniqueConstraint constraint) {
+    public String visit(UniqueConstraint constraint, AstContext ctx) {
         return uniqueConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
-    public String visit(ForeignKeyConstraint constraint) {
+    public String visit(ForeignKeyConstraint constraint, AstContext ctx) {
         return foreignKeyConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
-    public String visit(CheckConstraint constraint) {
+    public String visit(CheckConstraint constraint, AstContext ctx) {
         return checkConstraintStrategy.render(constraint, this, ctx);
     }
 
     @Override
-    public String visit(DefaultConstraint constraint) {
+    public String visit(DefaultConstraint constraint, AstContext ctx) {
         return defaultConstraintStrategy.render(constraint, this, ctx);
     }
 }

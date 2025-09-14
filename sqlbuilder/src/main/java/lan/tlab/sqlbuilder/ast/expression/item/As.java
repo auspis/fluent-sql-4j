@@ -20,6 +20,6 @@ public class As implements SqlItem {
 
     @Override
     public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-        return visitor.visit(this);
+        return visitor.visit(this, ctx);
     }
 }

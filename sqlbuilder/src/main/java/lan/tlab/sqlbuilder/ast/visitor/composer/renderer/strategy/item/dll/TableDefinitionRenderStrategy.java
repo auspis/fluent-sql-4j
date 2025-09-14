@@ -16,10 +16,11 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
         StringBuilder builder = new StringBuilder();
         builder.append(item.getTable().accept(sqlRenderer, ctx));
         builder.append(" (");
-        builder.append(item.getColumns().stream().map(sqlRenderer::visit).collect(Collectors.joining(", ")));
-        builder.append(primaryKey(item.getPrimaryKey(), sqlRenderer));
+        builder.append(
+                item.getColumns().stream().map(c -> sqlRenderer.visit(c, ctx)).collect(Collectors.joining(", ")));
+        builder.append(primaryKey(item.getPrimaryKey(), sqlRenderer, ctx));
         builder.append(constraints(item.getConstraints(), sqlRenderer, ctx));
-        builder.append(indexes(item.getIndexes(), sqlRenderer));
+        builder.append(indexes(item.getIndexes(), sqlRenderer, ctx));
         builder.append(")");
         return builder.toString();
     }
@@ -31,17 +32,17 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
         return ", " + constraints.stream().map(c -> c.accept(sqlRenderer, ctx)).collect(Collectors.joining(", "));
     }
 
-    private String indexes(List<Index> indexes, SqlRenderer sqlRenderer) {
+    private String indexes(List<Index> indexes, SqlRenderer sqlRenderer, AstContext ctx) {
         if (indexes == null || indexes.isEmpty()) {
             return "";
         }
-        return ", " + indexes.stream().map(sqlRenderer::visit).collect(Collectors.joining(", "));
+        return ", " + indexes.stream().map(i -> sqlRenderer.visit(i, ctx)).collect(Collectors.joining(", "));
     }
 
-    private String primaryKey(PrimaryKey primaryKey, SqlRenderer sqlRenderer) {
+    private String primaryKey(PrimaryKey primaryKey, SqlRenderer sqlRenderer, AstContext ctx) {
         if (primaryKey == null) {
             return "";
         }
-        return ", " + sqlRenderer.visit(primaryKey);
+        return ", " + sqlRenderer.visit(primaryKey, ctx);
     }
 }

@@ -18,7 +18,7 @@ public interface InsertData extends SqlItem {
     public static class DefaultValues implements InsertData {
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 
@@ -33,7 +33,7 @@ public interface InsertData extends SqlItem {
 
         @Override
         public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
-            return visitor.visit(this);
+            return visitor.visit(this, ctx);
         }
     }
 
