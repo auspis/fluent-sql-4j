@@ -79,7 +79,7 @@ import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
 public interface SqlVisitor<T> {
 
     // statements
-    T visit(SelectStatement clause);
+    T visit(SelectStatement clause, AstContext ctx);
 
     T visit(InsertStatement insertStatement);
 
@@ -90,55 +90,55 @@ public interface SqlVisitor<T> {
     T visit(CreateTableStatement createTableStatement);
 
     // clause
-    T visit(Select clause);
+    T visit(Select clause, AstContext ctx);
 
-    T visit(AggregationFunctionProjection aggregationFunctionProjection);
+    T visit(AggregationFunctionProjection aggregationFunctionProjection, AstContext ctx);
 
-    T visit(ScalarExpressionProjection scalarExpressionProjection);
+    T visit(ScalarExpressionProjection scalarExpressionProjection, AstContext ctx);
 
-    T visit(From clause);
+    T visit(From clause, AstContext ctx);
 
-    T visit(OnJoin onJoin);
+    T visit(OnJoin onJoin, AstContext ctx);
 
     T visit(FromSubquery fromSubquery);
 
-    T visit(Where clause);
+    T visit(Where clause, AstContext ctx);
 
-    T visit(GroupBy clause);
+    T visit(GroupBy clause, AstContext ctx);
 
-    T visit(Having clause);
+    T visit(Having clause, AstContext ctx);
 
-    T visit(OrderBy clause);
+    T visit(OrderBy clause, AstContext ctx);
 
-    T visit(Sorting sorting);
+    T visit(Sorting sorting, AstContext ctx);
 
-    T visit(Pagination clause);
+    T visit(Pagination clause, AstContext ctx);
 
     // boolean expressions
     T visit(NullBooleanExpression expression);
 
     T visit(Between expression);
 
-    T visit(Comparison expression);
+    T visit(Comparison expression, AstContext ctx);
 
     T visit(In expression);
 
-    T visit(IsNotNull expression);
+    T visit(IsNotNull expression, AstContext ctx);
 
-    T visit(IsNull expression);
+    T visit(IsNull expression, AstContext ctx);
 
     T visit(Like expression);
 
     // boolean expressions - logical
-    T visit(AndOr expression);
+    T visit(AndOr expression, AstContext ctx);
 
-    T visit(Not expression);
+    T visit(Not expression, AstContext ctx);
 
     // ordering expressions
     // ...
 
     // scalar expressions
-    T visit(AggregateCall expression);
+    T visit(AggregateCall expression, AstContext ctx);
 
     T visit(ColumnReference expression);
 
@@ -212,7 +212,7 @@ public interface SqlVisitor<T> {
 
     T visit(InsertValues item);
 
-    T visit(InsertSource item);
+    T visit(InsertSource item, AstContext ctx);
 
     T visit(DefaultValues item);
 

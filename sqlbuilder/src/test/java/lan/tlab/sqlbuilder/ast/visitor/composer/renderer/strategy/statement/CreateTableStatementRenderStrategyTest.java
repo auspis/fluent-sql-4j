@@ -15,6 +15,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ class CreateTableStatementRenderStrategyTest {
                         ColumnDefinitionBuilder.varchar("name").build()))
                 .build());
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -56,7 +57,7 @@ class CreateTableStatementRenderStrategyTest {
     void emptyColumns() {
         CreateTableStatement statement = new CreateTableStatement(
                 TableDefinition.builder().table(new Table("empty_table")).build());
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -75,7 +76,7 @@ class CreateTableStatementRenderStrategyTest {
                         ColumnDefinitionBuilder.varchar("desc").build(),
                         ColumnDefinitionBuilder.bool("flag").build()))
                 .build());
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -97,7 +98,7 @@ class CreateTableStatementRenderStrategyTest {
                         .defaultConstraint(new DefaultConstraint(Literal.of("UNKNOWN")))
                         .build()))
                 .build());
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -120,7 +121,7 @@ class CreateTableStatementRenderStrategyTest {
                 .index(new Index("idx_name", "name"))
                 .index(new Index("idx_email", "email"))
                 .build());
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -144,7 +145,7 @@ class CreateTableStatementRenderStrategyTest {
                         ColumnDefinitionBuilder.integer("user-id").build(),
                         ColumnDefinitionBuilder.varchar("e-mail").build()))
                 .build());
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -171,7 +172,7 @@ class CreateTableStatementRenderStrategyTest {
                 .constraint(new CheckConstraint(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
                 .build());
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
 
         assertThat(sql)
                 .isEqualTo(
@@ -199,7 +200,7 @@ class CreateTableStatementRenderStrategyTest {
                 .index(new Index("idx_email", "email"))
                 .build());
 
-        String sql = strategy.render(statement, renderer);
+        String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProje
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ class UnionRenderStrategyTest {
                 .build();
 
         UnionExpression union = UnionExpression.union(select1, select2);
-        String sql = strategy.render(union, sqlRenderer);
+        String sql = strategy.render(union, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -68,7 +69,7 @@ class UnionRenderStrategyTest {
                 .build();
 
         UnionExpression union = UnionExpression.union(select1, select2);
-        String sql = strategy.render(union, sqlRenderer);
+        String sql = strategy.render(union, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -94,7 +95,7 @@ class UnionRenderStrategyTest {
                 .build();
 
         UnionExpression union = UnionExpression.unionAll(select1, select2);
-        String sql = strategy.render(union, sqlRenderer);
+        String sql = strategy.render(union, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -127,7 +128,7 @@ class UnionRenderStrategyTest {
 
         UnionExpression firstUnion = UnionExpression.unionAll(select1, select2);
         UnionExpression union = UnionExpression.unionAll(firstUnion, select3);
-        String sql = strategy.render(union, sqlRenderer);
+        String sql = strategy.render(union, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

@@ -13,6 +13,7 @@ import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,14 +33,14 @@ class FromRenderStrategyTest {
     @Test
     void table() {
         From from = From.fromTable("Customer");
-        String sql = strategy.render(from, sqlRenderer);
+        String sql = strategy.render(from, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FROM \"Customer\"");
     }
 
     @Test
     void tableWithAlias() {
         From from = From.fromTable("Customer", "c");
-        String sql = strategy.render(from, sqlRenderer);
+        String sql = strategy.render(from, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FROM \"Customer\" AS c");
     }
 
@@ -50,7 +51,7 @@ class FromRenderStrategyTest {
                 .from(From.fromTable("Customer"))
                 .build();
         From from = From.of(FromSubquery.of(subquery, "c"));
-        assertThat(strategy.render(from, sqlRenderer))
+        assertThat(strategy.render(from, sqlRenderer, new AstContext()))
                 .isEqualTo("FROM (SELECT \"Customer\".\"id\" FROM \"Customer\") AS c");
     }
 
@@ -62,14 +63,14 @@ class FromRenderStrategyTest {
                 new Table("orders", "o"),
                 Comparison.eq(ColumnReference.of("u", "id"), ColumnReference.of("o", "user_id")));
         From from = From.of(join);
-        String sql = strategy.render(from, sqlRenderer);
+        String sql = strategy.render(from, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\"");
     }
 
     @Test
     void multipleTablesImplicitCrossJoin() {
         From from = From.of(new Table("table1"), new Table("table2"));
-        String sql = strategy.render(from, sqlRenderer);
+        String sql = strategy.render(from, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FROM \"table1\", \"table2\"");
     }
 
@@ -86,7 +87,7 @@ class FromRenderStrategyTest {
                 new Table("c"),
                 Comparison.eq(ColumnReference.of("b", "id"), ColumnReference.of("c", "b_id")));
         From from = From.of(join2);
-        String sql = strategy.render(from, sqlRenderer);
+        String sql = strategy.render(from, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         "FROM \"a\" INNER JOIN \"b\" ON \"a\".\"id\" = \"b\".\"a_id\" LEFT JOIN \"c\" ON \"b\".\"id\" = \"c\".\"b_id\"");

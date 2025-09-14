@@ -9,6 +9,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ class ScalarSubqueryRenderStrategyTest {
                         .from(From.fromTable("Risk"))
                         .build())
                 .build();
-        String sql = strategy.render(subquery, sqlRenderer);
+        String sql = strategy.render(subquery, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(SELECT MAX(\"Risk\".\"value\") FROM \"Risk\")");
     }
 }

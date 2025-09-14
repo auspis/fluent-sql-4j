@@ -8,6 +8,7 @@ import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProje
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.set.ExceptExpression;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ class ExceptOracleRenderStrategyTest {
                 .build();
 
         ExceptExpression except = ExceptExpression.except(select1, select2);
-        String sql = strategy.render(except, sqlRenderer);
+        String sql = strategy.render(except, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -66,7 +67,7 @@ class ExceptOracleRenderStrategyTest {
                 .build();
 
         ExceptExpression except = ExceptExpression.exceptAll(select1, select2);
-        String sql = strategy.render(except, sqlRenderer);
+        String sql = strategy.render(except, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """

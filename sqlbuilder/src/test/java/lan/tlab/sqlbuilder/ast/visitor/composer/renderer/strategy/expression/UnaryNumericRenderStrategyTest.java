@@ -7,6 +7,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.UnaryNumeric;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,21 +27,21 @@ class UnaryNumericRenderStrategyTest {
     @Test
     void abs_columnReference() {
         UnaryNumeric func = UnaryNumeric.abs(ColumnReference.of("Customer", "value"));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("ABS(\"Customer\".\"value\")");
     }
 
     @Test
     void abs_integer() {
         UnaryNumeric func = UnaryNumeric.abs(-10);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("ABS(-10)");
     }
 
     @Test
     void abs_double() {
         UnaryNumeric func = UnaryNumeric.abs(Literal.of(-5.75));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("ABS(-5.75)");
     }
 
@@ -48,7 +49,7 @@ class UnaryNumericRenderStrategyTest {
     void abs_arithmeticExpression() {
         UnaryNumeric func = UnaryNumeric.abs(ArithmeticExpression.subtraction(
                 ColumnReference.of("Customer", "price"), ColumnReference.of("Customer", "cost")));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("ABS((\"Customer\".\"price\" - \"Customer\".\"cost\"))");
     }
 
@@ -57,28 +58,28 @@ class UnaryNumericRenderStrategyTest {
         ScalarExpression valueCol = ColumnReference.of("my_table", "decimal_value");
 
         UnaryNumeric func = UnaryNumeric.ceil(valueCol);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("CEIL(\"my_table\".\"decimal_value\")");
     }
 
     @Test
     void ceil_double() {
         UnaryNumeric func = UnaryNumeric.ceil(10.1);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("CEIL(10.1)");
     }
 
     @Test
     void ceil_negativeDoubleLiteral() {
         UnaryNumeric func = UnaryNumeric.ceil(Literal.of(-5.7));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("CEIL(-5.7)");
     }
 
     @Test
     void ceil_integer() {
         UnaryNumeric func = UnaryNumeric.ceil(15);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("CEIL(15)");
     }
 
@@ -86,7 +87,7 @@ class UnaryNumericRenderStrategyTest {
     void ceil_arithmeticExpression() {
         UnaryNumeric func = UnaryNumeric.ceil(ArithmeticExpression.division(
                 ColumnReference.of("my_table", "total_cost"), ColumnReference.of("my_table", "item_count")));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("CEIL((\"my_table\".\"total_cost\" / \"my_table\".\"item_count\"))");
     }
 
@@ -95,28 +96,28 @@ class UnaryNumericRenderStrategyTest {
         ScalarExpression valueCol = ColumnReference.of("my_table", "decimal_value");
 
         UnaryNumeric func = UnaryNumeric.floor(valueCol);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FLOOR(\"my_table\".\"decimal_value\")");
     }
 
     @Test
     void floor_double() {
         UnaryNumeric func = UnaryNumeric.floor(10.1);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FLOOR(10.1)");
     }
 
     @Test
     void floor_negativeDoubleLiteral() {
         UnaryNumeric func = UnaryNumeric.floor(Literal.of(-5.7));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FLOOR(-5.7)");
     }
 
     @Test
     void floor_integer() {
         UnaryNumeric func = UnaryNumeric.floor(15);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FLOOR(15)");
     }
 
@@ -124,7 +125,7 @@ class UnaryNumericRenderStrategyTest {
     void floor_arithmeticExpression() {
         UnaryNumeric func = UnaryNumeric.floor(ArithmeticExpression.division(
                 ColumnReference.of("my_table", "total_cost"), ColumnReference.of("my_table", "item_count")));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FLOOR((\"my_table\".\"total_cost\" / \"my_table\".\"item_count\"))");
     }
 
@@ -133,28 +134,28 @@ class UnaryNumericRenderStrategyTest {
         ScalarExpression valueCol = ColumnReference.of("my_table", "decimal_value");
 
         UnaryNumeric func = UnaryNumeric.sqrt(valueCol);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SQRT(\"my_table\".\"decimal_value\")");
     }
 
     @Test
     void sqrt_double() {
         UnaryNumeric func = UnaryNumeric.sqrt(10.1);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SQRT(10.1)");
     }
 
     @Test
     void sqrt_negativeDoubleLiteral() {
         UnaryNumeric func = UnaryNumeric.sqrt(Literal.of(-5.7));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SQRT(-5.7)");
     }
 
     @Test
     void sqrt_integer() {
         UnaryNumeric func = UnaryNumeric.sqrt(15);
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SQRT(15)");
     }
 
@@ -162,7 +163,7 @@ class UnaryNumericRenderStrategyTest {
     void sqrt_arithmeticExpression() {
         UnaryNumeric func = UnaryNumeric.sqrt(ArithmeticExpression.division(
                 ColumnReference.of("my_table", "total_cost"), ColumnReference.of("my_table", "item_count")));
-        String sql = strategy.render(func, sqlRenderer);
+        String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SQRT((\"my_table\".\"total_cost\" / \"my_table\".\"item_count\"))");
     }
 }

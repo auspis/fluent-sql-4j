@@ -6,12 +6,14 @@ import java.util.stream.Collectors;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.strategy.expression.ConcatRenderStrategy;
 
 public class MySqlConcatRenderStrategy implements ConcatRenderStrategy {
 
-    public String render(Concat functionCall, SqlRenderer sqlRenderer) {
+    @Override
+    public String render(Concat functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         String functionName = "CONCAT";
         List<ScalarExpression> expressions = new ArrayList<>();
 
@@ -25,6 +27,6 @@ public class MySqlConcatRenderStrategy implements ConcatRenderStrategy {
         return String.format(
                 "%s(%s)",
                 functionName,
-                expressions.stream().map(e -> e.accept(sqlRenderer)).collect(Collectors.joining(", ")));
+                expressions.stream().map(e -> e.accept(sqlRenderer, ctx)).collect(Collectors.joining(", ")));
     }
 }
