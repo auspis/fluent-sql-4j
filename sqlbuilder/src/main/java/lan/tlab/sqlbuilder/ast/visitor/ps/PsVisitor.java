@@ -85,101 +85,33 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.NoArgsConstructor;
 
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class PsVisitor implements Visitor<PsDto> {
-    private final SelectClausePsStrategy selectClauseStrategy;
-    private final FromClausePsStrategy fromClauseStrategy;
-    private final WhereClausePsStrategy whereClauseStrategy;
-    private final GroupByClausePsStrategy groupByClauseStrategy;
-    private final HavingClausePsStrategy havingClauseStrategy;
-    private final OrderByClausePsStrategy orderByClauseStrategy;
+    @Default
+    private final SelectClausePsStrategy selectClauseStrategy = new DefaultSelectClausePsStrategy();
 
-    public PsVisitor() {
-        this(
-                new DefaultSelectClausePsStrategy(),
-                new DefaultFromClausePsStrategy(),
-                new DefaultWhereClausePsStrategy(),
-                new DefaultGroupByClausePsStrategy(),
-                new DefaultHavingClausePsStrategy(),
-                new DefaultOrderByClausePsStrategy());
-    }
+    @Default
+    private final FromClausePsStrategy fromClauseStrategy = new DefaultFromClausePsStrategy();
 
-    public PsVisitor(SelectClausePsStrategy selectClauseStrategy) {
-        this(
-                selectClauseStrategy,
-                new DefaultFromClausePsStrategy(),
-                new DefaultWhereClausePsStrategy(),
-                new DefaultGroupByClausePsStrategy(),
-                new DefaultHavingClausePsStrategy(),
-                new DefaultOrderByClausePsStrategy());
-    }
+    @Default
+    private final WhereClausePsStrategy whereClauseStrategy = new DefaultWhereClausePsStrategy();
 
-    public PsVisitor(SelectClausePsStrategy selectClauseStrategy, FromClausePsStrategy fromClauseStrategy) {
-        this(
-                selectClauseStrategy,
-                fromClauseStrategy,
-                new DefaultWhereClausePsStrategy(),
-                new DefaultGroupByClausePsStrategy(),
-                new DefaultHavingClausePsStrategy(),
-                new DefaultOrderByClausePsStrategy());
-    }
+    @Default
+    private final GroupByClausePsStrategy groupByClauseStrategy = new DefaultGroupByClausePsStrategy();
 
-    public PsVisitor(
-            SelectClausePsStrategy selectClauseStrategy,
-            FromClausePsStrategy fromClauseStrategy,
-            WhereClausePsStrategy whereClauseStrategy) {
-        this(
-                selectClauseStrategy,
-                fromClauseStrategy,
-                whereClauseStrategy,
-                new DefaultGroupByClausePsStrategy(),
-                new DefaultHavingClausePsStrategy(),
-                new DefaultOrderByClausePsStrategy());
-    }
+    @Default
+    private final HavingClausePsStrategy havingClauseStrategy = new DefaultHavingClausePsStrategy();
 
-    public PsVisitor(
-            SelectClausePsStrategy selectClauseStrategy,
-            FromClausePsStrategy fromClauseStrategy,
-            WhereClausePsStrategy whereClauseStrategy,
-            GroupByClausePsStrategy groupByClauseStrategy) {
-        this(
-                selectClauseStrategy,
-                fromClauseStrategy,
-                whereClauseStrategy,
-                groupByClauseStrategy,
-                new DefaultHavingClausePsStrategy(),
-                new DefaultOrderByClausePsStrategy());
-    }
-
-    public PsVisitor(
-            SelectClausePsStrategy selectClauseStrategy,
-            FromClausePsStrategy fromClauseStrategy,
-            WhereClausePsStrategy whereClauseStrategy,
-            GroupByClausePsStrategy groupByClauseStrategy,
-            HavingClausePsStrategy havingClauseStrategy) {
-        this(
-                selectClauseStrategy,
-                fromClauseStrategy,
-                whereClauseStrategy,
-                groupByClauseStrategy,
-                havingClauseStrategy,
-                new DefaultOrderByClausePsStrategy());
-    }
-
-    public PsVisitor(
-            SelectClausePsStrategy selectClauseStrategy,
-            FromClausePsStrategy fromClauseStrategy,
-            WhereClausePsStrategy whereClauseStrategy,
-            GroupByClausePsStrategy groupByClauseStrategy,
-            HavingClausePsStrategy havingClauseStrategy,
-            OrderByClausePsStrategy orderByClauseStrategy) {
-        this.selectClauseStrategy = selectClauseStrategy;
-        this.fromClauseStrategy = fromClauseStrategy;
-        this.whereClauseStrategy = whereClauseStrategy;
-        this.groupByClauseStrategy = groupByClauseStrategy;
-        this.havingClauseStrategy = havingClauseStrategy;
-        this.orderByClauseStrategy = orderByClauseStrategy;
-    }
+    @Default
+    private final OrderByClausePsStrategy orderByClauseStrategy = new DefaultOrderByClausePsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
