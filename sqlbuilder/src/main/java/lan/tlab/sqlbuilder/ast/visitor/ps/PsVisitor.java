@@ -73,19 +73,41 @@ import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultFromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSelectClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultWhereClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 
 public class PsVisitor implements Visitor<PsDto> {
     private final List<Object> parameters = new ArrayList<>();
     private final SelectClausePsStrategy selectClauseStrategy;
+    private final FromClausePsStrategy fromClauseStrategy;
+    private final WhereClausePsStrategy whereClauseStrategy;
 
     public PsVisitor() {
-        this(new DefaultSelectClausePsStrategy());
+        this(
+                new DefaultSelectClausePsStrategy(),
+                new DefaultFromClausePsStrategy(),
+                new DefaultWhereClausePsStrategy());
     }
 
     public PsVisitor(SelectClausePsStrategy selectClauseStrategy) {
+        this(selectClauseStrategy, new DefaultFromClausePsStrategy(), new DefaultWhereClausePsStrategy());
+    }
+
+    public PsVisitor(SelectClausePsStrategy selectClauseStrategy, FromClausePsStrategy fromClauseStrategy) {
+        this(selectClauseStrategy, fromClauseStrategy, new DefaultWhereClausePsStrategy());
+    }
+
+    public PsVisitor(
+            SelectClausePsStrategy selectClauseStrategy,
+            FromClausePsStrategy fromClauseStrategy,
+            WhereClausePsStrategy whereClauseStrategy) {
         this.selectClauseStrategy = selectClauseStrategy;
+        this.fromClauseStrategy = fromClauseStrategy;
+        this.whereClauseStrategy = whereClauseStrategy;
     }
 
     @Override
@@ -252,11 +274,7 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Where where, AstContext ctx) {
-        BooleanExpression cond = where.getCondition();
-        if (cond instanceof NullBooleanExpression) {
-            return new PsDto("", List.of());
-        }
-        return cond.accept(this, ctx);
+        return whereClauseStrategy.handle(where, this, ctx);
     }
 
     @Override
@@ -314,15 +332,7 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(From clause, AstContext ctx) {
-        List<String> sqlParts = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
-        for (var source : clause.getSources()) {
-            PsDto res = visit(source, ctx);
-            sqlParts.add(res.sql());
-            params.addAll(res.parameters());
-        }
-        String sql = String.join(", ", sqlParts);
-        return new PsDto(sql, params);
+        return fromClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
