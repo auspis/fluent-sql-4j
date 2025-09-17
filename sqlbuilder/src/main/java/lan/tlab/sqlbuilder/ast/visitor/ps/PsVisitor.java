@@ -74,9 +74,15 @@ import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultFromClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultGroupByClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultHavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultWhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 
@@ -85,29 +91,95 @@ public class PsVisitor implements Visitor<PsDto> {
     private final SelectClausePsStrategy selectClauseStrategy;
     private final FromClausePsStrategy fromClauseStrategy;
     private final WhereClausePsStrategy whereClauseStrategy;
+    private final GroupByClausePsStrategy groupByClauseStrategy;
+    private final HavingClausePsStrategy havingClauseStrategy;
+    private final OrderByClausePsStrategy orderByClauseStrategy;
 
     public PsVisitor() {
         this(
                 new DefaultSelectClausePsStrategy(),
                 new DefaultFromClausePsStrategy(),
-                new DefaultWhereClausePsStrategy());
+                new DefaultWhereClausePsStrategy(),
+                new DefaultGroupByClausePsStrategy(),
+                new DefaultHavingClausePsStrategy(),
+                new DefaultOrderByClausePsStrategy());
     }
 
     public PsVisitor(SelectClausePsStrategy selectClauseStrategy) {
-        this(selectClauseStrategy, new DefaultFromClausePsStrategy(), new DefaultWhereClausePsStrategy());
+        this(
+                selectClauseStrategy,
+                new DefaultFromClausePsStrategy(),
+                new DefaultWhereClausePsStrategy(),
+                new DefaultGroupByClausePsStrategy(),
+                new DefaultHavingClausePsStrategy(),
+                new DefaultOrderByClausePsStrategy());
     }
 
     public PsVisitor(SelectClausePsStrategy selectClauseStrategy, FromClausePsStrategy fromClauseStrategy) {
-        this(selectClauseStrategy, fromClauseStrategy, new DefaultWhereClausePsStrategy());
+        this(
+                selectClauseStrategy,
+                fromClauseStrategy,
+                new DefaultWhereClausePsStrategy(),
+                new DefaultGroupByClausePsStrategy(),
+                new DefaultHavingClausePsStrategy(),
+                new DefaultOrderByClausePsStrategy());
     }
 
     public PsVisitor(
             SelectClausePsStrategy selectClauseStrategy,
             FromClausePsStrategy fromClauseStrategy,
             WhereClausePsStrategy whereClauseStrategy) {
+        this(
+                selectClauseStrategy,
+                fromClauseStrategy,
+                whereClauseStrategy,
+                new DefaultGroupByClausePsStrategy(),
+                new DefaultHavingClausePsStrategy(),
+                new DefaultOrderByClausePsStrategy());
+    }
+
+    public PsVisitor(
+            SelectClausePsStrategy selectClauseStrategy,
+            FromClausePsStrategy fromClauseStrategy,
+            WhereClausePsStrategy whereClauseStrategy,
+            GroupByClausePsStrategy groupByClauseStrategy) {
+        this(
+                selectClauseStrategy,
+                fromClauseStrategy,
+                whereClauseStrategy,
+                groupByClauseStrategy,
+                new DefaultHavingClausePsStrategy(),
+                new DefaultOrderByClausePsStrategy());
+    }
+
+    public PsVisitor(
+            SelectClausePsStrategy selectClauseStrategy,
+            FromClausePsStrategy fromClauseStrategy,
+            WhereClausePsStrategy whereClauseStrategy,
+            GroupByClausePsStrategy groupByClauseStrategy,
+            HavingClausePsStrategy havingClauseStrategy) {
+        this(
+                selectClauseStrategy,
+                fromClauseStrategy,
+                whereClauseStrategy,
+                groupByClauseStrategy,
+                havingClauseStrategy,
+                new DefaultOrderByClausePsStrategy());
+    }
+
+    public PsVisitor(
+            SelectClausePsStrategy selectClauseStrategy,
+            FromClausePsStrategy fromClauseStrategy,
+            WhereClausePsStrategy whereClauseStrategy,
+            GroupByClausePsStrategy groupByClauseStrategy,
+            HavingClausePsStrategy havingClauseStrategy,
+            OrderByClausePsStrategy orderByClauseStrategy) {
         this.selectClauseStrategy = selectClauseStrategy;
         this.fromClauseStrategy = fromClauseStrategy;
         this.whereClauseStrategy = whereClauseStrategy;
+        this.groupByClauseStrategy = groupByClauseStrategy;
+        this.havingClauseStrategy = havingClauseStrategy;
+        this.orderByClauseStrategy = orderByClauseStrategy;
     }
 
     @Override
@@ -373,36 +445,17 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(GroupBy clause, AstContext ctx) {
-        List<String> exprSqls = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
-        for (var expr : clause.getGroupingExpressions()) {
-            PsDto res = expr.accept(this, ctx);
-            exprSqls.add(res.sql());
-            params.addAll(res.parameters());
-        }
-        String sql = String.join(", ", exprSqls);
-        return new PsDto(sql, params);
+        return groupByClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
     public PsDto visit(Having clause, AstContext ctx) {
-        if (clause.getCondition() == null || clause.getCondition() instanceof NullBooleanExpression) {
-            return new PsDto("", List.of());
-        }
-        return clause.getCondition().accept(this, ctx);
+        return havingClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
     public PsDto visit(OrderBy clause, AstContext ctx) {
-        List<String> sqlParts = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
-        for (var sorting : clause.getSortings()) {
-            PsDto res = visit(sorting, ctx);
-            sqlParts.add(res.sql());
-            params.addAll(res.parameters());
-        }
-        String sql = String.join(", ", sqlParts);
-        return new PsDto(sql, params);
+        return orderByClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
