@@ -87,7 +87,6 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 
 public class PsVisitor implements Visitor<PsDto> {
-    private final List<Object> parameters = new ArrayList<>();
     private final SelectClausePsStrategy selectClauseStrategy;
     private final FromClausePsStrategy fromClauseStrategy;
     private final WhereClausePsStrategy whereClauseStrategy;
@@ -195,25 +194,25 @@ public class PsVisitor implements Visitor<PsDto> {
         String columnList = String.join(", ", columns);
         // Placeholders and parameters
         String placeholders = "";
+        List<Object> params = new ArrayList<>();
         if (stmt.getData() instanceof InsertValues values) {
             placeholders = values.getValueExpressions().stream()
                     .map(val -> {
                         if (val instanceof Literal<?> literal) {
-                            parameters.add(literal.getValue());
+                            params.add(literal.getValue());
                         } else {
-                            parameters.add(null); // fallback
+                            params.add(null); // fallback
                         }
                         return "?";
                     })
                     .collect(Collectors.joining(", "));
         }
         String sql = "INSERT INTO \"" + tableName + "\" (" + columnList + ") VALUES (" + placeholders + ")";
-        return new PsDto(sql, List.copyOf(parameters));
+        return new PsDto(sql, params);
     }
 
     @Override
     public PsDto visit(SelectStatement stmt, AstContext ctx) {
-        parameters.clear();
         // SELECT ...
         PsDto selectResult = stmt.getSelect().accept(this, ctx);
         // FROM ...
@@ -351,7 +350,6 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Literal<?> literal, AstContext ctx) {
-        parameters.add(literal.getValue());
         return new PsDto("?", List.of(literal.getValue()));
     }
 
