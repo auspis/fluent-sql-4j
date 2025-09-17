@@ -16,15 +16,15 @@ import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.PreparedSqlResult;
-import lan.tlab.sqlbuilder.ast.visitor.PreparedSqlVisitor;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.SqlRendererImpl;
-import lan.tlab.sqlbuilder.ast.visitor.composer.renderer.factory.SqlRendererFactory;
+import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
+import lan.tlab.sqlbuilder.ast.visitor.ps.PsVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
+import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class SpikeObjectToJdbcMain {
 
     public static void main(String[] args) throws Exception {
-        SqlRendererImpl sqlRenderer = SqlRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = SqlRendererFactory.standardSql2008();
         TableDefinition userTableDefinition = TableDefinition.builder()
                 .table(new Table("User"))
                 .columns(List.of(
@@ -46,8 +46,8 @@ public class SpikeObjectToJdbcMain {
             // 3. Insert a user
             User user = new User(1, "John", "john@example.com");
             InsertStatement insertStatement = InsertStatementBuilderFromObject.fromObject("User", user);
-            PreparedSqlVisitor preparedVisitor = new PreparedSqlVisitor();
-            PreparedSqlResult preparedResult = preparedVisitor.visit(insertStatement, new AstContext());
+            PsVisitor preparedVisitor = new PsVisitor();
+            PsDto preparedResult = preparedVisitor.visit(insertStatement, new AstContext());
             String insertSql = preparedResult.sql();
             System.out.println("SQL insert: " + insertSql);
             try (var ps = conn.prepareStatement(insertSql)) {
@@ -81,8 +81,8 @@ public class SpikeObjectToJdbcMain {
                     .from(From.of(new Table("User")))
                     .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                     .build();
-            PreparedSqlVisitor selectVisitor = new PreparedSqlVisitor();
-            PreparedSqlResult selectResult = selectVisitor.visit(selectStmt, new AstContext());
+            PsVisitor selectVisitor = new PsVisitor();
+            PsDto selectResult = selectVisitor.visit(selectStmt, new AstContext());
             String selectSql = selectResult.sql();
             System.out.println("SQL select: " + selectSql);
             System.out.println("Parameters: " + selectResult.parameters());

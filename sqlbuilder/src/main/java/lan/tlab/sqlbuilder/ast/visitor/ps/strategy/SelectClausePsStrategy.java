@@ -2,9 +2,9 @@ package lan.tlab.sqlbuilder.ast.visitor.ps.strategy;
 
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.PreparedSqlResult;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
+import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
 
 public interface SelectClausePsStrategy {
-    PreparedSqlResult handle(Select select, SqlVisitor<PreparedSqlResult> visitor, AstContext ctx);
+    PsDto handle(Select select, Visitor<PsDto> visitor, AstContext ctx);
 }
