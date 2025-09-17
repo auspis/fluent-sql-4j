@@ -15,7 +15,6 @@ import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
 import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.Projection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Between;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
@@ -72,9 +71,20 @@ import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSelectClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 
-public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
+public class PsSqlVisitor implements SqlVisitor<PreparedSqlResult> {
     private final List<Object> parameters = new ArrayList<>();
+    private final SelectClausePsStrategy selectClauseStrategy;
+
+    public PsSqlVisitor() {
+        this(new DefaultSelectClausePsStrategy());
+    }
+
+    public PsSqlVisitor(SelectClausePsStrategy selectClauseStrategy) {
+        this.selectClauseStrategy = selectClauseStrategy;
+    }
 
     @Override
     public PreparedSqlResult visit(InsertStatement stmt, AstContext ctx) {
@@ -181,19 +191,7 @@ public class PreparedSqlVisitor implements SqlVisitor<PreparedSqlResult> {
 
     @Override
     public PreparedSqlResult visit(Select select, AstContext ctx) {
-        List<String> cols = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
-        if (select.getProjections().isEmpty()) {
-            // No projections: SELECT *
-            return new PreparedSqlResult("*", List.of());
-        }
-        for (Projection p : select.getProjections()) {
-            PreparedSqlResult res = p.accept(this, ctx);
-            cols.add(res.sql());
-            params.addAll(res.parameters());
-        }
-        String sql = String.join(", ", cols);
-        return new PreparedSqlResult(sql, params);
+        return selectClauseStrategy.handle(select, this, ctx);
     }
 
     @Override
