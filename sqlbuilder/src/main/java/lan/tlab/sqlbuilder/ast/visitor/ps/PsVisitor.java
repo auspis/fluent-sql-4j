@@ -17,7 +17,6 @@ import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Between;
-import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.bool.In;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
@@ -25,7 +24,6 @@ import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.Like;
 import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
-import lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.Not;
 import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.DefaultValues;
@@ -73,15 +71,22 @@ import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AndOrPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultAggregationFunctionProjectionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultAndOrPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultFromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultGroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultHavingClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultLiteralPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultNotPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultOnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultOrderByClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultTablePsStrategy;
@@ -90,7 +95,10 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
@@ -137,6 +145,23 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Default
     private final SortingPsStrategy sortingPsStrategy = new DefaultSortingPsStrategy();
+
+    @Default
+    private final OnJoinPsStrategy onJoinPsStrategy = new DefaultOnJoinPsStrategy();
+
+    @Default
+    private final AndOrPsStrategy andOrPsStrategy = new DefaultAndOrPsStrategy();
+
+    @Default
+    private final NotPsStrategy notPsStrategy = new DefaultNotPsStrategy();
+
+    @Default
+    private final AggregationFunctionProjectionPsStrategy aggregationFunctionProjectionPsStrategy =
+            new DefaultAggregationFunctionProjectionPsStrategy();
+
+    @Default
+    private final ScalarExpressionProjectionPsStrategy scalarExpressionProjectionPsStrategy =
+            new DefaultScalarExpressionProjectionPsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
@@ -288,34 +313,12 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(AggregationFunctionProjection aggregationFunctionProjection, AstContext ctx) {
-        // The AggregationFunctionProjection wraps an AggregateCall (e.g., COUNT, SUM, etc.)
-        var expr = aggregationFunctionProjection.getExpression();
-        PsDto exprResult = expr.accept(this, ctx);
-        String sql = exprResult.sql();
-        // Handle alias if present
-        String alias = aggregationFunctionProjection.getAs() != null
-                ? aggregationFunctionProjection.getAs().getName()
-                : null;
-        if (alias != null && !alias.isBlank()) {
-            sql += " AS \"" + alias + "\"";
-        }
-        return new PsDto(sql, exprResult.parameters());
+        return aggregationFunctionProjectionPsStrategy.handle(aggregationFunctionProjection, this, ctx);
     }
 
     @Override
     public PsDto visit(ScalarExpressionProjection scalarExpressionProjection, AstContext ctx) {
-        // Visit the underlying scalar expression
-        var expr = scalarExpressionProjection.getExpression();
-        PsDto exprResult = expr.accept(this, ctx);
-        String sql = exprResult.sql();
-        // Handle alias if present
-        String alias = scalarExpressionProjection.getAs() != null
-                ? scalarExpressionProjection.getAs().getName()
-                : null;
-        if (alias != null && !alias.isBlank()) {
-            sql += " AS \"" + alias + "\"";
-        }
-        return new PsDto(sql, exprResult.parameters());
+        return scalarExpressionProjectionPsStrategy.handle(scalarExpressionProjection, this, ctx);
     }
 
     @Override
@@ -325,33 +328,7 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(OnJoin join, AstContext ctx) {
-        // Visit left and right sources
-        PsDto leftResult = visit(join.getLeft(), ctx);
-        PsDto rightResult = visit(join.getRight(), ctx);
-        String joinType;
-        switch (join.getType()) {
-            case INNER -> joinType = "INNER JOIN";
-            case LEFT -> joinType = "LEFT JOIN";
-            case RIGHT -> joinType = "RIGHT JOIN";
-            case FULL -> joinType = "FULL JOIN";
-            case CROSS -> joinType = "CROSS JOIN";
-            default -> throw new UnsupportedOperationException("Unknown join type: " + join.getType());
-        }
-        StringBuilder sql = new StringBuilder();
-        sql.append(leftResult.sql()).append(" ").append(joinType).append(" ").append(rightResult.sql());
-        List<Object> params = new ArrayList<>();
-        params.addAll(leftResult.parameters());
-        params.addAll(rightResult.parameters());
-        // ON condition (not for CROSS JOIN)
-        if (join.getType() != lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin.JoinType.CROSS) {
-            if (join.getOnCondition() != null) {
-                // Passa il contesto con scope JOIN_ON
-                PsDto onResult = join.getOnCondition().accept(this, new AstContext(AstContext.Scope.JOIN_ON));
-                sql.append(" ON ").append(onResult.sql());
-                params.addAll(onResult.parameters());
-            }
-        }
-        return new PsDto(sql.toString(), params);
+        return onJoinPsStrategy.handle(join, this, ctx);
     }
 
     @Override
@@ -401,23 +378,12 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(AndOr expression, AstContext ctx) {
-        String operator = expression.getOperator() == LogicalOperator.AND ? "AND" : "OR";
-        List<String> sqlParts = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
-        for (BooleanExpression expr : expression.getOperands()) {
-            PsDto res = expr.accept(this, ctx);
-            sqlParts.add("(" + res.sql() + ")");
-            params.addAll(res.parameters());
-        }
-        String sql = String.join(" " + operator + " ", sqlParts);
-        return new PsDto(sql, params);
+        return andOrPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(Not expression, AstContext ctx) {
-        PsDto inner = expression.getExpression().accept(this, ctx);
-        String sql = "NOT (" + inner.sql() + ")";
-        return new PsDto(sql, inner.parameters());
+        return notPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
