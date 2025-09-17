@@ -73,17 +73,27 @@ import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultColumnReferencePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultFromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultGroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultHavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultLiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSelectClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSortingPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultTablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultWhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -112,6 +122,21 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Default
     private final OrderByClausePsStrategy orderByClauseStrategy = new DefaultOrderByClausePsStrategy();
+
+    @Default
+    private final TablePsStrategy tablePsStrategy = new DefaultTablePsStrategy();
+
+    @Default
+    private final ColumnReferencePsStrategy columnReferencePsStrategy = new DefaultColumnReferencePsStrategy();
+
+    @Default
+    private final ComparisonPsStrategy comparisonPsStrategy = new DefaultComparisonPsStrategy();
+
+    @Default
+    private final LiteralPsStrategy literalPsStrategy = new DefaultLiteralPsStrategy();
+
+    @Default
+    private final SortingPsStrategy sortingPsStrategy = new DefaultSortingPsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
@@ -223,56 +248,17 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Table table, AstContext ctx) {
-        String sql = "\"" + table.getName() + "\"";
-        String alias = table.getAs() != null ? table.getAs().getName() : null;
-        if (alias != null && !alias.isBlank()) {
-            sql += " AS " + alias;
-        }
-        return new PsDto(sql, List.of());
+        return tablePsStrategy.handle(table, this, ctx);
     }
 
     @Override
     public PsDto visit(ColumnReference col, AstContext ctx) {
-        boolean qualify = ctx != null && ctx.getScope() == AstContext.Scope.JOIN_ON;
-        String sql;
-        if (qualify && col.getTable() != null && !col.getTable().isBlank()) {
-            sql = "\"" + col.getTable() + "\".\"" + col.getColumn() + "\"";
-        } else {
-            sql = "\"" + col.getColumn() + "\"";
-        }
-        return new PsDto(sql, List.of());
+        return columnReferencePsStrategy.handle(col, this, ctx);
     }
 
     @Override
     public PsDto visit(Comparison cmp, AstContext ctx) {
-        String operator;
-        switch (cmp.getOperator()) {
-            case EQUALS -> operator = "=";
-            case NOT_EQUALS -> operator = "<>";
-            case GREATER_THAN -> operator = ">";
-            case GREATER_THAN_OR_EQUALS -> operator = ">=";
-            case LESS_THAN -> operator = "<";
-            case LESS_THAN_OR_EQUALS -> operator = "<=";
-            default -> throw new UnsupportedOperationException("Operator not supported: " + cmp.getOperator());
-        }
-        boolean qualify = ctx != null && ctx.getScope() == AstContext.Scope.JOIN_ON;
-        String lhs;
-        if (cmp.getLhs() instanceof ColumnReference colLhs) {
-            PsDto lhsResult = visit(colLhs, ctx.copy());
-            lhs = lhsResult.sql();
-        } else {
-            lhs = cmp.getLhs().accept(this, ctx).sql();
-        }
-        String rhsSql;
-        List<Object> params = new ArrayList<>();
-        if (cmp.getRhs() instanceof ColumnReference colRhs) {
-            rhsSql = visit(colRhs, ctx.copy()).sql();
-        } else {
-            PsDto rhsResult = cmp.getRhs().accept(this, ctx);
-            rhsSql = rhsResult.sql();
-            params.addAll(rhsResult.parameters());
-        }
-        return new PsDto(lhs + " " + operator + " " + rhsSql, params);
+        return comparisonPsStrategy.handle(cmp, this, ctx);
     }
 
     @Override
@@ -282,7 +268,7 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Literal<?> literal, AstContext ctx) {
-        return new PsDto("?", List.of(literal.getValue()));
+        return literalPsStrategy.handle(literal, this, ctx);
     }
 
     @Override
@@ -390,13 +376,7 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Sorting sorting, AstContext ctx) {
-        PsDto exprResult = sorting.getExpression().accept(this, ctx);
-        String sql = exprResult.sql();
-        String order = sorting.getSortOrder().getSqlKeyword();
-        if (!order.isEmpty()) {
-            sql += " " + order;
-        }
-        return new PsDto(sql, exprResult.parameters());
+        return sortingPsStrategy.handle(sorting, this, ctx);
     }
 
     @Override
