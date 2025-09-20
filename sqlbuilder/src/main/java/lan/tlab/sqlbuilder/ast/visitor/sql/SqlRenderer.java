@@ -402,8 +402,6 @@ public class SqlRenderer implements Visitor<String> {
     @Default
     private final DefaultConstraintRenderStrategy defaultConstraintStrategy = new DefaultConstraintRenderStrategy();
 
-    private final AstContext ctx;
-
     // statements
     @Override
     public String visit(SelectStatement statement, AstContext ctx) {

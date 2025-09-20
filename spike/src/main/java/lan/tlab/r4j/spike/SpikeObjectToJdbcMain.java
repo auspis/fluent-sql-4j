@@ -16,8 +16,8 @@ import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
+import lan.tlab.sqlbuilder.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
-import lan.tlab.sqlbuilder.ast.visitor.ps.PsVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
 
@@ -46,7 +46,7 @@ public class SpikeObjectToJdbcMain {
             // 3. Insert a user
             User user = new User(1, "John", "john@example.com");
             InsertStatement insertStatement = InsertStatementBuilderFromObject.fromObject("User", user);
-            PsVisitor preparedVisitor = new PsVisitor();
+            PreparedStatementVisitor preparedVisitor = new PreparedStatementVisitor();
             PsDto preparedResult = preparedVisitor.visit(insertStatement, new AstContext());
             String insertSql = preparedResult.sql();
             System.out.println("SQL insert: " + insertSql);
@@ -81,7 +81,7 @@ public class SpikeObjectToJdbcMain {
                     .from(From.of(new Table("User")))
                     .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                     .build();
-            PsVisitor selectVisitor = new PsVisitor();
+            PreparedStatementVisitor selectVisitor = new PreparedStatementVisitor();
             PsDto selectResult = selectVisitor.visit(selectStmt, new AstContext());
             String selectSql = selectResult.sql();
             System.out.println("SQL select: " + selectSql);

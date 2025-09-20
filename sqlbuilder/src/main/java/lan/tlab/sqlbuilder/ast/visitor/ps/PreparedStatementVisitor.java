@@ -135,7 +135,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class PsVisitor implements Visitor<PsDto> {
+public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final SelectClausePsStrategy selectClauseStrategy = new DefaultSelectClausePsStrategy();
 
