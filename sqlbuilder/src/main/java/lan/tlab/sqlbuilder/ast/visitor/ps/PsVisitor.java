@@ -1,8 +1,5 @@
 package lan.tlab.sqlbuilder.ast.visitor.ps;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lan.tlab.sqlbuilder.ast.clause.conditional.having.Having;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
@@ -31,6 +28,16 @@ import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertSource;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.item.UpdateItem;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.ForeignKeyConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.SimpleDataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Index;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
@@ -38,7 +45,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.UnaryArith
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.NullScalarExpression;
-import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
@@ -71,35 +78,51 @@ import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.statement.UpdateStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregateCallPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AndOrPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultAggregateCallPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultAggregationFunctionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultAndOrPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultComparisonPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultDefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultFromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultGroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultHavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultInsertSourcePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultInsertStatementPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultInsertValuesPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultIsNotNullPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultIsNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultLiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultNotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultOnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSelectClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultTablePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultWhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertSourcePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertStatementPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertValuesPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNotNullPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
@@ -163,107 +186,38 @@ public class PsVisitor implements Visitor<PsDto> {
     private final ScalarExpressionProjectionPsStrategy scalarExpressionProjectionPsStrategy =
             new DefaultScalarExpressionProjectionPsStrategy();
 
+    @Default
+    private final AggregateCallPsStrategy aggregateCallPsStrategy = new DefaultAggregateCallPsStrategy();
+
+    @Default
+    private final InsertValuesPsStrategy insertValuesPsStrategy = new DefaultInsertValuesPsStrategy();
+
+    @Default
+    private final InsertSourcePsStrategy insertSourcePsStrategy = new DefaultInsertSourcePsStrategy();
+
+    @Default
+    private final DefaultValuesPsStrategy defaultValuesPsStrategy = new DefaultDefaultValuesPsStrategy();
+
+    @Default
+    private final IsNullPsStrategy isNullPsStrategy = new DefaultIsNullPsStrategy();
+
+    @Default
+    private final IsNotNullPsStrategy isNotNullPsStrategy = new DefaultIsNotNullPsStrategy();
+
+    @Default
+    private final InsertStatementPsStrategy insertStatementPsStrategy = new DefaultInsertStatementPsStrategy();
+
+    @Default
+    private final SelectStatementPsStrategy selectStatementPsStrategy = new DefaultSelectStatementPsStrategy();
+
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
-        // Table name
-        Table table = (Table) stmt.getTable();
-        String tableName = table.getName();
-        // Column names
-        List<String> columns = stmt.getColumns().stream()
-                .map(ColumnReference::getColumn)
-                .map(name -> "\"" + name + "\"")
-                .collect(Collectors.toList());
-        String columnList = String.join(", ", columns);
-        // Placeholders and parameters
-        String placeholders = "";
-        List<Object> params = new ArrayList<>();
-        if (stmt.getData() instanceof InsertValues values) {
-            placeholders = values.getValueExpressions().stream()
-                    .map(val -> {
-                        if (val instanceof Literal<?> literal) {
-                            params.add(literal.getValue());
-                        } else {
-                            params.add(null); // fallback
-                        }
-                        return "?";
-                    })
-                    .collect(Collectors.joining(", "));
-        }
-        String sql = "INSERT INTO \"" + tableName + "\" (" + columnList + ") VALUES (" + placeholders + ")";
-        return new PsDto(sql, params);
+        return insertStatementPsStrategy.handle(stmt, this, ctx);
     }
 
     @Override
     public PsDto visit(SelectStatement stmt, AstContext ctx) {
-        // SELECT ...
-        PsDto selectResult = stmt.getSelect().accept(this, ctx);
-        // FROM ...
-        PsDto fromResult = stmt.getFrom().accept(this, ctx);
-        // WHERE ... (optional)
-        PsDto whereResult = null;
-        String whereClause = "";
-        if (stmt.getWhere() != null
-                && stmt.getWhere().getCondition() != null
-                && !(stmt.getWhere().getCondition()
-                        instanceof lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression)) {
-            whereResult = visit(stmt.getWhere(), ctx);
-            whereClause = " WHERE " + whereResult.sql();
-        }
-        // GROUP BY ... (optional)
-        PsDto groupByResult = null;
-        String groupByClause = "";
-        if (stmt.getGroupBy() != null
-                && !stmt.getGroupBy().getGroupingExpressions().isEmpty()) {
-            groupByResult = stmt.getGroupBy().accept(this, ctx);
-            groupByClause = " GROUP BY " + groupByResult.sql();
-        }
-        // HAVING ... (optional, after GROUP BY)
-        PsDto havingResult = null;
-        String havingClause = "";
-        if (stmt.getHaving() != null && stmt.getHaving().getCondition() != null) {
-            havingResult = visit(stmt.getHaving(), ctx);
-            if (!havingResult.sql().isBlank()) {
-                havingClause = " HAVING " + havingResult.sql();
-            }
-        }
-        // ORDER BY ... (optional)
-        PsDto orderByResult = null;
-        String orderByClause = "";
-        if (stmt.getOrderBy() != null && !stmt.getOrderBy().getSortings().isEmpty()) {
-            orderByResult = stmt.getOrderBy().accept(this, ctx);
-            orderByClause = " ORDER BY " + orderByResult.sql();
-        }
-        // PAGINATION (LIMIT/OFFSET)
-        String paginationClause = "";
-        if (stmt.getPagination() != null && stmt.getPagination().getPerPage() != null) {
-            Integer perPage = stmt.getPagination().getPerPage();
-            Integer page = stmt.getPagination().getPage();
-            if (perPage != null) {
-                paginationClause = " LIMIT " + perPage;
-                if (page != null && page > 0) {
-                    int offset = page * perPage;
-                    paginationClause += " OFFSET " + offset;
-                }
-            }
-        }
-        String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause
-                + havingClause + orderByClause + paginationClause;
-        List<Object> allParams = new ArrayList<>();
-        allParams.addAll(selectResult.parameters());
-        allParams.addAll(fromResult.parameters());
-        if (whereResult != null) {
-            allParams.addAll(whereResult.parameters());
-        }
-        if (groupByResult != null) {
-            allParams.addAll(groupByResult.parameters());
-        }
-        if (havingResult != null) {
-            allParams.addAll(havingResult.parameters());
-        }
-        if (orderByResult != null) {
-            allParams.addAll(orderByResult.parameters());
-        }
-        return new PsDto(sql, allParams);
+        return selectStatementPsStrategy.handle(stmt, this, ctx);
     }
 
     @Override
@@ -537,63 +491,57 @@ public class PsVisitor implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition item, AstContext ctx) {
+    public PsDto visit(ColumnDefinition item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.SimpleDataType type, AstContext ctx) {
+    public PsDto visit(SimpleDataType type, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType type, AstContext ctx) {
+    public PsDto visit(ParameterizedDataType type, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey item, AstContext ctx) {
+    public PsDto visit(PrimaryKey item, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(lan.tlab.sqlbuilder.ast.expression.item.ddl.Index index, AstContext ctx) {
+    public PsDto visit(Index index, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint constraint, AstContext ctx) {
+    public PsDto visit(NotNullConstraint constraint, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.UniqueConstraint constraint, AstContext ctx) {
+    public PsDto visit(UniqueConstraint constraint, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.ForeignKeyConstraint constraint, AstContext ctx) {
+    public PsDto visit(ForeignKeyConstraint constraint, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.CheckConstraint constraint, AstContext ctx) {
+    public PsDto visit(CheckConstraint constraint, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(
-            lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.DefaultConstraint constraint, AstContext ctx) {
+    public PsDto visit(DefaultConstraint constraint, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PsDto visit(lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery expression, AstContext ctx) {
+    public PsDto visit(ScalarSubquery expression, AstContext ctx) {
         throw new UnsupportedOperationException();
     }
 
@@ -604,72 +552,22 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(AggregateCall expression, AstContext ctx) {
-        // Handle SQL generation for aggregate functions (COUNT, SUM, AVG, MIN, MAX)
-        // The AggregateCallImpl should expose the operator and argument
-        // We'll assume the interface provides getOperator() and getArgument()
-        String functionName = null;
-        String argumentSql = null;
-        List<Object> params = new ArrayList<>();
-        try {
-            var operatorField = expression.getClass().getDeclaredField("operator");
-            operatorField.setAccessible(true);
-            var operator = operatorField.get(expression);
-            functionName = operator.toString();
-            // Normalize to SQL function names
-            functionName = switch (functionName) {
-                case "COUNT" -> "COUNT";
-                case "SUM" -> "SUM";
-                case "AVG" -> "AVG";
-                case "MIN" -> "MIN";
-                case "MAX" -> "MAX";
-                default -> throw new UnsupportedOperationException("Unknown aggregate function: " + functionName);
-            };
-            var argumentField = expression.getClass().getDeclaredField("expression");
-            argumentField.setAccessible(true);
-            var argument = argumentField.get(expression);
-            if (argument == null) {
-                argumentSql = "*";
-            } else {
-                PsDto argResult = ((ScalarExpression) argument).accept(this, ctx);
-                argumentSql = argResult.sql();
-                params.addAll(argResult.parameters());
-            }
-        } catch (Exception e) {
-            throw new UnsupportedOperationException("AggregateCall reflection failed", e);
-        }
-        String sql = functionName + "(" + argumentSql + ")";
-        return new PsDto(sql, params);
+        return aggregateCallPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(InsertValues item, AstContext ctx) {
-        // InsertValues holds a list of value expressions (e.g., literals)
-        List<String> placeholders = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
-        for (var expr : item.getValueExpressions()) {
-            if (expr instanceof Literal<?> literal) {
-                placeholders.add("?");
-                params.add(literal.getValue());
-            } else {
-                // Fallback for non-literal expressions
-                placeholders.add("?");
-                params.add(null);
-            }
-        }
-        String sql = String.join(", ", placeholders);
-        return new PsDto(sql, params);
+        return insertValuesPsStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(InsertSource item, AstContext ctx) {
-        // InsertSource is a parent type, delegate to the actual subtype
-        return item.accept(this, ctx);
+        return insertSourcePsStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(DefaultValues item, AstContext ctx) {
-        // For SQL DEFAULT VALUES
-        return new PsDto("DEFAULT VALUES", List.of());
+        return defaultValuesPsStrategy.handle(item, this, ctx);
     }
 
     // Handle FromSource dispatch for FROM clause
@@ -684,13 +582,11 @@ public class PsVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(IsNull expr, AstContext ctx) {
-        PsDto inner = expr.getExpression().accept(this, ctx);
-        return new PsDto(inner.sql() + " IS NULL", inner.parameters());
+        return isNullPsStrategy.handle(expr, this, ctx);
     }
 
     @Override
     public PsDto visit(IsNotNull expr, AstContext ctx) {
-        PsDto inner = expr.getExpression().accept(this, ctx);
-        return new PsDto(inner.sql() + " IS NOT NULL", inner.parameters());
+        return isNotNullPsStrategy.handle(expr, this, ctx);
     }
 }
