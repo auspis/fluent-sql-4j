@@ -15,32 +15,24 @@ public class DefaultAggregateCallPsStrategy implements AggregateCallPsStrategy {
         String functionName = null;
         String argumentSql = null;
         List<Object> params = new ArrayList<>();
-        try {
-            var operatorField = aggregateCall.getClass().getDeclaredField("operator");
-            operatorField.setAccessible(true);
-            var operator = operatorField.get(aggregateCall);
-            functionName = operator.toString();
-            // Normalize to SQL function names
-            functionName = switch (functionName) {
-                case "COUNT" -> "COUNT";
-                case "SUM" -> "SUM";
-                case "AVG" -> "AVG";
-                case "MIN" -> "MIN";
-                case "MAX" -> "MAX";
-                default -> throw new UnsupportedOperationException("Unknown aggregate function: " + functionName);
-            };
-            var argumentField = aggregateCall.getClass().getDeclaredField("expression");
-            argumentField.setAccessible(true);
-            var argument = argumentField.get(aggregateCall);
-            if (argument == null) {
-                argumentSql = "*";
-            } else {
-                PsDto argResult = ((ScalarExpression) argument).accept(visitor, ctx);
-                argumentSql = argResult.sql();
-                params.addAll(argResult.parameters());
-            }
-        } catch (Exception e) {
-            throw new UnsupportedOperationException("AggregateCall reflection failed", e);
+        var operator = aggregateCall.getOperator();
+        functionName = operator.toString();
+        // Normalize to SQL function names
+        functionName = switch (functionName) {
+            case "COUNT" -> "COUNT";
+            case "SUM" -> "SUM";
+            case "AVG" -> "AVG";
+            case "MIN" -> "MIN";
+            case "MAX" -> "MAX";
+            default -> throw new UnsupportedOperationException("Unknown aggregate function: " + functionName);
+        };
+        var argument = aggregateCall.getExpression();
+        if (argument == null) {
+            argumentSql = "*";
+        } else {
+            PsDto argResult = ((ScalarExpression) argument).accept(visitor, ctx);
+            argumentSql = argResult.sql();
+            params.addAll(argResult.parameters());
         }
         String sql = functionName + "(" + argumentSql + ")";
         return new PsDto(sql, params);
