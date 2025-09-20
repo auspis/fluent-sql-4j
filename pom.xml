@@ -23,6 +23,7 @@
     <maven.exec.plugin.version>3.5.1</maven.exec.plugin.version>
     <maven.versions.plugin.version>2.19.0</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.1</maven.enforcer.plugin.version>
+    <maven.rewrite.plugin.version>5.28.0</maven.rewrite.plugin.version>
 
     <dep.lombok.version>1.18.42</dep.lombok.version>
     <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
@@ -211,6 +212,16 @@
               </configuration>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.openrewrite.maven</groupId>
+          <artifactId>rewrite-maven-plugin</artifactId>
+          <version>${maven.rewrite.plugin.version}</version>
+          <configuration>
+            <activeRecipes>
+              <!--<org.openrewrite.java.migrate.UpgradeJavaVersion25</<!->-->
+            </activeRecipes>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
