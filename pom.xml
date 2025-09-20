@@ -15,12 +15,25 @@
   <properties>
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.plugin.version>3.12.1</maven.compiler.plugin.version>
+    <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
     <maven.failsafe.plugin.version>3.5.3</maven.failsafe.plugin.version>
     <maven.spotless.plugin.version>2.46.1</maven.spotless.plugin.version>
     <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
     <maven.exec.plugin.version>3.5.1</maven.exec.plugin.version>
+    <maven.versions.plugin.version>2.19.0</maven.versions.plugin.version>
+    <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
+
+    <dep.lombok.version>1.18.42</dep.lombok.version>
+    <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
+
+    <dep.h2.version>2.3.232</dep.h2.version>
+    <dep.mysql-connector-java.version>8.0.33</dep.mysql-connector-java.version>
+    <dep.postgresql.version>42.7.8</dep.postgresql.version>
+
+    <dep.testcontainer.version>1.21.3</dep.testcontainer.version>
+    <dep.junit-jupiter.version>5.10.0</dep.junit-jupiter.version>
+    <dep.assertj-core.version>3.25.3</dep.assertj-core.version>
   </properties>
 
   <dependencyManagement>
@@ -44,61 +57,61 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.38</version>
+        <version>${dep.lombok.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.20.0</version>
+        <version>${dep.jackson-core.version}</version>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>2.2.224</version>
+        <version>${dep.h2.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers</artifactId>
-        <version>1.19.7</version>
+        <version>${dep.testcontainer.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>1.19.7</version>
+        <version>${dep.testcontainer.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>mysql</artifactId>
-        <version>1.19.7</version>
+        <version>${dep.testcontainer.version}</version>
       </dependency>
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>postgresql</artifactId>
-        <version>1.19.7</version>
+        <version>${dep.testcontainer.version}</version>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
-        <version>8.0.33</version>
+        <version>${dep.mysql-connector-java.version}</version>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.7.3</version>
+        <version>${dep.postgresql.version}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>5.10.0</version>
+        <version>${dep.junit-jupiter.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>3.25.3</version>
+        <version>${dep.assertj-core.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -170,6 +183,35 @@
             </markdown>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${maven.versions.plugin.version}</version>
+          <configuration>
+            <allowSnapshots>false</allowSnapshots>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven.enforcer.plugin.version}</version>
+          <executions>
+            <execution>
+              <id>enforce-maven</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <requireMavenVersion>
+                    <version>[3.6.3,)</version>
+                  </requireMavenVersion>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -219,6 +261,26 @@
                 <argument>+x</argument>
                 <argument>.git/hooks/pre-commit</argument>
               </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.6.3,)</version>
+                </requireMavenVersion>
+              </rules>
+              <fail>true</fail>
             </configuration>
           </execution>
         </executions>
