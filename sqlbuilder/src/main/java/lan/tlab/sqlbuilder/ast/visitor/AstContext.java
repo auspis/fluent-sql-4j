@@ -1,7 +1,5 @@
 package lan.tlab.sqlbuilder.ast.visitor;
 
-import java.util.Objects;
-
 public class AstContext {
     public enum Scope {
         DEFAULT,
@@ -16,7 +14,7 @@ public class AstContext {
     }
 
     public AstContext(Scope scope) {
-        this.scope = Objects.requireNonNull(scope);
+        this.scope = scope;
     }
 
     public Scope getScope() {

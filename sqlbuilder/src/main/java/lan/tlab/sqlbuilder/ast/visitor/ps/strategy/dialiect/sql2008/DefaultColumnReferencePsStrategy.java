@@ -10,9 +10,9 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 public class DefaultColumnReferencePsStrategy implements ColumnReferencePsStrategy {
     @Override
     public PsDto handle(ColumnReference col, Visitor<PsDto> visitor, AstContext ctx) {
-        boolean qualify = ctx != null && ctx.getScope() == AstContext.Scope.JOIN_ON;
+        boolean qualify = ctx.getScope() == AstContext.Scope.JOIN_ON;
         String sql;
-        if (qualify && col.getTable() != null && !col.getTable().isBlank()) {
+        if (qualify && !col.getTable().isBlank()) {
             sql = "\"" + col.getTable() + "\".\"" + col.getColumn() + "\"";
         } else {
             sql = "\"" + col.getColumn() + "\"";

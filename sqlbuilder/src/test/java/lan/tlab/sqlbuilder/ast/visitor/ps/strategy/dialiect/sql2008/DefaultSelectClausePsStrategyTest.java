@@ -26,7 +26,6 @@ class DefaultSelectClausePsStrategyTest {
         @SuppressWarnings("unchecked")
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
-            //noinspection unchecked
             return (T) new PsDto(sql, params);
         }
     }
