@@ -28,8 +28,11 @@ This repository is a multi-module Java project managed with Maven. It is structu
 
 - Source code in `src/main/java/`
 - Tests in `src/test/java/`
+- never user var to declare a variable
+- never user java reflection to solve problems
 - Use AssertJ for assertions in tests
 - Use JUnit 5 for unit and integration tests
+- keep the test name compact avoiding to prefix it with `test` or `with` and explaining the expected behavior
 - Integration tests may use Testcontainers for database emulation
 - SQL code is generated using the project's SQL builder classes
 

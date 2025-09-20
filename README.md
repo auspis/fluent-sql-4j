@@ -65,3 +65,17 @@ This will:
 - Surefire is configured to exclude `*IT.java` files.
 - This ensures a clear separation between unit and integration tests.
 
+## check updates
+
+### dependencies
+
+```bash
+data/scripts/dependency-updates-show.sh
+```
+
+### plugins
+
+```bash
+data/scripts/plugin-updates-show.sh
+```
+

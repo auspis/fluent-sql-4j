@@ -7,7 +7,7 @@ import lan.tlab.sqlbuilder.ast.expression.Expression;
 import lan.tlab.sqlbuilder.ast.expression.set.NullSetExpression;
 import lan.tlab.sqlbuilder.ast.expression.set.SetExpression;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +17,7 @@ public interface InsertData extends SqlItem {
     @Getter
     public static class DefaultValues implements InsertData {
         @Override
-        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+        public <T> T accept(Visitor<T> visitor, AstContext ctx) {
             return visitor.visit(this, ctx);
         }
     }
@@ -32,7 +32,7 @@ public interface InsertData extends SqlItem {
         }
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+        public <T> T accept(Visitor<T> visitor, AstContext ctx) {
             return visitor.visit(this, ctx);
         }
     }
@@ -43,7 +43,7 @@ public interface InsertData extends SqlItem {
         private SetExpression setExpression = new NullSetExpression();
 
         @Override
-        public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+        public <T> T accept(Visitor<T> visitor, AstContext ctx) {
             return visitor.visit(this, ctx);
         }
     }
