@@ -4,7 +4,7 @@
 set -e
 
 # Filtro gli aggiornamenti dei plugin mostrando solo versioni stabili ed eliminando i duplicati
-./mvnw org.codehaus.mojo:versions-maven-plugin:2.16.2:display-plugin-updates -DallowSnapshots=false -Dversions.displayAllVersions=true \
+./mvnw versions:display-plugin-updates -DallowSnapshots=false -Dversions.displayAllVersions=true \
   | grep -e '->' \
   | awk 'BEGIN{IGNORECASE=1} {split($0, a, "-> "); if (a[2] !~ /-(M|RC|beta|alpha|cr|preview|ea)/) print $0}' \
   | sort -u \
