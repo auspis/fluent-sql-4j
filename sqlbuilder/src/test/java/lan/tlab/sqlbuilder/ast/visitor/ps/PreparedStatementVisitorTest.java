@@ -16,6 +16,7 @@ import lan.tlab.sqlbuilder.ast.expression.Expression;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
+import lan.tlab.sqlbuilder.ast.expression.bool.Like;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.Not;
 import lan.tlab.sqlbuilder.ast.expression.item.As;
@@ -573,7 +574,7 @@ class PreparedStatementVisitorTest {
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
-        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" LIMIT 10");
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" FETCH NEXT 10 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -586,7 +587,7 @@ class PreparedStatementVisitorTest {
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
-        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" LIMIT 10 OFFSET 20");
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -596,11 +597,12 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
-                .pagination(Pagination.builder().perPage(5).page(1).build())
+                .pagination(Pagination.builder().perPage(5).page(2).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
-        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? LIMIT 5 OFFSET 5");
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? OFFSET 5 ROWS FETCH NEXT 5 ROWS ONLY");
         assertThat(result.parameters()).containsExactly(100);
     }
 
@@ -614,7 +616,8 @@ class PreparedStatementVisitorTest {
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
-        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC LIMIT 3 OFFSET 6");
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC OFFSET 3 ROWS FETCH NEXT 3 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -628,7 +631,8 @@ class PreparedStatementVisitorTest {
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
-        assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" GROUP BY \"email\" LIMIT 2 OFFSET 6");
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"email\" FROM \"User\" GROUP BY \"email\" OFFSET 4 ROWS FETCH NEXT 2 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -741,7 +745,8 @@ class PreparedStatementVisitorTest {
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(stmt, new AstContext());
-        assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" CROSS JOIN \"t2\" LIMIT 5 OFFSET 5");
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" CROSS JOIN \"t2\" FETCH NEXT 5 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -884,7 +889,7 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
-                        "SELECT MIN(\"id\") FROM \"User\" WHERE \"id\" > ? GROUP BY \"email\" HAVING MIN(\"id\") < ? ORDER BY \"email\" DESC LIMIT 5 OFFSET 5");
+                        "SELECT MIN(\"id\") FROM \"User\" WHERE \"id\" > ? GROUP BY \"email\" HAVING MIN(\"id\") < ? ORDER BY \"email\" DESC FETCH NEXT 5 ROWS ONLY");
         assertThat(result.parameters()).containsExactly(10, 100);
     }
 
@@ -983,5 +988,54 @@ class PreparedStatementVisitorTest {
                 .isEqualTo(
                         "SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING NOT ((COUNT(\"id\") < ?) OR (COUNT(\"id\") > ?))");
         assertThat(result.parameters()).containsExactly(5, 50);
+    }
+
+    @Test
+    void testSelectPaginationFirstPage() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .pagination(Pagination.builder().perPage(10).page(1).build())
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" FETCH NEXT 10 ROWS ONLY");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectPaginationLargeOffset() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .pagination(Pagination.builder().perPage(25).page(10).build())
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" OFFSET 225 ROWS FETCH NEXT 25 ROWS ONLY");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void testSelectPaginationWithComplexQuery() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("User", "id")),
+                        new ScalarExpressionProjection(ColumnReference.of("User", "name"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(AndOr.and(
+                        Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100)),
+                        new Like(ColumnReference.of("User", "name"), "John%"))))
+                .orderBy(OrderBy.of(
+                        Sorting.asc(ColumnReference.of("User", "name")),
+                        Sorting.desc(ColumnReference.of("User", "id"))))
+                .pagination(Pagination.builder().perPage(15).page(3).build())
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT \"id\", \"name\" FROM \"User\" WHERE (\"id\" > ?) AND (\"name\" LIKE ?) ORDER BY \"name\" ASC, \"id\" DESC OFFSET 30 ROWS FETCH NEXT 15 ROWS ONLY");
+        assertThat(result.parameters()).containsExactly(100, "John%");
     }
 }

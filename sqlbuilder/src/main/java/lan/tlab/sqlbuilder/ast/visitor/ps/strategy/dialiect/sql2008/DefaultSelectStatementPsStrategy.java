@@ -49,18 +49,12 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
             orderByResult = stmt.getOrderBy().accept(visitor, ctx);
             orderByClause = " ORDER BY " + orderByResult.sql();
         }
-        // PAGINATION (LIMIT/OFFSET)
+        // PAGINATION - delegate to proper pagination strategy
+        PsDto paginationResult = null;
         String paginationClause = "";
-        if (stmt.getPagination() != null && stmt.getPagination().getPerPage() != null) {
-            Integer perPage = stmt.getPagination().getPerPage();
-            Integer page = stmt.getPagination().getPage();
-            if (perPage != null) {
-                paginationClause = " LIMIT " + perPage;
-                if (page != null && page > 0) {
-                    int offset = page * perPage;
-                    paginationClause += " OFFSET " + offset;
-                }
-            }
+        if (stmt.getPagination() != null && stmt.getPagination().isActive()) {
+            paginationResult = stmt.getPagination().accept(visitor, ctx);
+            paginationClause = paginationResult.sql();
         }
         String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause
                 + havingClause + orderByClause + paginationClause;
@@ -78,6 +72,9 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         }
         if (orderByResult != null) {
             allParams.addAll(orderByResult.parameters());
+        }
+        if (paginationResult != null) {
+            allParams.addAll(paginationResult.parameters());
         }
         return new PsDto(sql, allParams);
     }

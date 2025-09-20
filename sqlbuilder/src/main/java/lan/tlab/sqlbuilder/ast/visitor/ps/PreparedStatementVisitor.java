@@ -92,6 +92,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNullPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
@@ -117,6 +118,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInser
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNullPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoinPsStrategy;
@@ -128,16 +130,22 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelec
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultWhereClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class PreparedStatementVisitor implements Visitor<PsDto> {
+    @Getter
+    @Default
+    private final EscapeStrategy escapeStrategy = EscapeStrategy.standard();
+
     @Default
     private final SelectClausePsStrategy selectClauseStrategy = new DefaultSelectClausePsStrategy();
 
@@ -214,6 +222,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final PaginationPsStrategy paginationPsStrategy = new DefaultPaginationPsStrategy();
+
+    @Default
+    private final LikePsStrategy likePsStrategy = new DefaultLikePsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
@@ -582,7 +593,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Like expression, AstContext ctx) {
-        throw new UnsupportedOperationException("Unsupported FromSource type: " + expression.getClass());
+        return likePsStrategy.handle(expression, this, ctx);
     }
 
     @Override
