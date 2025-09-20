@@ -1,8 +1,8 @@
 package lan.tlab.sqlbuilder.ast.expression;
 
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.Visitable;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 
 /**
  * Interfaccia base per tutte le espressioni nell'AST SQL. Una Expression rappresenta una parte di
@@ -11,5 +11,5 @@ import lan.tlab.sqlbuilder.ast.visitor.Visitable;
 public interface Expression extends Visitable {
 
     @Override
-    <T> T accept(SqlVisitor<T> visitor, AstContext ctx);
+    <T> T accept(Visitor<T> visitor, AstContext ctx);
 }
