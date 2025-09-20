@@ -3,7 +3,7 @@ package lan.tlab.sqlbuilder.ast.clause.selection.projection;
 import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 
 public class ScalarExpressionProjection extends Projection {
 
@@ -20,7 +20,7 @@ public class ScalarExpressionProjection extends Projection {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
     }
 }

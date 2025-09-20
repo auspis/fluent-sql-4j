@@ -34,7 +34,15 @@
 # ----------------------------------------------------------------------------
 # Set default JAVA_HOME if not already set by environment (e.g., GitHub Actions)
 if [ -z "$JAVA_HOME" ]; then
-  # Try Amazon Corretto 21 first, then fallback to available Java installations
+  # Try Amazon Corretto 25 first, then fallback to 21 and other available Java installations
+  #if [ -d "/usr/lib/jvm/java-25-amazon-corretto" ]; then
+  #  JAVA_HOME=/usr/lib/jvm/java-25-amazon-corretto
+  #elif [ -d "/usr/lib/jvm/amazon-corretto-25" ]; then
+  #  JAVA_HOME=/usr/lib/jvm/amazon-corretto-25
+  #elif [ -d "/usr/lib/jvm/temurin-25-jdk-amd64" ]; then
+  #  JAVA_HOME=/usr/lib/jvm/temurin-25-jdk-amd64
+  #  
+  #elif [ -d "/usr/lib/jvm/java-21-amazon-corretto" ]; then
   if [ -d "/usr/lib/jvm/java-21-amazon-corretto" ]; then
     JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
   elif [ -d "/usr/lib/jvm/amazon-corretto-21" ]; then

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.sqlbuilder.ast.clause.Clause;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class OrderBy implements Clause {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
     }
 }
