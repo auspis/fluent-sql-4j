@@ -1,9 +1,10 @@
 package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
-import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCallImpl;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.CountDistinct;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.CountStar;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
@@ -12,29 +13,25 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregateCallPsStrategy;
 public class DefaultAggregateCallPsStrategy implements AggregateCallPsStrategy {
     @Override
     public PsDto handle(AggregateCall aggregateCall, Visitor<PsDto> visitor, AstContext ctx) {
-        String functionName = null;
-        String argumentSql = null;
-        List<Object> params = new ArrayList<>();
-        var operator = aggregateCall.getOperator();
-        functionName = operator.toString();
-        // Normalize to SQL function names
-        functionName = switch (functionName) {
-            case "COUNT" -> "COUNT";
-            case "SUM" -> "SUM";
-            case "AVG" -> "AVG";
-            case "MIN" -> "MIN";
-            case "MAX" -> "MAX";
-            default -> throw new UnsupportedOperationException("Unknown aggregate function: " + functionName);
+        return switch (aggregateCall) {
+            case AggregateCallImpl e -> {
+                String functionName = e.getOperator().name();
+                PsDto argResult =
+                        e.getExpression() == null ? null : e.getExpression().accept(visitor, ctx);
+                String argumentSql = argResult == null ? "*" : argResult.sql();
+                List<Object> params = argResult == null ? List.of() : argResult.parameters();
+                String sql = functionName + "(" + argumentSql + ")";
+                yield new PsDto(sql, params);
+            }
+            case CountDistinct e -> {
+                PsDto argResult = e.getExpression().accept(visitor, ctx);
+                String sql = "COUNT(DISTINCT " + argResult.sql() + ")";
+                yield new PsDto(sql, argResult.parameters());
+            }
+            case CountStar e -> {
+                yield new PsDto("COUNT(*)", List.of());
+            }
+            default -> throw new UnsupportedOperationException("Unknown aggregate function: " + aggregateCall);
         };
-        var argument = aggregateCall.getExpression();
-        if (argument == null) {
-            argumentSql = "*";
-        } else {
-            PsDto argResult = ((ScalarExpression) argument).accept(visitor, ctx);
-            argumentSql = argResult.sql();
-            params.addAll(argResult.parameters());
-        }
-        String sql = functionName + "(" + argumentSql + ")";
-        return new PsDto(sql, params);
     }
 }
