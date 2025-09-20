@@ -9,7 +9,7 @@ import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.expression.set.TableExpression;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public class SelectStatement implements Statement, TableExpression {
     private final Pagination pagination = Pagination.builder().build();
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
     }
 }
