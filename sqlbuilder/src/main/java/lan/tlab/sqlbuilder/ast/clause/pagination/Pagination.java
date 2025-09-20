@@ -3,7 +3,7 @@ package lan.tlab.sqlbuilder.ast.clause.pagination;
 import java.util.Objects;
 import lan.tlab.sqlbuilder.ast.clause.Clause;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,7 @@ public class Pagination implements Clause {
     private final Integer perPage;
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
     }
 

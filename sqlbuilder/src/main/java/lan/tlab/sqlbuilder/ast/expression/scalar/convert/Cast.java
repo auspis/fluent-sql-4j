@@ -3,7 +3,7 @@ package lan.tlab.sqlbuilder.ast.expression.scalar.convert;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.ast.visitor.SqlVisitor;
+import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,7 +36,7 @@ public class Cast implements FunctionCall {
     }
 
     @Override
-    public <T> T accept(SqlVisitor<T> visitor, AstContext ctx) {
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
     }
 }
