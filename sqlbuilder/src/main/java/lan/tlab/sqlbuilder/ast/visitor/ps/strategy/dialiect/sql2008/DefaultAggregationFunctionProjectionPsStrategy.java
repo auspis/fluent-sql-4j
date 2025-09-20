@@ -1,9 +1,10 @@
-package lan.tlab.sqlbuilder.ast.visitor.ps.strategy;
+package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
 
 public class DefaultAggregationFunctionProjectionPsStrategy implements AggregationFunctionProjectionPsStrategy {
     @Override

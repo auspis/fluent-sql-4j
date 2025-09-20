@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.ast.visitor.ps.strategy;
+package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 
 public class DefaultOnJoinPsStrategy implements OnJoinPsStrategy {
     @Override

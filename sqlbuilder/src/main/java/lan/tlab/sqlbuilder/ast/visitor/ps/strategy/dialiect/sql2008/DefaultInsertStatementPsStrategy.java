@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.ast.visitor.ps.strategy;
+package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 
 public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrategy {
     @Override
