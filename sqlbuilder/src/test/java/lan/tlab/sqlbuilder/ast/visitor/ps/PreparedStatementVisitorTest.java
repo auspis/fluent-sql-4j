@@ -38,6 +38,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Mod;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Power;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Round;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.UnaryNumeric;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
@@ -1963,5 +1964,55 @@ class PreparedStatementVisitorTest {
 
         assertThat(result.sql()).isEqualTo("SELECT TRIM(LEADING ? FROM ?) AS \"cleaned\" FROM \"dual\"");
         assertThat(result.parameters()).containsExactly("*", "***data***");
+    }
+
+    @Test
+    void unaryNumericInSelectClause() {
+        var absFunction = UnaryNumeric.abs(ColumnReference.of("transactions", "amount"));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(absFunction, new As("abs_amount"))))
+                .from(From.of(new Table("transactions")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT ABS(\"amount\") AS \"abs_amount\" FROM \"transactions\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void unaryNumericInWhereClause() {
+        var sqrtFunction = UnaryNumeric.sqrt(Literal.of(16));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("data", "id"))))
+                .from(From.of(new Table("data")))
+                .where(Where.of(Comparison.gt(ColumnReference.of("data", "value"), sqrtFunction)))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"data\" WHERE \"value\" > SQRT(?)");
+        assertThat(result.parameters()).containsExactly(16);
+    }
+
+    @Test
+    void unaryNumericMultipleFunctions() {
+        var ceilFunction = UnaryNumeric.ceil(ColumnReference.of("orders", "total"));
+        var floorFunction = UnaryNumeric.floor(Literal.of(9.8));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ceilFunction, new As("rounded_up")),
+                        new ScalarExpressionProjection(floorFunction, new As("rounded_down"))))
+                .from(From.of(new Table("orders")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql())
+                .isEqualTo("SELECT CEIL(\"total\") AS \"rounded_up\", FLOOR(?) AS \"rounded_down\" FROM \"orders\"");
+        assertThat(result.parameters()).containsExactly(9.8);
     }
 }

@@ -131,6 +131,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SubstringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryNumericPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
@@ -187,6 +188,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSubst
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryArithmeticExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryNumericPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultWhereClausePsStrategy;
@@ -348,6 +350,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final TrimPsStrategy trimPsStrategy = new DefaultTrimPsStrategy();
+
+    @Default
+    private final UnaryNumericPsStrategy unaryNumericPsStrategy = new DefaultUnaryNumericPsStrategy();
 
     @Default
     private final CreateTableStatementPsStrategy createTableStatementPsStrategy =
@@ -613,7 +618,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(UnaryNumeric functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return unaryNumericPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
