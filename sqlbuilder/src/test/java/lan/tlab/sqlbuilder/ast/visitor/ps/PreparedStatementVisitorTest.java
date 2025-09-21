@@ -24,6 +24,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
@@ -1826,6 +1827,25 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql()).contains("users");
         assertThat(result.sql()).contains("id");
         assertThat(result.sql()).contains("name");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void createTableStatementWithUniqueConstraint() {
+        CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
+                .table(new Table("users"))
+                .columns(List.of(
+                        ColumnDefinitionBuilder.integer("id").build(),
+                        ColumnDefinitionBuilder.varchar("email").build()))
+                .constraint(new Constraint.UniqueConstraint("email"))
+                .build());
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(createTable, new AstContext());
+
+        assertThat(result.sql()).startsWith("CREATE TABLE");
+        assertThat(result.sql()).contains("UNIQUE");
+        assertThat(result.sql()).contains("email");
         assertThat(result.parameters()).isEmpty();
     }
 
