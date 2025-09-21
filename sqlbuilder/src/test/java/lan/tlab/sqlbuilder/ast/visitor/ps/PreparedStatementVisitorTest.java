@@ -27,6 +27,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
+import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
@@ -1103,5 +1104,24 @@ class PreparedStatementVisitorTest {
 
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void deleteStatement() {
+        Table table = new Table("users");
+        // Delete con where
+        Comparison whereExpr = Comparison.eq(ColumnReference.of("", "id"), Literal.of(42));
+        Where where = Where.builder().condition(whereExpr).build();
+        DeleteStatement stmt =
+                DeleteStatement.builder().table(table).where(where).build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto ps = visitor.visit(stmt, new AstContext());
+        assertThat(ps.sql()).isEqualTo("DELETE FROM users WHERE \"id\" = ?");
+        assertThat(ps.parameters()).containsExactly(42);
+        // Delete senza where
+        DeleteStatement stmtNoWhere = DeleteStatement.builder().table(table).build();
+        PsDto psNoWhere = visitor.visit(stmtNoWhere, new AstContext());
+        assertThat(psNoWhere.sql()).isEqualTo("DELETE FROM users");
+        assertThat(psNoWhere.parameters()).isEmpty();
     }
 }
