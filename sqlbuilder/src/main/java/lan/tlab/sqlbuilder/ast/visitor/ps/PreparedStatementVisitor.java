@@ -124,6 +124,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PowerPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReplacePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.RoundPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
@@ -186,6 +187,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoi
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPaginationPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPowerPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReferencesItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReplacePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultRoundPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultScalarExpressionProjectionPsStrategy;
@@ -361,6 +363,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final ReplacePsStrategy replacePsStrategy = new DefaultReplacePsStrategy();
+
+    @Default
+    private final ReferencesItemPsStrategy referencesItemPsStrategy = new DefaultReferencesItemPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -684,7 +689,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(ReferencesItem item, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return referencesItemPsStrategy.handle(item, this, ctx);
     }
 
     @Override
