@@ -1893,6 +1893,17 @@ class PreparedStatementVisitorTest {
     }
 
     @Test
+    void defaultConstraintIntegration() {
+        Constraint.DefaultConstraint constraint = new Constraint.DefaultConstraint(Literal.of("active"));
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+
+        PsDto result = visitor.visit(constraint, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("DEFAULT 'active'");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
     void roundInSelectClause() {
         Round roundFunction = Round.of(ColumnReference.of("products", "price"), Literal.of(2));
         SelectStatement selectStmt = SelectStatement.builder()
