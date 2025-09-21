@@ -27,6 +27,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
 import lan.tlab.sqlbuilder.ast.statement.InsertStatement;
@@ -1214,5 +1215,41 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (-?) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly(100);
+    }
+
+    @Test
+    void selectWithCastLiteralToVarchar() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(Cast.of(Literal.of("hello"), "VARCHAR(50)"))))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CAST(? AS VARCHAR(50)) FROM \"Test\"");
+        assertThat(result.parameters()).containsExactly("hello");
+    }
+
+    @Test
+    void selectWithCastColumnToInt() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(Cast.of(ColumnReference.of("users", "age"), "INT"))))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CAST(\"age\" AS INT) FROM \"Test\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithCastNumberToDate() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(Cast.of(Literal.of(123), "DATE"))))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CAST(? AS DATE) FROM \"Test\"");
+        assertThat(result.parameters()).containsExactly(123);
     }
 }

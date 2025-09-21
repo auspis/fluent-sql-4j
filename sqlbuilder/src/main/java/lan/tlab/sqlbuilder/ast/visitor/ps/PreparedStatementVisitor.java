@@ -84,6 +84,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AndOrPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AsPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BetweenPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BinaryArithmeticExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
@@ -120,6 +121,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAndOr
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAsPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBetweenPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBinaryArithmeticExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
@@ -259,6 +261,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final UnaryArithmeticExpressionPsStrategy unaryArithmeticExpressionPsStrategy =
             new DefaultUnaryArithmeticExpressionPsStrategy();
+
+    @Default
+    private final CastPsStrategy castPsStrategy = new DefaultCastPsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -421,7 +426,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Cast functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return castPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
