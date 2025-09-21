@@ -118,6 +118,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ModPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotNullConstraintPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullScalarExpressionPsStrategy;
@@ -187,6 +188,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLengt
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultModPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotNullConstraintPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullScalarExpressionPsStrategy;
@@ -397,6 +399,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final IndexPsStrategy indexPsStrategy = new DefaultIndexPsStrategy();
+
+    @Default
+    private final NotNullConstraintPsStrategy notNullConstraintPsStrategy = new DefaultNotNullConstraintPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -755,7 +760,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(NotNullConstraint constraint, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return notNullConstraintPsStrategy.handle(constraint, this, ctx);
     }
 
     @Override
