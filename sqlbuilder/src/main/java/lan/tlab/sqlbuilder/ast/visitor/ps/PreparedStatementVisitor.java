@@ -137,6 +137,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsSt
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryNumericPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryStringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggregateCallPsStrategy;
@@ -198,6 +199,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnary
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryNumericPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryStringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnionExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUpdateItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultWhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.escape.EscapeStrategy;
@@ -400,6 +402,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final NullBooleanExpressionPsStrategy nullBooleanExpressionPsStrategy =
             new DefaultNullBooleanExpressionPsStrategy();
+
+    @Default
+    private final UpdateItemPsStrategy updateItemPsStrategy = new DefaultUpdateItemPsStrategy();
 
     @Default
     private final UpdateStatementPsStrategy updateStatementPsStrategy = new DefaultUpdateStatementPsStrategy();
@@ -674,7 +679,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(UpdateItem item, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return updateItemPsStrategy.handle(item, this, ctx);
     }
 
     @Override
