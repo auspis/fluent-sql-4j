@@ -93,6 +93,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDateTimePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ExtractDatePartPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
@@ -135,6 +136,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurre
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDateArithmeticPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDeleteStatementPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultExtractDatePartPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultGroupByClausePsStrategy;
@@ -286,6 +288,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final DateArithmeticPsStrategy dateArithmeticPsStrategy = new DefaultDateArithmeticPsStrategy();
+
+    @Default
+    private final ExtractDatePartPsStrategy extractDatePartPsStrategy = new DefaultExtractDatePartPsStrategy();
 
     @Default
     private final IntervalPsStrategy intervalPsStrategy = new DefaultIntervalPsStrategy();
@@ -476,7 +481,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(ExtractDatePart functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return extractDatePartPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override

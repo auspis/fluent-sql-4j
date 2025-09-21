@@ -30,6 +30,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArithmetic;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
@@ -1389,5 +1390,45 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT DATEADD(INTERVAL ? MONTH, \"start_date\") FROM \"subscriptions\"");
         assertThat(result.parameters()).containsExactly(1);
+    }
+
+    @Test
+    void selectWithExtractYear() {
+        var extractYear = ExtractDatePart.year(ColumnReference.of("orders", "created_date"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(extractYear)))
+                .from(From.of(new Table("orders")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT EXTRACT(YEAR FROM \"created_date\") FROM \"orders\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithExtractMonth() {
+        var extractMonth = ExtractDatePart.month(ColumnReference.of("events", "event_date"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(extractMonth)))
+                .from(From.of(new Table("events")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT EXTRACT(MONTH FROM \"event_date\") FROM \"events\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithExtractDayInWhere() {
+        var extractDay = ExtractDatePart.day(ColumnReference.of("logs", "timestamp"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("logs", "id"))))
+                .from(From.of(new Table("logs")))
+                .where(Where.of(Comparison.eq(extractDay, Literal.of(25))))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"logs\" WHERE EXTRACT(DAY FROM \"timestamp\") = ?");
+        assertThat(result.parameters()).containsExactly(25);
     }
 }
