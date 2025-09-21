@@ -81,6 +81,7 @@ import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregateCallPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AndOrPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AsPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BetweenPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
@@ -110,6 +111,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggregateCallPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggregationFunctionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAndOrPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAsPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBetweenPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
@@ -240,6 +242,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
+
+    @Default
+    private final AsPsStrategy asPsStrategy = new DefaultAsPsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
@@ -503,7 +508,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(As item, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return asPsStrategy.handle(item, this, ctx);
     }
 
     @Override
