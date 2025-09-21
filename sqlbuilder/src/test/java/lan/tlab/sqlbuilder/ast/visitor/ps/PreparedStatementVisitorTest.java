@@ -45,6 +45,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.DataLength
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Replace;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
@@ -1869,5 +1870,51 @@ class PreparedStatementVisitorTest {
 
         assertThat(result.sql()).isEqualTo("SELECT ROUND(?, \"precision\") AS \"pi_rounded\" FROM \"settings\"");
         assertThat(result.parameters()).containsExactly(3.14159);
+    }
+
+    @Test
+    void substringInSelectClause() {
+        Substring substringFunction = Substring.of(ColumnReference.of("users", "name"), 1, 10);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(substringFunction, new As("short_name"))))
+                .from(From.of(new Table("users")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT SUBSTRING(\"name\", ?, ?) AS \"short_name\" FROM \"users\"");
+        assertThat(result.parameters()).containsExactly(1, 10);
+    }
+
+    @Test
+    void substringInWhereClause() {
+        Substring substringFunction = Substring.of(ColumnReference.of("posts", "content"), 1, 50);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("posts", "id"))))
+                .from(From.of(new Table("posts")))
+                .where(Where.of(new Like(substringFunction, "%search%")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"posts\" WHERE SUBSTRING(\"content\", ?, ?) LIKE ?");
+        assertThat(result.parameters()).containsExactly(1, 50, "%search%");
+    }
+
+    @Test
+    void substringWithoutLength() {
+        Substring substringFunction = Substring.of(Literal.of("Hello World"), 7);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(substringFunction, new As("greeting"))))
+                .from(From.of(new Table("dual")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT SUBSTRING(?, ?) AS \"greeting\" FROM \"dual\"");
+        assertThat(result.parameters()).containsExactly("Hello World", 7);
     }
 }
