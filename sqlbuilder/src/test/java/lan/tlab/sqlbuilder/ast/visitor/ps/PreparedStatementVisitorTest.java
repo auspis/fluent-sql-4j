@@ -951,14 +951,11 @@ class PreparedStatementVisitorTest {
                         new lan.tlab.sqlbuilder.ast.expression.bool.Between(
                                 AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10), Literal.of(100))))
                 .build();
-        // NOTA: il visitor lancia UnsupportedOperationException per Between, quindi qui ci aspettiamo eccezione
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        try {
-            visitor.visit(selectStmt, new AstContext());
-            throw new AssertionError("Expected UnsupportedOperationException for BETWEEN in HAVING");
-        } catch (UnsupportedOperationException e) {
-            // ok
-        }
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql())
+                .isEqualTo("SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\" HAVING SUM(\"id\") BETWEEN ? AND ?");
+        assertThat(result.parameters()).containsExactly(10, 100);
     }
 
     @Test

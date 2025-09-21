@@ -81,6 +81,7 @@ import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregateCallPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AndOrPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BetweenPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
@@ -108,6 +109,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggregateCallPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggregationFunctionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAndOrPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBetweenPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
@@ -231,6 +233,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final UnionExpressionPsStrategy unionExpressionPsStrategy = new DefaultUnionExpressionPsStrategy();
 
+    @Default
+    private final BetweenPsStrategy betweenPsStrategy = new DefaultBetweenPsStrategy();
+
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
         return insertStatementPsStrategy.handle(stmt, this, ctx);
@@ -343,7 +348,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Between expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return betweenPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
