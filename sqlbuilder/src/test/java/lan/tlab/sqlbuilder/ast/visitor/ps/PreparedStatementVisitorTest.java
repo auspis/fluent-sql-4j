@@ -70,6 +70,18 @@ class PreparedStatementVisitorTest {
     }
 
     @Test
+    void testInsertStatementWithDefaultValues() {
+        Table table = new Table("User");
+        var defaultValues = new lan.tlab.sqlbuilder.ast.expression.item.InsertData.DefaultValues();
+        InsertStatement insertStatement =
+                InsertStatement.builder().table(table).data(defaultValues).build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(insertStatement, new AstContext());
+        assertThat(result.sql()).isEqualTo("INSERT INTO \"User\" DEFAULT VALUES");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
     void testSelectStatement() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
