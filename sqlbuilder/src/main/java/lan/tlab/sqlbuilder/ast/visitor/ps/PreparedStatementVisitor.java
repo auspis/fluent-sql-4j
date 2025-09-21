@@ -100,6 +100,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ExtractDatePartPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ForeignKeyConstraintPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
@@ -171,6 +172,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefau
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDeleteStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultExceptExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultExtractDatePartPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultForeignKeyConstraintPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultGroupByClausePsStrategy;
@@ -407,6 +409,10 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final UniqueConstraintPsStrategy uniqueConstraintPsStrategy = new DefaultUniqueConstraintPsStrategy();
+
+    @Default
+    private final ForeignKeyConstraintPsStrategy foreignKeyConstraintPsStrategy =
+            new DefaultForeignKeyConstraintPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -775,7 +781,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(ForeignKeyConstraint constraint, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return foreignKeyConstraintPsStrategy.handle(constraint, this, ctx);
     }
 
     @Override

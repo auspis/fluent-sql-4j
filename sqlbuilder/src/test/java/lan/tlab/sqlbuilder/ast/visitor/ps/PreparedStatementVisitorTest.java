@@ -25,6 +25,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
@@ -1846,6 +1847,28 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("UNIQUE");
         assertThat(result.sql()).contains("email");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void createTableStatementWithForeignKeyConstraint() {
+        ReferencesItem references = new ReferencesItem("users", "id");
+        CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
+                .table(new Table("orders"))
+                .columns(List.of(
+                        ColumnDefinitionBuilder.integer("id").build(),
+                        ColumnDefinitionBuilder.integer("user_id").build()))
+                .constraint(new Constraint.ForeignKeyConstraint(List.of("user_id"), references))
+                .build());
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(createTable, new AstContext());
+
+        assertThat(result.sql()).startsWith("CREATE TABLE");
+        assertThat(result.sql()).contains("FOREIGN KEY");
+        assertThat(result.sql()).contains("user_id");
+        assertThat(result.sql()).contains("REFERENCES");
+        assertThat(result.sql()).contains("users");
         assertThat(result.parameters()).isEmpty();
     }
 
