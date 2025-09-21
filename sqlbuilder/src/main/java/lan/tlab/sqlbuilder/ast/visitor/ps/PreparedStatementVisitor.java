@@ -87,6 +87,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InPsStrategy;
@@ -117,6 +118,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColum
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultGroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultHavingClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInPsStrategy;
@@ -246,6 +248,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final AsPsStrategy asPsStrategy = new DefaultAsPsStrategy();
 
+    @Default
+    private final FromSubqueryPsStrategy fromSubqueryPsStrategy = new DefaultFromSubqueryPsStrategy();
+
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
         return insertStatementPsStrategy.handle(stmt, this, ctx);
@@ -323,7 +328,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(FromSubquery fromSubquery, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return fromSubqueryPsStrategy.handle(fromSubquery, this, ctx);
     }
 
     @Override

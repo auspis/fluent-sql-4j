@@ -1066,4 +1066,27 @@ class PreparedStatementVisitorTest {
                         "((SELECT \"id\" FROM \"User\" WHERE \"id\" = ?) UNION (SELECT \"id\" FROM \"User\" WHERE \"id\" = ?))");
         assertThat(result.parameters()).containsExactly(1, 2);
     }
+
+    @Test
+    void selectFromSubquery() {
+        var subquery = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
+                .build();
+
+        var fromSubquery = lan.tlab.sqlbuilder.ast.clause.from.source.FromSubquery.of(subquery, "sub");
+
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("sub", "id"))))
+                .from(From.of(fromSubquery))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"id\" FROM (SELECT \"id\" FROM \"User\" WHERE \"id\" > ?) AS \"sub\"");
+        assertThat(result.parameters()).containsExactly(10);
+    }
 }
