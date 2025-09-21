@@ -117,6 +117,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ModPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullScalarExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullSetExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
@@ -175,6 +176,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultModPs
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullScalarExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullSetExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPaginationPsStrategy;
@@ -337,6 +339,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final NullScalarExpressionPsStrategy nullScalarExpressionPsStrategy =
             new DefaultNullScalarExpressionPsStrategy();
+
+    @Default
+    private final NullSetExpressionPsStrategy nullSetExpressionPsStrategy = new DefaultNullSetExpressionPsStrategy();
 
     @Default
     private final PowerPsStrategy powerPsStrategy = new DefaultPowerPsStrategy();
@@ -633,7 +638,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(NullSetExpression expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return nullSetExpressionPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
