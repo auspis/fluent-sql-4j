@@ -90,6 +90,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CharacterLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ConcatPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CreateTableStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDateTimePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DataLengthPsStrategy;
@@ -142,6 +143,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultChara
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultConcatPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCreateTableStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurrentDateTimePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDataLengthPsStrategy;
@@ -333,6 +335,10 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     private final ReplacePsStrategy replacePsStrategy = new DefaultReplacePsStrategy();
 
     @Default
+    private final CreateTableStatementPsStrategy createTableStatementPsStrategy =
+            new DefaultCreateTableStatementPsStrategy();
+
+    @Default
     private final CharLengthPsStrategy charLengthPsStrategy = new DefaultCharLengthPsStrategy();
 
     @Default
@@ -412,7 +418,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(CreateTableStatement createTableStatement, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return createTableStatementPsStrategy.handle(createTableStatement, this, ctx);
     }
 
     @Override
