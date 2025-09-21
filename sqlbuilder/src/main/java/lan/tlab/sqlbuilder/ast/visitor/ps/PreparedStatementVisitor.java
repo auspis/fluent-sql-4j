@@ -126,6 +126,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PowerPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PrimaryKeyPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReplacePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.RoundPsStrategy;
@@ -193,6 +194,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOrder
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPaginationPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultParameterizedDataTypePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPowerPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPrimaryKeyPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReferencesItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReplacePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultRoundPsStrategy;
@@ -387,6 +389,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final ParameterizedDataTypePsStrategy parameterizedDataTypePsStrategy =
             new DefaultParameterizedDataTypePsStrategy();
+
+    @Default
+    private final PrimaryKeyPsStrategy primaryKeyPsStrategy = new DefaultPrimaryKeyPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -735,7 +740,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(PrimaryKey item, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return primaryKeyPsStrategy.handle(item, this, ctx);
     }
 
     @Override
