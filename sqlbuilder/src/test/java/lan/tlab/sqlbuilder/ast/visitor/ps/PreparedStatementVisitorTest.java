@@ -28,6 +28,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
@@ -1317,6 +1318,32 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"created_date\" FROM \"orders\" WHERE \"created_date\" = CURRENT_DATE");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithCurrentDateTime() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(new CurrentDateTime())))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CURRENT_TIMESTAMP FROM \"Test\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithCurrentDateTimeInComparison() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("events", "timestamp"))))
+                .from(From.of(new Table("events")))
+                .where(Where.of(Comparison.eq(ColumnReference.of("events", "timestamp"), new CurrentDateTime())))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"timestamp\" FROM \"events\" WHERE \"timestamp\" = CURRENT_TIMESTAMP");
         assertThat(result.parameters()).isEmpty();
     }
 }
