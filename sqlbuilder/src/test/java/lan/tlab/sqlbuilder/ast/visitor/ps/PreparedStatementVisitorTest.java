@@ -41,6 +41,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.DataLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Replace;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
@@ -1758,5 +1759,46 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"calculations\" WHERE POWER(\"value\", ?) > ?");
         assertThat(result.parameters()).containsExactly(2, 100);
+    }
+
+    @Test
+    void selectReplaceFunction() {
+        var replaceFunction = Replace.of(Literal.of("Hello World"), Literal.of("World"), Literal.of("Universe"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
+                .from(From.of(new Table("dummy")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT REPLACE(?, ?, ?) FROM \"dummy\"");
+        assertThat(result.parameters()).containsExactly("Hello World", "World", "Universe");
+    }
+
+    @Test
+    void selectReplaceWithColumn() {
+        var replaceFunction =
+                Replace.of(ColumnReference.of("users", "email"), Literal.of("@old.com"), Literal.of("@new.com"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
+                .from(From.of(new Table("users")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT REPLACE(\"email\", ?, ?) FROM \"users\"");
+        assertThat(result.parameters()).containsExactly("@old.com", "@new.com");
+    }
+
+    @Test
+    void whereReplaceContains() {
+        var replaceFunction = Replace.of(ColumnReference.of("content", "text"), Literal.of("old"), Literal.of("new"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("content", "id"))))
+                .from(From.of(new Table("content")))
+                .where(Where.of(new Like(replaceFunction, "%new%")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"content\" WHERE REPLACE(\"text\", ?, ?) LIKE ?");
+        assertThat(result.parameters()).containsExactly("old", "new", "%new%");
     }
 }
