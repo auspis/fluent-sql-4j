@@ -99,6 +99,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
@@ -130,6 +131,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNul
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPaginationPsStrategy;
@@ -251,6 +253,10 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final FromSubqueryPsStrategy fromSubqueryPsStrategy = new DefaultFromSubqueryPsStrategy();
 
+    @Default
+    private final NullBooleanExpressionPsStrategy nullBooleanExpressionPsStrategy =
+            new DefaultNullBooleanExpressionPsStrategy();
+
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
         return insertStatementPsStrategy.handle(stmt, this, ctx);
@@ -358,7 +364,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(NullBooleanExpression expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return nullBooleanExpressionPsStrategy.handle(expression, this, ctx);
     }
 
     @Override

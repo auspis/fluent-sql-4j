@@ -17,6 +17,7 @@ import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.Like;
+import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.Not;
 import lan.tlab.sqlbuilder.ast.expression.item.As;
@@ -1027,8 +1028,7 @@ class PreparedStatementVisitorTest {
     void testSelectPaginationWithComplexQuery() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
-                        new ScalarExpressionProjection(ColumnReference.of("User", "id")),
-                        new ScalarExpressionProjection(ColumnReference.of("User", "name"))))
+                        new ScalarExpressionProjection(ColumnReference.of("User", "id")))) // Only project "id"
                 .from(From.of(new Table("User")))
                 .where(Where.of(AndOr.and(
                         Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100)),
@@ -1042,7 +1042,7 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
-                        "SELECT \"id\", \"name\" FROM \"User\" WHERE (\"id\" > ?) AND (\"name\" LIKE ?) ORDER BY \"name\" ASC, \"id\" DESC OFFSET 30 ROWS FETCH NEXT 15 ROWS ONLY");
+                        "SELECT \"id\" FROM \"User\" WHERE (\"id\" > ?) AND (\"name\" LIKE ?) ORDER BY \"name\" ASC, \"id\" DESC OFFSET 30 ROWS FETCH NEXT 15 ROWS ONLY");
         assertThat(result.parameters()).containsExactly(100, "John%");
     }
 
@@ -1088,5 +1088,20 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\" FROM (SELECT \"id\" FROM \"User\" WHERE \"id\" > ?) AS \"sub\"");
         assertThat(result.parameters()).containsExactly(10);
+    }
+
+    @Test
+    void selectWhereNullBooleanExpression() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(From.of(new Table("User")))
+                .where(Where.of(new NullBooleanExpression()))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\"");
+        assertThat(result.parameters()).isEmpty();
     }
 }

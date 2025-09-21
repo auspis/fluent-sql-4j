@@ -18,12 +18,17 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         // WHERE ... (optional)
         PsDto whereResult = null;
         String whereClause = "";
-        if (stmt.getWhere() != null
-                && stmt.getWhere().getCondition() != null
-                && !(stmt.getWhere().getCondition()
-                        instanceof lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression)) {
+        if (stmt.getWhere() != null && stmt.getWhere().getCondition() != null) {
             whereResult = stmt.getWhere().accept(visitor, ctx);
-            whereClause = " WHERE " + whereResult.sql();
+            String whereSql = whereResult.sql();
+            if (!whereSql.isBlank()) {
+                // If the whereSql already starts with WHERE, don't prepend it
+                if (whereSql.trim().toUpperCase().startsWith("WHERE")) {
+                    whereClause = " " + whereSql.trim();
+                } else {
+                    whereClause = " WHERE " + whereSql;
+                }
+            }
         }
         // GROUP BY ... (optional)
         PsDto groupByResult = null;
