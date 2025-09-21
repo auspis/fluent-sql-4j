@@ -29,6 +29,8 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArithmetic;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
@@ -1345,5 +1347,47 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql())
                 .isEqualTo("SELECT \"timestamp\" FROM \"events\" WHERE \"timestamp\" = CURRENT_TIMESTAMP");
         assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithDateAddition() {
+        var interval = Interval.of(Literal.of(30), Interval.IntervalUnit.DAY);
+        var dateAdd = DateArithmetic.add(ColumnReference.of("orders", "created_date"), interval);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(dateAdd)))
+                .from(From.of(new Table("orders")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT DATEADD(INTERVAL ? DAY, \"created_date\") FROM \"orders\"");
+        assertThat(result.parameters()).containsExactly(30);
+    }
+
+    @Test
+    void selectWithDateSubtraction() {
+        var interval = Interval.of(Literal.of(7), Interval.IntervalUnit.DAY);
+        var dateSub = DateArithmetic.subtract(ColumnReference.of("events", "event_date"), interval);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(dateSub)))
+                .from(From.of(new Table("events")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT DATESUB(INTERVAL ? DAY, \"event_date\") FROM \"events\"");
+        assertThat(result.parameters()).containsExactly(7);
+    }
+
+    @Test
+    void selectWithDateArithmeticSimple() {
+        var interval = Interval.of(Literal.of(1), Interval.IntervalUnit.MONTH);
+        var dateAdd = DateArithmetic.add(ColumnReference.of("subscriptions", "start_date"), interval);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(dateAdd)))
+                .from(From.of(new Table("subscriptions")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT DATEADD(INTERVAL ? MONTH, \"start_date\") FROM \"subscriptions\"");
+        assertThat(result.parameters()).containsExactly(1);
     }
 }

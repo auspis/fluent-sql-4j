@@ -90,6 +90,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ConcatPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDateTimePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
@@ -100,6 +101,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertValuesPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IntervalPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LikePsStrategy;
@@ -130,6 +132,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCompa
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultConcatPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurrentDateTimePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDateArithmeticPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDeleteStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromClausePsStrategy;
@@ -140,6 +143,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInPsS
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertValuesPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIntervalPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLikePsStrategy;
@@ -279,6 +283,12 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final CurrentDateTimePsStrategy currentDateTimePsStrategy = new DefaultCurrentDateTimePsStrategy();
+
+    @Default
+    private final DateArithmeticPsStrategy dateArithmeticPsStrategy = new DefaultDateArithmeticPsStrategy();
+
+    @Default
+    private final IntervalPsStrategy intervalPsStrategy = new DefaultIntervalPsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -461,7 +471,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(DateArithmetic functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return dateArithmeticPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
@@ -636,7 +646,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Interval interval, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return intervalPsStrategy.handle(interval, this, ctx);
     }
 
     @Override
