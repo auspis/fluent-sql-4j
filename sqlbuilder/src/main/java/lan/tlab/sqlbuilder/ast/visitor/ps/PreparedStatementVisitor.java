@@ -124,6 +124,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullSetExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PowerPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReplacePsStrategy;
@@ -190,6 +191,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullS
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPaginationPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultParameterizedDataTypePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPowerPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReferencesItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReplacePsStrategy;
@@ -381,6 +383,10 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final SimpleDataTypePsStrategy simpleDataTypePsStrategy = new DefaultSimpleDataTypePsStrategy();
+
+    @Default
+    private final ParameterizedDataTypePsStrategy parameterizedDataTypePsStrategy =
+            new DefaultParameterizedDataTypePsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -724,7 +730,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(ParameterizedDataType type, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return parameterizedDataTypePsStrategy.handle(type, this, ctx);
     }
 
     @Override
