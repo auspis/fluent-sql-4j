@@ -132,6 +132,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryNumericPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryStringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
@@ -189,6 +190,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTable
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryNumericPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryStringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultWhereClausePsStrategy;
@@ -353,6 +355,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final UnaryNumericPsStrategy unaryNumericPsStrategy = new DefaultUnaryNumericPsStrategy();
+
+    @Default
+    private final UnaryStringPsStrategy unaryStringPsStrategy = new DefaultUnaryStringPsStrategy();
 
     @Default
     private final CreateTableStatementPsStrategy createTableStatementPsStrategy =
@@ -623,7 +628,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(UnaryString functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return unaryStringPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override

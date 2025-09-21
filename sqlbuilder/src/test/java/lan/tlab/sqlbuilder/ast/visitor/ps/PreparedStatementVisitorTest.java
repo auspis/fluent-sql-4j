@@ -48,6 +48,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Replace;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Trim;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.UnaryString;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
@@ -2014,5 +2015,56 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql())
                 .isEqualTo("SELECT CEIL(\"total\") AS \"rounded_up\", FLOOR(?) AS \"rounded_down\" FROM \"orders\"");
         assertThat(result.parameters()).containsExactly(9.8);
+    }
+
+    @Test
+    void unaryStringInSelectClause() {
+        var upperFunction = UnaryString.upper(ColumnReference.of("users", "name"));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(upperFunction, new As("upper_name"))))
+                .from(From.of(new Table("users")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT UPPER(\"name\") AS \"upper_name\" FROM \"users\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void unaryStringInWhereClause() {
+        var lowerFunction = UnaryString.lower(Literal.of("ADMIN"));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "id"))))
+                .from(From.of(new Table("users")))
+                .where(Where.of(Comparison.eq(UnaryString.lower(ColumnReference.of("users", "role")), lowerFunction)))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"users\" WHERE LOWER(\"role\") = LOWER(?)");
+        assertThat(result.parameters()).containsExactly("ADMIN");
+    }
+
+    @Test
+    void unaryStringMixedCaseFunctions() {
+        var upperFunction = UnaryString.upper(Literal.of("hello"));
+        var lowerFunction = UnaryString.lower(ColumnReference.of("products", "category"));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(upperFunction, new As("greeting")),
+                        new ScalarExpressionProjection(lowerFunction, new As("lower_category"))))
+                .from(From.of(new Table("products")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql())
+                .isEqualTo(
+                        "SELECT UPPER(?) AS \"greeting\", LOWER(\"category\") AS \"lower_category\" FROM \"products\"");
+        assertThat(result.parameters()).containsExactly("hello");
     }
 }
