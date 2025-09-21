@@ -86,6 +86,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BetweenPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BinaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CharLengthPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CharacterLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ConcatPsStrategy;
@@ -132,6 +133,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBetwe
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBinaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCharLengthPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCharacterLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultConcatPsStrategy;
@@ -309,6 +311,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final CharLengthPsStrategy charLengthPsStrategy = new DefaultCharLengthPsStrategy();
+
+    @Default
+    private final CharacterLengthPsStrategy characterLengthPsStrategy = new DefaultCharacterLengthPsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -516,7 +521,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(CharacterLength functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return characterLengthPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
