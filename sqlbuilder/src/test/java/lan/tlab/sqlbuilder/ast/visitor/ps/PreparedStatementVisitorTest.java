@@ -27,6 +27,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
@@ -1291,5 +1292,31 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CONCAT_WS(?, ?, ?) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly(" - ", "First", "Second");
+    }
+
+    @Test
+    void selectWithCurrentDate() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(new CurrentDate())))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CURRENT_DATE FROM \"Test\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithCurrentDateInComparison() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("orders", "created_date"))))
+                .from(From.of(new Table("orders")))
+                .where(Where.of(Comparison.eq(ColumnReference.of("orders", "created_date"), new CurrentDate())))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql())
+                .isEqualTo("SELECT \"created_date\" FROM \"orders\" WHERE \"created_date\" = CURRENT_DATE");
+        assertThat(result.parameters()).isEmpty();
     }
 }

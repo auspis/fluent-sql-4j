@@ -88,6 +88,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ConcatPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
@@ -126,6 +127,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCastP
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultConcatPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDeleteStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromClausePsStrategy;
@@ -269,6 +271,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final ConcatPsStrategy concatPsStrategy = new DefaultConcatPsStrategy();
+
+    @Default
+    private final CurrentDatePsStrategy currentDatePsStrategy = new DefaultCurrentDatePsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -441,7 +446,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(CurrentDate functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return currentDatePsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
