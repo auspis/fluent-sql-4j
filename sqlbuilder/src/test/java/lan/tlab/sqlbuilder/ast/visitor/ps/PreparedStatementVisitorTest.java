@@ -1190,4 +1190,29 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql()).isEqualTo("SELECT (\"id\" % ?) FROM \"User\"");
         assertThat(result.parameters()).containsExactly(10);
     }
+
+    @Test
+    void selectWithArithmeticNegation() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        ArithmeticExpression.negation(ColumnReference.of("Customer", "score")))))
+                .from(From.of(new Table("Customer")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT (-\"score\") FROM \"Customer\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithArithmeticNegationLiteral() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ArithmeticExpression.negation(Literal.of(100)))))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT (-?) FROM \"Test\"");
+        assertThat(result.parameters()).containsExactly(100);
+    }
 }

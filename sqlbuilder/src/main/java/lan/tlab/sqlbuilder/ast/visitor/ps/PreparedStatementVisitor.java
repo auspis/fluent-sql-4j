@@ -110,6 +110,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
@@ -145,6 +146,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelec
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTablePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultWhereClausePsStrategy;
@@ -253,6 +255,10 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final BinaryArithmeticExpressionPsStrategy binaryArithmeticExpressionPsStrategy =
             new DefaultBinaryArithmeticExpressionPsStrategy();
+
+    @Default
+    private final UnaryArithmeticExpressionPsStrategy unaryArithmeticExpressionPsStrategy =
+            new DefaultUnaryArithmeticExpressionPsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -410,7 +416,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(UnaryArithmeticExpression expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return unaryArithmeticExpressionPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
