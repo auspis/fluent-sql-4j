@@ -132,6 +132,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SubstringPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsStrategy;
@@ -195,6 +196,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelec
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSubstringPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTableDefinitionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryArithmeticExpressionPsStrategy;
@@ -366,6 +368,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final ReferencesItemPsStrategy referencesItemPsStrategy = new DefaultReferencesItemPsStrategy();
+
+    @Default
+    private final TableDefinitionPsStrategy tableDefinitionPsStrategy = new DefaultTableDefinitionPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -694,7 +699,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(TableDefinition item, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return tableDefinitionPsStrategy.handle(item, this, ctx);
     }
 
     @Override
