@@ -970,14 +970,11 @@ class PreparedStatementVisitorTest {
                                 AggregateCall.count(ColumnReference.of("User", "id")),
                                 List.of(Literal.of(1), Literal.of(2), Literal.of(3)))))
                 .build();
-        // NOTA: il visitor lancia UnsupportedOperationException per In, quindi qui ci aspettiamo eccezione
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        try {
-            visitor.visit(selectStmt, new AstContext());
-            throw new AssertionError("Expected UnsupportedOperationException for IN in HAVING");
-        } catch (UnsupportedOperationException e) {
-            // ok
-        }
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql())
+                .isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") IN (?, ?, ?)");
+        assertThat(result.parameters()).containsExactly(1, 2, 3);
     }
 
     @Test
@@ -1045,7 +1042,7 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
-                        "SELECT \"id\", \"name\" FROM \"User\" WHERE (\"id\" > ?) AND (\"name\" LIKE ?) ORDER BY \"name\" ASC, \"id\" DESC OFFSET 30 ROWS FETCH NEXT 15 ROWS ONLY");
+                        "SELECT \"id\" FROM \"User\" WHERE (\"id\" > ?) AND (\"name\" LIKE ?) ORDER BY \"name\" ASC, \"id\" DESC OFFSET 30 ROWS FETCH NEXT 15 ROWS ONLY");
         assertThat(result.parameters()).containsExactly(100, "John%");
     }
 

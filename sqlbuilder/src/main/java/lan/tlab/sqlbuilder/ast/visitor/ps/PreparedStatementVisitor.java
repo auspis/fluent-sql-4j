@@ -88,6 +88,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertValuesPsStrategy;
@@ -116,6 +117,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefau
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultGroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultHavingClausePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertValuesPsStrategy;
@@ -236,6 +238,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final BetweenPsStrategy betweenPsStrategy = new DefaultBetweenPsStrategy();
 
+    @Default
+    private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
+
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
         return insertStatementPsStrategy.handle(stmt, this, ctx);
@@ -353,7 +358,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(In expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return inPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
