@@ -136,6 +136,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReplacePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.RoundPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SimpleDataTypePsStrategy;
@@ -210,6 +211,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultRefer
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReplacePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultRoundPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultScalarExpressionProjectionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultScalarSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSimpleDataTypePsStrategy;
@@ -438,6 +440,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final UnaryStringPsStrategy unaryStringPsStrategy = new DefaultUnaryStringPsStrategy();
+
+    @Default
+    private final ScalarSubqueryPsStrategy scalarSubqueryPsStrategy = new DefaultScalarSubqueryPsStrategy();
 
     @Default
     private final CreateTableStatementPsStrategy createTableStatementPsStrategy =
@@ -806,7 +811,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(ScalarSubquery expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return scalarSubqueryPsStrategy.handle(expression, this, ctx);
     }
 
     @Override

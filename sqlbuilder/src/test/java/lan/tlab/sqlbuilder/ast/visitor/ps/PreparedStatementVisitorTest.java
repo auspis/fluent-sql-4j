@@ -31,6 +31,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.NullScalarExpression;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
@@ -1901,6 +1902,28 @@ class PreparedStatementVisitorTest {
 
         assertThat(result.sql()).isEqualTo("DEFAULT 'active'");
         assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void scalarSubqueryIntegration() {
+        SelectStatement innerSelect = SelectStatement.builder()
+                .select(Select.of(new AggregationFunctionProjection(AggregateCall.countStar())))
+                .from(From.of(new Table("users")))
+                .where(Where.of(Comparison.eq(ColumnReference.of("users", "active"), Literal.of(true))))
+                .build();
+
+        ScalarSubquery subquery =
+                ScalarSubquery.builder().tableExpression(innerSelect).build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(subquery, new AstContext());
+
+        assertThat(result.sql()).startsWith("(");
+        assertThat(result.sql()).endsWith(")");
+        assertThat(result.sql()).contains("SELECT COUNT(*)");
+        assertThat(result.sql()).contains("FROM \"users\"");
+        assertThat(result.sql()).contains("WHERE");
+        assertThat(result.parameters()).containsExactly(true);
     }
 
     @Test
