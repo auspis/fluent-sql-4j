@@ -26,6 +26,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.expression.scalar.NullScalarExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDate;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentDateTime;
@@ -1689,5 +1690,32 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"numbers\" WHERE MOD(\"value\", ?) = ?");
         assertThat(result.parameters()).containsExactly(3, 0);
+    }
+
+    @Test
+    void selectNullScalarExpression() {
+        var nullExpression = new NullScalarExpression();
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(nullExpression)))
+                .from(From.of(new Table("dummy")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT NULL FROM \"dummy\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void whereNullScalarExpressionComparison() {
+        var nullExpression = new NullScalarExpression();
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "id"))))
+                .from(From.of(new Table("users")))
+                .where(Where.of(Comparison.eq(ColumnReference.of("users", "status"), nullExpression)))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"users\" WHERE \"status\" = NULL");
+        assertThat(result.parameters()).isEmpty();
     }
 }
