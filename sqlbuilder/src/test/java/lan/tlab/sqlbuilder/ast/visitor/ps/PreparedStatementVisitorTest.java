@@ -35,6 +35,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.DataLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
@@ -1607,5 +1608,45 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"comments\" WHERE CHARACTER_LENGTH(\"content\") < ?");
         assertThat(result.parameters()).containsExactly(280);
+    }
+
+    @Test
+    void selectDataLengthFunction() {
+        var dataLengthFunction = new DataLength(ColumnReference.of("files", "content"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(dataLengthFunction)))
+                .from(From.of(new Table("files")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT DATALENGTH(\"content\") FROM \"files\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectDataLengthWithLiteral() {
+        var dataLengthFunction = new DataLength(Literal.of("Hello World"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(dataLengthFunction)))
+                .from(From.of(new Table("dummy")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT DATALENGTH(?) FROM \"dummy\"");
+        assertThat(result.parameters()).containsExactly("Hello World");
+    }
+
+    @Test
+    void whereDataLengthGreaterThan() {
+        var dataLengthFunction = new DataLength(ColumnReference.of("files", "binary_data"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("files", "id"))))
+                .from(From.of(new Table("files")))
+                .where(Where.of(Comparison.gt(dataLengthFunction, Literal.of(1024))))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"files\" WHERE DATALENGTH(\"binary_data\") > ?");
+        assertThat(result.parameters()).containsExactly(1024);
     }
 }

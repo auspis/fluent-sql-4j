@@ -92,6 +92,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ConcatPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CurrentDateTimePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DataLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
@@ -139,6 +140,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCompa
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultConcatPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurrentDatePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCurrentDateTimePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDataLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDateArithmeticPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDeleteStatementPsStrategy;
@@ -314,6 +316,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final CharacterLengthPsStrategy characterLengthPsStrategy = new DefaultCharacterLengthPsStrategy();
+
+    @Default
+    private final DataLengthPsStrategy dataLengthPsStrategy = new DefaultDataLengthPsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -526,7 +531,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(DataLength functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return dataLengthPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
