@@ -34,6 +34,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArit
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Mod;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Power;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
@@ -1717,5 +1718,45 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"users\" WHERE \"status\" = NULL");
         assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectPowerFunction() {
+        var powerFunction = new Power(Literal.of(2), Literal.of(8));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(powerFunction)))
+                .from(From.of(new Table("dummy")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT POWER(?, ?) FROM \"dummy\"");
+        assertThat(result.parameters()).containsExactly(2, 8);
+    }
+
+    @Test
+    void selectPowerWithColumn() {
+        var powerFunction = new Power(ColumnReference.of("math", "base"), Literal.of(3));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(powerFunction)))
+                .from(From.of(new Table("math")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT POWER(\"base\", ?) FROM \"math\"");
+        assertThat(result.parameters()).containsExactly(3);
+    }
+
+    @Test
+    void wherePowerGreaterThan() {
+        var powerFunction = new Power(ColumnReference.of("calculations", "value"), Literal.of(2));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("calculations", "id"))))
+                .from(From.of(new Table("calculations")))
+                .where(Where.of(Comparison.gt(powerFunction, Literal.of(100))))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"calculations\" WHERE POWER(\"value\", ?) > ?");
+        assertThat(result.parameters()).containsExactly(2, 100);
     }
 }

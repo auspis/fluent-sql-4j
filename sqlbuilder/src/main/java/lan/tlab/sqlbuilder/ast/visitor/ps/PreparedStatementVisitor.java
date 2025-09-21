@@ -119,6 +119,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullScalarExpressionPsStrateg
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PowerPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
@@ -169,6 +170,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullS
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPaginationPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPowerPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectStatementPsStrategy;
@@ -321,6 +323,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final NullScalarExpressionPsStrategy nullScalarExpressionPsStrategy =
             new DefaultNullScalarExpressionPsStrategy();
+
+    @Default
+    private final PowerPsStrategy powerPsStrategy = new DefaultPowerPsStrategy();
 
     @Default
     private final CharLengthPsStrategy charLengthPsStrategy = new DefaultCharLengthPsStrategy();
@@ -557,7 +562,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Power functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return powerPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
