@@ -83,6 +83,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AggregationFunctionProjection
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AndOrPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.AsPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BetweenPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BinaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
@@ -117,6 +118,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggre
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAndOrPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAsPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBetweenPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBinaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultDefaultValuesPsStrategy;
@@ -247,6 +249,10 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final BetweenPsStrategy betweenPsStrategy = new DefaultBetweenPsStrategy();
+
+    @Default
+    private final BinaryArithmeticExpressionPsStrategy binaryArithmeticExpressionPsStrategy =
+            new DefaultBinaryArithmeticExpressionPsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -399,7 +405,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(BinaryArithmeticExpression expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return binaryArithmeticExpressionPsStrategy.handle(expression, this, ctx);
     }
 
     @Override

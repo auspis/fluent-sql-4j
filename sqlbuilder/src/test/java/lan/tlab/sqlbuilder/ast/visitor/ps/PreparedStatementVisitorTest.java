@@ -23,6 +23,7 @@ import lan.tlab.sqlbuilder.ast.expression.bool.logical.Not;
 import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
@@ -1123,5 +1124,70 @@ class PreparedStatementVisitorTest {
         PsDto psNoWhere = visitor.visit(stmtNoWhere, new AstContext());
         assertThat(psNoWhere.sql()).isEqualTo("DELETE FROM users");
         assertThat(psNoWhere.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithArithmeticAddition() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        ArithmeticExpression.addition(ColumnReference.of("Product", "price"), Literal.of(10)))))
+                .from(From.of(new Table("Product")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT (\"price\" + ?) FROM \"Product\"");
+        assertThat(result.parameters()).containsExactly(10);
+    }
+
+    @Test
+    void selectWithArithmeticSubtraction() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        ArithmeticExpression.subtraction(Literal.of(100), ColumnReference.of("Product", "discount")))))
+                .from(From.of(new Table("Product")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT (? - \"discount\") FROM \"Product\"");
+        assertThat(result.parameters()).containsExactly(100);
+    }
+
+    @Test
+    void selectWithArithmeticMultiplication() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ArithmeticExpression.multiplication(
+                        ColumnReference.of("Order", "quantity"), ColumnReference.of("Product", "price")))))
+                .from(From.of(new Table("Order")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT (\"quantity\" * \"price\") FROM \"Order\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithArithmeticDivision() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        ArithmeticExpression.division(ColumnReference.of("Customer", "score"), Literal.of(2)))))
+                .from(From.of(new Table("Customer")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT (\"score\" / ?) FROM \"Customer\"");
+        assertThat(result.parameters()).containsExactly(2);
+    }
+
+    @Test
+    void selectWithArithmeticModulo() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        ArithmeticExpression.modulo(ColumnReference.of("User", "id"), Literal.of(10)))))
+                .from(From.of(new Table("User")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT (\"id\" % ?) FROM \"User\"");
+        assertThat(result.parameters()).containsExactly(10);
     }
 }

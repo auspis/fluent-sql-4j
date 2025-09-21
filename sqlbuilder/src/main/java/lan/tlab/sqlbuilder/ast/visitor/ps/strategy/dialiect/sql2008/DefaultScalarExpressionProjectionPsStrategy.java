@@ -1,6 +1,5 @@
 package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
-import java.util.List;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.Expression;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
@@ -27,6 +26,6 @@ public class DefaultScalarExpressionProjectionPsStrategy implements ScalarExpres
         if (!alias.isBlank()) {
             sql += " AS " + escapeStrategy.apply(alias);
         }
-        return new PsDto(sql, List.of());
+        return new PsDto(sql, exprResult.parameters());
     }
 }
