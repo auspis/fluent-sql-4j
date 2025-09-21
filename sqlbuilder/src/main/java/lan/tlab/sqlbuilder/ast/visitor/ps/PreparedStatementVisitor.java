@@ -87,6 +87,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BinaryArithmeticExpressionPsS
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CharLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CharacterLengthPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CheckConstraintPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
@@ -159,6 +160,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBinar
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCharLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCharacterLengthPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCheckConstraintPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnDefinitionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
@@ -413,6 +415,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     @Default
     private final ForeignKeyConstraintPsStrategy foreignKeyConstraintPsStrategy =
             new DefaultForeignKeyConstraintPsStrategy();
+
+    @Default
+    private final CheckConstraintPsStrategy checkConstraintPsStrategy = new DefaultCheckConstraintPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -786,7 +791,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(CheckConstraint constraint, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return checkConstraintPsStrategy.handle(constraint, this, ctx);
     }
 
     @Override

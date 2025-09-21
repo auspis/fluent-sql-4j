@@ -1873,6 +1873,26 @@ class PreparedStatementVisitorTest {
     }
 
     @Test
+    void createTableStatementWithCheckConstraint() {
+        Comparison ageCheck = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
+        CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
+                .table(new Table("users"))
+                .columns(List.of(
+                        ColumnDefinitionBuilder.integer("id").build(),
+                        ColumnDefinitionBuilder.integer("age").build()))
+                .constraint(new Constraint.CheckConstraint(ageCheck))
+                .build());
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(createTable, new AstContext());
+
+        assertThat(result.sql()).startsWith("CREATE TABLE");
+        assertThat(result.sql()).contains("CHECK");
+        assertThat(result.sql()).contains("age");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
     void roundInSelectClause() {
         Round roundFunction = Round.of(ColumnReference.of("products", "price"), Literal.of(2));
         SelectStatement selectStmt = SelectStatement.builder()
