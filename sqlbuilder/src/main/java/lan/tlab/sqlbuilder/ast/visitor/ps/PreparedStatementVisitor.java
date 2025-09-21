@@ -112,6 +112,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LeftPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ModPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
@@ -160,6 +161,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLeftP
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLiteralPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultModPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullBooleanExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoinPsStrategy;
@@ -310,6 +312,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final LengthPsStrategy lengthPsStrategy = new DefaultLengthPsStrategy();
+
+    @Default
+    private final ModPsStrategy modPsStrategy = new DefaultModPsStrategy();
 
     @Default
     private final CharLengthPsStrategy charLengthPsStrategy = new DefaultCharLengthPsStrategy();
@@ -536,7 +541,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Mod functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return modPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override

@@ -32,6 +32,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.CurrentD
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArithmetic;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Mod;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
@@ -1648,5 +1649,45 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"files\" WHERE DATALENGTH(\"binary_data\") > ?");
         assertThat(result.parameters()).containsExactly(1024);
+    }
+
+    @Test
+    void selectModFunction() {
+        var modFunction = new Mod(ColumnReference.of("orders", "total"), Literal.of(100));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(modFunction)))
+                .from(From.of(new Table("orders")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT MOD(\"total\", ?) FROM \"orders\"");
+        assertThat(result.parameters()).containsExactly(100);
+    }
+
+    @Test
+    void selectModWithTwoLiterals() {
+        var modFunction = new Mod(Literal.of(17), Literal.of(5));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(modFunction)))
+                .from(From.of(new Table("dummy")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT MOD(?, ?) FROM \"dummy\"");
+        assertThat(result.parameters()).containsExactly(17, 5);
+    }
+
+    @Test
+    void whereModEqualsZero() {
+        var modFunction = new Mod(ColumnReference.of("numbers", "value"), Literal.of(3));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("numbers", "id"))))
+                .from(From.of(new Table("numbers")))
+                .where(Where.of(Comparison.eq(modFunction, Literal.of(0))))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"numbers\" WHERE MOD(\"value\", ?) = ?");
+        assertThat(result.parameters()).containsExactly(3, 0);
     }
 }
