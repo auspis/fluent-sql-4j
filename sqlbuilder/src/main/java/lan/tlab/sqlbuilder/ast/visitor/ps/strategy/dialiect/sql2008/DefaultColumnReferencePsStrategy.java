@@ -17,7 +17,7 @@ public class DefaultColumnReferencePsStrategy implements ColumnReferencePsStrate
             escapeStrategy = psVisitor.getEscapeStrategy();
         }
 
-        boolean qualify = ctx.getScope() == AstContext.Scope.JOIN_ON;
+        boolean qualify = ctx.getScope() == AstContext.Scope.JOIN_ON || ctx.getScope() == AstContext.Scope.UNION;
         String sql;
         if (qualify && !col.getTable().isBlank()) {
             sql = escapeStrategy.apply(col.getTable()) + "." + escapeStrategy.apply(col.getColumn());
