@@ -37,6 +37,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractD
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Mod;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Power;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.number.Round;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
@@ -1822,5 +1823,51 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql()).contains("id");
         assertThat(result.sql()).contains("name");
         assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void roundInSelectClause() {
+        Round roundFunction = Round.of(ColumnReference.of("products", "price"), Literal.of(2));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(roundFunction, new As("rounded_price"))))
+                .from(From.of(new Table("products")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT ROUND(\"price\", ?) AS \"rounded_price\" FROM \"products\"");
+        assertThat(result.parameters()).containsExactly(2);
+    }
+
+    @Test
+    void roundInWhereClause() {
+        Round roundFunction = Round.of(ColumnReference.of("orders", "total"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("orders", "id"))))
+                .from(From.of(new Table("orders")))
+                .where(Where.of(Comparison.gt(roundFunction, Literal.of(100))))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"orders\" WHERE ROUND(\"total\") > ?");
+        assertThat(result.parameters()).containsExactly(100);
+    }
+
+    @Test
+    void roundWithMixedParameters() {
+        Round roundFunction = Round.of(Literal.of(3.14159), ColumnReference.of("settings", "precision"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(roundFunction, new As("pi_rounded"))))
+                .from(From.of(new Table("settings")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT ROUND(?, \"precision\") AS \"pi_rounded\" FROM \"settings\"");
+        assertThat(result.parameters()).containsExactly(3.14159);
     }
 }

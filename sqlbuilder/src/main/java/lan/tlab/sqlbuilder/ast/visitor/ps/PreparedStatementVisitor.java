@@ -122,6 +122,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PowerPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ReplacePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.RoundPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
@@ -175,6 +176,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOrder
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPaginationPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultPowerPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultReplacePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultRoundPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectStatementPsStrategy;
@@ -333,6 +335,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final ReplacePsStrategy replacePsStrategy = new DefaultReplacePsStrategy();
+
+    @Default
+    private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
 
     @Default
     private final CreateTableStatementPsStrategy createTableStatementPsStrategy =
@@ -583,7 +588,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Round functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return roundPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
