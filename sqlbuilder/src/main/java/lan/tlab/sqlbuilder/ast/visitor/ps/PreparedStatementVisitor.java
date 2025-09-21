@@ -107,6 +107,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertValuesPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IntervalPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNullPsStrategy;
@@ -167,6 +168,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInPsS
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertValuesPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIntersectExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIntervalPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNullPsStrategy;
@@ -328,6 +330,10 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final ExtractDatePartPsStrategy extractDatePartPsStrategy = new DefaultExtractDatePartPsStrategy();
+
+    @Default
+    private final IntersectExpressionPsStrategy intersectExpressionPsStrategy =
+            new DefaultIntersectExpressionPsStrategy();
 
     @Default
     private final IntervalPsStrategy intervalPsStrategy = new DefaultIntervalPsStrategy();
@@ -653,7 +659,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(IntersectExpression expression, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return intersectExpressionPsStrategy.handle(expression, this, ctx);
     }
 
     @Override
