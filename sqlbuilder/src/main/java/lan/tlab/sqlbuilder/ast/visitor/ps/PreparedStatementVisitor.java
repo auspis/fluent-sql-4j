@@ -131,6 +131,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.RoundPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SimpleDataTypePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SubstringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
@@ -196,6 +197,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultRound
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultScalarExpressionProjectionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelectStatementPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSimpleDataTypePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSubstringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTableDefinitionPsStrategy;
@@ -376,6 +378,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final ColumnDefinitionPsStrategy columnDefinitionPsStrategy = new DefaultColumnDefinitionPsStrategy();
+
+    @Default
+    private final SimpleDataTypePsStrategy simpleDataTypePsStrategy = new DefaultSimpleDataTypePsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -714,7 +719,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(SimpleDataType type, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return simpleDataTypePsStrategy.handle(type, this, ctx);
     }
 
     @Override
