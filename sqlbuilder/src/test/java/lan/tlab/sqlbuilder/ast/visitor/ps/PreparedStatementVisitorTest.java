@@ -34,6 +34,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractD
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
@@ -1484,5 +1485,45 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"products\" WHERE LEFT(\"code\", ?) = ?");
         assertThat(result.parameters()).containsExactly(2, "AB");
+    }
+
+    @Test
+    void selectWithLengthFunction() {
+        var lengthFunction = new Length(ColumnReference.of("users", "email"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(lengthFunction)))
+                .from(From.of(new Table("users")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT LENGTH(\"email\") FROM \"users\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void selectWithLengthLiteralString() {
+        var lengthFunction = new Length(Literal.of("Test String"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(lengthFunction)))
+                .from(From.of(new Table("dummy")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT LENGTH(?) FROM \"dummy\"");
+        assertThat(result.parameters()).containsExactly("Test String");
+    }
+
+    @Test
+    void selectWithLengthInWhere() {
+        var lengthFunction = new Length(ColumnReference.of("users", "username"));
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "id"))))
+                .from(From.of(new Table("users")))
+                .where(Where.of(Comparison.gt(lengthFunction, Literal.of(8))))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"users\" WHERE LENGTH(\"username\") > ?");
+        assertThat(result.parameters()).containsExactly(8);
     }
 }
