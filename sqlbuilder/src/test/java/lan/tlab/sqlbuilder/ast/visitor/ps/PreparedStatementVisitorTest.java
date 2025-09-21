@@ -27,6 +27,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
@@ -1251,5 +1252,44 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CAST(? AS DATE) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly(123);
+    }
+
+    @Test
+    void selectWithConcatTwoLiterals() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(Concat.concat(Literal.of("Hello"), Literal.of("World")))))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CONCAT(?, ?) FROM \"Test\"");
+        assertThat(result.parameters()).containsExactly("Hello", "World");
+    }
+
+    @Test
+    void selectWithConcatLiteralAndColumn() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        Concat.concat(Literal.of("Name: "), ColumnReference.of("users", "name")))))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CONCAT(?, \"name\") FROM \"Test\"");
+        assertThat(result.parameters()).containsExactly("Name: ");
+    }
+
+    @Test
+    void selectWithConcatWithSeparator() {
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(
+                        Concat.concatWithSeparator(" - ", Literal.of("First"), Literal.of("Second")))))
+                .from(From.of(new Table("Test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT CONCAT_WS(?, ?, ?) FROM \"Test\"");
+        assertThat(result.parameters()).containsExactly(" - ", "First", "Second");
     }
 }
