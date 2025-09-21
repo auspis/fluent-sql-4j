@@ -1471,4 +1471,18 @@ class PreparedStatementVisitorTest {
         assertThat(result.sql()).isEqualTo("SELECT LEFT(\"code\", ?) FROM \"products\"");
         assertThat(result.parameters()).containsExactly(2);
     }
+
+    @Test
+    void selectWithLeftInWhere() {
+        var leftFunction = Left.of(ColumnReference.of("products", "code"), 2);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("products", "id"))))
+                .from(From.of(new Table("products")))
+                .where(Where.of(Comparison.eq(leftFunction, Literal.of("AB"))))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"products\" WHERE LEFT(\"code\", ?) = ?");
+        assertThat(result.parameters()).containsExactly(2, "AB");
+    }
 }
