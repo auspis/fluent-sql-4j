@@ -87,6 +87,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.BinaryArithmeticExpressionPsS
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CharLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.CharacterLengthPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ConcatPsStrategy;
@@ -151,6 +152,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultBinar
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCastPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCharLengthPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultCharacterLengthPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnDefinitionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultColumnReferencePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultComparisonPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultConcatPsStrategy;
@@ -371,6 +373,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final TableDefinitionPsStrategy tableDefinitionPsStrategy = new DefaultTableDefinitionPsStrategy();
+
+    @Default
+    private final ColumnDefinitionPsStrategy columnDefinitionPsStrategy = new DefaultColumnDefinitionPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -704,7 +709,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(ColumnDefinition item, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return columnDefinitionPsStrategy.handle(item, this, ctx);
     }
 
     @Override
