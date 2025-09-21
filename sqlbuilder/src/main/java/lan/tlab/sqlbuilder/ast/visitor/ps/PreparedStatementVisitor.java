@@ -129,6 +129,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SubstringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
@@ -184,6 +185,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelec
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSubstringPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTablePsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTrimPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnaryArithmeticExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnionExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUpdateStatementPsStrategy;
@@ -343,6 +345,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final SubstringPsStrategy substringPsStrategy = new DefaultSubstringPsStrategy();
+
+    @Default
+    private final TrimPsStrategy trimPsStrategy = new DefaultTrimPsStrategy();
 
     @Default
     private final CreateTableStatementPsStrategy createTableStatementPsStrategy =
@@ -603,7 +608,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Trim functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return trimPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override

@@ -46,6 +46,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Replace;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Substring;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
@@ -1916,5 +1917,51 @@ class PreparedStatementVisitorTest {
 
         assertThat(result.sql()).isEqualTo("SELECT SUBSTRING(?, ?) AS \"greeting\" FROM \"dual\"");
         assertThat(result.parameters()).containsExactly("Hello World", 7);
+    }
+
+    @Test
+    void trimInSelectClause() {
+        var trimFunction = Trim.trim(ColumnReference.of("users", "name"));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(trimFunction, new As("clean_name"))))
+                .from(From.of(new Table("users")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT TRIM(\"name\") AS \"clean_name\" FROM \"users\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void trimInWhereClause() {
+        var trimFunction = Trim.trimBoth(ColumnReference.of("products", "code"));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("products", "id"))))
+                .from(From.of(new Table("products")))
+                .where(Where.of(Comparison.eq(trimFunction, Literal.of("ABC123"))))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"products\" WHERE TRIM(BOTH \"code\") = ?");
+        assertThat(result.parameters()).containsExactly("ABC123");
+    }
+
+    @Test
+    void trimWithCharactersToRemove() {
+        var trimFunction = Trim.trimLeading(Literal.of("*"), Literal.of("***data***"));
+        var selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(trimFunction, new As("cleaned"))))
+                .from(From.of(new Table("dual")))
+                .build();
+
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("SELECT TRIM(LEADING ? FROM ?) AS \"cleaned\" FROM \"dual\"");
+        assertThat(result.parameters()).containsExactly("*", "***data***");
     }
 }
