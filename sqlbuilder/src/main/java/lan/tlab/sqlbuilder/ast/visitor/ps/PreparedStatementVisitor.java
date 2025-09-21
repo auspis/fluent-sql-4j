@@ -105,6 +105,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IntervalPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IsNullPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LeftPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NotPsStrategy;
@@ -148,6 +149,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInser
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIntervalPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNotNullPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIsNullPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLeftPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLikePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLiteralPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotPsStrategy;
@@ -294,6 +296,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final IntervalPsStrategy intervalPsStrategy = new DefaultIntervalPsStrategy();
+
+    @Default
+    private final LeftPsStrategy leftPsStrategy = new DefaultLeftPsStrategy();
 
     @Default
     private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
@@ -486,7 +491,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Left functionCall, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return leftPsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override

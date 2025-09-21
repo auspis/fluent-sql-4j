@@ -33,6 +33,7 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.DateArit
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Concat;
+import lan.tlab.sqlbuilder.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.sqlbuilder.ast.expression.scalar.convert.Cast;
 import lan.tlab.sqlbuilder.ast.expression.set.UnionExpression;
 import lan.tlab.sqlbuilder.ast.statement.DeleteStatement;
@@ -1430,5 +1431,44 @@ class PreparedStatementVisitorTest {
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"logs\" WHERE EXTRACT(DAY FROM \"timestamp\") = ?");
         assertThat(result.parameters()).containsExactly(25);
+    }
+
+    @Test
+    void selectWithLeftFunction() {
+        var leftFunction = Left.of(ColumnReference.of("users", "full_name"), 5);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(leftFunction)))
+                .from(From.of(new Table("users")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT LEFT(\"full_name\", ?) FROM \"users\"");
+        assertThat(result.parameters()).containsExactly(5);
+    }
+
+    @Test
+    void selectWithLeftLiteralString() {
+        var leftFunction = Left.of(Literal.of("Hello World"), 3);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(leftFunction)))
+                .from(From.of(new Table("test")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT LEFT(?, ?) FROM \"test\"");
+        assertThat(result.parameters()).containsExactly("Hello World", 3);
+    }
+
+    @Test
+    void selectWithLeftInSelect() {
+        var leftFunction = Left.of(ColumnReference.of("products", "code"), 2);
+        SelectStatement selectStmt = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(leftFunction)))
+                .from(From.of(new Table("products")))
+                .build();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = visitor.visit(selectStmt, new AstContext());
+        assertThat(result.sql()).isEqualTo("SELECT LEFT(\"code\", ?) FROM \"products\"");
+        assertThat(result.parameters()).containsExactly(2);
     }
 }
