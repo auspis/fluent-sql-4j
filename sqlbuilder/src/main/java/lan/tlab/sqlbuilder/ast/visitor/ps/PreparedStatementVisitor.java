@@ -109,6 +109,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.SortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.TablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.WhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggregateCallPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultAggregationFunctionProjectionPsStrategy;
@@ -141,6 +142,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSelec
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultSortingPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultTablePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUnionExpressionPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultUpdateStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultWhereClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lombok.AccessLevel;
@@ -257,6 +259,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     private final NullBooleanExpressionPsStrategy nullBooleanExpressionPsStrategy =
             new DefaultNullBooleanExpressionPsStrategy();
 
+    @Default
+    private final UpdateStatementPsStrategy updateStatementPsStrategy = new DefaultUpdateStatementPsStrategy();
+
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
         return insertStatementPsStrategy.handle(stmt, this, ctx);
@@ -299,7 +304,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(UpdateStatement updateStatement, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return updateStatementPsStrategy.handle(updateStatement, this, ctx);
     }
 
     @Override
