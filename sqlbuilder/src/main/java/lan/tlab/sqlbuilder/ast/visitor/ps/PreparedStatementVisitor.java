@@ -105,6 +105,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromSubqueryPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.HavingClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.IndexPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.InsertValuesPsStrategy;
@@ -173,6 +174,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromS
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultGroupByClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultHavingClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIndexPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertSourcePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertValuesPsStrategy;
@@ -392,6 +394,9 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Default
     private final PrimaryKeyPsStrategy primaryKeyPsStrategy = new DefaultPrimaryKeyPsStrategy();
+
+    @Default
+    private final IndexPsStrategy indexPsStrategy = new DefaultIndexPsStrategy();
 
     @Default
     private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
@@ -745,7 +750,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Index index, AstContext ctx) {
-        throw new UnsupportedOperationException();
+        return indexPsStrategy.handle(index, this, ctx);
     }
 
     @Override
