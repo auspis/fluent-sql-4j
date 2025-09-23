@@ -32,7 +32,7 @@ This repository is a multi-module Java project managed with Maven. It is structu
 - never user java reflection to solve problems
 - Use AssertJ for assertions in tests
 - Use JUnit 5 for unit and integration tests
-- keep the test name compact avoiding to prefix it with `test` or `with` and explaining the expected behavior
+- keep the test name compact avoiding to prefix it with `test` or `with` or `handle` and explaining the expected behavior
 - Integration tests may use Testcontainers for database emulation
 - SQL code is generated using the project's SQL builder classes
 

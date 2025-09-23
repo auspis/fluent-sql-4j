@@ -3,7 +3,6 @@ package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
-import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
@@ -23,23 +22,17 @@ public class DefaultComparisonPsStrategy implements ComparisonPsStrategy {
             default -> throw new UnsupportedOperationException("Operator not supported: " + cmp.getOperator());
         }
 
-        String lhs;
-        if (cmp.getLhs() instanceof ColumnReference colLhs) {
-            PsDto lhsResult = colLhs.accept(visitor, ctx.copy());
-            lhs = lhsResult.sql();
-        } else {
-            lhs = cmp.getLhs().accept(visitor, ctx).sql();
-        }
-
-        String rhsSql;
         List<Object> params = new ArrayList<>();
-        if (cmp.getRhs() instanceof ColumnReference colRhs) {
-            rhsSql = colRhs.accept(visitor, ctx.copy()).sql();
-        } else {
-            PsDto rhsResult = cmp.getRhs().accept(visitor, ctx);
-            rhsSql = rhsResult.sql();
-            params.addAll(rhsResult.parameters());
-        }
+
+        // Handle LHS (Left Hand Side)
+        PsDto lhsResult = cmp.getLhs().accept(visitor, ctx.copy());
+        String lhs = lhsResult.sql();
+        params.addAll(lhsResult.parameters());
+
+        // Handle RHS (Right Hand Side)
+        PsDto rhsResult = cmp.getRhs().accept(visitor, ctx);
+        String rhsSql = rhsResult.sql();
+        params.addAll(rhsResult.parameters());
 
         return new PsDto(lhs + " " + operator + " " + rhsSql, params);
     }

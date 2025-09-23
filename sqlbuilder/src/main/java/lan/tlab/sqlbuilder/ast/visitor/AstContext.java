@@ -2,9 +2,10 @@ package lan.tlab.sqlbuilder.ast.visitor;
 
 public class AstContext {
     public enum Scope {
-        DEFAULT,
-        JOIN_ON
         // In futuro: WHERE, HAVING, GROUP_BY, ecc.
+        DEFAULT,
+        JOIN_ON,
+        UNION
     }
 
     private final Scope scope;
