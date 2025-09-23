@@ -18,12 +18,17 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         // WHERE ... (optional)
         PsDto whereResult = null;
         String whereClause = "";
-        if (stmt.getWhere() != null
-                && stmt.getWhere().getCondition() != null
-                && !(stmt.getWhere().getCondition()
-                        instanceof lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression)) {
+        if (stmt.getWhere() != null && stmt.getWhere().getCondition() != null) {
             whereResult = stmt.getWhere().accept(visitor, ctx);
-            whereClause = " WHERE " + whereResult.sql();
+            String whereSql = whereResult.sql();
+            if (!whereSql.isBlank()) {
+                // If the whereSql already starts with WHERE, don't prepend it
+                if (whereSql.trim().toUpperCase().startsWith("WHERE")) {
+                    whereClause = " " + whereSql.trim();
+                } else {
+                    whereClause = " WHERE " + whereSql;
+                }
+            }
         }
         // GROUP BY ... (optional)
         PsDto groupByResult = null;
@@ -49,18 +54,12 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
             orderByResult = stmt.getOrderBy().accept(visitor, ctx);
             orderByClause = " ORDER BY " + orderByResult.sql();
         }
-        // PAGINATION (LIMIT/OFFSET)
+        // PAGINATION - delegate to proper pagination strategy
+        PsDto paginationResult = null;
         String paginationClause = "";
-        if (stmt.getPagination() != null && stmt.getPagination().getPerPage() != null) {
-            Integer perPage = stmt.getPagination().getPerPage();
-            Integer page = stmt.getPagination().getPage();
-            if (perPage != null) {
-                paginationClause = " LIMIT " + perPage;
-                if (page != null && page > 0) {
-                    int offset = page * perPage;
-                    paginationClause += " OFFSET " + offset;
-                }
-            }
+        if (stmt.getPagination() != null && stmt.getPagination().isActive()) {
+            paginationResult = stmt.getPagination().accept(visitor, ctx);
+            paginationClause = paginationResult.sql();
         }
         String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause
                 + havingClause + orderByClause + paginationClause;
@@ -78,6 +77,9 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         }
         if (orderByResult != null) {
             allParams.addAll(orderByResult.parameters());
+        }
+        if (paginationResult != null) {
+            allParams.addAll(paginationResult.parameters());
         }
         return new PsDto(sql, allParams);
     }
