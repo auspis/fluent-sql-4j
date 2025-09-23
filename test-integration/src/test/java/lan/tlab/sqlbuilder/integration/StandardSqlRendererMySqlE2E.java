@@ -40,7 +40,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class StandardSqlRendererMySqlIT {
+public class StandardSqlRendererMySqlE2E {
     @Container
     private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("testdb")
