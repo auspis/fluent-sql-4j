@@ -1,5 +1,6 @@
 package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
@@ -17,7 +18,14 @@ public class DefaultSelectClausePsStrategy implements SelectClausePsStrategy {
             return new PsDto("*", List.of());
         }
 
-        String sql = projections.stream().map(p -> p.accept(visitor, ctx).sql()).collect(Collectors.joining(", "));
-        return new PsDto(sql, List.of());
+        List<Object> allParameters = new ArrayList<>();
+        String sql = projections.stream()
+                .map(p -> {
+                    PsDto result = p.accept(visitor, ctx);
+                    allParameters.addAll(result.parameters());
+                    return result.sql();
+                })
+                .collect(Collectors.joining(", "));
+        return new PsDto(sql, allParameters);
     }
 }

@@ -3,6 +3,8 @@ package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lan.tlab.sqlbuilder.ast.expression.item.InsertData;
+import lan.tlab.sqlbuilder.ast.expression.item.InsertData.DefaultValues;
 import lan.tlab.sqlbuilder.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
@@ -19,17 +21,26 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
         // Table name
         Table table = (Table) stmt.getTable();
         String tableName = table.getName();
-        // Column names
-        List<String> columns = stmt.getColumns().stream()
-                .map(ColumnReference::getColumn)
-                .map(name -> "\"" + name + "\"")
-                .collect(Collectors.toList());
-        String columnList = String.join(", ", columns);
-        // Placeholders and parameters
-        String placeholders = "";
-        List<Object> params = new ArrayList<>();
-        if (stmt.getData() instanceof InsertValues values) {
-            placeholders = values.getValueExpressions().stream()
+
+        InsertData data = stmt.getData();
+
+        if (data instanceof DefaultValues defaultValues) {
+            // Handle DEFAULT VALUES case
+            PsDto dataResult = defaultValues.accept(visitor, ctx);
+            String sql = "INSERT INTO \"" + tableName + "\" " + dataResult.sql();
+            return new PsDto(sql, dataResult.parameters());
+        } else if (data instanceof InsertValues values) {
+            // Handle explicit values case
+            // Column names
+            List<String> columns = stmt.getColumns().stream()
+                    .map(ColumnReference::getColumn)
+                    .map(name -> "\"" + name + "\"")
+                    .collect(Collectors.toList());
+            String columnList = String.join(", ", columns);
+
+            // Placeholders and parameters
+            List<Object> params = new ArrayList<>();
+            String placeholders = values.getValueExpressions().stream()
                     .map(val -> {
                         if (val instanceof Literal<?> literal) {
                             params.add(literal.getValue());
@@ -39,8 +50,11 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
                         return "?";
                     })
                     .collect(Collectors.joining(", "));
+
+            String sql = "INSERT INTO \"" + tableName + "\" (" + columnList + ") VALUES (" + placeholders + ")";
+            return new PsDto(sql, params);
+        } else {
+            throw new UnsupportedOperationException("Unsupported InsertData type: " + data.getClass());
         }
-        String sql = "INSERT INTO \"" + tableName + "\" (" + columnList + ") VALUES (" + placeholders + ")";
-        return new PsDto(sql, params);
     }
 }

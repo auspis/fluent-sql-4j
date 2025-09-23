@@ -46,7 +46,7 @@ class DefaultSelectClausePsStrategyTest {
         Select select = Select.of(proj);
         PsDto result = strategy.handle(select, null, new AstContext());
         assertThat(result.sql()).isEqualTo("col1");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.parameters()).containsExactly(42);
     }
 
     @Test
@@ -57,6 +57,6 @@ class DefaultSelectClausePsStrategyTest {
         Select select = Select.of(p1, p2);
         PsDto result = strategy.handle(select, null, new AstContext());
         assertThat(result.sql()).isEqualTo("col1, col2");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.parameters()).containsExactly(1, 2);
     }
 }
