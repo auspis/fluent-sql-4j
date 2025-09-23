@@ -40,7 +40,7 @@ class DefaultScalarExpressionProjectionPsStrategyTest {
         ScalarExpressionProjection projection = new ScalarExpressionProjection(expr);
         PsDto dto = strategy.handle(projection, null, new AstContext());
         assertThat(dto.sql()).isEqualTo("foo");
-        assertThat(dto.parameters()).isEmpty();
+        assertThat(dto.parameters()).containsExactly(1);
     }
 
     @Test
@@ -58,7 +58,7 @@ class DefaultScalarExpressionProjectionPsStrategyTest {
         ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new As("   "));
         PsDto dto = strategy.handle(projection, null, new AstContext());
         assertThat(dto.sql()).isEqualTo("baz");
-        assertThat(dto.parameters()).isEmpty();
+        assertThat(dto.parameters()).containsExactly("x");
     }
 
     @Test
@@ -67,6 +67,6 @@ class DefaultScalarExpressionProjectionPsStrategyTest {
         ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new As("a"));
         PsDto dto = strategy.handle(projection, null, new AstContext());
         assertThat(dto.sql()).isEqualTo("col AS \"a\"");
-        assertThat(dto.parameters()).isEmpty();
+        assertThat(dto.parameters()).containsExactly(42, "foo");
     }
 }
