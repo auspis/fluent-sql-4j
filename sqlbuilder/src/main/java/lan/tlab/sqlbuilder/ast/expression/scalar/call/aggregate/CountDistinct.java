@@ -15,6 +15,6 @@ public class CountDistinct implements AggregateCall {
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
-        return null;
+        return visitor.visit(this, ctx);
     }
 }
