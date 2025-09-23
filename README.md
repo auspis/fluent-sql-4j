@@ -4,7 +4,7 @@
 
 The project is split into Maven modules:
 - `sqlbuilder`: contains the main code and unit tests
-- `test-integration`: contains only integration tests (slow, using Testcontainers)
+- `test-integration`: contains integration tests (fast H2 tests and slow E2E tests with Testcontainers)
 
 ## Install GIT hook
 
@@ -22,48 +22,59 @@ To reduce conflicts, a hook is provided to automatically format code with Spotle
 
 ## Run tests
 
-### To run unit  tests
+### To run fast tests (unit tests + H2 integration tests)
 
 ```bash
 ./mvnw test
 ```
 
-### To run all tests (unit + integration)
+### To run all tests (unit + H2 integration + E2E tests)
 
 ```bash
 ./mvnw verify
 ```
 
-## Integration test naming convention
+## Test naming convention
 
-Integration tests must use the `*IT.java` suffix (e.g. `MyFeatureIT.java`).
-This is required for the Maven Failsafe Plugin to detect and execute them correctly.
+- **Unit tests**: `*Test.java` suffix (e.g. `MyFeatureTest.java`)
+- **Integration tests (H2)**: `*Test.java` suffix (e.g. `PreparedStatementVisitorTest.java`)
+- **End-to-end tests (Testcontainers)**: `*E2E.java` suffix (e.g. `StandardSqlRendererMySqlE2E.java`)
 
-## How to run only integration tests
+This naming convention allows for:
+- Fast feedback during development: `./mvnw test` runs unit and H2 integration tests
+- Complete validation: `./mvnw verify` runs all tests including E2E tests
 
-To run only the integration tests (without running unit tests in other modules):
+## How to run specific test types
+
+### To run only H2 integration tests
 
 ```bash
-./mvnw verify -pl test-integration -am -DskipTests
+./mvnw test -pl test-integration -am
 ```
 
-This will:
-- Build all required modules (using `-am`)
-- Skip unit tests in dependencies (using `-DskipTests`)
-- Run only the integration tests in `test-integration` (using Failsafe)
+### To run only E2E tests
+
+```bash
+./mvnw verify -Dtest=skip -Dit.test="*E2E" -pl test-integration -am
+```
+
+### To run all integration tests (H2 + E2E)
+
+```bash
+./mvnw verify -pl test-integration -am
+```
 
 ### Technical details
 
-- Running `./mvnw test` will execute **only the unit tests** in the `sqlbuilder` module.
-- Integration tests are **NOT** executed, because they are in a separate module (`test-integration`) that contains only tests and no production code.
-- Integration tests are located only in the `test-integration` module.
-- The `test-integration` module depends on `sqlbuilder` and contains all the necessary dependencies for testing (JUnit, Testcontainers, etc).
-- The standard build cycle (`test`, `package`, `install`) on `sqlbuilder` excludes integration tests.
-- The build cycle on `test-integration` runs only the integration tests.
-- Integration tests must be named with the `*IT.java` suffix.
-- The Maven Failsafe Plugin is configured to run only these tests in the `test-integration` module.
-- Surefire is configured to exclude `*IT.java` files.
-- This ensures a clear separation between unit and integration tests.
+- Running `./mvnw test` will execute:
+  - **Unit tests** in the `sqlbuilder` module
+  - **H2 integration tests** in the `test-integration` module (fast, in-memory database)
+- Running `./mvnw verify` will additionally execute:
+  - **E2E tests** with Testcontainers in the `test-integration` module (slower, real databases)
+- The `test-integration` module depends on `sqlbuilder` and contains all the necessary dependencies for testing (JUnit, Testcontainers, H2, etc).
+- **H2 integration tests** are named with the `*Test.java` suffix and run with Surefire.
+- **E2E tests** are named with the `*E2E.java` suffix and run with Failsafe.
+- This ensures optimal development workflow: fast feedback with `test`, complete validation with `verify`.
 
 ## check updates
 
