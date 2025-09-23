@@ -24,7 +24,7 @@ public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrate
             PsDto colDto = item.getColumn().accept(visitor, ctx);
             // Valore
             PsDto valDto = item.getValue().accept(visitor, ctx);
-            setClauses.add(colDto.sql() + " = ?");
+            setClauses.add(colDto.sql() + " = " + valDto.sql());
             params.addAll(valDto.parameters());
         }
         String setSql = String.join(", ", setClauses);
