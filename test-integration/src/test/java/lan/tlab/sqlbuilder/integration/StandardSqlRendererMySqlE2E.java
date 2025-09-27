@@ -9,10 +9,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
@@ -42,6 +42,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class StandardSqlRendererMySqlE2E {
     @Container
+    @SuppressWarnings("resource")
     private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("testdb")
             .withUsername("test")
@@ -100,7 +101,7 @@ public class StandardSqlRendererMySqlE2E {
                 .orderBy(OrderBy.of(
                         Sorting.desc(ColumnReference.of("Customer", "name")),
                         Sorting.asc(ColumnReference.of("Customer", "createdAt"))))
-                .pagination(Pagination.builder().rows(5).offset(0).build())
+                .fetch(Fetch.builder().rows(5).offset(0).build())
                 .build();
         String sql = statement.accept(renderer, new AstContext());
         assertThat(sql)
