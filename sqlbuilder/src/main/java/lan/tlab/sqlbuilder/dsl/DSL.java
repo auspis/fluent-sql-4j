@@ -2,9 +2,20 @@ package lan.tlab.sqlbuilder.dsl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
+import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
+import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
+import lan.tlab.sqlbuilder.ast.visitor.AstContext;
+import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
 public class DSL {
+
+    private static final SqlRenderer SQL_RENDERER = SqlRenderer.builder().build();
 
     public static TableBuilder createTable(String tableName) {
         return new TableBuilder(tableName);
@@ -12,7 +23,8 @@ public class DSL {
 
     public static class TableBuilder {
         private final String tableName;
-        private final List<Column> columns = new ArrayList<>();
+        private final List<ColumnDefinition> columns = new ArrayList<>();
+        private final List<String> primaryKeyColumns = new ArrayList<>();
 
         public TableBuilder(String tableName) {
             this.tableName = tableName;
@@ -22,21 +34,38 @@ public class DSL {
             return new ColumnBuilder(this, columnName);
         }
 
-        void addColumn(Column column) {
+        void addColumn(ColumnDefinition column) {
             columns.add(column);
         }
 
+        void addPrimaryKeyColumn(String columnName) {
+            primaryKeyColumns.add(columnName);
+        }
+
         public String build() {
-            String columnsDefinition = columns.stream().map(Column::toSql).collect(Collectors.joining(", "));
-            return "CREATE TABLE " + tableName + " (" + columnsDefinition + ")";
+            CreateTableStatement statement = buildAst();
+            return statement.accept(SQL_RENDERER, new AstContext());
+        }
+
+        private CreateTableStatement buildAst() {
+            TableDefinition.TableDefinitionBuilder builder =
+                    TableDefinition.builder().name(tableName).columns(columns);
+
+            if (!primaryKeyColumns.isEmpty()) {
+                builder.primaryKey(new PrimaryKey(primaryKeyColumns));
+            }
+
+            TableDefinition tableDefinition = builder.build();
+            return new CreateTableStatement(tableDefinition);
         }
     }
 
     public static class ColumnBuilder {
         private final TableBuilder tableBuilder;
         private final String columnName;
-        private String dataType;
-        private final List<String> constraints = new ArrayList<>();
+        private DataType dataType;
+        private NotNullConstraint notNullConstraint;
+        private boolean isPrimaryKey = false;
 
         public ColumnBuilder(TableBuilder tableBuilder, String columnName) {
             this.tableBuilder = tableBuilder;
@@ -44,32 +73,42 @@ public class DSL {
         }
 
         public ColumnBuilder integer() {
-            this.dataType = "INTEGER";
+            dataType = DataType.INTEGER;
             return this;
         }
 
         public ColumnBuilder varchar(int length) {
-            this.dataType = "VARCHAR(" + length + ")";
+            dataType = new ParameterizedDataType("VARCHAR", List.of(Literal.of(length)));
             return this;
         }
 
         public ColumnBuilder date() {
-            this.dataType = "DATE";
+            dataType = DataType.DATE;
+            return this;
+        }
+
+        public ColumnBuilder timestamp() {
+            dataType = DataType.TIMESTAMP;
+            return this;
+        }
+
+        public ColumnBuilder bool() {
+            dataType = DataType.BOOLEAN;
             return this;
         }
 
         public ColumnBuilder decimal(int precision, int scale) {
-            this.dataType = "DECIMAL(" + precision + ", " + scale + ")";
+            dataType = new ParameterizedDataType("DECIMAL", List.of(Literal.of(precision), Literal.of(scale)));
             return this;
         }
 
         public ColumnBuilder primaryKey() {
-            constraints.add("PRIMARY KEY");
+            isPrimaryKey = true;
             return this;
         }
 
         public ColumnBuilder notNull() {
-            constraints.add("NOT NULL");
+            notNullConstraint = new NotNullConstraint();
             return this;
         }
 
@@ -84,30 +123,23 @@ public class DSL {
         }
 
         private void finishColumn() {
-            tableBuilder.addColumn(new Column(columnName, dataType, constraints));
-        }
-    }
-
-    private static class Column {
-        private final String name;
-        private final String dataType;
-        private final List<String> constraints;
-
-        public Column(String name, String dataType, List<String> constraints) {
-            this.name = name;
-            this.dataType = dataType;
-            this.constraints = new ArrayList<>(constraints);
-        }
-
-        public String toSql() {
-            StringBuilder sql = new StringBuilder();
-            sql.append(name).append(" ").append(dataType);
-
-            for (String constraint : constraints) {
-                sql.append(" ").append(constraint);
+            if (dataType == null) {
+                throw new IllegalStateException("Data type must be specified for column: " + columnName);
             }
 
-            return sql.toString();
+            ColumnDefinition.ColumnDefinitionBuilder builder =
+                    ColumnDefinition.builder().name(columnName).type(dataType);
+
+            if (notNullConstraint != null) {
+                builder.notNullConstraint(notNullConstraint);
+            }
+
+            ColumnDefinition columnDefinition = builder.build();
+            tableBuilder.addColumn(columnDefinition);
+
+            if (isPrimaryKey) {
+                tableBuilder.addPrimaryKeyColumn(columnName);
+            }
         }
     }
 }
