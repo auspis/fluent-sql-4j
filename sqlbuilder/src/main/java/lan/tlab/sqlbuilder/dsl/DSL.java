@@ -113,16 +113,16 @@ public class DSL {
         }
 
         public ColumnBuilder column(String columnName) {
-            finishColumn();
+            buildColumn();
             return tableBuilder.column(columnName);
         }
 
         public String build() {
-            finishColumn();
+            buildColumn();
             return tableBuilder.build();
         }
 
-        private void finishColumn() {
+        private void buildColumn() {
             if (dataType == null) {
                 throw new IllegalStateException("Data type must be specified for column: " + columnName);
             }
