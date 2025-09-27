@@ -32,6 +32,16 @@ public class DSL {
             return new ColumnBuilder(this, columnName);
         }
 
+        public TableBuilder columnIntegerPrimaryKey(String columnName) {
+            column(columnName).integer().notNull().primaryKey().buildColumn();
+            return this;
+        }
+
+        public TableBuilder columnStringPrimaryKey(String columnName, int length) {
+            column(columnName).varchar(length).notNull().primaryKey().buildColumn();
+            return this;
+        }
+
         void addColumn(ColumnDefinition column) {
             columns.add(column);
         }
