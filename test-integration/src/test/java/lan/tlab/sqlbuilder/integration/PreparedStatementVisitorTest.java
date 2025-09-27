@@ -27,7 +27,7 @@ class PreparedStatementVisitorTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        // H2 in memory con modalità SQL standard
+        // H2 in-memory database with standard SQL mode
         String jdbcUrl = "jdbc:h2:mem:testdb;MODE=REGULAR;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
         connection = DriverManager.getConnection(jdbcUrl, "sa", "");
         visitor = new PreparedStatementVisitor();
