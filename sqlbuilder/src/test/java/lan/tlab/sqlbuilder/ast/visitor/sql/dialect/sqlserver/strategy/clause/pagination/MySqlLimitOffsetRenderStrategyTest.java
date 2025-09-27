@@ -31,12 +31,12 @@ class MySqlLimitOffsetRenderStrategyTest {
 
     @Test
     void ok() {
-        Pagination pagination = Pagination.builder().page(0).perPage(10).build();
+        Pagination pagination = Pagination.builder().offset(0).rows(10).build();
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LIMIT 10 OFFSET 0");
 
-        pagination = Pagination.builder().page(3).perPage(8).build();
+        pagination = Pagination.builder().offset(16).rows(8).build();
         sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LIMIT 8 OFFSET 16");
     }

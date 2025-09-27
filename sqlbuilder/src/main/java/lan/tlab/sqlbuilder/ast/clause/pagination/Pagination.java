@@ -16,9 +16,9 @@ import lombok.Getter;
 public class Pagination implements Clause {
 
     @Default
-    private final Integer page = 0;
+    private final Integer offset = 0;
 
-    private final Integer perPage;
+    private final Integer rows;
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
@@ -26,6 +26,6 @@ public class Pagination implements Clause {
     }
 
     public boolean isActive() {
-        return !Objects.isNull(perPage);
+        return !Objects.isNull(rows);
     }
 }

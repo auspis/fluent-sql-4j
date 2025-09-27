@@ -95,7 +95,7 @@ public class SelectBuilder {
     // Helper method to update pagination using a functional approach
     private void updatePagination(Function<Pagination.PaginationBuilder, Pagination.PaginationBuilder> updater) {
         Pagination.PaginationBuilder builder = pagination
-                .map(p -> Pagination.builder().page(p.getPage()).perPage(p.getPerPage()))
+                .map(p -> Pagination.builder().offset(p.getOffset()).rows(p.getRows()))
                 .orElse(Pagination.builder());
         this.pagination = Optional.of(updater.apply(builder).build());
     }
@@ -155,22 +155,9 @@ public class SelectBuilder {
             throw new IllegalArgumentException("Fetch rows must be positive, got: " + rows);
         }
         updatePagination(builder -> {
-            Integer currentPage = pagination.map(Pagination::getPage).orElse(null);
-            builder.perPage(rows);
-
-            // Check if offset() was called before (negative page as marker)
-            if (currentPage != null && currentPage < 0) {
-                // Extract the stored offset and calculate correct page
-                int storedOffset = -(currentPage + 1);
-                int page = (storedOffset / rows) + 1;
-                return builder.page(page);
-            } else if (currentPage != null && currentPage > 0) {
-                // Keep existing page
-                return builder.page(currentPage);
-            } else {
-                // Default to first page
-                return builder.page(1);
-            }
+            // Preserve existing offset, set rows
+            Integer currentOffset = pagination.map(Pagination::getOffset).orElse(0);
+            return builder.offset(currentOffset).rows(rows);
         });
         return this;
     }
@@ -179,19 +166,10 @@ public class SelectBuilder {
         if (offset < 0) {
             throw new IllegalArgumentException("Offset must be non-negative, got: " + offset);
         }
-        // Store offset temporarily, will be converted to page when perPage is set
-        // or during build if only offset is provided
         updatePagination(builder -> {
-            Integer currentPerPage = pagination.map(Pagination::getPerPage).orElse(null);
-            if (currentPerPage != null) {
-                // Convert offset to page number
-                int page = (offset / currentPerPage) + 1;
-                return builder.page(page);
-            } else {
-                // Store with a temporary page calculation, will be corrected in fetch()
-                // Use a special marker (offset + 1) that will be recognized in fetch()
-                return builder.page(-(offset + 1)).perPage(1); // negative page as marker
-            }
+            // Preserve existing rows, set offset
+            Integer currentRows = pagination.map(Pagination::getRows).orElse(null);
+            return builder.offset(offset).rows(currentRows);
         });
         return this;
     }
