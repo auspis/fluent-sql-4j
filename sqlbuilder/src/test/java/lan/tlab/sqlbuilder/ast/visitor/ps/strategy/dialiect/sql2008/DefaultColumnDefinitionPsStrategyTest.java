@@ -17,45 +17,36 @@ class DefaultColumnDefinitionPsStrategyTest {
 
     @Test
     void shouldHandleNullObject() {
-        // Given
         ColumnDefinition nullColumnDefinition = ColumnDefinition.nullObject();
 
-        // When
         PsDto result = strategy.handle(nullColumnDefinition, visitor, context);
 
-        // Then
         Assertions.assertThat(result.sql()).isEmpty();
         Assertions.assertThat(result.parameters()).isEmpty();
     }
 
     @Test
     void shouldHandleSimpleColumn() {
-        // Given
         ColumnDefinition columnDefinition = ColumnDefinition.builder()
                 .name("id")
                 .type(new SimpleDataType("INTEGER"))
                 .build();
 
-        // When
         PsDto result = strategy.handle(columnDefinition, visitor, context);
 
-        // Then
         Assertions.assertThat(result.sql()).isEqualTo("\"id\" INTEGER");
         Assertions.assertThat(result.parameters()).isEmpty();
     }
 
     @Test
     void shouldHandleColumnWithDifferentDataType() {
-        // Given
         ColumnDefinition columnDefinition = ColumnDefinition.builder()
                 .name("name")
                 .type(new SimpleDataType("VARCHAR"))
                 .build();
 
-        // When
         PsDto result = strategy.handle(columnDefinition, visitor, context);
 
-        // Then
         Assertions.assertThat(result.sql()).isEqualTo("\"name\" VARCHAR");
         Assertions.assertThat(result.parameters()).isEmpty();
     }
