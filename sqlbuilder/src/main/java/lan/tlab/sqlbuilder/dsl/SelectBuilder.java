@@ -30,7 +30,7 @@ import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
 public class SelectBuilder {
     private final List<String> columns = new ArrayList<>();
-    private String fromTable;
+    private Table fromTable;
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
     private String orderByColumn;
     private boolean orderByAsc = true;
@@ -57,7 +57,6 @@ public class SelectBuilder {
         if (columns != null && columns.length > 0) {
             this.columns.addAll(Arrays.asList(columns));
         } else {
-            // SELECT *
             this.columns.add("*");
         }
     }
@@ -66,7 +65,19 @@ public class SelectBuilder {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
-        this.fromTable = tableName;
+        this.fromTable = new Table(tableName);
+        return this;
+    }
+
+    // New method with alias support
+    public SelectBuilder from(String tableName, String alias) {
+        if (tableName == null || tableName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Table name cannot be null or empty");
+        }
+        if (alias == null || alias.trim().isEmpty()) {
+            throw new IllegalArgumentException("Alias cannot be null or empty");
+        }
+        this.fromTable = new Table(tableName, alias);
         return this;
     }
 
@@ -75,7 +86,7 @@ public class SelectBuilder {
         if (column == null || column.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
-        ColumnReference columnRef = ColumnReference.of(fromTable, column);
+        ColumnReference columnRef = ColumnReference.of(fromTable.getName(), column);
         BooleanExpression condition = createCondition(columnRef, operator, value);
         return addWhereCondition(condition, LogicalOperator.AND);
     }
@@ -205,13 +216,13 @@ public class SelectBuilder {
         } else {
             List<ScalarExpressionProjection> projections = new ArrayList<>();
             for (String column : columns) {
-                projections.add(new ScalarExpressionProjection(ColumnReference.of(fromTable, column)));
+                projections.add(new ScalarExpressionProjection(ColumnReference.of(fromTable.getName(), column)));
             }
             builder.select(Select.of(projections.toArray(new ScalarExpressionProjection[0])));
         }
 
         // Build FROM clause
-        builder.from(From.of(new Table(fromTable)));
+        builder.from(From.of(fromTable));
 
         // Build WHERE clause
         if (!whereConditions.isEmpty()) {
@@ -230,8 +241,8 @@ public class SelectBuilder {
         // Build ORDER BY clause
         if (orderByColumn != null) {
             Sorting sorting = orderByAsc
-                    ? Sorting.asc(ColumnReference.of(fromTable, orderByColumn))
-                    : Sorting.desc(ColumnReference.of(fromTable, orderByColumn));
+                    ? Sorting.asc(ColumnReference.of(fromTable.getName(), orderByColumn))
+                    : Sorting.desc(ColumnReference.of(fromTable.getName(), orderByColumn));
             builder.orderBy(OrderBy.of(sorting));
         }
 
@@ -271,7 +282,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder eq(Object value) {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = Comparison.eq(columnRef, selectBuilder.toLiteral(value));
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -279,7 +290,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder ne(Object value) {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = Comparison.ne(columnRef, selectBuilder.toLiteral(value));
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -287,7 +298,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder gt(Object value) {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = Comparison.gt(columnRef, selectBuilder.toLiteral(value));
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -295,7 +306,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder lt(Object value) {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = Comparison.lt(columnRef, selectBuilder.toLiteral(value));
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -303,7 +314,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder gte(Object value) {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = Comparison.gte(columnRef, selectBuilder.toLiteral(value));
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -311,7 +322,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder lte(Object value) {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = Comparison.lte(columnRef, selectBuilder.toLiteral(value));
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -319,7 +330,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder like(String pattern) {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = new Like(columnRef, pattern);
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -327,7 +338,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder isNull() {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = new IsNull(columnRef);
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
@@ -335,7 +346,7 @@ public class SelectBuilder {
         }
 
         public SelectBuilder isNotNull() {
-            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable, column);
+            ColumnReference columnRef = ColumnReference.of(selectBuilder.fromTable.getName(), column);
             BooleanExpression condition = new IsNotNull(columnRef);
             LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
             selectBuilder.addWhereCondition(condition, op);
