@@ -23,7 +23,7 @@
     <maven.exec.plugin.version>3.5.1</maven.exec.plugin.version>
     <maven.versions.plugin.version>2.19.0</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.1</maven.enforcer.plugin.version>
-    <maven.rewrite.plugin.version>5.28.0</maven.rewrite.plugin.version>
+    <maven.rewrite.plugin.version>6.19.0</maven.rewrite.plugin.version>
 
     <dep.lombok.version>1.18.42</dep.lombok.version>
     <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
