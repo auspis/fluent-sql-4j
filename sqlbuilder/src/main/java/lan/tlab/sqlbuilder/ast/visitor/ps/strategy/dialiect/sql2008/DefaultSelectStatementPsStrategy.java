@@ -57,8 +57,8 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         // PAGINATION - delegate to proper pagination strategy
         PsDto paginationResult = null;
         String paginationClause = "";
-        if (stmt.getPagination() != null && stmt.getPagination().isActive()) {
-            paginationResult = stmt.getPagination().accept(visitor, ctx);
+        if (stmt.getFetch() != null && stmt.getFetch().isActive()) {
+            paginationResult = stmt.getFetch().accept(visitor, ctx);
             paginationClause = paginationResult.sql();
         }
         String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause

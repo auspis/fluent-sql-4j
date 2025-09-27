@@ -21,13 +21,11 @@ class DefaultInsertSourcePsStrategyTest {
 
     private DefaultInsertSourcePsStrategy strategy;
     private PreparedStatementVisitor visitor;
-    private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new DefaultInsertSourcePsStrategy();
         visitor = new PreparedStatementVisitor();
-        ctx = new AstContext();
     }
 
     @Test

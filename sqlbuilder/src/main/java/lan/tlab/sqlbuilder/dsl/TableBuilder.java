@@ -9,7 +9,6 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
-import lan.tlab.sqlbuilder.dsl.TableBuilder.ColumnBuilder;
 
 public class TableBuilder {
     public static class ColumnBuilder {

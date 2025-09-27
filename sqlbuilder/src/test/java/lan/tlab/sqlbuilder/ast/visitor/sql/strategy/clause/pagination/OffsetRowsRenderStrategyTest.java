@@ -2,10 +2,11 @@ package lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.pagination;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.fetch.OffsetRowsRenderStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ class OffsetRowsRenderStrategyTest {
 
     @Test
     void empty() {
-        Pagination pagination = Pagination.builder().build();
+        Fetch pagination = Fetch.builder().build();
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("");
@@ -30,12 +31,12 @@ class OffsetRowsRenderStrategyTest {
 
     @Test
     void ok() {
-        Pagination pagination = Pagination.builder().offset(0).rows(10).build();
+        Fetch pagination = Fetch.builder().offset(0).rows(10).build();
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
 
-        pagination = Pagination.builder().offset(16).rows(8).build();
+        pagination = Fetch.builder().offset(16).rows(8).build();
         sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("OFFSET 16 ROWS FETCH NEXT 8 ROWS ONLY");
     }

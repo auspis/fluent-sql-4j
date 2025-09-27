@@ -2,7 +2,7 @@ package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
@@ -16,7 +16,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitOnly() {
-        Pagination pagination = Pagination.builder().rows(10).build();
+        Fetch pagination = Fetch.builder().rows(10).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -26,7 +26,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage1() {
-        Pagination pagination = Pagination.builder().rows(5).offset(0).build();
+        Fetch pagination = Fetch.builder().rows(5).offset(0).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -36,7 +36,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage2() {
-        Pagination pagination = Pagination.builder().rows(10).offset(10).build();
+        Fetch pagination = Fetch.builder().rows(10).offset(10).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -46,7 +46,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage3() {
-        Pagination pagination = Pagination.builder().rows(5).offset(10).build();
+        Fetch pagination = Fetch.builder().rows(5).offset(10).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -56,7 +56,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetLargePage() {
-        Pagination pagination = Pagination.builder().rows(20).offset(80).build();
+        Fetch pagination = Fetch.builder().rows(20).offset(80).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -66,7 +66,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetCalculation() {
-        Pagination pagination = Pagination.builder().rows(15).offset(45).build();
+        Fetch pagination = Fetch.builder().rows(15).offset(45).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
