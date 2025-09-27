@@ -42,6 +42,21 @@ public class DSL {
             return this;
         }
 
+        public TableBuilder columnTimestampNotNull(String columnName) {
+            column(columnName).timestamp().notNull().buildColumn();
+            return this;
+        }
+
+        public TableBuilder columnVarcharNotNull(String columnName, int length) {
+            column(columnName).varchar(length).notNull().buildColumn();
+            return this;
+        }
+
+        public TableBuilder columnDecimalNotNull(String columnName, int precision, int scale) {
+            column(columnName).decimal(precision, scale).notNull().buildColumn();
+            return this;
+        }
+
         void addColumn(ColumnDefinition column) {
             columns.add(column);
         }
