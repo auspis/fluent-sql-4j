@@ -11,13 +11,18 @@ class SelectBuilderTest {
     @Test
     void ok() {
         String result = select("name", "email").from("users").build();
-        assertThat(result).isEqualTo("SELECT \"users\".\"name\", \"users\".\"email\" FROM \"users\"");
+        assertThat(result)
+                .isEqualTo("""
+            SELECT "users"."name", "users"."email" FROM "users"\
+            """);
     }
 
     @Test
     void star() {
         String result = select("*").from("products").build();
-        assertThat(result).isEqualTo("SELECT * FROM \"products\"");
+        assertThat(result).isEqualTo("""
+            SELECT * FROM "products"\
+            """);
     }
 
     @Test
@@ -32,14 +37,16 @@ class SelectBuilderTest {
         assertThat(result)
                 .isEqualTo(
                         """
-            SELECT "u"."name", "u"."email" FROM "users" AS u WHERE "u"."name" = 'John'\
-            """);
+                        SELECT "u"."name", "u"."email" FROM "users" AS u WHERE "u"."name" = 'John'\
+                        """);
     }
 
     @Test
     void where() {
         String result = select("*").from("users").where("age", ">", 18).build();
-        assertThat(result).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"age\" > 18");
+        assertThat(result).isEqualTo("""
+            SELECT * FROM "users" WHERE "users"."age" > 18\
+            """);
     }
 
     @Test
@@ -56,7 +63,9 @@ class SelectBuilderTest {
 
         assertThat(result)
                 .isEqualTo(
-                        "SELECT \"users\".\"name\", \"users\".\"email\" FROM \"users\" WHERE ((\"users\".\"age\" > 18) AND (\"users\".\"status\" = 'active')) AND (\"users\".\"country\" = 'Italy')");
+                        """
+                        SELECT "users"."name", "users"."email" FROM "users" WHERE ((\"users\".\"age\" > 18) AND (\"users\".\"status\" = 'active')) AND (\"users\".\"country\" = 'Italy')\
+                        """);
     }
 
     @Test
@@ -71,7 +80,9 @@ class SelectBuilderTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "SELECT * FROM \"users\" WHERE (\"users\".\"role\" = 'admin') OR (\"users\".\"role\" = 'moderator')");
+                        """
+                        SELECT * FROM "users" WHERE ("users"."role" = 'admin') OR ("users"."role" = 'moderator')\
+                        """);
     }
 
     @Test
@@ -88,7 +99,9 @@ class SelectBuilderTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "SELECT * FROM \"users\" WHERE ((\"users\".\"status\" = 'active') AND (\"users\".\"age\" > 18)) OR (\"users\".\"role\" = 'admin')");
+                        """
+                        SELECT * FROM "users" WHERE ((\"users\".\"status\" = 'active') AND (\"users\".\"age\" > 18)) OR (\"users\".\"role\" = 'admin')\
+                        """);
     }
 
     @Test
@@ -97,28 +110,42 @@ class SelectBuilderTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "SELECT \"users\".\"name\", \"users\".\"age\" FROM \"users\" ORDER BY \"users\".\"name\" ASC");
+                        """
+                        SELECT "users"."name", "users"."age" FROM "users" ORDER BY "users"."name" ASC\
+                        """);
     }
 
     @Test
     void orderByDesc() {
         String sql = select("*").from("products").orderByDesc("created_at").build();
 
-        assertThat(sql).isEqualTo("SELECT * FROM \"products\" ORDER BY \"products\".\"created_at\" DESC");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+            SELECT * FROM "products" ORDER BY "products"."created_at" DESC\
+            """);
     }
 
     @Test
     void fetch() {
         String sql = select("*").from("users").limit(10).build();
 
-        assertThat(sql).isEqualTo("SELECT * FROM \"users\" OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+            SELECT * FROM "users" OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY\
+            """);
     }
 
     @Test
     void fetchWithOffset() {
         String sql = select("*").from("users").limit(10).offset(20).build();
 
-        assertThat(sql).isEqualTo("SELECT * FROM \"users\" OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+            SELECT * FROM "users" OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY\
+            """);
     }
 
     @Test
@@ -140,28 +167,39 @@ class SelectBuilderTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "SELECT \"users\".\"name\", \"users\".\"email\", \"users\".\"age\" FROM \"users\" WHERE (((\"users\".\"status\" = 'active') AND (\"users\".\"age\" >= 18)) AND (\"users\".\"country\" = 'Italy')) OR (\"users\".\"role\" = 'admin') ORDER BY \"users\".\"created_at\" DESC OFFSET 100 ROWS FETCH NEXT 50 ROWS ONLY");
+                        """
+                        SELECT "users"."name", "users"."email", "users"."age" FROM "users" WHERE (((\"users\".\"status\" = 'active') AND (\"users\".\"age\" >= 18)) AND (\"users\".\"country\" = 'Italy')) OR (\"users\".\"role\" = 'admin') ORDER BY "users"."created_at" DESC OFFSET 100 ROWS FETCH NEXT 50 ROWS ONLY\
+                        """);
     }
 
     @Test
     void isNull() {
         String sql = select("*").from("users").where("deleted_at").isNull().build();
 
-        assertThat(sql).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"deleted_at\" IS NULL");
+        assertThat(sql)
+                .isEqualTo("""
+            SELECT * FROM "users" WHERE "users"."deleted_at" IS NULL\
+            """);
     }
 
     @Test
     void isNotNull() {
         String sql = select("*").from("users").where("email").isNotNull().build();
 
-        assertThat(sql).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"email\" IS NOT NULL");
+        assertThat(sql)
+                .isEqualTo("""
+            SELECT * FROM "users" WHERE "users"."email" IS NOT NULL\
+            """);
     }
 
     @Test
     void like() {
         String sql = select("*").from("users").where("name").like("%john%").build();
 
-        assertThat(sql).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"name\" LIKE '%john%'");
+        assertThat(sql)
+                .isEqualTo("""
+            SELECT * FROM "users" WHERE "users"."name" LIKE '%john%'\
+            """);
     }
 
     @Test
@@ -182,7 +220,9 @@ class SelectBuilderTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "SELECT * FROM \"products\" WHERE ((((\"products\".\"price\" > 100) AND (\"products\".\"discount\" < 50)) AND (\"products\".\"rating\" >= 4)) AND (\"products\".\"stock\" <= 10)) AND (\"products\".\"category\" != 'deprecated')");
+                        """
+                        SELECT * FROM "products" WHERE ((((\"products\".\"price\" > 100) AND (\"products\".\"discount\" < 50)) AND (\"products\".\"rating\" >= 4)) AND (\"products\".\"stock\" <= 10)) AND (\"products\".\"category\" != 'deprecated')\
+                        """);
     }
 
     @Test
