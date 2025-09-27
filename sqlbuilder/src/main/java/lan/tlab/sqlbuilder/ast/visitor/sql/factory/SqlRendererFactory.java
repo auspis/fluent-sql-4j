@@ -1,7 +1,7 @@
 package lan.tlab.sqlbuilder.ast.visitor.sql.factory;
 
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
-import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.pagination.PaginationRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.fetch.FetchRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.CurrentDateRenderStrategy;
@@ -62,7 +62,7 @@ public class SqlRendererFactory {
          */
         return SqlRenderer.builder()
                 .escapeStrategy(EscapeStrategy.mysql())
-                .paginationStrategy(PaginationRenderStrategy.mysql())
+                .paginationStrategy(FetchRenderStrategy.mysql())
                 .currentDateStrategy(CurrentDateRenderStrategy.mysql())
                 .currentDateTimeStrategy(CurrentDateTimeRenderStrategy.mysql())
                 .dateArithmeticStrategy(DateArithmeticRenderStrategy.mysql())

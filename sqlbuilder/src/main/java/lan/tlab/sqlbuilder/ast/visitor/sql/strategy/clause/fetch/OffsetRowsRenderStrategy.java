@@ -1,13 +1,13 @@
-package lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.pagination;
+package lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.fetch;
 
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
-public class OffsetRowsRenderStrategy implements PaginationRenderStrategy {
+public class OffsetRowsRenderStrategy implements FetchRenderStrategy {
 
     @Override
-    public String render(Pagination clause, SqlRenderer sqlRenderer, AstContext ctx) {
+    public String render(Fetch clause, SqlRenderer sqlRenderer, AstContext ctx) {
         if (!clause.isActive()) {
             return "";
         }

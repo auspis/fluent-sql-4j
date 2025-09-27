@@ -1,16 +1,16 @@
 package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import java.util.List;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
-import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FetchPsStrategy;
 
-public class DefaultPaginationPsStrategy implements PaginationPsStrategy {
+public class DefaultPaginationPsStrategy implements FetchPsStrategy {
 
     @Override
-    public PsDto handle(Pagination pagination, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(Fetch pagination, PreparedStatementVisitor visitor, AstContext ctx) {
         StringBuilder sql = new StringBuilder();
 
         // SQL 2008 standard uses OFFSET ... ROWS FETCH NEXT ... ROWS ONLY
