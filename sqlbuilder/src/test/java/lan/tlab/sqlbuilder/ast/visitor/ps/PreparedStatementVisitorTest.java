@@ -613,7 +613,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().perPage(10).build())
+                .pagination(Pagination.builder().rows(10).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -626,7 +626,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().perPage(10).page(2).build())
+                .pagination(Pagination.builder().rows(10).offset(10).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -640,7 +640,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
-                .pagination(Pagination.builder().perPage(5).page(2).build())
+                .pagination(Pagination.builder().rows(5).offset(5).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -655,7 +655,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
-                .pagination(Pagination.builder().perPage(3).page(2).build())
+                .pagination(Pagination.builder().rows(3).offset(3).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -670,7 +670,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .pagination(Pagination.builder().perPage(2).page(3).build())
+                .pagination(Pagination.builder().rows(2).offset(4).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -784,7 +784,7 @@ class PreparedStatementVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
                         new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
                 .from(From.of(join))
-                .pagination(Pagination.builder().perPage(5).page(1).build())
+                .pagination(Pagination.builder().rows(5).offset(0).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(stmt, new AstContext());
@@ -926,7 +926,7 @@ class PreparedStatementVisitorTest {
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
                         Comparison.lt(AggregateCall.min(ColumnReference.of("User", "id")), Literal.of(100))))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "email"))))
-                .pagination(Pagination.builder().perPage(5).page(1).build())
+                .pagination(Pagination.builder().rows(5).offset(0).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1032,7 +1032,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().perPage(10).page(1).build())
+                .pagination(Pagination.builder().rows(10).offset(0).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1045,7 +1045,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().perPage(25).page(10).build())
+                .pagination(Pagination.builder().rows(25).offset(225).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1065,7 +1065,7 @@ class PreparedStatementVisitorTest {
                 .orderBy(OrderBy.of(
                         Sorting.asc(ColumnReference.of("User", "name")),
                         Sorting.desc(ColumnReference.of("User", "id"))))
-                .pagination(Pagination.builder().perPage(15).page(3).build())
+                .pagination(Pagination.builder().rows(15).offset(30).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
