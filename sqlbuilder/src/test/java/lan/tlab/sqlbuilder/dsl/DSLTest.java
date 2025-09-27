@@ -37,4 +37,36 @@ class DSLTest {
                     PRIMARY KEY ("id")\
                     )""");
     }
+
+    @Test
+    void columnIntegerPrimaryKey() {
+        String sqlShortForm = createTable("Test").columnIntegerPrimaryKey("id").build();
+        assertThat(sqlShortForm).contains("\"id\" INTEGER NOT NULL").contains("PRIMARY KEY (\"id\")");
+
+        String sqlLongForm = createTable("Test")
+                .column("id")
+                .integer()
+                .primaryKey()
+                .notNull()
+                .build();
+
+        assertThat(sqlShortForm).isEqualTo(sqlLongForm);
+    }
+
+    @Test
+    void columnStringPrimaryKey() {
+        String sqlShortForm =
+                createTable("Test").columnStringPrimaryKey("code", 50).build();
+
+        assertThat(sqlShortForm).contains("\"code\" VARCHAR(50) NOT NULL").contains("PRIMARY KEY (\"code\")");
+
+        String sqlLongForm = createTable("Test")
+                .column("code")
+                .varchar(50)
+                .primaryKey()
+                .notNull()
+                .build();
+
+        assertThat(sqlShortForm).isEqualTo(sqlLongForm);
+    }
 }
