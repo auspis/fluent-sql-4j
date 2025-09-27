@@ -150,19 +150,19 @@ public class SelectBuilder {
         return this;
     }
 
-    public SelectBuilder limit(int limit) {
-        if (limit <= 0) {
-            throw new IllegalArgumentException("Limit must be positive, got: " + limit);
+    public SelectBuilder fetch(int rows) {
+        if (rows <= 0) {
+            throw new IllegalArgumentException("Fetch rows must be positive, got: " + rows);
         }
         updatePagination(builder -> {
             Integer currentPage = pagination.map(Pagination::getPage).orElse(null);
-            builder.perPage(limit);
+            builder.perPage(rows);
 
             // Check if offset() was called before (negative page as marker)
             if (currentPage != null && currentPage < 0) {
                 // Extract the stored offset and calculate correct page
                 int storedOffset = -(currentPage + 1);
-                int page = (storedOffset / limit) + 1;
+                int page = (storedOffset / rows) + 1;
                 return builder.page(page);
             } else if (currentPage != null && currentPage > 0) {
                 // Keep existing page
@@ -188,8 +188,8 @@ public class SelectBuilder {
                 int page = (offset / currentPerPage) + 1;
                 return builder.page(page);
             } else {
-                // Store with a temporary page calculation, will be corrected in limit()
-                // Use a special marker (offset + 1) that will be recognized in limit()
+                // Store with a temporary page calculation, will be corrected in fetch()
+                // Use a special marker (offset + 1) that will be recognized in fetch()
                 return builder.page(-(offset + 1)).perPage(1); // negative page as marker
             }
         });
