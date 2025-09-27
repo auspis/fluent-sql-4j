@@ -27,7 +27,7 @@ class ColumnDefinitionRenderStrategyTest {
     @Test
     void ok() {
         ColumnDefinition column =
-                ColumnDefinition.builder("id", DataType.INTEGER).build();
+                ColumnDefinition.builder("id", DataType.integer()).build();
         String sql = strategy.render(column, renderer, new AstContext());
         assertThat(sql).isEqualTo("\"id\" INTEGER");
     }
@@ -41,7 +41,7 @@ class ColumnDefinitionRenderStrategyTest {
 
     @Test
     void notNullConstraint() {
-        ColumnDefinition column = ColumnDefinition.builder("name", DataType.VARCHAR_255)
+        ColumnDefinition column = ColumnDefinition.builder("name", DataType.varchar(255))
                 .notNullConstraint(new NotNullConstraint())
                 .build();
 

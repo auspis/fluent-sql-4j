@@ -12,12 +12,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
+import lombok.ToString;
 
 public interface Constraint extends SqlItem {
 
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
+    @ToString
     public static class PrimaryKey implements Constraint {
         @Singular
         private final List<String> columns;
@@ -34,6 +36,7 @@ public interface Constraint extends SqlItem {
 
     @NoArgsConstructor
     @EqualsAndHashCode
+    @ToString
     public static class NotNullConstraint implements Constraint {
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
@@ -44,6 +47,7 @@ public interface Constraint extends SqlItem {
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
+    @ToString
     public class UniqueConstraint implements Constraint {
 
         private final List<String> columns;
@@ -61,6 +65,7 @@ public interface Constraint extends SqlItem {
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
+    @ToString
     public static class ForeignKeyConstraint implements Constraint {
         private final List<String> columns;
         private final ReferencesItem references;
@@ -74,6 +79,7 @@ public interface Constraint extends SqlItem {
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
+    @ToString
     public static class CheckConstraint implements Constraint {
         private final BooleanExpression expression;
 
@@ -86,6 +92,7 @@ public interface Constraint extends SqlItem {
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
+    @ToString
     public static class DefaultConstraint implements Constraint {
         private final ScalarExpression value;
 
