@@ -35,8 +35,7 @@ public class SelectBuilder {
     private Optional<Table> fromTable = Optional.empty();
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
     private Optional<OrderBy> orderBy = Optional.empty();
-    private Integer limit;
-    private Integer offset;
+    private Optional<Pagination> pagination = Optional.empty();
 
     // Inner class to track conditions with their logical operators
     private static class WhereConditionEntry {
@@ -93,6 +92,14 @@ public class SelectBuilder {
                 .orElse("");
     }
 
+    // Helper method to update pagination using a functional approach
+    private void updatePagination(Function<Pagination.PaginationBuilder, Pagination.PaginationBuilder> updater) {
+        Pagination.PaginationBuilder builder = pagination
+                .map(p -> Pagination.builder().page(p.getPage()).perPage(p.getPerPage()))
+                .orElse(Pagination.builder());
+        this.pagination = Optional.of(updater.apply(builder).build());
+    }
+
     // Direct where method with operator
     public SelectBuilder where(String column, String operator, Object value) {
         if (column == null || column.trim().isEmpty()) {
@@ -147,7 +154,24 @@ public class SelectBuilder {
         if (limit <= 0) {
             throw new IllegalArgumentException("Limit must be positive, got: " + limit);
         }
-        this.limit = limit;
+        updatePagination(builder -> {
+            Integer currentPage = pagination.map(Pagination::getPage).orElse(null);
+            builder.perPage(limit);
+
+            // Check if offset() was called before (negative page as marker)
+            if (currentPage != null && currentPage < 0) {
+                // Extract the stored offset and calculate correct page
+                int storedOffset = -(currentPage + 1);
+                int page = (storedOffset / limit) + 1;
+                return builder.page(page);
+            } else if (currentPage != null && currentPage > 0) {
+                // Keep existing page
+                return builder.page(currentPage);
+            } else {
+                // Default to first page
+                return builder.page(1);
+            }
+        });
         return this;
     }
 
@@ -155,7 +179,20 @@ public class SelectBuilder {
         if (offset < 0) {
             throw new IllegalArgumentException("Offset must be non-negative, got: " + offset);
         }
-        this.offset = offset;
+        // Store offset temporarily, will be converted to page when perPage is set
+        // or during build if only offset is provided
+        updatePagination(builder -> {
+            Integer currentPerPage = pagination.map(Pagination::getPerPage).orElse(null);
+            if (currentPerPage != null) {
+                // Convert offset to page number
+                int page = (offset / currentPerPage) + 1;
+                return builder.page(page);
+            } else {
+                // Store with a temporary page calculation, will be corrected in limit()
+                // Use a special marker (offset + 1) that will be recognized in limit()
+                return builder.page(-(offset + 1)).perPage(1); // negative page as marker
+            }
+        });
         return this;
     }
 
@@ -253,25 +290,8 @@ public class SelectBuilder {
         // Build ORDER BY clause
         orderBy.ifPresent(builder::orderBy);
 
-        // Build LIMIT/OFFSET clause (combined in Pagination)
-        if (limit != null || offset != null) {
-            Pagination.PaginationBuilder paginationBuilder = Pagination.builder();
-
-            if (limit != null) {
-                paginationBuilder.perPage(limit);
-            }
-
-            if (offset != null && limit != null) {
-                // Calculate page from offset and limit
-                int page = (offset / limit) + 1;
-                paginationBuilder.page(page);
-            } else if (offset == null) {
-                // Only limit, start from page 1
-                paginationBuilder.page(1);
-            }
-
-            builder.pagination(paginationBuilder.build());
-        }
+        // Build PAGINATION clause
+        pagination.ifPresent(builder::pagination);
 
         return builder.build();
     }
