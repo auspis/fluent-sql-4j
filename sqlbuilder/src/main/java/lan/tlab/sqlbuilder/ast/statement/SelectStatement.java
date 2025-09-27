@@ -2,10 +2,10 @@ package lan.tlab.sqlbuilder.ast.statement;
 
 import lan.tlab.sqlbuilder.ast.clause.conditional.having.Having;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.expression.set.TableExpression;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
@@ -37,7 +37,7 @@ public class SelectStatement implements Statement, TableExpression {
     private final OrderBy orderBy = OrderBy.builder().build();
 
     @Default
-    private final Pagination pagination = Pagination.builder().build();
+    private final Fetch fetch = Fetch.builder().build();
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {

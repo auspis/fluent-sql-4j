@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.ast.clause.pagination;
+package lan.tlab.sqlbuilder.ast.clause.fetch;
 
 import java.util.Objects;
 import lan.tlab.sqlbuilder.ast.clause.Clause;
@@ -13,7 +13,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class Pagination implements Clause {
+public class Fetch implements Clause {
 
     @Default
     private final Integer offset = 0;

@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
@@ -35,7 +35,7 @@ public class SelectBuilder {
     private Optional<Table> fromTable = Optional.empty();
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
     private Optional<OrderBy> orderBy = Optional.empty();
-    private Optional<Pagination> pagination = Optional.empty();
+    private Optional<Fetch> pagination = Optional.empty();
 
     // Inner class to track conditions with their logical operators
     private static class WhereConditionEntry {
@@ -93,10 +93,10 @@ public class SelectBuilder {
     }
 
     // Helper method to update pagination using a functional approach
-    private void updatePagination(Function<Pagination.PaginationBuilder, Pagination.PaginationBuilder> updater) {
-        Pagination.PaginationBuilder builder = pagination
-                .map(p -> Pagination.builder().offset(p.getOffset()).rows(p.getRows()))
-                .orElse(Pagination.builder());
+    private void updatePagination(Function<Fetch.FetchBuilder, Fetch.FetchBuilder> updater) {
+        Fetch.FetchBuilder builder = pagination
+                .map(p -> Fetch.builder().offset(p.getOffset()).rows(p.getRows()))
+                .orElse(Fetch.builder());
         this.pagination = Optional.of(updater.apply(builder).build());
     }
 
@@ -156,7 +156,7 @@ public class SelectBuilder {
         }
         updatePagination(builder -> {
             // Preserve existing offset, set rows
-            Integer currentOffset = pagination.map(Pagination::getOffset).orElse(0);
+            Integer currentOffset = pagination.map(Fetch::getOffset).orElse(0);
             return builder.offset(currentOffset).rows(rows);
         });
         return this;
@@ -168,7 +168,7 @@ public class SelectBuilder {
         }
         updatePagination(builder -> {
             // Preserve existing rows, set offset
-            Integer currentRows = pagination.map(Pagination::getRows).orElse(null);
+            Integer currentRows = pagination.map(Fetch::getRows).orElse(null);
             return builder.offset(offset).rows(currentRows);
         });
         return this;
@@ -269,7 +269,7 @@ public class SelectBuilder {
         orderBy.ifPresent(builder::orderBy);
 
         // Build PAGINATION clause
-        pagination.ifPresent(builder::pagination);
+        pagination.ifPresent(builder::fetch);
 
         return builder.build();
     }

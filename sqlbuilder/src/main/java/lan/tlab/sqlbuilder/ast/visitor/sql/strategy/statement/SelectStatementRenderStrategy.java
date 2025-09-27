@@ -17,7 +17,7 @@ public class SelectStatementRenderStrategy implements StatementRenderStrategy {
                         statement.getGroupBy(),
                         statement.getHaving(),
                         statement.getOrderBy(),
-                        statement.getPagination())
+                        statement.getFetch())
                 .map(clause -> clause.accept(sqlRenderer, ctx))
                 .filter(s -> !Objects.isNull(s))
                 .filter(s -> !s.isBlank())
