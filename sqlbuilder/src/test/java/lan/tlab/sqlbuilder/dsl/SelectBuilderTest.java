@@ -9,25 +9,41 @@ import org.junit.jupiter.api.Test;
 class SelectBuilderTest {
 
     @Test
-    void simpleSelect() {
+    void ok() {
         String result = select("name", "email").from("users").build();
         assertThat(result).isEqualTo("SELECT \"users\".\"name\", \"users\".\"email\" FROM \"users\"");
     }
 
     @Test
-    void selectAllTest() {
+    void star() {
         String result = select("*").from("products").build();
         assertThat(result).isEqualTo("SELECT * FROM \"products\"");
     }
 
     @Test
-    void selectWithWhereCondition() {
+    void fromWithAlias() {
+        String result = select("name", "email")
+                .from("users")
+                .as("u")
+                .where("name")
+                .eq("John")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT "u"."name", "u"."email" FROM "users" AS u WHERE "u"."name" = 'John'\
+            """);
+    }
+
+    @Test
+    void where() {
         String result = select("*").from("users").where("age", ">", 18).build();
         assertThat(result).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"age\" > 18");
     }
 
     @Test
-    void selectWithMultipleAndConditions() {
+    void and() {
         String result = select("name", "email")
                 .from("users")
                 .where("age")
@@ -44,7 +60,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectWithOrCondition() {
+    void or() {
         String sql = select("*")
                 .from("users")
                 .where("role")
@@ -59,7 +75,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectWithMixedAndOrConditions() {
+    void andOr() {
         String sql = select("*")
                 .from("users")
                 .where("status")
@@ -76,7 +92,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectWithOrderBy() {
+    void orderBy() {
         String sql = select("name", "age").from("users").orderBy("name").build();
 
         assertThat(sql)
@@ -85,21 +101,21 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectWithOrderByDesc() {
+    void orderByDesc() {
         String sql = select("*").from("products").orderByDesc("created_at").build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"products\" ORDER BY \"products\".\"created_at\" DESC");
     }
 
     @Test
-    void selectWithLimit() {
+    void fetch() {
         String sql = select("*").from("users").limit(10).build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"users\" OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
     }
 
     @Test
-    void selectWithLimitAndOffset() {
+    void fetchWithOffset() {
         String sql = select("*").from("users").limit(10).offset(20).build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"users\" OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY");
@@ -128,28 +144,28 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectWithNullCheck() {
+    void isNull() {
         String sql = select("*").from("users").where("deleted_at").isNull().build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"deleted_at\" IS NULL");
     }
 
     @Test
-    void selectWithNotNullCheck() {
+    void isNotNull() {
         String sql = select("*").from("users").where("email").isNotNull().build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"email\" IS NOT NULL");
     }
 
     @Test
-    void selectWithLikePattern() {
+    void like() {
         String sql = select("*").from("users").where("name").like("%john%").build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"users\" WHERE \"users\".\"name\" LIKE '%john%'");
     }
 
     @Test
-    void selectWithAllComparisonOperators() {
+    void allComparisonOperators() {
         String sql = select("*")
                 .from("products")
                 .where("price")
@@ -170,35 +186,42 @@ class SelectBuilderTest {
     }
 
     @Test
-    void throwsExceptionWhenFromNotSpecified() {
+    void fromNotSpecified() {
         assertThatThrownBy(() -> select("*").build())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified");
     }
 
     @Test
-    void throwsExceptionForInvalidTableName() {
+    void invalidTableName() {
         assertThatThrownBy(() -> select("*").from(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
-    void throwsExceptionForInvalidColumnName() {
+    void invalidColumnName() {
         assertThatThrownBy(() -> select("*").from("users").where(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
-    void throwsExceptionForInvalidLimit() {
+    void invalidAlias() {
+        assertThatThrownBy(() -> select("*").from("users").as(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Alias cannot be null or empty");
+    }
+
+    @Test
+    void invalidLimit() {
         assertThatThrownBy(() -> select("*").from("users").limit(-1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Limit must be positive, got: -1");
     }
 
     @Test
-    void throwsExceptionForInvalidOffset() {
+    void invalidOffset() {
         assertThatThrownBy(() -> select("*").from("users").offset(-5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Offset must be non-negative, got: -5");
