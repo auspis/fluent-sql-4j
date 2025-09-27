@@ -2,13 +2,13 @@ package lan.tlab.sqlbuilder.ast.visitor.sql;
 
 import lan.tlab.sqlbuilder.ast.clause.conditional.having.Having;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSubquery;
 import lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin;
 import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
@@ -86,7 +86,7 @@ import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.OrderByRenderStrategy
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.SelectRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.SortingRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.WhereRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.pagination.PaginationRenderStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.fetch.FetchRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.AggregateCallRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.AggregationFunctionProjectionRenderStrategy;
@@ -217,7 +217,7 @@ public class SqlRenderer implements Visitor<String> {
     private final SortingRenderStrategy sortingStrategy = new SortingRenderStrategy();
 
     @Default
-    private final PaginationRenderStrategy paginationStrategy = PaginationRenderStrategy.standardSql2008();
+    private final FetchRenderStrategy paginationStrategy = FetchRenderStrategy.standardSql2008();
 
     // boolean expressions
     @Default
@@ -485,7 +485,7 @@ public class SqlRenderer implements Visitor<String> {
     }
 
     @Override
-    public String visit(Pagination clause, AstContext ctx) {
+    public String visit(Fetch clause, AstContext ctx) {
         return paginationStrategy.render(clause, this, ctx);
     }
 

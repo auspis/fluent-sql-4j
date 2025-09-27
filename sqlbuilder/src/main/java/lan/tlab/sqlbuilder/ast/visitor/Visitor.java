@@ -2,13 +2,13 @@ package lan.tlab.sqlbuilder.ast.visitor;
 
 import lan.tlab.sqlbuilder.ast.clause.conditional.having.Having;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSubquery;
 import lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin;
 import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
@@ -112,7 +112,7 @@ public interface Visitor<T> {
 
     T visit(Sorting sorting, AstContext ctx);
 
-    T visit(Pagination clause, AstContext ctx);
+    T visit(Fetch clause, AstContext ctx);
 
     // boolean expressions
     T visit(NullBooleanExpression expression, AstContext ctx);
