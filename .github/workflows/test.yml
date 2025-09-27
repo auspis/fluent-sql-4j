@@ -27,11 +27,27 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Run unit tests
-      run: ./mvnw test
-
-    - name: Run all tests (including integration tests)
-      run: ./mvnw verify
-
+    # Check code formatting
     - name: Check code formatting
       run: ./mvnw spotless:check
+
+    # Run all tests: unit + H2 integration + E2E (as per README)
+    - name: Run all tests (unit + H2 integration + E2E)
+      run: ./mvnw verify
+
+    # Upload Surefire and Failsafe reports for debugging
+    - name: Upload Surefire reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: surefire-reports
+        path: |
+          sqlbuilder/target/surefire-reports/
+          test-integration/target/surefire-reports/
+    - name: Upload Failsafe reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: failsafe-reports
+        path: |
+          test-integration/target/failsafe-reports/
