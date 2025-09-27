@@ -9,18 +9,38 @@ import lan.tlab.sqlbuilder.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 public interface DataType extends SqlItem {
 
-    ParameterizedDataType VARCHAR_255 = new ParameterizedDataType("VARCHAR", List.of(Literal.of(255)));
-    SimpleDataType INTEGER = new SimpleDataType("INTEGER");
-    SimpleDataType DATE = new SimpleDataType("DATE");
-    SimpleDataType TIMESTAMP = new SimpleDataType("TIMESTAMP");
-    SimpleDataType BOOLEAN = new SimpleDataType("BOOLEAN");
+    static ParameterizedDataType varchar(int length) {
+        return new ParameterizedDataType("VARCHAR", List.of(Literal.of(length)));
+    }
+
+    static ParameterizedDataType decimal(int precision, int scale) {
+        return new ParameterizedDataType("DECIMAL", List.of(Literal.of(precision), Literal.of(scale)));
+    }
+
+    static SimpleDataType integer() {
+        return new SimpleDataType("INTEGER");
+    }
+
+    static SimpleDataType date() {
+        return new SimpleDataType("DATE");
+    }
+
+    static SimpleDataType timestamp() {
+        return new SimpleDataType("TIMESTAMP");
+    }
+
+    static SimpleDataType bool() {
+        return new SimpleDataType("BOOLEAN");
+    }
 
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
+    @ToString
     public static class SimpleDataType implements DataType {
         private final String name;
 
@@ -33,6 +53,7 @@ public interface DataType extends SqlItem {
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
+    @ToString
     public static class ParameterizedDataType implements DataType {
         private final String name;
         private final List<Expression> parameters;
