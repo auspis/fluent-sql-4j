@@ -100,18 +100,18 @@ public class StandardSqlRendererMySqlE2E {
                 .orderBy(OrderBy.of(
                         Sorting.desc(ColumnReference.of("Customer", "name")),
                         Sorting.asc(ColumnReference.of("Customer", "createdAt"))))
-                .pagination(Pagination.builder().perPage(5).build())
+                .pagination(Pagination.builder().rows(5).offset(0).build())
                 .build();
         String sql = statement.accept(renderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
                         """
-        			SELECT `Customer`.`name` \
-        			FROM `Customer` \
-        			WHERE `Customer`.`name` != 'unknown' \
-        			ORDER BY `Customer`.`name` DESC, `Customer`.`createdAt` ASC \
-        			LIMIT 5 OFFSET 0\
-        			""");
+                        SELECT `Customer`.`name` \
+                        FROM `Customer` \
+                        WHERE `Customer`.`name` != 'unknown' \
+                        ORDER BY `Customer`.`name` DESC, `Customer`.`createdAt` ASC \
+                        LIMIT 5 OFFSET 0\
+                        """);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             assertThat(rs.next()).isTrue();
