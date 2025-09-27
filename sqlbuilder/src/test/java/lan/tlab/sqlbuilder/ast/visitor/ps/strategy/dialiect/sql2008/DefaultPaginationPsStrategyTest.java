@@ -16,7 +16,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitOnly() {
-        Pagination pagination = Pagination.builder().perPage(10).build();
+        Pagination pagination = Pagination.builder().rows(10).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -26,7 +26,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage1() {
-        Pagination pagination = Pagination.builder().perPage(5).page(1).build();
+        Pagination pagination = Pagination.builder().rows(5).offset(0).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -36,7 +36,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage2() {
-        Pagination pagination = Pagination.builder().perPage(10).page(2).build();
+        Pagination pagination = Pagination.builder().rows(10).offset(10).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -46,7 +46,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage3() {
-        Pagination pagination = Pagination.builder().perPage(5).page(3).build();
+        Pagination pagination = Pagination.builder().rows(5).offset(10).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -56,7 +56,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetLargePage() {
-        Pagination pagination = Pagination.builder().perPage(20).page(5).build();
+        Pagination pagination = Pagination.builder().rows(20).offset(80).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 
@@ -66,7 +66,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetCalculation() {
-        Pagination pagination = Pagination.builder().perPage(15).page(4).build();
+        Pagination pagination = Pagination.builder().rows(15).offset(45).build();
 
         PsDto result = strategy.handle(pagination, visitor, ctx);
 

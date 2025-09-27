@@ -13,9 +13,8 @@ public class MySqlLimitOffsetRenderStrategy implements PaginationRenderStrategy 
             return "";
         }
 
-        Integer page = clause.getPage();
-        Integer perPage = clause.getPerPage();
-        int offset = Math.max(0, page - 1) * perPage;
-        return String.format("LIMIT %s OFFSET %s", perPage, offset);
+        Integer offset = clause.getOffset();
+        Integer rows = clause.getRows();
+        return String.format("LIMIT %s OFFSET %s", rows, offset);
     }
 }
