@@ -1,6 +1,6 @@
 package lan.tlab.sqlbuilder.dsl;
 
-import static lan.tlab.sqlbuilder.dsl.DSL.*;
+import static lan.tlab.sqlbuilder.dsl.DSL.createTable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -26,11 +26,15 @@ class DSLTest {
                 .build();
 
         assertThat(sql)
-                .isEqualTo("CREATE TABLE User (" + "id INTEGER PRIMARY KEY NOT NULL, "
-                        + "name VARCHAR(100) NOT NULL, "
-                        + "email VARCHAR(255), "
-                        + "birthdate DATE, "
-                        + "score DECIMAL(10, 2)"
-                        + ")");
+                .isEqualTo(
+                        """
+                    CREATE TABLE "User" (\
+                    "id" INTEGER NOT NULL, \
+                    "name" VARCHAR(100) NOT NULL, \
+                    "email" VARCHAR(255), \
+                    "birthdate" DATE, \
+                    "score" DECIMAL(10, 2), \
+                    PRIMARY KEY ("id")\
+                    )""");
     }
 }
