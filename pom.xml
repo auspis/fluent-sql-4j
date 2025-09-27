@@ -34,7 +34,7 @@
 
     <dep.testcontainer.version>1.21.3</dep.testcontainer.version>
     <dep.junit-jupiter.version>5.10.0</dep.junit-jupiter.version>
-    <dep.assertj-core.version>3.25.3</dep.assertj-core.version>
+    <dep.assertj-core.version>3.27.6</dep.assertj-core.version>
   </properties>
 
   <dependencyManagement>
