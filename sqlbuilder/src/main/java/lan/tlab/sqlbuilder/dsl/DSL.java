@@ -6,9 +6,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
-import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType.ParameterizedDataType;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
-import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
@@ -73,32 +71,31 @@ public class DSL {
         }
 
         public ColumnBuilder integer() {
-            dataType = DataType.INTEGER;
-            return this;
+            return dataType(DataType.integer());
         }
 
         public ColumnBuilder varchar(int length) {
-            dataType = new ParameterizedDataType("VARCHAR", List.of(Literal.of(length)));
-            return this;
+            return dataType(DataType.varchar(length));
         }
 
         public ColumnBuilder date() {
-            dataType = DataType.DATE;
-            return this;
+            return dataType(DataType.date());
         }
 
         public ColumnBuilder timestamp() {
-            dataType = DataType.TIMESTAMP;
-            return this;
+            return dataType(DataType.timestamp());
         }
 
         public ColumnBuilder bool() {
-            dataType = DataType.BOOLEAN;
-            return this;
+            return dataType(DataType.bool());
         }
 
         public ColumnBuilder decimal(int precision, int scale) {
-            dataType = new ParameterizedDataType("DECIMAL", List.of(Literal.of(precision), Literal.of(scale)));
+            return dataType(DataType.decimal(precision, scale));
+        }
+
+        private ColumnBuilder dataType(DataType value) {
+            dataType = value;
             return this;
         }
 

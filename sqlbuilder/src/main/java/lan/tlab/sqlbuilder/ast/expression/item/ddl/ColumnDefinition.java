@@ -9,17 +9,19 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.Tolerate;
 
 @Builder
 @Getter
 @EqualsAndHashCode
+@ToString
 public class ColumnDefinition implements Visitable {
 
     private final String name;
 
     @Default
-    private final DataType type = DataType.VARCHAR_255;
+    private final DataType type = DataType.varchar(255);
 
     private final NotNullConstraint notNullConstraint;
     private final DefaultConstraint defaultConstraint;
@@ -31,19 +33,19 @@ public class ColumnDefinition implements Visitable {
     public static class ColumnDefinitionBuilder {
 
         public static ColumnDefinitionBuilder integer(String name) {
-            return builder(name, DataType.INTEGER);
+            return builder(name, DataType.integer());
         }
 
         public static ColumnDefinitionBuilder varchar(String name) {
-            return builder(name, DataType.VARCHAR_255);
+            return builder(name, DataType.varchar(255));
         }
 
         public static ColumnDefinitionBuilder date(String name) {
-            return builder(name, DataType.DATE);
+            return builder(name, DataType.date());
         }
 
         public static ColumnDefinitionBuilder bool(String name) {
-            return builder(name, DataType.BOOLEAN);
+            return builder(name, DataType.bool());
         }
     }
 

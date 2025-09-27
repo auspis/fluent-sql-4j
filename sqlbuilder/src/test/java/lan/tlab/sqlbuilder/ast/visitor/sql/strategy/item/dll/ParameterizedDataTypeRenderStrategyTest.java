@@ -26,7 +26,7 @@ class ParameterizedDataTypeRenderStrategyTest {
 
     @Test
     void varchar() {
-        ParameterizedDataType dataType = DataType.VARCHAR_255;
+        ParameterizedDataType dataType = DataType.varchar(255);
         String sql = strategy.render(dataType, renderer, new AstContext());
         assertThat(sql).isEqualTo("VARCHAR(255)");
 
