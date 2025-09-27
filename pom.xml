@@ -28,7 +28,7 @@
     <dep.lombok.version>1.18.42</dep.lombok.version>
     <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
 
-    <dep.h2.version>2.3.232</dep.h2.version>
+    <dep.h2.version>2.4.240</dep.h2.version>
     <dep.mysql-connector-java.version>8.0.33</dep.mysql-connector-java.version>
     <dep.postgresql.version>42.7.8</dep.postgresql.version>
 
