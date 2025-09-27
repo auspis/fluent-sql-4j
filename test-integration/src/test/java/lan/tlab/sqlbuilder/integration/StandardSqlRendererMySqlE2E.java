@@ -62,7 +62,7 @@ public class StandardSqlRendererMySqlE2E {
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
                         ColumnDefinitionBuilder.integer("score").build(),
-                        ColumnDefinition.builder("createdAt", DataType.TIMESTAMP)
+                        ColumnDefinition.builder("createdAt", DataType.timestamp())
                                 .build()))
                 .primaryKey(new PrimaryKey("id"))
                 .build());
