@@ -32,7 +32,7 @@ import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
 public class SelectBuilder {
     private final List<String> columns = new ArrayList<>();
-    private Table fromTable;
+    private Optional<Table> fromTable = Optional.empty();
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
     private Optional<OrderBy> orderBy = Optional.empty();
     private Integer limit;
@@ -66,29 +66,31 @@ public class SelectBuilder {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
-        this.fromTable = new Table(tableName);
+        this.fromTable = Optional.of(new Table(tableName));
         return this;
     }
 
     public SelectBuilder as(String alias) {
-        if (fromTable == null) {
+        if (fromTable.isEmpty()) {
             throw new IllegalStateException("Cannot set alias before specifying table with from()");
         }
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.fromTable = new Table(fromTable.getName(), alias);
+        this.fromTable = Optional.of(new Table(fromTable.get().getName(), alias));
         return this;
     }
 
     // Helper method to get the table reference name (alias if available, otherwise table name)
     private String getTableReference() {
-        if (fromTable != null
-                && fromTable.getAs() != null
-                && !fromTable.getAs().getName().isEmpty()) {
-            return fromTable.getAs().getName();
-        }
-        return fromTable != null ? fromTable.getName() : "";
+        return fromTable
+                .map(table -> {
+                    if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
+                        return table.getAs().getName();
+                    }
+                    return table.getName();
+                })
+                .orElse("");
     }
 
     // Direct where method with operator
@@ -195,7 +197,7 @@ public class SelectBuilder {
     }
 
     private void validateState() {
-        if (fromTable == null) {
+        if (fromTable.isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
     }
@@ -213,7 +215,7 @@ public class SelectBuilder {
     }
 
     private SelectStatement buildSelectStatement() {
-        if (fromTable == null) {
+        if (fromTable.isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
 
@@ -232,7 +234,7 @@ public class SelectBuilder {
         }
 
         // Build FROM clause
-        builder.from(From.of(fromTable));
+        fromTable.ifPresent(table -> builder.from(From.of(table)));
 
         // Build WHERE clause
         if (!whereConditions.isEmpty()) {
