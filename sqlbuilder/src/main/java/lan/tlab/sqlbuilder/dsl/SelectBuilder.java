@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
@@ -32,8 +34,7 @@ public class SelectBuilder {
     private final List<String> columns = new ArrayList<>();
     private Table fromTable;
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
-    private String orderByColumn;
-    private boolean orderByAsc = true;
+    private Optional<OrderBy> orderBy = Optional.empty();
     private Integer limit;
     private Integer offset;
 
@@ -123,20 +124,20 @@ public class SelectBuilder {
     }
 
     public SelectBuilder orderBy(String column) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        this.orderByColumn = column;
-        this.orderByAsc = true;
-        return this;
+        return orderBy(column, Sorting::asc);
     }
 
     public SelectBuilder orderByDesc(String column) {
+        return orderBy(column, Sorting::desc);
+    }
+
+    private SelectBuilder orderBy(String column, Function<ColumnReference, Sorting> sortingFactory) {
         if (column == null || column.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
-        this.orderByColumn = column;
-        this.orderByAsc = false;
+        ColumnReference columnRef = ColumnReference.of(getTableReference(), column);
+        Sorting sorting = sortingFactory.apply(columnRef);
+        this.orderBy = Optional.of(OrderBy.of(sorting));
         return this;
     }
 
@@ -248,12 +249,7 @@ public class SelectBuilder {
         }
 
         // Build ORDER BY clause
-        if (orderByColumn != null) {
-            Sorting sorting = orderByAsc
-                    ? Sorting.asc(ColumnReference.of(getTableReference(), orderByColumn))
-                    : Sorting.desc(ColumnReference.of(getTableReference(), orderByColumn));
-            builder.orderBy(OrderBy.of(sorting));
-        }
+        orderBy.ifPresent(builder::orderBy);
 
         // Build LIMIT/OFFSET clause (combined in Pagination)
         if (limit != null || offset != null) {
