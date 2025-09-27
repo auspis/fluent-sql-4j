@@ -2,6 +2,7 @@ package lan.tlab.sqlbuilder.ast.visitor.ps;
 
 import lan.tlab.sqlbuilder.ast.clause.conditional.having.Having;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSource;
 import lan.tlab.sqlbuilder.ast.clause.from.source.FromSubquery;
@@ -9,7 +10,6 @@ import lan.tlab.sqlbuilder.ast.clause.from.source.join.OnJoin;
 import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
@@ -102,6 +102,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ExtractDatePartPsStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FetchPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ForeignKeyConstraintPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromClausePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.FromSubqueryPsStrategy;
@@ -128,7 +129,6 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullScalarExpressionPsStrateg
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.NullSetExpressionPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.OrderByClausePsStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PaginationPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PowerPsStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.ps.strategy.PrimaryKeyPsStrategy;
@@ -319,7 +319,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     private final SelectStatementPsStrategy selectStatementPsStrategy = new DefaultSelectStatementPsStrategy();
 
     @Default
-    private final PaginationPsStrategy paginationPsStrategy = new DefaultPaginationPsStrategy();
+    private final FetchPsStrategy paginationPsStrategy = new DefaultPaginationPsStrategy();
 
     @Default
     private final LikePsStrategy likePsStrategy = new DefaultLikePsStrategy();
@@ -580,7 +580,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(Pagination clause, AstContext ctx) {
+    public PsDto visit(Fetch clause, AstContext ctx) {
         return paginationPsStrategy.handle(clause, this, ctx);
     }
 

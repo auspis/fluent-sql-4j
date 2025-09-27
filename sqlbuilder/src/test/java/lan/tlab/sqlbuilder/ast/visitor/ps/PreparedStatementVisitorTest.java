@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
@@ -613,7 +613,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().rows(10).build())
+                .fetch(Fetch.builder().rows(10).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -626,7 +626,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().rows(10).offset(10).build())
+                .fetch(Fetch.builder().rows(10).offset(10).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -640,7 +640,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
-                .pagination(Pagination.builder().rows(5).offset(5).build())
+                .fetch(Fetch.builder().rows(5).offset(5).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -655,7 +655,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
-                .pagination(Pagination.builder().rows(3).offset(3).build())
+                .fetch(Fetch.builder().rows(3).offset(3).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -670,7 +670,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .pagination(Pagination.builder().rows(2).offset(4).build())
+                .fetch(Fetch.builder().rows(2).offset(4).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -784,7 +784,7 @@ class PreparedStatementVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
                         new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
                 .from(From.of(join))
-                .pagination(Pagination.builder().rows(5).offset(0).build())
+                .fetch(Fetch.builder().rows(5).offset(0).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(stmt, new AstContext());
@@ -926,7 +926,7 @@ class PreparedStatementVisitorTest {
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
                         Comparison.lt(AggregateCall.min(ColumnReference.of("User", "id")), Literal.of(100))))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "email"))))
-                .pagination(Pagination.builder().rows(5).offset(0).build())
+                .fetch(Fetch.builder().rows(5).offset(0).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1028,11 +1028,11 @@ class PreparedStatementVisitorTest {
     }
 
     @Test
-    void testSelectPaginationFirstPage() {
+    void testSelectfetchFirstPage() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().rows(10).offset(0).build())
+                .fetch(Fetch.builder().rows(10).offset(0).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1041,11 +1041,11 @@ class PreparedStatementVisitorTest {
     }
 
     @Test
-    void testSelectPaginationLargeOffset() {
+    void testSelectfetchLargeOffset() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .pagination(Pagination.builder().rows(25).offset(225).build())
+                .fetch(Fetch.builder().rows(25).offset(225).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1054,7 +1054,7 @@ class PreparedStatementVisitorTest {
     }
 
     @Test
-    void testSelectPaginationWithComplexQuery() {
+    void testSelectfetchWithComplexQuery() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("User", "id")))) // Only project "id"
@@ -1065,7 +1065,7 @@ class PreparedStatementVisitorTest {
                 .orderBy(OrderBy.of(
                         Sorting.asc(ColumnReference.of("User", "name")),
                         Sorting.desc(ColumnReference.of("User", "id"))))
-                .pagination(Pagination.builder().rows(15).offset(30).build())
+                .fetch(Fetch.builder().rows(15).offset(30).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());

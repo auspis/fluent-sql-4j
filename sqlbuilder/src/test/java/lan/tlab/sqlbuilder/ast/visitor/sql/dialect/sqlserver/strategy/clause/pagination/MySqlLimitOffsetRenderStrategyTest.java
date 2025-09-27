@@ -2,7 +2,7 @@ package lan.tlab.sqlbuilder.ast.visitor.sql.dialect.sqlserver.strategy.clause.pa
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.sqlbuilder.ast.clause.pagination.Pagination;
+import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.sql.dialect.mysql.strategy.clause.pagination.MySqlLimitOffsetRenderStrategy;
@@ -23,7 +23,7 @@ class MySqlLimitOffsetRenderStrategyTest {
 
     @Test
     void empty() {
-        Pagination pagination = Pagination.builder().build();
+        Fetch pagination = Fetch.builder().build();
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("");
@@ -31,12 +31,12 @@ class MySqlLimitOffsetRenderStrategyTest {
 
     @Test
     void ok() {
-        Pagination pagination = Pagination.builder().offset(0).rows(10).build();
+        Fetch pagination = Fetch.builder().offset(0).rows(10).build();
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LIMIT 10 OFFSET 0");
 
-        pagination = Pagination.builder().offset(16).rows(8).build();
+        pagination = Fetch.builder().offset(16).rows(8).build();
         sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LIMIT 8 OFFSET 16");
     }
