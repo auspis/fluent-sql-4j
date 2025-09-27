@@ -16,7 +16,7 @@
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
-    <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
+    <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
     <maven.failsafe.plugin.version>3.5.4</maven.failsafe.plugin.version>
     <maven.spotless.plugin.version>2.46.1</maven.spotless.plugin.version>
     <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
