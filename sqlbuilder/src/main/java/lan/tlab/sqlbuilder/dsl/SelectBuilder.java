@@ -37,10 +37,12 @@ public class SelectBuilder {
     // Current table state - needed for alias handling
     private Optional<Table> currentTable = Optional.empty();
 
+    // Current pagination state - needed for incremental fetch/offset operations
+    private Optional<Fetch> currentPagination = Optional.empty();
+
     // Legacy fields - will be migrated one by one
     private final List<String> columns = new ArrayList<>();
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
-    private Optional<Fetch> pagination = Optional.empty();
 
     // Inner class to track conditions with their logical operators
     private static class WhereConditionEntry {
@@ -103,10 +105,12 @@ public class SelectBuilder {
 
     // Helper method to update pagination using a functional approach
     private void updatePagination(Function<Fetch.FetchBuilder, Fetch.FetchBuilder> updater) {
-        Fetch.FetchBuilder builder = pagination
+        Fetch.FetchBuilder builder = currentPagination
                 .map(p -> Fetch.builder().offset(p.getOffset()).rows(p.getRows()))
                 .orElse(Fetch.builder());
-        this.pagination = Optional.of(updater.apply(builder).build());
+        Fetch newPagination = updater.apply(builder).build();
+        this.currentPagination = Optional.of(newPagination);
+        this.statementBuilder = this.statementBuilder.fetch(newPagination);
     }
 
     // Direct where method with operator
@@ -165,7 +169,7 @@ public class SelectBuilder {
         }
         updatePagination(builder -> {
             // Preserve existing offset, set rows
-            Integer currentOffset = pagination.map(Fetch::getOffset).orElse(0);
+            Integer currentOffset = currentPagination.map(Fetch::getOffset).orElse(0);
             return builder.offset(currentOffset).rows(rows);
         });
         return this;
@@ -177,7 +181,7 @@ public class SelectBuilder {
         }
         updatePagination(builder -> {
             // Preserve existing rows, set offset
-            Integer currentRows = pagination.map(Fetch::getRows).orElse(null);
+            Integer currentRows = currentPagination.map(Fetch::getRows).orElse(null);
             return builder.offset(offset).rows(currentRows);
         });
         return this;
@@ -270,10 +274,6 @@ public class SelectBuilder {
                 }
             }
             builder = builder.where(Where.of(combinedCondition));
-        }
-
-        if (pagination.isPresent()) {
-            builder = builder.fetch(pagination.get());
         }
 
         return builder.build();
