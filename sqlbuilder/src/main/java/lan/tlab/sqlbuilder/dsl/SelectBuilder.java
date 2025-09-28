@@ -34,9 +34,11 @@ public class SelectBuilder {
     // New approach: Use SelectStatement builder directly
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
 
+    // Current table state - needed for alias handling
+    private Optional<Table> currentTable = Optional.empty();
+
     // Legacy fields - will be migrated one by one
     private final List<String> columns = new ArrayList<>();
-    private Optional<Table> fromTable = Optional.empty();
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
     private Optional<OrderBy> orderBy = Optional.empty();
     private Optional<Fetch> pagination = Optional.empty();
@@ -69,24 +71,28 @@ public class SelectBuilder {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
-        this.fromTable = Optional.of(new Table(tableName));
+        Table table = new Table(tableName);
+        this.currentTable = Optional.of(table);
+        this.statementBuilder.from(From.of(table));
         return this;
     }
 
     public SelectBuilder as(String alias) {
-        if (fromTable.isEmpty()) {
+        if (currentTable.isEmpty()) {
             throw new IllegalStateException("Cannot set alias before specifying table with from()");
         }
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.fromTable = Optional.of(new Table(fromTable.get().getName(), alias));
+        Table tableWithAlias = new Table(currentTable.get().getName(), alias);
+        this.currentTable = Optional.of(tableWithAlias);
+        this.statementBuilder.from(From.of(tableWithAlias));
         return this;
     }
 
     // Helper method to get the table reference name (alias if available, otherwise table name)
     private String getTableReference() {
-        return fromTable
+        return currentTable
                 .map(table -> {
                     if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
                         return table.getAs().getName();
@@ -216,7 +222,7 @@ public class SelectBuilder {
     }
 
     private void validateState() {
-        if (fromTable.isEmpty()) {
+        if (currentTable.isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
     }
@@ -234,26 +240,24 @@ public class SelectBuilder {
     }
 
     private SelectStatement buildSelectStatement() {
-        if (fromTable.isEmpty()) {
+        if (currentTable.isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
 
-        SelectStatement.SelectStatementBuilder builder = SelectStatement.builder();
+        // Start with the statementBuilder that already has FROM configured
+        SelectStatement.SelectStatementBuilder builder = statementBuilder;
 
         // Build SELECT clause
         if (columns.isEmpty() || (columns.size() == 1 && "*".equals(columns.get(0)))) {
             // SELECT * (use default empty projections which renders as *)
-            builder.select(Select.builder().build());
+            builder = builder.select(Select.builder().build());
         } else {
             List<ScalarExpressionProjection> projections = new ArrayList<>();
             for (String column : columns) {
                 projections.add(new ScalarExpressionProjection(ColumnReference.of(getTableReference(), column)));
             }
-            builder.select(Select.of(projections.toArray(new ScalarExpressionProjection[0])));
+            builder = builder.select(Select.of(projections.toArray(new ScalarExpressionProjection[0])));
         }
-
-        // Build FROM clause
-        fromTable.ifPresent(table -> builder.from(From.of(table)));
 
         // Build WHERE clause
         if (!whereConditions.isEmpty()) {
@@ -266,11 +270,16 @@ public class SelectBuilder {
                     combinedCondition = AndOr.and(combinedCondition, entry.condition);
                 }
             }
-            builder.where(Where.of(combinedCondition));
+            builder = builder.where(Where.of(combinedCondition));
         }
 
-        orderBy.ifPresent(builder::orderBy);
-        pagination.ifPresent(builder::fetch);
+        if (orderBy.isPresent()) {
+            builder = builder.orderBy(orderBy.get());
+        }
+        if (pagination.isPresent()) {
+            builder = builder.fetch(pagination.get());
+        }
+
         return builder.build();
     }
 
