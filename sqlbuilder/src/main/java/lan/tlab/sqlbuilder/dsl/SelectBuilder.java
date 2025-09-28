@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
@@ -31,14 +30,8 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
 public class SelectBuilder {
-    // New approach: Use SelectStatement builder directly
+    // Single source of truth
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
-
-    // Current table state - needed for alias handling
-    private Optional<Table> table = Optional.empty();
-
-    // Current pagination state - needed for incremental fetch/offset operations
-    private Optional<Fetch> pagination = Optional.empty();
 
     private enum LogicalOperator {
         AND,
@@ -62,42 +55,52 @@ public class SelectBuilder {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
+
         Table table = new Table(tableName);
-        this.table = Optional.of(table);
         this.statementBuilder = this.statementBuilder.from(From.of(table));
 
-        // Update SELECT clause since table context is now available
-        updateSelectClause();
+        // Update SELECT clause with table context
+        updateSelectClauseWithTable(table);
 
         return this;
     }
 
     public SelectBuilder as(String alias) {
-        if (table.isEmpty()) {
-            throw new IllegalStateException("Cannot set alias before specifying table with from()");
-        }
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        Table tableWithAlias = new Table(table.get().getName(), alias);
-        this.table = Optional.of(tableWithAlias);
-        this.statementBuilder = this.statementBuilder.from(From.of(tableWithAlias));
 
-        // Update SELECT clause since table reference changed
-        updateSelectClause();
+        // Get current table from FROM clause
+        From currentFrom = getCurrentStatement().getFrom();
+        if (currentFrom == null || currentFrom.getSources().isEmpty()) {
+            throw new IllegalStateException("Cannot set alias before specifying table with from()");
+        }
+
+        Table currentTable = (Table) currentFrom.getSources().get(0);
+        Table tableWithAlias = new Table(currentTable.getName(), alias);
+
+        this.statementBuilder = this.statementBuilder.from(From.of(tableWithAlias));
+        updateSelectClauseWithTable(tableWithAlias);
 
         return this;
     }
 
-    // Helper method to get the table reference name (alias if available, otherwise table name)
+    // Helper methods to work with current state
+    private SelectStatement getCurrentStatement() {
+        return statementBuilder.build();
+    }
+
     private String getTableReference() {
-        return table.map(table -> {
-                    if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
-                        return table.getAs().getName();
-                    }
-                    return table.getName();
-                })
-                .orElse("");
+        From from = getCurrentStatement().getFrom();
+        if (from == null || from.getSources().isEmpty()) {
+            return "";
+        }
+
+        Table table = (Table) from.getSources().get(0);
+        if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
+            return table.getAs().getName();
+        }
+        return table.getName();
     }
 
     // Helper method to check if statementBuilder has WHERE clause
@@ -106,52 +109,44 @@ public class SelectBuilder {
         return where != null && !(where.getCondition() instanceof NullBooleanExpression);
     }
 
-    // Helper method to update SELECT clause on statementBuilder when table reference changes
-    private void updateSelectClause() {
-        // When table reference changes (alias is set), we need to update column references
-        // Only update if we have explicit column projections (not SELECT *)
-        if (table.isPresent()) {
-            Select currentSelect = statementBuilder.build().getSelect();
-            if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
-                String tableReference = getTableReference();
-                List<ScalarExpressionProjection> updatedProjections = new ArrayList<>();
+    private void updateSelectClauseWithTable(Table table) {
+        Select currentSelect = getCurrentStatement().getSelect();
+        if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
+            String tableReference =
+                    table.getAs() != null && !table.getAs().getName().isEmpty()
+                            ? table.getAs().getName()
+                            : table.getName();
 
-                for (var projection : currentSelect.getProjections()) {
-                    if (projection instanceof ScalarExpressionProjection scalarProj) {
-                        if (scalarProj.getExpression() instanceof ColumnReference colRef) {
-                            // Don't update table reference for "*" - it should remain as is
-                            if ("*".equals(colRef.getColumn())) {
-                                updatedProjections.add(scalarProj);
-                            } else {
-                                // Update table reference in column reference
-                                updatedProjections.add(new ScalarExpressionProjection(
-                                        ColumnReference.of(tableReference, colRef.getColumn())));
-                            }
+            List<ScalarExpressionProjection> updatedProjections = new ArrayList<>();
 
-                        } else {
-                            // Keep other expressions as is
-                            updatedProjections.add(scalarProj);
-                        }
+            for (var projection : currentSelect.getProjections()) {
+                if (projection instanceof ScalarExpressionProjection scalarProj
+                        && scalarProj.getExpression() instanceof ColumnReference colRef) {
+
+                    if (!"*".equals(colRef.getColumn())) {
+                        updatedProjections.add(
+                                new ScalarExpressionProjection(ColumnReference.of(tableReference, colRef.getColumn())));
+                    } else {
+                        updatedProjections.add(scalarProj);
                     }
-                }
-
-                if (!updatedProjections.isEmpty()) {
-                    this.statementBuilder = this.statementBuilder.select(
-                            Select.of(updatedProjections.toArray(new ScalarExpressionProjection[0])));
+                } else {
+                    updatedProjections.add((ScalarExpressionProjection) projection);
                 }
             }
-            // If currentSelect is null or has empty projections, it means SELECT * - don't change anything
+
+            if (!updatedProjections.isEmpty()) {
+                this.statementBuilder = this.statementBuilder.select(
+                        Select.of(updatedProjections.toArray(new ScalarExpressionProjection[0])));
+            }
         }
     }
 
-    // Helper method to update pagination using a functional approach
-    private void updatePagination(Function<Fetch.FetchBuilder, Fetch.FetchBuilder> updater) {
-        Fetch.FetchBuilder builder = pagination
-                .map(p -> Fetch.builder().offset(p.getOffset()).rows(p.getRows()))
-                .orElse(Fetch.builder());
-        Fetch newPagination = updater.apply(builder).build();
-        this.pagination = Optional.of(newPagination);
-        this.statementBuilder = this.statementBuilder.fetch(newPagination);
+    // Pagination using functional approach
+    private SelectBuilder updateFetch(Function<Fetch, Fetch> updater) {
+        Fetch currentFetch = getCurrentStatement().getFetch();
+        Fetch newFetch = updater.apply(currentFetch);
+        this.statementBuilder = this.statementBuilder.fetch(newFetch);
+        return this;
     }
 
     // Direct where method with operator
@@ -208,24 +203,22 @@ public class SelectBuilder {
         if (rows <= 0) {
             throw new IllegalArgumentException("Fetch rows must be positive, got: " + rows);
         }
-        updatePagination(builder -> {
-            // Preserve existing offset, set rows
-            Integer currentOffset = pagination.map(Fetch::getOffset).orElse(0);
-            return builder.offset(currentOffset).rows(rows);
+
+        return updateFetch(fetch -> {
+            int currentOffset = fetch != null ? fetch.getOffset() : 0;
+            return Fetch.builder().offset(currentOffset).rows(rows).build();
         });
-        return this;
     }
 
     public SelectBuilder offset(int offset) {
         if (offset < 0) {
             throw new IllegalArgumentException("Offset must be non-negative, got: " + offset);
         }
-        updatePagination(builder -> {
-            // Preserve existing rows, set offset
-            Integer currentRows = pagination.map(Fetch::getRows).orElse(null);
-            return builder.offset(offset).rows(currentRows);
+
+        return updateFetch(fetch -> {
+            Integer currentRows = fetch != null ? fetch.getRows() : null;
+            return Fetch.builder().offset(offset).rows(currentRows).build();
         });
-        return this;
     }
 
     public WhereBuilder and(String column) {
@@ -278,21 +271,14 @@ public class SelectBuilder {
 
     public String build() {
         validateState();
-        SelectStatement selectStatement = buildSelectStatement();
-
-        // Use the SqlRenderer to render the statement with standard SQL strategy
-        SqlRenderer renderer = SqlRenderer.builder().build(); // Uses standard() strategy by default
+        SelectStatement selectStatement = getCurrentStatement();
+        SqlRenderer renderer = SqlRenderer.builder().build();
         return selectStatement.accept(renderer, new AstContext());
     }
 
-    private void validateState() {
-        if (table.isEmpty()) {
-            throw new IllegalStateException("FROM table must be specified");
-        }
-    }
-
     public PreparedStatement buildPrepared(Connection connection) throws SQLException {
-        SelectStatement stmt = buildSelectStatement();
+        validateState();
+        SelectStatement stmt = getCurrentStatement();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = stmt.accept(visitor, new AstContext());
 
@@ -303,19 +289,11 @@ public class SelectBuilder {
         return ps;
     }
 
-    private SelectStatement buildSelectStatement() {
-        if (table.isEmpty()) {
+    private void validateState() {
+        From from = getCurrentStatement().getFrom();
+        if (from == null || from.getSources().isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
-
-        // Start with the statementBuilder that already has FROM configured
-        SelectStatement.SelectStatementBuilder builder = statementBuilder;
-
-        // SELECT and WHERE clauses are now managed by statementBuilder
-        // Updated via updateSelectClause() and updateWhereClause() methods
-        // No need to rebuild clauses here since they're already in statementBuilder
-
-        return builder.build();
     }
 
     // Builder class for WHERE conditions with fluent API
