@@ -40,7 +40,6 @@ public class SelectBuilder {
     // Legacy fields - will be migrated one by one
     private final List<String> columns = new ArrayList<>();
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
-    private Optional<OrderBy> orderBy = Optional.empty();
     private Optional<Fetch> pagination = Optional.empty();
 
     // Inner class to track conditions with their logical operators
@@ -156,7 +155,7 @@ public class SelectBuilder {
         }
         ColumnReference columnRef = ColumnReference.of(getTableReference(), column);
         Sorting sorting = sortingFactory.apply(columnRef);
-        this.orderBy = Optional.of(OrderBy.of(sorting));
+        this.statementBuilder = this.statementBuilder.orderBy(OrderBy.of(sorting));
         return this;
     }
 
@@ -273,9 +272,6 @@ public class SelectBuilder {
             builder = builder.where(Where.of(combinedCondition));
         }
 
-        if (orderBy.isPresent()) {
-            builder = builder.orderBy(orderBy.get());
-        }
         if (pagination.isPresent()) {
             builder = builder.fetch(pagination.get());
         }
