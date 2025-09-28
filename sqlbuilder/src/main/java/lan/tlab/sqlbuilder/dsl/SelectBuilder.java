@@ -35,10 +35,10 @@ public class SelectBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
 
     // Current table state - needed for alias handling
-    private Optional<Table> currentTable = Optional.empty();
+    private Optional<Table> table = Optional.empty();
 
     // Current pagination state - needed for incremental fetch/offset operations
-    private Optional<Fetch> currentPagination = Optional.empty();
+    private Optional<Fetch> pagination = Optional.empty();
 
     private enum LogicalOperator {
         AND,
@@ -63,7 +63,7 @@ public class SelectBuilder {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
         Table table = new Table(tableName);
-        this.currentTable = Optional.of(table);
+        this.table = Optional.of(table);
         this.statementBuilder = this.statementBuilder.from(From.of(table));
 
         // Update SELECT clause since table context is now available
@@ -73,14 +73,14 @@ public class SelectBuilder {
     }
 
     public SelectBuilder as(String alias) {
-        if (currentTable.isEmpty()) {
+        if (table.isEmpty()) {
             throw new IllegalStateException("Cannot set alias before specifying table with from()");
         }
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        Table tableWithAlias = new Table(currentTable.get().getName(), alias);
-        this.currentTable = Optional.of(tableWithAlias);
+        Table tableWithAlias = new Table(table.get().getName(), alias);
+        this.table = Optional.of(tableWithAlias);
         this.statementBuilder = this.statementBuilder.from(From.of(tableWithAlias));
 
         // Update SELECT clause since table reference changed
@@ -91,8 +91,7 @@ public class SelectBuilder {
 
     // Helper method to get the table reference name (alias if available, otherwise table name)
     private String getTableReference() {
-        return currentTable
-                .map(table -> {
+        return table.map(table -> {
                     if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
                         return table.getAs().getName();
                     }
@@ -111,7 +110,7 @@ public class SelectBuilder {
     private void updateSelectClause() {
         // When table reference changes (alias is set), we need to update column references
         // Only update if we have explicit column projections (not SELECT *)
-        if (currentTable.isPresent()) {
+        if (table.isPresent()) {
             Select currentSelect = statementBuilder.build().getSelect();
             if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
                 String tableReference = getTableReference();
@@ -147,11 +146,11 @@ public class SelectBuilder {
 
     // Helper method to update pagination using a functional approach
     private void updatePagination(Function<Fetch.FetchBuilder, Fetch.FetchBuilder> updater) {
-        Fetch.FetchBuilder builder = currentPagination
+        Fetch.FetchBuilder builder = pagination
                 .map(p -> Fetch.builder().offset(p.getOffset()).rows(p.getRows()))
                 .orElse(Fetch.builder());
         Fetch newPagination = updater.apply(builder).build();
-        this.currentPagination = Optional.of(newPagination);
+        this.pagination = Optional.of(newPagination);
         this.statementBuilder = this.statementBuilder.fetch(newPagination);
     }
 
@@ -211,7 +210,7 @@ public class SelectBuilder {
         }
         updatePagination(builder -> {
             // Preserve existing offset, set rows
-            Integer currentOffset = currentPagination.map(Fetch::getOffset).orElse(0);
+            Integer currentOffset = pagination.map(Fetch::getOffset).orElse(0);
             return builder.offset(currentOffset).rows(rows);
         });
         return this;
@@ -223,7 +222,7 @@ public class SelectBuilder {
         }
         updatePagination(builder -> {
             // Preserve existing rows, set offset
-            Integer currentRows = currentPagination.map(Fetch::getRows).orElse(null);
+            Integer currentRows = pagination.map(Fetch::getRows).orElse(null);
             return builder.offset(offset).rows(currentRows);
         });
         return this;
@@ -287,7 +286,7 @@ public class SelectBuilder {
     }
 
     private void validateState() {
-        if (currentTable.isEmpty()) {
+        if (table.isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
     }
@@ -305,7 +304,7 @@ public class SelectBuilder {
     }
 
     private SelectStatement buildSelectStatement() {
-        if (currentTable.isEmpty()) {
+        if (table.isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
 
