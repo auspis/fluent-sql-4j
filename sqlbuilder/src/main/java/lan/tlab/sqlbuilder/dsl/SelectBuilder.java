@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -20,6 +19,7 @@ import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
 import lan.tlab.sqlbuilder.ast.expression.bool.Like;
+import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
@@ -40,9 +40,6 @@ public class SelectBuilder {
     // Current pagination state - needed for incremental fetch/offset operations
     private Optional<Fetch> currentPagination = Optional.empty();
 
-    // Legacy field - will be migrated
-    private final List<String> columns = new ArrayList<>();
-
     private enum LogicalOperator {
         AND,
         OR
@@ -50,10 +47,15 @@ public class SelectBuilder {
 
     public SelectBuilder(String... columns) {
         if (columns != null && columns.length > 0) {
-            this.columns.addAll(Arrays.asList(columns));
-        } else {
-            this.columns.add("*");
+            // Build projections for specified columns
+            List<ScalarExpressionProjection> projections = new ArrayList<>();
+            for (String column : columns) {
+                projections.add(new ScalarExpressionProjection(ColumnReference.of("", column)));
+            }
+            this.statementBuilder =
+                    this.statementBuilder.select(Select.of(projections.toArray(new ScalarExpressionProjection[0])));
         }
+        // else: Default SELECT * behavior - no select clause (empty projections list renders as *)
     }
 
     public SelectBuilder from(String tableName) {
@@ -101,25 +103,45 @@ public class SelectBuilder {
 
     // Helper method to check if statementBuilder has WHERE clause
     private boolean hasWhereClause() {
-        return statementBuilder.build().getWhere() != null;
+        Where where = statementBuilder.build().getWhere();
+        return where != null && !(where.getCondition() instanceof NullBooleanExpression);
     }
 
-    // Helper method to update SELECT clause on statementBuilder
+    // Helper method to update SELECT clause on statementBuilder when table reference changes
     private void updateSelectClause() {
-        if (currentTable.isPresent() && !columns.isEmpty()) {
-            if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                // SELECT * (use default empty projections which renders as *)
-                this.statementBuilder =
-                        this.statementBuilder.select(Select.builder().build());
-            } else {
+        // When table reference changes (alias is set), we need to update column references
+        // Only update if we have explicit column projections (not SELECT *)
+        if (currentTable.isPresent()) {
+            Select currentSelect = statementBuilder.build().getSelect();
+            if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
                 String tableReference = getTableReference();
-                List<ScalarExpressionProjection> projections = new ArrayList<>();
-                for (String column : columns) {
-                    projections.add(new ScalarExpressionProjection(ColumnReference.of(tableReference, column)));
+                List<ScalarExpressionProjection> updatedProjections = new ArrayList<>();
+
+                for (var projection : currentSelect.getProjections()) {
+                    if (projection instanceof ScalarExpressionProjection scalarProj) {
+                        if (scalarProj.getExpression() instanceof ColumnReference colRef) {
+                            // Don't update table reference for "*" - it should remain as is
+                            if ("*".equals(colRef.getColumn())) {
+                                updatedProjections.add(scalarProj);
+                            } else {
+                                // Update table reference in column reference
+                                updatedProjections.add(new ScalarExpressionProjection(
+                                        ColumnReference.of(tableReference, colRef.getColumn())));
+                            }
+
+                        } else {
+                            // Keep other expressions as is
+                            updatedProjections.add(scalarProj);
+                        }
+                    }
                 }
-                this.statementBuilder =
-                        this.statementBuilder.select(Select.of(projections.toArray(new ScalarExpressionProjection[0])));
+
+                if (!updatedProjections.isEmpty()) {
+                    this.statementBuilder = this.statementBuilder.select(
+                            Select.of(updatedProjections.toArray(new ScalarExpressionProjection[0])));
+                }
             }
+            // If currentSelect is null or has empty projections, it means SELECT * - don't change anything
         }
     }
 
@@ -221,7 +243,7 @@ public class SelectBuilder {
 
         // Combine with new condition
         BooleanExpression combinedCondition;
-        if (currentWhere == null) {
+        if (currentWhere == null || currentWhere.getCondition() instanceof NullBooleanExpression) {
             // First condition - use it directly regardless of operator
             combinedCondition = condition;
         } else {
@@ -239,9 +261,8 @@ public class SelectBuilder {
         this.statementBuilder = this.statementBuilder.where(Where.of(combinedCondition));
 
         return this;
-    }
+    } // Helper method to convert Object to Literal
 
-    // Helper method to convert Object to Literal
     private Literal<?> toLiteral(Object value) {
         if (value instanceof String) {
             return Literal.of((String) value);
