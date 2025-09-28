@@ -40,20 +40,8 @@ public class SelectBuilder {
     // Current pagination state - needed for incremental fetch/offset operations
     private Optional<Fetch> currentPagination = Optional.empty();
 
-    // Legacy fields - will be migrated one by one
+    // Legacy field - will be migrated
     private final List<String> columns = new ArrayList<>();
-    private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
-
-    // Inner class to track conditions with their logical operators
-    private static class WhereConditionEntry {
-        final BooleanExpression condition;
-        final LogicalOperator operator; // AND or OR (null for first condition)
-
-        WhereConditionEntry(BooleanExpression condition, LogicalOperator operator) {
-            this.condition = condition;
-            this.operator = operator;
-        }
-    }
 
     private enum LogicalOperator {
         AND,
@@ -74,7 +62,11 @@ public class SelectBuilder {
         }
         Table table = new Table(tableName);
         this.currentTable = Optional.of(table);
-        this.statementBuilder.from(From.of(table));
+        this.statementBuilder = this.statementBuilder.from(From.of(table));
+
+        // Update SELECT clause since table context is now available
+        updateSelectClause();
+
         return this;
     }
 
@@ -87,7 +79,11 @@ public class SelectBuilder {
         }
         Table tableWithAlias = new Table(currentTable.get().getName(), alias);
         this.currentTable = Optional.of(tableWithAlias);
-        this.statementBuilder.from(From.of(tableWithAlias));
+        this.statementBuilder = this.statementBuilder.from(From.of(tableWithAlias));
+
+        // Update SELECT clause since table reference changed
+        updateSelectClause();
+
         return this;
     }
 
@@ -101,6 +97,30 @@ public class SelectBuilder {
                     return table.getName();
                 })
                 .orElse("");
+    }
+
+    // Helper method to check if statementBuilder has WHERE clause
+    private boolean hasWhereClause() {
+        return statementBuilder.build().getWhere() != null;
+    }
+
+    // Helper method to update SELECT clause on statementBuilder
+    private void updateSelectClause() {
+        if (currentTable.isPresent() && !columns.isEmpty()) {
+            if (columns.size() == 1 && "*".equals(columns.get(0))) {
+                // SELECT * (use default empty projections which renders as *)
+                this.statementBuilder =
+                        this.statementBuilder.select(Select.builder().build());
+            } else {
+                String tableReference = getTableReference();
+                List<ScalarExpressionProjection> projections = new ArrayList<>();
+                for (String column : columns) {
+                    projections.add(new ScalarExpressionProjection(ColumnReference.of(tableReference, column)));
+                }
+                this.statementBuilder =
+                        this.statementBuilder.select(Select.of(projections.toArray(new ScalarExpressionProjection[0])));
+            }
+        }
     }
 
     // Helper method to update pagination using a functional approach
@@ -196,7 +216,28 @@ public class SelectBuilder {
     }
 
     SelectBuilder addWhereCondition(BooleanExpression condition, LogicalOperator operator) {
-        whereConditions.add(new WhereConditionEntry(condition, operator));
+        // Get current WHERE clause from statementBuilder
+        Where currentWhere = statementBuilder.build().getWhere();
+
+        // Combine with new condition
+        BooleanExpression combinedCondition;
+        if (currentWhere == null) {
+            // First condition - use it directly regardless of operator
+            combinedCondition = condition;
+        } else {
+            // Combine with existing WHERE clause using logical operator
+            BooleanExpression existingCondition = currentWhere.getCondition();
+            if (operator == LogicalOperator.OR) {
+                combinedCondition = AndOr.or(existingCondition, condition);
+            } else {
+                // Default to AND if operator is null or AND
+                combinedCondition = AndOr.and(existingCondition, condition);
+            }
+        }
+
+        // Update statementBuilder with combined WHERE clause
+        this.statementBuilder = this.statementBuilder.where(Where.of(combinedCondition));
+
         return this;
     }
 
@@ -250,31 +291,9 @@ public class SelectBuilder {
         // Start with the statementBuilder that already has FROM configured
         SelectStatement.SelectStatementBuilder builder = statementBuilder;
 
-        // Build SELECT clause
-        if (columns.isEmpty() || (columns.size() == 1 && "*".equals(columns.get(0)))) {
-            // SELECT * (use default empty projections which renders as *)
-            builder = builder.select(Select.builder().build());
-        } else {
-            List<ScalarExpressionProjection> projections = new ArrayList<>();
-            for (String column : columns) {
-                projections.add(new ScalarExpressionProjection(ColumnReference.of(getTableReference(), column)));
-            }
-            builder = builder.select(Select.of(projections.toArray(new ScalarExpressionProjection[0])));
-        }
-
-        // Build WHERE clause
-        if (!whereConditions.isEmpty()) {
-            BooleanExpression combinedCondition = whereConditions.get(0).condition;
-            for (int i = 1; i < whereConditions.size(); i++) {
-                WhereConditionEntry entry = whereConditions.get(i);
-                if (entry.operator == LogicalOperator.OR) {
-                    combinedCondition = AndOr.or(combinedCondition, entry.condition);
-                } else {
-                    combinedCondition = AndOr.and(combinedCondition, entry.condition);
-                }
-            }
-            builder = builder.where(Where.of(combinedCondition));
-        }
+        // SELECT and WHERE clauses are now managed by statementBuilder
+        // Updated via updateSelectClause() and updateWhereClause() methods
+        // No need to rebuild clauses here since they're already in statementBuilder
 
         return builder.build();
     }
@@ -294,7 +313,7 @@ public class SelectBuilder {
         public SelectBuilder eq(Object value) {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = Comparison.eq(columnRef, selectBuilder.toLiteral(value));
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -302,7 +321,7 @@ public class SelectBuilder {
         public SelectBuilder ne(Object value) {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = Comparison.ne(columnRef, selectBuilder.toLiteral(value));
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -310,7 +329,7 @@ public class SelectBuilder {
         public SelectBuilder gt(Object value) {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = Comparison.gt(columnRef, selectBuilder.toLiteral(value));
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -318,7 +337,7 @@ public class SelectBuilder {
         public SelectBuilder lt(Object value) {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = Comparison.lt(columnRef, selectBuilder.toLiteral(value));
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -326,7 +345,7 @@ public class SelectBuilder {
         public SelectBuilder gte(Object value) {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = Comparison.gte(columnRef, selectBuilder.toLiteral(value));
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -334,7 +353,7 @@ public class SelectBuilder {
         public SelectBuilder lte(Object value) {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = Comparison.lte(columnRef, selectBuilder.toLiteral(value));
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -342,7 +361,7 @@ public class SelectBuilder {
         public SelectBuilder like(String pattern) {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = new Like(columnRef, pattern);
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -350,7 +369,7 @@ public class SelectBuilder {
         public SelectBuilder isNull() {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = new IsNull(columnRef);
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
@@ -358,7 +377,7 @@ public class SelectBuilder {
         public SelectBuilder isNotNull() {
             ColumnReference columnRef = ColumnReference.of(selectBuilder.getTableReference(), column);
             BooleanExpression condition = new IsNotNull(columnRef);
-            LogicalOperator op = selectBuilder.whereConditions.isEmpty() ? null : logicalOperator;
+            LogicalOperator op = selectBuilder.hasWhereClause() ? logicalOperator : null;
             selectBuilder.addWhereCondition(condition, op);
             return selectBuilder;
         }
