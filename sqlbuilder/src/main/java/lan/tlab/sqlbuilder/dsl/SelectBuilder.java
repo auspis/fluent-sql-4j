@@ -31,6 +31,10 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
 public class SelectBuilder {
+    // New approach: Use SelectStatement builder directly
+    private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
+
+    // Legacy fields - will be migrated one by one
     private final List<String> columns = new ArrayList<>();
     private Optional<Table> fromTable = Optional.empty();
     private final List<WhereConditionEntry> whereConditions = new ArrayList<>();
@@ -265,12 +269,8 @@ public class SelectBuilder {
             builder.where(Where.of(combinedCondition));
         }
 
-        // Build ORDER BY clause
         orderBy.ifPresent(builder::orderBy);
-
-        // Build PAGINATION clause
         pagination.ifPresent(builder::fetch);
-
         return builder.build();
     }
 
