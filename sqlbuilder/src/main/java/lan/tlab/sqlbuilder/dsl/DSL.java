@@ -1,6 +1,7 @@
 package lan.tlab.sqlbuilder.dsl;
 
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
+import lan.tlab.sqlbuilder.dsl.select.SelectBuilder;
 
 public class DSL {
 
