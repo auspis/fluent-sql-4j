@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.dsl;
+package lan.tlab.sqlbuilder.dsl.select;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,15 +14,10 @@ import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
-import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
-import lan.tlab.sqlbuilder.ast.expression.bool.IsNotNull;
-import lan.tlab.sqlbuilder.ast.expression.bool.IsNull;
-import lan.tlab.sqlbuilder.ast.expression.bool.Like;
 import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
-import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PreparedStatementVisitor;
@@ -30,22 +25,19 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
 public class SelectBuilder {
-    // Single source of truth
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
 
-    private enum LogicalOperator {
+    enum LogicalOperator {
         AND,
         OR
     }
 
     public SelectBuilder(String... columns) {
         if (columns != null && columns.length > 0) {
-            // Build projections for specified columns
-            this.statementBuilder = this.statementBuilder.select(Select.of(java.util.Arrays.stream(columns)
+            statementBuilder = statementBuilder.select(Select.of(java.util.Arrays.stream(columns)
                     .map(column -> new ScalarExpressionProjection(ColumnReference.of("", column)))
                     .toArray(ScalarExpressionProjection[]::new)));
         }
-        // else: Default SELECT * behavior - no select clause (empty projections list renders as *)
     }
 
     public SelectBuilder from(String tableName) {
@@ -54,11 +46,9 @@ public class SelectBuilder {
         }
 
         Table table = new Table(tableName);
-        this.statementBuilder = this.statementBuilder.from(From.of(table));
+        statementBuilder = statementBuilder.from(From.of(table));
 
-        // Update SELECT clause with table context
         updateSelectClauseWithTable(table);
-
         return this;
     }
 
@@ -67,7 +57,6 @@ public class SelectBuilder {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
 
-        // Get current table from FROM clause
         From currentFrom = getCurrentStatement().getFrom();
         if (currentFrom == null || currentFrom.getSources().isEmpty()) {
             throw new IllegalStateException("Cannot set alias before specifying table with from()");
@@ -76,18 +65,17 @@ public class SelectBuilder {
         Table currentTable = (Table) currentFrom.getSources().get(0);
         Table tableWithAlias = new Table(currentTable.getName(), alias);
 
-        this.statementBuilder = this.statementBuilder.from(From.of(tableWithAlias));
+        statementBuilder = statementBuilder.from(From.of(tableWithAlias));
         updateSelectClauseWithTable(tableWithAlias);
 
         return this;
     }
 
-    // Helper methods to work with current state
     private SelectStatement getCurrentStatement() {
         return statementBuilder.build();
     }
 
-    private String getTableReference() {
+    String getTableReference() {
         From from = getCurrentStatement().getFrom();
         if (from == null || from.getSources().isEmpty()) {
             return "";
@@ -126,21 +114,19 @@ public class SelectBuilder {
             }
 
             if (!updatedProjections.isEmpty()) {
-                this.statementBuilder = this.statementBuilder.select(
+                statementBuilder = statementBuilder.select(
                         Select.of(updatedProjections.toArray(new ScalarExpressionProjection[0])));
             }
         }
     }
 
-    // Pagination using functional approach
     private SelectBuilder updateFetch(Function<Fetch, Fetch> updater) {
         Fetch currentFetch = getCurrentStatement().getFetch();
         Fetch newFetch = updater.apply(currentFetch);
-        this.statementBuilder = this.statementBuilder.fetch(newFetch);
+        statementBuilder = statementBuilder.fetch(newFetch);
         return this;
     }
 
-    // Fluent where method that returns WhereConditionBuilder
     public WhereConditionBuilder where(String column) {
         if (column == null || column.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
@@ -162,7 +148,7 @@ public class SelectBuilder {
         }
         ColumnReference columnRef = ColumnReference.of(getTableReference(), column);
         Sorting sorting = sortingFactory.apply(columnRef);
-        this.statementBuilder = this.statementBuilder.orderBy(OrderBy.of(sorting));
+        statementBuilder = statementBuilder.orderBy(OrderBy.of(sorting));
         return this;
     }
 
@@ -197,15 +183,15 @@ public class SelectBuilder {
     }
 
     // Functional WHERE updater
-    private SelectBuilder updateWhere(Function<Where, Where> updater) {
+    SelectBuilder updateWhere(Function<Where, Where> updater) {
         Where currentWhere = getCurrentStatement().getWhere();
         Where newWhere = updater.apply(currentWhere);
-        this.statementBuilder = this.statementBuilder.where(newWhere);
+        statementBuilder = statementBuilder.where(newWhere);
         return this;
     }
 
     // Helper to combine conditions
-    private Where combineConditions(Where currentWhere, BooleanExpression newCondition, LogicalOperator operator) {
+    Where combineConditions(Where currentWhere, BooleanExpression newCondition, LogicalOperator operator) {
         if (currentWhere == null || currentWhere.getCondition() instanceof NullBooleanExpression) {
             return Where.of(newCondition);
         }
@@ -220,20 +206,6 @@ public class SelectBuilder {
 
     SelectBuilder addWhereCondition(BooleanExpression condition, LogicalOperator operator) {
         return updateWhere(where -> combineConditions(where, condition, operator));
-    } // Helper method to convert Object to Literal
-
-    private Literal<?> toLiteral(Object value) {
-        if (value instanceof String) {
-            return Literal.of((String) value);
-        } else if (value instanceof Number) {
-            return Literal.of((Number) value);
-        } else if (value instanceof Boolean) {
-            return Literal.of((Boolean) value);
-        } else if (value == null) {
-            return Literal.ofNull();
-        } else {
-            return Literal.of(value.toString());
-        }
     }
 
     public String build() {
@@ -260,63 +232,6 @@ public class SelectBuilder {
         From from = getCurrentStatement().getFrom();
         if (from == null || from.getSources().isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
-        }
-    }
-
-    // Functional WHERE condition builder
-    public static class WhereConditionBuilder {
-        private final SelectBuilder parent;
-        private final String column;
-        private final LogicalOperator operator;
-
-        public WhereConditionBuilder(SelectBuilder parent, String column, LogicalOperator operator) {
-            this.parent = parent;
-            this.column = column;
-            this.operator = operator;
-        }
-
-        public SelectBuilder eq(Object value) {
-            return addCondition(Comparison.eq(getColumnRef(), parent.toLiteral(value)));
-        }
-
-        public SelectBuilder ne(Object value) {
-            return addCondition(Comparison.ne(getColumnRef(), parent.toLiteral(value)));
-        }
-
-        public SelectBuilder gt(Object value) {
-            return addCondition(Comparison.gt(getColumnRef(), parent.toLiteral(value)));
-        }
-
-        public SelectBuilder lt(Object value) {
-            return addCondition(Comparison.lt(getColumnRef(), parent.toLiteral(value)));
-        }
-
-        public SelectBuilder gte(Object value) {
-            return addCondition(Comparison.gte(getColumnRef(), parent.toLiteral(value)));
-        }
-
-        public SelectBuilder lte(Object value) {
-            return addCondition(Comparison.lte(getColumnRef(), parent.toLiteral(value)));
-        }
-
-        public SelectBuilder like(String pattern) {
-            return addCondition(new Like(getColumnRef(), pattern));
-        }
-
-        public SelectBuilder isNull() {
-            return addCondition(new IsNull(getColumnRef()));
-        }
-
-        public SelectBuilder isNotNull() {
-            return addCondition(new IsNotNull(getColumnRef()));
-        }
-
-        private ColumnReference getColumnRef() {
-            return ColumnReference.of(parent.getTableReference(), column);
-        }
-
-        private SelectBuilder addCondition(BooleanExpression condition) {
-            return parent.updateWhere(where -> parent.combineConditions(where, condition, operator));
         }
     }
 }
