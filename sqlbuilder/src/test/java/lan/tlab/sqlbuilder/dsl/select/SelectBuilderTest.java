@@ -4,6 +4,13 @@ import static lan.tlab.sqlbuilder.dsl.DSL.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
+import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
+import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
+import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
+import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
+import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderTest {
@@ -319,5 +326,75 @@ class SelectBuilderTest {
         assertThatThrownBy(() -> select("*").from("users").offset(-5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Offset must be non-negative, got: -5");
+    }
+
+    // Tests for static helper methods
+    @Test
+    void hasValidConditionReturnsTrueForValidComparison() {
+        Where whereWithComparison = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        assertThat(SelectBuilder.hasValidCondition(whereWithComparison)).isTrue();
+    }
+
+    @Test
+    void hasValidConditionReturnsFalseForNullBooleanExpression() {
+        Where whereWithNull = Where.of(new NullBooleanExpression());
+
+        assertThat(SelectBuilder.hasValidCondition(whereWithNull)).isFalse();
+    }
+
+    @Test
+    void combineWithExistingCreatesAndCondition() {
+        Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        BooleanExpression newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Where result = SelectBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.AND);
+
+        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+    }
+
+    @Test
+    void combineWithExistingCreatesOrCondition() {
+        Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        BooleanExpression newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Where result = SelectBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.OR);
+
+        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+        AndOr andOr = (AndOr) result.getCondition();
+        assertThat(andOr.getOperator()).isEqualTo(lan.tlab.sqlbuilder.ast.expression.bool.logical.LogicalOperator.OR);
+    }
+
+    @Test
+    void combineConditionsWithNullWhereCreatesNewCondition() {
+        BooleanExpression condition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+
+        Where result = SelectBuilder.combineConditions(null, condition, LogicalCombinator.AND);
+
+        assertThat(result.getCondition()).isEqualTo(condition);
+    }
+
+    @Test
+    void combineConditionsWithValidWhereCreatesCombinedCondition() {
+        Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        BooleanExpression newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Where result = SelectBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.OR);
+
+        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+    }
+
+    @Test
+    void combineConditionsWithNullBooleanExpressionCreatesNewCondition() {
+        Where existingWhere = Where.of(new NullBooleanExpression());
+
+        BooleanExpression newCondition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+
+        Where result = SelectBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.AND);
+
+        assertThat(result.getCondition()).isEqualTo(newCondition);
     }
 }
