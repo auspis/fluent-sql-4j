@@ -43,7 +43,7 @@ class SelectBuilderTest {
 
     @Test
     void where() {
-        String result = select("*").from("users").where("age", ">", 18).build();
+        String result = select("*").from("users").where("age").gt(18).build();
         assertThat(result).isEqualTo("""
             SELECT * FROM "users" WHERE "users"."age" > 18\
             """);
