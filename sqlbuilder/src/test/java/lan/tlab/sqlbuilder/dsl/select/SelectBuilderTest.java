@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.dsl;
+package lan.tlab.sqlbuilder.dsl.select;
 
 import static lan.tlab.sqlbuilder.dsl.DSL.select;
 import static org.assertj.core.api.Assertions.assertThat;
