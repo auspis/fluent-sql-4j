@@ -10,17 +10,16 @@ import lan.tlab.sqlbuilder.ast.expression.bool.Like;
 import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
-import lan.tlab.sqlbuilder.dsl.select.SelectBuilder.LogicalOperator;
 
 public class WhereConditionBuilder {
     private final SelectBuilder parent;
     private final String column;
-    private final LogicalOperator operator;
+    private final LogicalCombinator combinator;
 
-    public WhereConditionBuilder(SelectBuilder parent, String column, LogicalOperator operator) {
+    public WhereConditionBuilder(SelectBuilder parent, String column, LogicalCombinator combinator) {
         this.parent = parent;
         this.column = column;
-        this.operator = operator;
+        this.combinator = combinator;
     }
 
     // String comparisons
@@ -152,7 +151,7 @@ public class WhereConditionBuilder {
             BooleanExpression condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(startDate)),
                     Comparison.lte(getColumnRef(), Literal.of(endDate)));
-            return parent.combineConditions(where, condition, operator);
+            return parent.combineConditions(where, condition, combinator);
         });
     }
 
@@ -161,7 +160,7 @@ public class WhereConditionBuilder {
             BooleanExpression condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(startDateTime)),
                     Comparison.lte(getColumnRef(), Literal.of(endDateTime)));
-            return parent.combineConditions(where, condition, operator);
+            return parent.combineConditions(where, condition, combinator);
         });
     }
 
@@ -169,7 +168,7 @@ public class WhereConditionBuilder {
         return parent.updateWhere(where -> {
             BooleanExpression condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(min)), Comparison.lte(getColumnRef(), Literal.of(max)));
-            return parent.combineConditions(where, condition, operator);
+            return parent.combineConditions(where, condition, combinator);
         });
     }
 
@@ -179,6 +178,6 @@ public class WhereConditionBuilder {
     }
 
     private SelectBuilder addCondition(BooleanExpression condition) {
-        return parent.updateWhere(where -> parent.combineConditions(where, condition, operator));
+        return parent.updateWhere(where -> parent.combineConditions(where, condition, combinator));
     }
 }
