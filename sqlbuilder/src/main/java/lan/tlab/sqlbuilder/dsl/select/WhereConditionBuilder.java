@@ -151,7 +151,7 @@ public class WhereConditionBuilder {
             BooleanExpression condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(startDate)),
                     Comparison.lte(getColumnRef(), Literal.of(endDate)));
-            return parent.combineConditions(where, condition, combinator);
+            return SelectBuilder.combineConditions(where, condition, combinator);
         });
     }
 
@@ -160,7 +160,7 @@ public class WhereConditionBuilder {
             BooleanExpression condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(startDateTime)),
                     Comparison.lte(getColumnRef(), Literal.of(endDateTime)));
-            return parent.combineConditions(where, condition, combinator);
+            return SelectBuilder.combineConditions(where, condition, combinator);
         });
     }
 
@@ -168,7 +168,7 @@ public class WhereConditionBuilder {
         return parent.updateWhere(where -> {
             BooleanExpression condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(min)), Comparison.lte(getColumnRef(), Literal.of(max)));
-            return parent.combineConditions(where, condition, combinator);
+            return SelectBuilder.combineConditions(where, condition, combinator);
         });
     }
 
@@ -178,6 +178,6 @@ public class WhereConditionBuilder {
     }
 
     private SelectBuilder addCondition(BooleanExpression condition) {
-        return parent.updateWhere(where -> parent.combineConditions(where, condition, combinator));
+        return parent.updateWhere(where -> SelectBuilder.combineConditions(where, condition, combinator));
     }
 }
