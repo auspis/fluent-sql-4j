@@ -1,8 +1,9 @@
-package lan.tlab.sqlbuilder.dsl;
+package lan.tlab.sqlbuilder.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.sqlbuilder.dsl.DSL;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderPreparedStatementTest {
