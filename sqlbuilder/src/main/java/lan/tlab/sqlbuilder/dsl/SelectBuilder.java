@@ -140,36 +140,12 @@ public class SelectBuilder {
         return this;
     }
 
-    // Direct where method with operator
-    public SelectBuilder where(String column, String operator, Object value) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        ColumnReference columnRef = ColumnReference.of(getTableReference(), column);
-        BooleanExpression condition = createCondition(columnRef, operator, value);
-        return addWhereCondition(condition, LogicalOperator.AND);
-    }
-
     // Fluent where method that returns WhereConditionBuilder
     public WhereConditionBuilder where(String column) {
         if (column == null || column.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
         return new WhereConditionBuilder(this, column, LogicalOperator.AND);
-    }
-
-    // Helper method to create conditions from operator string
-    private BooleanExpression createCondition(ColumnReference columnRef, String operator, Object value) {
-        Literal<?> literal = toLiteral(value);
-        return switch (operator) {
-            case "=" -> Comparison.eq(columnRef, literal);
-            case ">" -> Comparison.gt(columnRef, literal);
-            case ">=" -> Comparison.gte(columnRef, literal);
-            case "<" -> Comparison.lt(columnRef, literal);
-            case "<=" -> Comparison.lte(columnRef, literal);
-            case "!=" -> Comparison.ne(columnRef, literal);
-            default -> throw new IllegalArgumentException("Unsupported operator: " + operator);
-        };
     }
 
     public SelectBuilder orderBy(String column) {
