@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.clause.fetch.Fetch;
@@ -184,20 +185,26 @@ public class SelectBuilder {
         return this;
     }
 
-    // Helper to combine conditions
-    Where combineConditions(Where currentWhere, BooleanExpression newCondition, LogicalCombinator combinator) {
-        if (currentWhere == null || currentWhere.getCondition() instanceof NullBooleanExpression) {
-            return Where.of(newCondition);
-        }
+    // Helper to combine conditions with functional approach
+    static Where combineConditions(Where currentWhere, BooleanExpression newCondition, LogicalCombinator combinator) {
+        return Optional.ofNullable(currentWhere)
+                .filter(SelectBuilder::hasValidCondition)
+                .map(where -> combineWithExisting(where, newCondition, combinator))
+                .orElse(Where.of(newCondition));
+    }
 
-        BooleanExpression existingCondition = currentWhere.getCondition();
+    static boolean hasValidCondition(Where where) {
+        return !(where.getCondition() instanceof NullBooleanExpression);
+    }
+
+    static Where combineWithExisting(Where where, BooleanExpression newCondition, LogicalCombinator combinator) {
+        BooleanExpression existingCondition = where.getCondition();
         BooleanExpression combinedCondition = combinator.combine(existingCondition, newCondition);
-
         return Where.of(combinedCondition);
     }
 
     SelectBuilder addWhereCondition(BooleanExpression condition, LogicalCombinator combinator) {
-        return updateWhere(where -> combineConditions(where, condition, combinator));
+        return updateWhere(where -> SelectBuilder.combineConditions(where, condition, combinator));
     }
 
     public String build() {
