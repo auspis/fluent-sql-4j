@@ -15,7 +15,6 @@ import lan.tlab.sqlbuilder.ast.clause.selection.Select;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.bool.NullBooleanExpression;
-import lan.tlab.sqlbuilder.ast.expression.bool.logical.AndOr;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.statement.SelectStatement;
@@ -26,11 +25,6 @@ import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
 public class SelectBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
-
-    enum LogicalOperator {
-        AND,
-        OR
-    }
 
     public SelectBuilder(String... columns) {
         if (columns != null && columns.length > 0) {
@@ -131,7 +125,7 @@ public class SelectBuilder {
         if (column == null || column.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
-        return new WhereConditionBuilder(this, column, LogicalOperator.AND);
+        return new WhereConditionBuilder(this, column, LogicalCombinator.AND);
     }
 
     public SelectBuilder orderBy(String column) {
@@ -175,11 +169,11 @@ public class SelectBuilder {
     }
 
     public WhereConditionBuilder and(String column) {
-        return new WhereConditionBuilder(this, column, LogicalOperator.AND);
+        return new WhereConditionBuilder(this, column, LogicalCombinator.AND);
     }
 
     public WhereConditionBuilder or(String column) {
-        return new WhereConditionBuilder(this, column, LogicalOperator.OR);
+        return new WhereConditionBuilder(this, column, LogicalCombinator.OR);
     }
 
     // Functional WHERE updater
@@ -191,21 +185,19 @@ public class SelectBuilder {
     }
 
     // Helper to combine conditions
-    Where combineConditions(Where currentWhere, BooleanExpression newCondition, LogicalOperator operator) {
+    Where combineConditions(Where currentWhere, BooleanExpression newCondition, LogicalCombinator combinator) {
         if (currentWhere == null || currentWhere.getCondition() instanceof NullBooleanExpression) {
             return Where.of(newCondition);
         }
 
         BooleanExpression existingCondition = currentWhere.getCondition();
-        BooleanExpression combinedCondition = (operator == LogicalOperator.OR)
-                ? AndOr.or(existingCondition, newCondition)
-                : AndOr.and(existingCondition, newCondition);
+        BooleanExpression combinedCondition = combinator.combine(existingCondition, newCondition);
 
         return Where.of(combinedCondition);
     }
 
-    SelectBuilder addWhereCondition(BooleanExpression condition, LogicalOperator operator) {
-        return updateWhere(where -> combineConditions(where, condition, operator));
+    SelectBuilder addWhereCondition(BooleanExpression condition, LogicalCombinator combinator) {
+        return updateWhere(where -> combineConditions(where, condition, combinator));
     }
 
     public String build() {
