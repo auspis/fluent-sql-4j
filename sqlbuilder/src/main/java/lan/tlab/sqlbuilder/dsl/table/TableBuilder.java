@@ -1,4 +1,4 @@
-package lan.tlab.sqlbuilder.dsl;
+package lan.tlab.sqlbuilder.dsl.table;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
+import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
+import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class TableBuilder {
     public static class ColumnBuilder {
@@ -96,8 +98,14 @@ public class TableBuilder {
     private final String tableName;
     private final List<ColumnDefinition> columns = new ArrayList<>();
     private final List<String> primaryKeyColumns = new ArrayList<>();
+    private final SqlRenderer sqlRenderer;
 
     public TableBuilder(String tableName) {
+        this(SqlRendererFactory.standardSql2008(), tableName);
+    }
+
+    public TableBuilder(SqlRenderer sqlRenderer, String tableName) {
+        this.sqlRenderer = sqlRenderer;
         this.tableName = tableName;
     }
 
@@ -140,7 +148,7 @@ public class TableBuilder {
 
     public String build() {
         CreateTableStatement statement = buildAst();
-        return statement.accept(DSL.SQL_RENDERER, new AstContext());
+        return statement.accept(sqlRenderer, new AstContext());
     }
 
     private CreateTableStatement buildAst() {
