@@ -63,6 +63,26 @@ public class ColumnBuilder {
         return tableBuilder.index(indexName, columns);
     }
 
+    public TableBuilder unique() {
+        buildAndAdd();
+        return tableBuilder.unique(columnBuilder.build().getName());
+    }
+
+    public TableBuilder foreignKey(String refTable, String... refColumns) {
+        buildAndAdd();
+        return tableBuilder.foreignKey(columnBuilder.build().getName(), refTable, refColumns);
+    }
+
+    public TableBuilder check(lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression expr) {
+        buildAndAdd();
+        return tableBuilder.check(expr);
+    }
+
+    public TableBuilder defaultValue(lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression value) {
+        buildAndAdd();
+        return tableBuilder.defaultConstraint(value);
+    }
+
     public String build() {
         buildAndAdd();
         return tableBuilder.build();
