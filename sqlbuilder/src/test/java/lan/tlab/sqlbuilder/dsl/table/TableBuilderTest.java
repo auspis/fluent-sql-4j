@@ -3,6 +3,9 @@ package lan.tlab.sqlbuilder.dsl.table;
 import static lan.tlab.sqlbuilder.dsl.DSL.createTable;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
+import lan.tlab.sqlbuilder.ast.expression.scalar.Literal;
 import org.junit.jupiter.api.Test;
 
 class TableBuilderTest {
@@ -160,6 +163,34 @@ class TableBuilderTest {
     }
 
     @Test
+    void uniqueConstraint() {
+        String sql = createTable("Users")
+                .column("id")
+                .integer()
+                .notNull()
+                .column("email")
+                .varchar(255)
+                .unique()
+                .build();
+
+        assertThat(sql).contains("UNIQUE (\"email\")");
+    }
+
+    @Test
+    void foreignKeyConstraint() {
+        String sql = createTable("Orders")
+                .column("id")
+                .integer()
+                .notNull()
+                .column("customer_id")
+                .integer()
+                .foreignKey("customer", "id")
+                .build();
+
+        assertThat(sql).contains("FOREIGN KEY (\"customer_id\") REFERENCES \"customer\" (\"id\")");
+    }
+
+    @Test
     void tableWithoutPrimaryKey() {
         String sql = createTable("Log")
                 .columnTimestampNotNull("timestamp")
@@ -196,6 +227,36 @@ class TableBuilderTest {
                 .contains("\"description\" VARCHAR(255) NOT NULL")
                 .contains("\"created_at\" TIMESTAMP NOT NULL")
                 .contains("PRIMARY KEY (\"id\")");
+    }
+
+    @Test
+    void checkConstraint() {
+        String sql = createTable("People")
+                .column("id")
+                .integer()
+                .notNull()
+                .column("age")
+                .integer()
+                .column("name")
+                .varchar(100)
+                .check(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18)))
+                .build();
+
+        assertThat(sql).contains("CHECK (\"age\" > 18)");
+    }
+
+    @Test
+    void defaultConstraint() {
+        String sql = createTable("Settings")
+                .column("id")
+                .integer()
+                .notNull()
+                .column("enabled")
+                .bool()
+                .defaultValue(Literal.of(true))
+                .build();
+
+        assertThat(sql).contains("DEFAULT true");
     }
 
     @Test
