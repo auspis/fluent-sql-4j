@@ -23,11 +23,18 @@ import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
+import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class SelectBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
+    private final SqlRenderer sqlRenderer;
 
     public SelectBuilder(String... columns) {
+        this(SqlRendererFactory.standardSql2008(), columns);
+    }
+
+    public SelectBuilder(SqlRenderer sqlRenderer, String... columns) {
+        this.sqlRenderer = sqlRenderer;
         if (columns != null && columns.length > 0) {
             statementBuilder = statementBuilder.select(Select.of(java.util.Arrays.stream(columns)
                     .map(column -> new ScalarExpressionProjection(ColumnReference.of("", column)))
@@ -210,8 +217,7 @@ public class SelectBuilder {
     public String build() {
         validateState();
         SelectStatement selectStatement = getCurrentStatement();
-        SqlRenderer renderer = SqlRenderer.builder().build();
-        return selectStatement.accept(renderer, new AstContext());
+        return selectStatement.accept(sqlRenderer, new AstContext());
     }
 
     public PreparedStatement buildPrepared(Connection connection) throws SQLException {
