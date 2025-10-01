@@ -199,6 +199,33 @@ class TableBuilderTest {
     }
 
     @Test
+    void singleIndex() {
+        String sql = createTable("Users")
+                .column("id")
+                .integer()
+                .notNull()
+                .column("email")
+                .varchar(255)
+                .index("idx_email", "email")
+                .build();
+
+        assertThat(sql).contains("\"email\" VARCHAR(255)").contains("INDEX \"idx_email\" (\"email\")");
+    }
+
+    @Test
+    void compositeIndex() {
+        String sql = createTable("Orders")
+                .column("customer_id")
+                .integer()
+                .column("order_date")
+                .date()
+                .index("idx_order_customer", "order_date", "customer_id")
+                .build();
+
+        assertThat(sql).contains("INDEX \"idx_order_customer\" (\"order_date\", \"customer_id\")");
+    }
+
+    @Test
     void columnWithoutExplicitTypeUsesDefault() {
         String sql = createTable("Test").column("default_column").notNull().build();
 
