@@ -1,6 +1,5 @@
 package lan.tlab.sqlbuilder.dsl.table;
 
-import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
@@ -17,12 +16,9 @@ public class TableBuilder {
     public static class ColumnBuilder {
         private final TableBuilder tableBuilder;
         private final ColumnDefinition.ColumnDefinitionBuilder columnBuilder;
-        private final String columnName;
-        private boolean isPrimaryKey = false;
 
         public ColumnBuilder(TableBuilder tableBuilder, String columnName) {
             this.tableBuilder = tableBuilder;
-            this.columnName = columnName;
             this.columnBuilder = ColumnDefinition.builder().name(columnName);
         }
 
@@ -56,11 +52,6 @@ public class TableBuilder {
             return this;
         }
 
-        public ColumnBuilder primaryKey() {
-            isPrimaryKey = true;
-            return this;
-        }
-
         public ColumnBuilder notNull() {
             columnBuilder.notNullConstraint(new NotNullConstraint());
             return this;
@@ -69,6 +60,11 @@ public class TableBuilder {
         public ColumnBuilder column(String nextColumnName) {
             buildAndAdd();
             return new ColumnBuilder(tableBuilder, nextColumnName);
+        }
+
+        public TableBuilder primaryKey(String... columnNames) {
+            buildAndAdd();
+            return tableBuilder.primaryKey(columnNames);
         }
 
         public String build() {
@@ -83,10 +79,6 @@ public class TableBuilder {
         private void buildAndAdd() {
             ColumnDefinition columnDef = columnBuilder.build();
             tableBuilder.addColumn(columnDef);
-
-            if (isPrimaryKey) {
-                tableBuilder.addToPrimaryKey(columnName);
-            }
         }
     }
 
@@ -106,6 +98,13 @@ public class TableBuilder {
         return new ColumnBuilder(this, columnName);
     }
 
+    public TableBuilder primaryKey(String... columnNames) {
+        if (columnNames.length > 0) {
+            definitionBuilder = definitionBuilder.primaryKey(new PrimaryKey(List.of(columnNames)));
+        }
+        return this;
+    }
+
     public TableBuilder columnIntegerPrimaryKey(String columnName) {
         ColumnDefinition columnDef = ColumnDefinition.builder()
                 .name(columnName)
@@ -114,8 +113,7 @@ public class TableBuilder {
                 .build();
 
         addColumn(columnDef);
-        addToPrimaryKey(columnName);
-        return this;
+        return primaryKey(columnName);
     }
 
     public TableBuilder columnStringPrimaryKey(String columnName, int length) {
@@ -126,8 +124,7 @@ public class TableBuilder {
                 .build();
 
         addColumn(columnDef);
-        addToPrimaryKey(columnName);
-        return this;
+        return primaryKey(columnName);
     }
 
     public TableBuilder columnTimestampNotNull(String columnName) {
@@ -165,24 +162,6 @@ public class TableBuilder {
 
     private void addColumn(ColumnDefinition column) {
         definitionBuilder = definitionBuilder.column(column);
-    }
-
-    private void addToPrimaryKey(String columnName) {
-        TableDefinition current = definitionBuilder.build();
-        List<String> columns = new ArrayList<>();
-
-        if (current.getPrimaryKey() != null) {
-            columns.addAll(current.getPrimaryKey().getColumns());
-        }
-        columns.add(columnName);
-
-        // Ricostruiamo il builder con la nuova primary key
-        definitionBuilder = TableDefinition.builder()
-                .table(current.getTable())
-                .columns(current.getColumns())
-                .primaryKey(new PrimaryKey(columns))
-                .constraints(current.getConstraints())
-                .indexes(current.getIndexes());
     }
 
     public String build() {

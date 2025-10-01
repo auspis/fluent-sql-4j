@@ -12,7 +12,6 @@ class TableBuilderTest {
         String sql = createTable("User")
                 .column("id")
                 .integer()
-                .primaryKey()
                 .notNull()
                 .column("name")
                 .varchar(100)
@@ -23,6 +22,7 @@ class TableBuilderTest {
                 .date()
                 .column("score")
                 .decimal(10, 2)
+                .primaryKey("id")
                 .build();
 
         assertThat(sql)
@@ -46,8 +46,8 @@ class TableBuilderTest {
         String sqlLongForm = createTable("Test")
                 .column("id")
                 .integer()
-                .primaryKey()
                 .notNull()
+                .primaryKey("id")
                 .build();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
@@ -63,8 +63,8 @@ class TableBuilderTest {
         String sqlLongForm = createTable("Test")
                 .column("code")
                 .varchar(50)
-                .primaryKey()
                 .notNull()
+                .primaryKey("code")
                 .build();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
@@ -112,11 +112,22 @@ class TableBuilderTest {
     @Test
     void allConvenienceMethodsTogether() {
         String sql = createTable("Product")
-                .columnIntegerPrimaryKey("id")
-                .columnStringPrimaryKey("sku", 20) // This would be a second primary key
-                .columnVarcharNotNull("name", 100)
-                .columnDecimalNotNull("price", 10, 2)
-                .columnTimestampNotNull("created_at")
+                .column("id")
+                .integer()
+                .notNull()
+                .column("sku")
+                .varchar(20)
+                .notNull()
+                .column("name")
+                .varchar(100)
+                .notNull()
+                .column("price")
+                .decimal(10, 2)
+                .notNull()
+                .column("created_at")
+                .timestamp()
+                .notNull()
+                .primaryKey("id", "sku") // Explicit composite primary key
                 .build();
 
         assertThat(sql)
@@ -127,27 +138,25 @@ class TableBuilderTest {
                 .contains("\"created_at\" TIMESTAMP NOT NULL")
                 .contains("PRIMARY KEY (\"id\", \"sku\")"); // Composite primary key
     }
-    // TODO: review primaryKey API for composite keys
 
     @Test
     void compositePrimaryKeyWithFluentApi() {
         String sql = createTable("Orders")
                 .column("customer_id")
                 .integer()
-                .primaryKey()
                 .notNull()
                 .column("order_date")
                 .date()
-                .primaryKey()
                 .column("amount")
                 .decimal(10, 2)
+                .primaryKey("order_date", "customer_id") // Ordine esplicito!
                 .build();
 
         assertThat(sql)
                 .contains("\"customer_id\" INTEGER NOT NULL")
                 .contains("\"order_date\" DATE")
                 .contains("\"amount\" DECIMAL(10, 2)")
-                .contains("PRIMARY KEY (\"customer_id\", \"order_date\")");
+                .contains("PRIMARY KEY (\"order_date\", \"customer_id\")"); // Ordine corretto
     }
 
     @Test
@@ -195,5 +204,28 @@ class TableBuilderTest {
 
         // ColumnDefinition ha un default di VARCHAR(255)
         assertThat(sql).contains("\"default_column\" VARCHAR(255) NOT NULL");
+    }
+
+    @Test
+    void primaryKeyWithExplicitOrderControl() {
+        // Dimostra il controllo esplicito dell'ordine delle colonne nella primary key
+        String sql = createTable("OrderItems")
+                .column("item_id")
+                .integer()
+                .notNull()
+                .column("order_id")
+                .integer()
+                .notNull()
+                .column("quantity")
+                .integer()
+                .primaryKey("order_id", "item_id") // Ordine esplicito: order_id prima di item_id
+                .build();
+
+        assertThat(sql)
+                .contains("\"item_id\" INTEGER NOT NULL")
+                .contains("\"order_id\" INTEGER NOT NULL")
+                .contains("\"quantity\" INTEGER")
+                .contains(
+                        "PRIMARY KEY (\"order_id\", \"item_id\")"); // Ordine corretto indipendente dalla dichiarazione
     }
 }
