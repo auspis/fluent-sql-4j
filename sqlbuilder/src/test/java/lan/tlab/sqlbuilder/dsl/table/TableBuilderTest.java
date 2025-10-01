@@ -127,4 +127,73 @@ class TableBuilderTest {
                 .contains("\"created_at\" TIMESTAMP NOT NULL")
                 .contains("PRIMARY KEY (\"id\", \"sku\")"); // Composite primary key
     }
+    // TODO: review primaryKey API for composite keys
+
+    @Test
+    void compositePrimaryKeyWithFluentApi() {
+        String sql = createTable("Orders")
+                .column("customer_id")
+                .integer()
+                .primaryKey()
+                .notNull()
+                .column("order_date")
+                .date()
+                .primaryKey()
+                .column("amount")
+                .decimal(10, 2)
+                .build();
+
+        assertThat(sql)
+                .contains("\"customer_id\" INTEGER NOT NULL")
+                .contains("\"order_date\" DATE")
+                .contains("\"amount\" DECIMAL(10, 2)")
+                .contains("PRIMARY KEY (\"customer_id\", \"order_date\")");
+    }
+
+    @Test
+    void tableWithoutPrimaryKey() {
+        String sql = createTable("Log")
+                .columnTimestampNotNull("timestamp")
+                .columnVarcharNotNull("message", 500)
+                .build();
+
+        assertThat(sql)
+                .contains("\"timestamp\" TIMESTAMP NOT NULL")
+                .contains("\"message\" VARCHAR(500) NOT NULL")
+                .doesNotContain("PRIMARY KEY");
+    }
+
+    @Test
+    void booleanColumn() {
+        String sql = createTable("Settings").column("enabled").bool().build();
+
+        assertThat(sql).contains("\"enabled\" BOOLEAN");
+    }
+
+    @Test
+    void mixedFluentAndConvenienceApis() {
+        String sql = createTable("Mixed")
+                .columnIntegerPrimaryKey("id")
+                .column("description")
+                .varchar(255)
+                .notNull()
+                .column("created_at")
+                .timestamp()
+                .notNull()
+                .build();
+
+        assertThat(sql)
+                .contains("\"id\" INTEGER NOT NULL")
+                .contains("\"description\" VARCHAR(255) NOT NULL")
+                .contains("\"created_at\" TIMESTAMP NOT NULL")
+                .contains("PRIMARY KEY (\"id\")");
+    }
+
+    @Test
+    void columnWithoutExplicitTypeUsesDefault() {
+        String sql = createTable("Test").column("default_column").notNull().build();
+
+        // ColumnDefinition ha un default di VARCHAR(255)
+        assertThat(sql).contains("\"default_column\" VARCHAR(255) NOT NULL");
+    }
 }
