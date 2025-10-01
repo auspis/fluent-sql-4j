@@ -5,6 +5,7 @@ import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.PrimaryKey;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
+import lan.tlab.sqlbuilder.ast.expression.item.ddl.Index;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
@@ -12,75 +13,6 @@ import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class TableBuilder {
-
-    public static class ColumnBuilder {
-        private final TableBuilder tableBuilder;
-        private final ColumnDefinition.ColumnDefinitionBuilder columnBuilder;
-
-        public ColumnBuilder(TableBuilder tableBuilder, String columnName) {
-            this.tableBuilder = tableBuilder;
-            this.columnBuilder = ColumnDefinition.builder().name(columnName);
-        }
-
-        public ColumnBuilder integer() {
-            columnBuilder.type(DataType.integer());
-            return this;
-        }
-
-        public ColumnBuilder varchar(int length) {
-            columnBuilder.type(DataType.varchar(length));
-            return this;
-        }
-
-        public ColumnBuilder date() {
-            columnBuilder.type(DataType.date());
-            return this;
-        }
-
-        public ColumnBuilder timestamp() {
-            columnBuilder.type(DataType.timestamp());
-            return this;
-        }
-
-        public ColumnBuilder bool() {
-            columnBuilder.type(DataType.bool());
-            return this;
-        }
-
-        public ColumnBuilder decimal(int precision, int scale) {
-            columnBuilder.type(DataType.decimal(precision, scale));
-            return this;
-        }
-
-        public ColumnBuilder notNull() {
-            columnBuilder.notNullConstraint(new NotNullConstraint());
-            return this;
-        }
-
-        public ColumnBuilder column(String nextColumnName) {
-            buildAndAdd();
-            return new ColumnBuilder(tableBuilder, nextColumnName);
-        }
-
-        public TableBuilder primaryKey(String... columnNames) {
-            buildAndAdd();
-            return tableBuilder.primaryKey(columnNames);
-        }
-
-        public String build() {
-            buildAndAdd();
-            return tableBuilder.build();
-        }
-
-        void buildColumn() {
-            buildAndAdd();
-        }
-
-        private void buildAndAdd() {
-            ColumnDefinition columnDef = columnBuilder.build();
-            tableBuilder.addColumn(columnDef);
-        }
-    }
 
     private TableDefinition.TableDefinitionBuilder definitionBuilder;
     private final SqlRenderer sqlRenderer;
@@ -160,8 +92,15 @@ public class TableBuilder {
         return this;
     }
 
-    private void addColumn(ColumnDefinition column) {
+    void addColumn(ColumnDefinition column) {
         definitionBuilder = definitionBuilder.column(column);
+    }
+
+    public TableBuilder index(String indexName, String... columns) {
+        if (indexName != null && columns != null && columns.length > 0) {
+            definitionBuilder = definitionBuilder.index(new Index(indexName, columns));
+        }
+        return this;
     }
 
     public String build() {
