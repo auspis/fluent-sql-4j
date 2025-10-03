@@ -23,15 +23,10 @@ import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
-import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class SelectBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final SqlRenderer sqlRenderer;
-
-    public SelectBuilder(String... columns) {
-        this(SqlRendererFactory.standardSql2008(), columns);
-    }
 
     public SelectBuilder(SqlRenderer sqlRenderer, String... columns) {
         this.sqlRenderer = sqlRenderer;
