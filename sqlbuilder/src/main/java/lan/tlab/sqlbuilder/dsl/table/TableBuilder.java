@@ -15,17 +15,12 @@ import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 import lan.tlab.sqlbuilder.ast.statement.CreateTableStatement;
 import lan.tlab.sqlbuilder.ast.visitor.AstContext;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
-import lan.tlab.sqlbuilder.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class TableBuilder {
 
     private TableDefinition.TableDefinitionBuilder definitionBuilder;
     private final SqlRenderer sqlRenderer;
     private List<ColumnDefinition> columns = new ArrayList<>();
-
-    public TableBuilder(String tableName) {
-        this(SqlRendererFactory.standardSql2008(), tableName);
-    }
 
     public TableBuilder(SqlRenderer sqlRenderer, String tableName) {
         this.sqlRenderer = sqlRenderer;
