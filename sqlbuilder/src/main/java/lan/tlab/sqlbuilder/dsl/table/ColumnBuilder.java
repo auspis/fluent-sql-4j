@@ -1,8 +1,10 @@
 package lan.tlab.sqlbuilder.dsl.table;
 
+import lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.ColumnDefinition;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.sqlbuilder.ast.expression.item.ddl.DataType;
+import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression;
 
 public class ColumnBuilder {
     private final TableBuilder tableBuilder;
@@ -64,21 +66,21 @@ public class ColumnBuilder {
     }
 
     public TableBuilder unique() {
-        buildAndAdd();
-        return tableBuilder.unique(columnBuilder.build().getName());
+        ColumnDefinition columnDef = buildAndAdd();
+        return tableBuilder.unique(columnDef.getName());
     }
 
     public TableBuilder foreignKey(String refTable, String... refColumns) {
-        buildAndAdd();
-        return tableBuilder.foreignKey(columnBuilder.build().getName(), refTable, refColumns);
+        ColumnDefinition columnDef = buildAndAdd();
+        return tableBuilder.foreignKey(columnDef.getName(), refTable, refColumns);
     }
 
-    public TableBuilder check(lan.tlab.sqlbuilder.ast.expression.bool.BooleanExpression expr) {
+    public TableBuilder check(BooleanExpression expr) {
         buildAndAdd();
         return tableBuilder.check(expr);
     }
 
-    public TableBuilder defaultValue(lan.tlab.sqlbuilder.ast.expression.scalar.ScalarExpression value) {
+    public TableBuilder defaultValue(ScalarExpression value) {
         buildAndAdd();
         return tableBuilder.defaultConstraint(value);
     }
@@ -92,8 +94,9 @@ public class ColumnBuilder {
         buildAndAdd();
     }
 
-    private void buildAndAdd() {
+    private ColumnDefinition buildAndAdd() {
         ColumnDefinition columnDef = columnBuilder.build();
         tableBuilder.addColumn(columnDef);
+        return columnDef;
     }
 }
