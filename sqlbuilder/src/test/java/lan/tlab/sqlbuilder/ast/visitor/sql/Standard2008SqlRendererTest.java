@@ -9,7 +9,7 @@ import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
@@ -46,7 +46,7 @@ class Standard2008SqlRendererTest {
         SelectStatement statement = SelectStatement.builder()
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("Customer", "name")),
-                        new AggregationFunctionProjection(AggregateCall.countStar(), "nameCounter")))
+                        new AggregateCallProjection(AggregateCall.countStar(), "nameCounter")))
                 .from(From.fromTable("Customer", "c"))
                 .where(Where.of(Comparison.gt(ColumnReference.of("c", "score"), Literal.of(400))))
                 .groupBy(GroupBy.of(ColumnReference.of("Customer", "name")))

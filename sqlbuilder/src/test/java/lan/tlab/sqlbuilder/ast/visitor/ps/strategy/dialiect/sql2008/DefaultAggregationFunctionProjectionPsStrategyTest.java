@@ -2,7 +2,7 @@ package lan.tlab.sqlbuilder.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
@@ -28,7 +28,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void countWithoutAlias() {
         AggregateCall aggregateCall = AggregateCall.count(ColumnReference.of("User", "id"));
-        AggregationFunctionProjection projection = new AggregationFunctionProjection(aggregateCall);
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall);
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -39,8 +39,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void countWithAlias() {
         AggregateCall aggregateCall = AggregateCall.count(ColumnReference.of("User", "id"));
-        AggregationFunctionProjection projection =
-                new AggregationFunctionProjection(aggregateCall, new As("total_users"));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As("total_users"));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -51,8 +50,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void sumWithAlias() {
         AggregateCall aggregateCall = AggregateCall.sum(ColumnReference.of("Order", "amount"));
-        AggregationFunctionProjection projection =
-                new AggregationFunctionProjection(aggregateCall, new As("total_amount"));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As("total_amount"));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -63,7 +61,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void avgWithoutAlias() {
         AggregateCall aggregateCall = AggregateCall.avg(ColumnReference.of("Product", "price"));
-        AggregationFunctionProjection projection = new AggregationFunctionProjection(aggregateCall);
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall);
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -74,8 +72,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void maxWithAlias() {
         AggregateCall aggregateCall = AggregateCall.max(ColumnReference.of("Product", "price"));
-        AggregationFunctionProjection projection =
-                new AggregationFunctionProjection(aggregateCall, new As("max_price"));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As("max_price"));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -86,8 +83,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void minWithAlias() {
         AggregateCall aggregateCall = AggregateCall.min(ColumnReference.of("Product", "price"));
-        AggregationFunctionProjection projection =
-                new AggregationFunctionProjection(aggregateCall, new As("min_price"));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As("min_price"));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -98,8 +94,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void countStarWithAlias() {
         AggregateCall aggregateCall = AggregateCall.countStar();
-        AggregationFunctionProjection projection =
-                new AggregationFunctionProjection(aggregateCall, new As("row_count"));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As("row_count"));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -110,8 +105,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void countDistinctWithAlias() {
         AggregateCall aggregateCall = AggregateCall.countDistinct(ColumnReference.of("User", "email"));
-        AggregationFunctionProjection projection =
-                new AggregationFunctionProjection(aggregateCall, new As("unique_emails"));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As("unique_emails"));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -122,7 +116,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void aliasWithEmptyString() {
         AggregateCall aggregateCall = AggregateCall.count(ColumnReference.of("User", "id"));
-        AggregationFunctionProjection projection = new AggregationFunctionProjection(aggregateCall, new As(""));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As(""));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 
@@ -133,7 +127,7 @@ class DefaultAggregationFunctionProjectionPsStrategyTest {
     @Test
     void aliasWithBlankString() {
         AggregateCall aggregateCall = AggregateCall.count(ColumnReference.of("User", "id"));
-        AggregationFunctionProjection projection = new AggregationFunctionProjection(aggregateCall, new As("   "));
+        AggregateCallProjection projection = new AggregateCallProjection(aggregateCall, new As("   "));
 
         PsDto result = strategy.handle(projection, visitor, ctx);
 

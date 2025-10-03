@@ -11,7 +11,7 @@ import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Between;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
@@ -535,7 +535,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(AggregationFunctionProjection aggregationFunctionProjection, AstContext ctx) {
+    public PsDto visit(AggregateCallProjection aggregationFunctionProjection, AstContext ctx) {
         return aggregationFunctionProjectionPsStrategy.handle(aggregationFunctionProjection, this, ctx);
     }
 
