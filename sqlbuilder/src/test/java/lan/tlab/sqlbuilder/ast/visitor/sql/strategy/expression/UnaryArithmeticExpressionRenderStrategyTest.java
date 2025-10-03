@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
@@ -40,8 +40,8 @@ class UnaryArithmeticExpressionRenderStrategyTest {
     void negationSubquery() {
         ScalarSubquery subquery = ScalarSubquery.builder()
                 .tableExpression(SelectStatement.builder()
-                        .select(Select.of(new AggregationFunctionProjection(
-                                AggregateCall.max(ColumnReference.of("Risk", "value")))))
+                        .select(Select.of(
+                                new AggregateCallProjection(AggregateCall.max(ColumnReference.of("Risk", "value")))))
                         .from(From.fromTable("Risk"))
                         .build())
                 .build();
