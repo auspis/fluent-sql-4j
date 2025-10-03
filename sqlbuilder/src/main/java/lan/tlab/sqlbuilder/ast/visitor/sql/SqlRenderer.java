@@ -10,7 +10,7 @@ import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Between;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
@@ -88,8 +88,8 @@ import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.SortingRenderStrategy
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.WhereRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause.fetch.FetchRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.AggregateCallProjectionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.AggregateCallRenderStrategy;
-import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.AggregationFunctionProjectionRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.AndOrRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.BetweenRenderStrategy;
 import lan.tlab.sqlbuilder.ast.visitor.sql.strategy.expression.BinaryArithmeticExpressionRenderStrategy;
@@ -185,8 +185,8 @@ public class SqlRenderer implements Visitor<String> {
     private final SelectRenderStrategy selectStrategy = new SelectRenderStrategy();
 
     @Default
-    private final AggregationFunctionProjectionRenderStrategy aggregationFunctionProjectionStrategy =
-            new AggregationFunctionProjectionRenderStrategy();
+    private final AggregateCallProjectionRenderStrategy aggregateCallProjectionStrategy =
+            new AggregateCallProjectionRenderStrategy();
 
     @Default
     private final ScalarExpressionProjectionRenderStrategy scalarExpressionProjectionStrategy =
@@ -435,8 +435,8 @@ public class SqlRenderer implements Visitor<String> {
     }
 
     @Override
-    public String visit(AggregationFunctionProjection projection, AstContext ctx) {
-        return aggregationFunctionProjectionStrategy.render(projection, this, ctx);
+    public String visit(AggregateCallProjection projection, AstContext ctx) {
+        return aggregateCallProjectionStrategy.render(projection, this, ctx);
     }
 
     @Override
