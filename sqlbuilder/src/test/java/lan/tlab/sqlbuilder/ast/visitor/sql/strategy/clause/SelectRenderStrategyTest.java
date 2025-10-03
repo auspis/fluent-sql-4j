@@ -3,7 +3,7 @@ package lan.tlab.sqlbuilder.ast.visitor.sql.strategy.clause;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.item.As;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ArithmeticExpression;
@@ -59,8 +59,8 @@ class SelectRenderStrategyTest {
     @Test
     void aggregationFunction() {
         Select select = Select.of(
-                new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("Customer", "score"))),
-                new AggregationFunctionProjection(
+                new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("Customer", "score"))),
+                new AggregateCallProjection(
                         AggregateCall.sum(ColumnReference.of("Customer", "amount")), new As("debt")));
         String sql = strategy.render(select, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("SELECT SUM(\"Customer\".\"score\"), SUM(\"Customer\".\"amount\") AS debt");

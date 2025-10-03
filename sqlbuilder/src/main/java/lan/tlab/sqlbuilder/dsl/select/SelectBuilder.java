@@ -64,7 +64,6 @@ public class SelectBuilder {
 
         statementBuilder = statementBuilder.from(From.of(tableWithAlias));
         updateSelectClauseWithTable(tableWithAlias);
-
         return this;
     }
 
@@ -88,11 +87,6 @@ public class SelectBuilder {
     private void updateSelectClauseWithTable(Table table) {
         Select currentSelect = getCurrentStatement().getSelect();
         if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
-            String tableReference =
-                    table.getAs() != null && !table.getAs().getName().isEmpty()
-                            ? table.getAs().getName()
-                            : table.getName();
-
             List<ScalarExpressionProjection> updatedProjections = new ArrayList<>();
 
             for (var projection : currentSelect.getProjections()) {
@@ -100,8 +94,8 @@ public class SelectBuilder {
                         && scalarProj.getExpression() instanceof ColumnReference colRef) {
 
                     if (!"*".equals(colRef.getColumn())) {
-                        updatedProjections.add(
-                                new ScalarExpressionProjection(ColumnReference.of(tableReference, colRef.getColumn())));
+                        updatedProjections.add(new ScalarExpressionProjection(
+                                ColumnReference.of(table.getTableReference(), colRef.getColumn())));
                     } else {
                         updatedProjections.add(scalarProj);
                     }
