@@ -10,7 +10,7 @@ import lan.tlab.sqlbuilder.ast.clause.groupby.GroupBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.OrderBy;
 import lan.tlab.sqlbuilder.ast.clause.orderby.Sorting;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.Expression;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
@@ -336,8 +336,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectCount() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -349,8 +348,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectSum() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -362,8 +360,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectAvg() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -375,8 +372,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectMin() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -388,8 +384,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectMax() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -401,8 +396,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectCountGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
@@ -415,8 +409,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectSumGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
@@ -429,8 +422,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectAvgGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
@@ -443,8 +435,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectMinGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
@@ -457,8 +448,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectMaxGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
@@ -498,7 +488,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectAggregationProjectionWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new AggregationFunctionProjection(
+                .select(Select.of(new AggregateCallProjection(
                         AggregateCall.count(ColumnReference.of("User", "id")), new As("totalUsers"))))
                 .from(From.of(new Table("User")))
                 .build();
@@ -511,7 +501,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectAggregationProjectionWithAliasGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new AggregationFunctionProjection(
+                .select(Select.of(new AggregateCallProjection(
                         AggregateCall.sum(ColumnReference.of("User", "id")), new As("sumId"))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
@@ -526,9 +516,9 @@ class PreparedStatementVisitorTest {
     void testSelectMultipleAggregationProjectionsWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
-                        new AggregationFunctionProjection(
+                        new AggregateCallProjection(
                                 AggregateCall.avg(ColumnReference.of("User", "id")), new As("avgId")),
-                        new AggregationFunctionProjection(
+                        new AggregateCallProjection(
                                 AggregateCall.max(ColumnReference.of("User", "id")), new As("maxId"))))
                 .from(From.of(new Table("User")))
                 .build();
@@ -826,8 +816,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectCountGroupByHaving() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -843,8 +832,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectSumGroupByHavingAnd() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -863,8 +851,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectAvgGroupByHavingOr() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -883,7 +870,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByHavingWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new AggregationFunctionProjection(
+                .select(Select.of(new AggregateCallProjection(
                         AggregateCall.count(ColumnReference.of("User", "id")), new As("total"))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
@@ -901,8 +888,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByMultipleColumnsHaving() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email"), ColumnReference.of("User", "name")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -918,8 +904,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByHavingWithWhereOrderByLimit() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
@@ -939,8 +924,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByHavingIsNull() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -956,8 +940,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByHavingIsNotNull() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -973,8 +956,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByHavingBetween() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -991,8 +973,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByHavingIn() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -1010,8 +991,7 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectGroupByHavingNotNested() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(
-                        new AggregationFunctionProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.sqlbuilder.ast.clause.conditional.having.Having.of(
@@ -1907,7 +1887,7 @@ class PreparedStatementVisitorTest {
     @Test
     void scalarSubqueryIntegration() {
         SelectStatement innerSelect = SelectStatement.builder()
-                .select(Select.of(new AggregationFunctionProjection(AggregateCall.countStar())))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.countStar())))
                 .from(From.of(new Table("users")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("users", "active"), Literal.of(true))))
                 .build();

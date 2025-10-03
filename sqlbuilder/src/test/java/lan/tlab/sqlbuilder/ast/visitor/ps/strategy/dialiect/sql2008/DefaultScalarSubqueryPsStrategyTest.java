@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.sqlbuilder.ast.clause.conditional.where.Where;
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.sqlbuilder.ast.expression.bool.Comparison;
 import lan.tlab.sqlbuilder.ast.expression.item.Table;
@@ -48,7 +48,7 @@ class DefaultScalarSubqueryPsStrategyTest {
     @Test
     void scalarSubqueryWithParameters() {
         SelectStatement innerSelect = SelectStatement.builder()
-                .select(Select.of(new AggregationFunctionProjection(AggregateCall.countStar())))
+                .select(Select.of(new AggregateCallProjection(AggregateCall.countStar())))
                 .from(From.of(new Table("orders")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("orders", "status"), Literal.of("active"))))
                 .build();

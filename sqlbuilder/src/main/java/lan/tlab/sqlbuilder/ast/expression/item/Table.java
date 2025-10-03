@@ -26,4 +26,8 @@ public class Table implements SqlItem, TableExpression, FromSource {
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
     }
+
+    public String getTableReference() {
+        return as.getName().isEmpty() ? name : as.getName();
+    }
 }
