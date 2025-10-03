@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.sqlbuilder.ast.clause.from.From;
 import lan.tlab.sqlbuilder.ast.clause.selection.Select;
-import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregationFunctionProjection;
+import lan.tlab.sqlbuilder.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ColumnReference;
 import lan.tlab.sqlbuilder.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.sqlbuilder.ast.expression.scalar.call.aggregate.AggregateCall;
@@ -31,7 +31,7 @@ class ScalarSubqueryRenderStrategyTest {
         ScalarSubquery subquery = ScalarSubquery.builder()
                 .tableExpression(SelectStatement.builder()
                         .select(Select.builder()
-                                .projection(new AggregationFunctionProjection(
+                                .projection(new AggregateCallProjection(
                                         AggregateCall.max(ColumnReference.of("Risk", "value"))))
                                 .build())
                         .from(From.fromTable("Risk"))
