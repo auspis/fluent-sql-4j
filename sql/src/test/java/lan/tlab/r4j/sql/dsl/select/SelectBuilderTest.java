@@ -5,12 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderTest {
@@ -337,8 +337,8 @@ class SelectBuilderTest {
     }
 
     @Test
-    void hasValidConditionReturnsFalseForNullBooleanExpression() {
-        Where whereWithNull = Where.of(new NullBooleanExpression());
+    void hasValidConditionReturnsFalseForNullPredicate() {
+        Where whereWithNull = Where.of(new NullPredicate());
 
         assertThat(SelectBuilder.hasValidCondition(whereWithNull)).isFalse();
     }
@@ -347,7 +347,7 @@ class SelectBuilderTest {
     void combineWithExistingCreatesAndCondition() {
         Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
 
-        BooleanExpression newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
 
         Where result = SelectBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.AND);
 
@@ -358,18 +358,18 @@ class SelectBuilderTest {
     void combineWithExistingCreatesOrCondition() {
         Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
 
-        BooleanExpression newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
 
         Where result = SelectBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.OR);
 
         assertThat(result.getCondition()).isInstanceOf(AndOr.class);
         AndOr andOr = (AndOr) result.getCondition();
-        assertThat(andOr.getOperator()).isEqualTo(lan.tlab.r4j.sql.ast.expression.bool.logical.LogicalOperator.OR);
+        assertThat(andOr.getOperator()).isEqualTo(lan.tlab.r4j.sql.ast.predicate.logical.LogicalOperator.OR);
     }
 
     @Test
     void combineConditionsWithNullWhereCreatesNewCondition() {
-        BooleanExpression condition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+        Predicate condition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
 
         Where result = SelectBuilder.combineConditions(null, condition, LogicalCombinator.AND);
 
@@ -380,7 +380,7 @@ class SelectBuilderTest {
     void combineConditionsWithValidWhereCreatesCombinedCondition() {
         Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
 
-        BooleanExpression newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
 
         Where result = SelectBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.OR);
 
@@ -388,10 +388,10 @@ class SelectBuilderTest {
     }
 
     @Test
-    void combineConditionsWithNullBooleanExpressionCreatesNewCondition() {
-        Where existingWhere = Where.of(new NullBooleanExpression());
+    void combineConditionsWithNullPredicateCreatesNewCondition() {
+        Where existingWhere = Where.of(new NullPredicate());
 
-        BooleanExpression newCondition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+        Predicate newCondition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
 
         Where result = SelectBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.AND);
 

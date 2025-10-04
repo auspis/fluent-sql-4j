@@ -1,8 +1,8 @@
 package lan.tlab.r4j.sql.ast.clause.conditional.having;
 
 import lan.tlab.r4j.sql.ast.clause.Clause;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AccessLevel;
@@ -17,9 +17,9 @@ import lombok.Getter;
 public class Having implements Clause {
 
     @Default
-    private final BooleanExpression condition = new NullBooleanExpression();
+    private final Predicate condition = new NullPredicate();
 
-    public static Having of(BooleanExpression condition) {
+    public static Having of(Predicate condition) {
         return builder().condition(condition).build();
     }
 

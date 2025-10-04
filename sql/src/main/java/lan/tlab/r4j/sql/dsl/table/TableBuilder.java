@@ -2,7 +2,6 @@ package lan.tlab.r4j.sql.dsl.table;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.NotNullConstraint;
@@ -12,6 +11,7 @@ import lan.tlab.r4j.sql.ast.expression.item.ddl.Index;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -124,7 +124,7 @@ public class TableBuilder {
         return this;
     }
 
-    public TableBuilder check(BooleanExpression expr) {
+    public TableBuilder check(Predicate expr) {
         if (expr != null) {
             definitionBuilder = definitionBuilder.constraint(new Constraint.CheckConstraint(expr));
         }

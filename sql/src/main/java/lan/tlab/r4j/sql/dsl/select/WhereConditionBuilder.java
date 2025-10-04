@@ -2,14 +2,14 @@ package lan.tlab.r4j.sql.dsl.select;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNotNull;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNull;
-import lan.tlab.r4j.sql.ast.expression.bool.Like;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
+import lan.tlab.r4j.sql.ast.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.predicate.Like;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 
 public class WhereConditionBuilder {
     private final SelectBuilder parent;
@@ -148,7 +148,7 @@ public class WhereConditionBuilder {
     // Convenience methods for date ranges
     public SelectBuilder between(LocalDate startDate, LocalDate endDate) {
         return parent.updateWhere(where -> {
-            BooleanExpression condition = AndOr.and(
+            Predicate condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(startDate)),
                     Comparison.lte(getColumnRef(), Literal.of(endDate)));
             return SelectBuilder.combineConditions(where, condition, combinator);
@@ -157,7 +157,7 @@ public class WhereConditionBuilder {
 
     public SelectBuilder between(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         return parent.updateWhere(where -> {
-            BooleanExpression condition = AndOr.and(
+            Predicate condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(startDateTime)),
                     Comparison.lte(getColumnRef(), Literal.of(endDateTime)));
             return SelectBuilder.combineConditions(where, condition, combinator);
@@ -166,7 +166,7 @@ public class WhereConditionBuilder {
 
     public SelectBuilder between(Number min, Number max) {
         return parent.updateWhere(where -> {
-            BooleanExpression condition = AndOr.and(
+            Predicate condition = AndOr.and(
                     Comparison.gte(getColumnRef(), Literal.of(min)), Comparison.lte(getColumnRef(), Literal.of(max)));
             return SelectBuilder.combineConditions(where, condition, combinator);
         });
@@ -177,7 +177,7 @@ public class WhereConditionBuilder {
         return ColumnReference.of(parent.getTableReference(), column);
     }
 
-    private SelectBuilder addCondition(BooleanExpression condition) {
+    private SelectBuilder addCondition(Predicate condition) {
         return parent.updateWhere(where -> SelectBuilder.combineConditions(where, condition, combinator));
     }
 }
