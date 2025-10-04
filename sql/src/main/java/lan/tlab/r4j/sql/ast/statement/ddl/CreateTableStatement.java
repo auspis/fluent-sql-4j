@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.statement;
+package lan.tlab.r4j.sql.ast.statement.ddl;
 
 import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class CreateTableStatement implements Statement {
+public class CreateTableStatement implements DataDefinitionStatement {
 
     private final TableDefinition tableDefinition;
 
