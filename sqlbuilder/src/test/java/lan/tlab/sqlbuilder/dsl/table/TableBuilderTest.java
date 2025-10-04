@@ -290,7 +290,7 @@ class TableBuilderTest {
     void columnWithoutExplicitTypeUsesDefault() {
         String sql = createTable("Test").column("default_column").notNull().build();
 
-        // ColumnDefinition ha un default di VARCHAR(255)
+        // ColumnDefinition has a default of VARCHAR(255)
         assertThat(sql).contains("\"default_column\" VARCHAR(255) NOT NULL");
     }
 
