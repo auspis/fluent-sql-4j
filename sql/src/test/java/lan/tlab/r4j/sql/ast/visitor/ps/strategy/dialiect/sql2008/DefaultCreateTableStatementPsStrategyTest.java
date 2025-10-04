@@ -6,7 +6,7 @@ import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
-import lan.tlab.r4j.sql.ast.statement.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
