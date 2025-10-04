@@ -7,7 +7,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>sqlbuilder</module>
+    <module>sql</module>
     <module>test-integration</module>
     <module>spike</module>
   </modules>
@@ -41,7 +41,7 @@
     <dependencies>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>sqlbuilder</artifactId>
+        <artifactId>sql</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
