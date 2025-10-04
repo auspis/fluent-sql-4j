@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -32,7 +32,7 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
         return ", " + constraints.stream().map(c -> c.accept(sqlRenderer, ctx)).collect(Collectors.joining(", "));
     }
 
-    private String indexes(List<Index> indexes, SqlRenderer sqlRenderer, AstContext ctx) {
+    private String indexes(List<IndexDefinition> indexes, SqlRenderer sqlRenderer, AstContext ctx) {
         if (indexes == null || indexes.isEmpty()) {
             return "";
         }

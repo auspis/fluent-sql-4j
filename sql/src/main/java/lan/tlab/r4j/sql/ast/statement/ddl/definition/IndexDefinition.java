@@ -10,12 +10,12 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class Index implements Visitable {
+public class IndexDefinition implements Visitable {
 
     private final String name;
     private final List<String> columnNames;
 
-    public Index(String name, String... columns) {
+    public IndexDefinition(String name, String... columns) {
         this(name, Stream.of(columns).toList());
     }
 
