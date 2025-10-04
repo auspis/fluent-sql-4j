@@ -13,13 +13,6 @@ import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNotNull;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNull;
-import lan.tlab.r4j.sql.ast.expression.bool.Like;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.Not;
 import lan.tlab.r4j.sql.ast.expression.item.As;
 import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.expression.item.Table;
@@ -54,6 +47,13 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
+import lan.tlab.r4j.sql.ast.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.predicate.Like;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.InsertStatement;
@@ -836,7 +836,7 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr.and(
+                        lan.tlab.r4j.sql.ast.predicate.logical.AndOr.and(
                                 Comparison.gt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10)),
                                 Comparison.lt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(100)))))
                 .build();
@@ -855,7 +855,7 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr.or(
+                        lan.tlab.r4j.sql.ast.predicate.logical.AndOr.or(
                                 Comparison.lt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(5)),
                                 Comparison.gt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(50)))))
                 .build();
@@ -960,7 +960,7 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        new lan.tlab.r4j.sql.ast.expression.bool.Between(
+                        new lan.tlab.r4j.sql.ast.predicate.Between(
                                 AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10), Literal.of(100))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -976,10 +976,9 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        new lan.tlab.r4j.sql.ast.expression.bool.In(
-                                AggregateCall.count(ColumnReference.of("User", "id")),
-                                List.of(Literal.of(1), Literal.of(2), Literal.of(3)))))
+                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(new lan.tlab.r4j.sql.ast.predicate.In(
+                        AggregateCall.count(ColumnReference.of("User", "id")),
+                        List.of(Literal.of(1), Literal.of(2), Literal.of(3)))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -995,7 +994,7 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new Table("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        new Not(lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr.or(
+                        new Not(lan.tlab.r4j.sql.ast.predicate.logical.AndOr.or(
                                 Comparison.lt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(5)),
                                 Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(50))))))
                 .build();
@@ -1100,11 +1099,11 @@ class PreparedStatementVisitorTest {
     }
 
     @Test
-    void selectWhereNullBooleanExpression() {
+    void selectWhereNullPredicate() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new Table("User")))
-                .where(Where.of(new NullBooleanExpression()))
+                .where(Where.of(new NullPredicate()))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();

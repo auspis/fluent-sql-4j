@@ -1,9 +1,9 @@
 package lan.tlab.r4j.sql.ast.clause.conditional.where;
 
 import lan.tlab.r4j.sql.ast.clause.Clause;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AccessLevel;
@@ -18,13 +18,13 @@ import lombok.Getter;
 public class Where implements Clause {
 
     @Default
-    private final BooleanExpression condition = new NullBooleanExpression();
+    private final Predicate condition = new NullPredicate();
 
-    public static Where andOf(BooleanExpression... conditions) {
+    public static Where andOf(Predicate... conditions) {
         return builder().condition(AndOr.and(conditions)).build();
     }
 
-    public static Where of(BooleanExpression condition) {
+    public static Where of(Predicate condition) {
         return builder().condition(condition).build();
     }
 

@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.expression.bool;
+package lan.tlab.r4j.sql.ast.predicate;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class IsNull implements BooleanExpression {
+public class IsNull implements Predicate {
 
     private final ScalarExpression expression;
 

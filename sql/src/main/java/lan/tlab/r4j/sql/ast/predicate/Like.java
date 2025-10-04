@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.expression.bool;
+package lan.tlab.r4j.sql.ast.predicate;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -8,9 +8,10 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class IsNotNull implements BooleanExpression {
+public class Like implements Predicate {
 
     private final ScalarExpression expression;
+    private final String pattern;
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
