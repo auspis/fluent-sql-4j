@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lan.tlab.r4j.sql.ast.statement.SelectStatement;
+import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 

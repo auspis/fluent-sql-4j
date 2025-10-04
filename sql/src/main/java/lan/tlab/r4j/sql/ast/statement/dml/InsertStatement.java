@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.statement;
+package lan.tlab.r4j.sql.ast.statement.dml;
 
 import java.util.ArrayList;
 import java.util.List;

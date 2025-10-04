@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
-import lan.tlab.r4j.sql.ast.statement.DeleteStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
