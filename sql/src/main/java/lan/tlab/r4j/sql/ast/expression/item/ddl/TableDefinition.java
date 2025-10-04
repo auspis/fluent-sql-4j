@@ -1,0 +1,41 @@
+package lan.tlab.r4j.sql.ast.expression.item.ddl;
+
+import java.util.List;
+import lan.tlab.r4j.sql.ast.expression.item.Table;
+import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
+import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.Visitable;
+import lan.tlab.r4j.sql.ast.visitor.Visitor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Singular;
+
+@Builder
+@Getter
+public class TableDefinition implements Visitable {
+
+    private final TableExpression table;
+
+    @Singular
+    private final List<ColumnDefinition> columns;
+
+    private final PrimaryKey primaryKey;
+
+    @Singular
+    private final List<Constraint> constraints;
+
+    @Singular
+    private final List<Index> indexes;
+
+    @Override
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
+    }
+
+    public static class TableDefinitionBuilder {
+        public TableDefinitionBuilder name(String value) {
+            return table(new Table(value));
+        }
+    }
+}
