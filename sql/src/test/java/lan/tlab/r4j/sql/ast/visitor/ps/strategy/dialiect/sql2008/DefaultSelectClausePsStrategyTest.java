@@ -6,7 +6,7 @@ import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.item.As;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -18,7 +18,7 @@ class DefaultSelectClausePsStrategyTest {
         private final List<Object> params;
 
         StubProjection(String sql, List<Object> params) {
-            super((Expression) null, (As) null);
+            super((Expression) null, (Alias) null);
             this.sql = sql;
             this.params = params;
         }

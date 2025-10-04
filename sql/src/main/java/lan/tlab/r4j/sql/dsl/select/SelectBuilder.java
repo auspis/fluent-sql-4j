@@ -14,8 +14,8 @@ import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
@@ -40,10 +40,10 @@ public class SelectBuilder {
 
     public SelectBuilder from(String tableName) {
         if (tableName == null || tableName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Table name cannot be null or empty");
+            throw new IllegalArgumentException("TableIdentifier name cannot be null or empty");
         }
 
-        Table table = new Table(tableName);
+        TableIdentifier table = new TableIdentifier(tableName);
         statementBuilder = statementBuilder.from(From.of(table));
 
         updateSelectClauseWithTable(table);
@@ -60,8 +60,9 @@ public class SelectBuilder {
             throw new IllegalStateException("Cannot set alias before specifying table with from()");
         }
 
-        Table currentTable = (Table) currentFrom.getSources().get(0);
-        Table tableWithAlias = new Table(currentTable.getName(), alias);
+        TableIdentifier currentTable =
+                (TableIdentifier) currentFrom.getSources().get(0);
+        TableIdentifier tableWithAlias = new TableIdentifier(currentTable.getName(), alias);
 
         statementBuilder = statementBuilder.from(From.of(tableWithAlias));
         updateSelectClauseWithTable(tableWithAlias);
@@ -78,14 +79,14 @@ public class SelectBuilder {
             return "";
         }
 
-        Table table = (Table) from.getSources().get(0);
+        TableIdentifier table = (TableIdentifier) from.getSources().get(0);
         if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
             return table.getAs().getName();
         }
         return table.getName();
     }
 
-    private void updateSelectClauseWithTable(Table table) {
+    private void updateSelectClauseWithTable(TableIdentifier table) {
         Select currentSelect = getCurrentStatement().getSelect();
         if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
             List<ScalarExpressionProjection> updatedProjections = new ArrayList<>();

@@ -2,8 +2,8 @@ package lan.tlab.r4j.sql.ast.statement.dml;
 
 import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.expression.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
+import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.Builder;

@@ -1,8 +1,7 @@
-package lan.tlab.r4j.sql.ast.expression.item.ddl;
+package lan.tlab.r4j.sql.ast.statement.ddl.definition;
 
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.item.SqlItem;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
@@ -11,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-public interface DataType extends SqlItem {
+public interface DataType extends Expression {
 
     static ParameterizedDataType varchar(int length) {
         return new ParameterizedDataType("VARCHAR", List.of(Literal.of(length)));

@@ -297,7 +297,7 @@ class SelectBuilderTest {
     void invalidTableName() {
         assertThatThrownBy(() -> select("*").from(""))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Table name cannot be null or empty");
+                .hasMessage("TableIdentifier name cannot be null or empty");
     }
 
     @Test

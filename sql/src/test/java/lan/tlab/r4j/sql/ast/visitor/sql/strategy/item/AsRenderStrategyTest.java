@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.item.As;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -22,14 +22,14 @@ class AsRenderStrategyTest {
 
     @Test
     void ok() {
-        As as = new As("c");
+        Alias as = new Alias("c");
         String sql = strategy.render(as, renderer, new AstContext());
         assertThat(sql).isEqualTo("AS c");
     }
 
     @Test
     void empty() {
-        As as = As.nullObject();
+        Alias as = Alias.nullObject();
         String sql = strategy.render(as, renderer, new AstContext());
         assertThat(sql).isEqualTo("");
     }

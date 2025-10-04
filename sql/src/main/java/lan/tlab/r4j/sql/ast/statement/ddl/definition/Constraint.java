@@ -1,11 +1,11 @@
-package lan.tlab.r4j.sql.ast.expression.item.ddl;
+package lan.tlab.r4j.sql.ast.statement.ddl.definition;
 
 import java.util.List;
 import java.util.stream.Stream;
-import lan.tlab.r4j.sql.ast.expression.item.SqlItem;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.ToString;
 
-public interface Constraint extends SqlItem {
+public interface Constraint extends Visitable {
 
     @AllArgsConstructor
     @Getter

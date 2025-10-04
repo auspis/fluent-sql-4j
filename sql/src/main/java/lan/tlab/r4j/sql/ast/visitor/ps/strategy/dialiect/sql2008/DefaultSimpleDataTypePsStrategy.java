@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.DataType.SimpleDataType;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

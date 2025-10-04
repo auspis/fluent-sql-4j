@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.item.As;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -24,7 +24,7 @@ class DefaultAsPsStrategyTest {
 
     @Test
     void asWithSimpleName() {
-        As as = new As("userId");
+        Alias as = new Alias("userId");
 
         PsDto result = strategy.handle(as, visitor, ctx);
 
@@ -34,7 +34,7 @@ class DefaultAsPsStrategyTest {
 
     @Test
     void asWithTableAlias() {
-        As as = new As("u");
+        Alias as = new Alias("u");
 
         PsDto result = strategy.handle(as, visitor, ctx);
 
@@ -44,7 +44,7 @@ class DefaultAsPsStrategyTest {
 
     @Test
     void asWithColumnAlias() {
-        As as = new As("totalCount");
+        Alias as = new Alias("totalCount");
 
         PsDto result = strategy.handle(as, visitor, ctx);
 
@@ -54,7 +54,7 @@ class DefaultAsPsStrategyTest {
 
     @Test
     void asWithComplexName() {
-        As as = new As("user_full_name");
+        Alias as = new Alias("user_full_name");
 
         PsDto result = strategy.handle(as, visitor, ctx);
 

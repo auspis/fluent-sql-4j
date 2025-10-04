@@ -3,13 +3,13 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.DefaultValues;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -18,8 +18,8 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrategy {
     @Override
     public PsDto handle(InsertStatement stmt, Visitor<PsDto> visitor, AstContext ctx) {
-        // Table name
-        Table table = (Table) stmt.getTable();
+        // TableIdentifier name
+        TableIdentifier table = (TableIdentifier) stmt.getTable();
         String tableName = table.getName();
 
         InsertData data = stmt.getData();
