@@ -152,7 +152,7 @@ class TableBuilderTest {
                 .date()
                 .column("amount")
                 .decimal(10, 2)
-                .primaryKey("order_date", "customer_id") // Ordine esplicito!
+                .primaryKey("order_date", "customer_id") // Explicit order!
                 .build();
 
         assertThat(sql)
