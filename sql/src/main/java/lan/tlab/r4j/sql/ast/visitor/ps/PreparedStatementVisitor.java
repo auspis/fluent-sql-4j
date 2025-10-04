@@ -13,15 +13,6 @@ import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.bool.Between;
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
-import lan.tlab.r4j.sql.ast.expression.bool.In;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNotNull;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNull;
-import lan.tlab.r4j.sql.ast.expression.bool.Like;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.Not;
 import lan.tlab.r4j.sql.ast.expression.item.As;
 import lan.tlab.r4j.sql.ast.expression.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertSource;
@@ -71,6 +62,15 @@ import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.predicate.Between;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.predicate.In;
+import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
+import lan.tlab.r4j.sql.ast.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.predicate.Like;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.InsertStatement;
@@ -124,7 +124,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ModPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NotNullConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NotPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullBooleanExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullPredicatePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullScalarExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullSetExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.OnJoinPsStrategy;
@@ -198,7 +198,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultLiteralP
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultModPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotNullConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNotPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullBooleanExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullPredicatePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullScalarExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultNullSetExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultOnJoinPsStrategy;
@@ -467,8 +467,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     private final FromSubqueryPsStrategy fromSubqueryPsStrategy = new DefaultFromSubqueryPsStrategy();
 
     @Default
-    private final NullBooleanExpressionPsStrategy nullBooleanExpressionPsStrategy =
-            new DefaultNullBooleanExpressionPsStrategy();
+    private final NullPredicatePsStrategy nullPredicatePsStrategy = new DefaultNullPredicatePsStrategy();
 
     @Default
     private final UpdateItemPsStrategy updateItemPsStrategy = new DefaultUpdateItemPsStrategy();
@@ -585,8 +584,8 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(NullBooleanExpression expression, AstContext ctx) {
-        return nullBooleanExpressionPsStrategy.handle(expression, this, ctx);
+    public PsDto visit(NullPredicate expression, AstContext ctx) {
+        return nullPredicatePsStrategy.handle(expression, this, ctx);
     }
 
     @Override

@@ -3,9 +3,9 @@ package lan.tlab.r4j.sql.dsl.table;
 import static lan.tlab.r4j.sql.dsl.DSL.createTable;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import org.junit.jupiter.api.Test;
 
 class TableBuilderTest {

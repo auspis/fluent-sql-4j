@@ -25,7 +25,7 @@ public interface ScalarExpression extends Expression {
             Esempio: UPPER(CustomerName) (Argomento: CustomerName (ScalarExpression)); ROUND(Price, 2) (Argomenti: Price (ScalarExpression), 2 (Literal/ScalarExpression))
         CaseExpression:
             Accetta come componente/parametro:
-                Una sequenza di clausole WHEN...THEN...: Ogni WHEN accetta una BooleanExpression. Ogni THEN accetta una ScalarExpression (il valore da restituire).
+                Una sequenza di clausole WHEN...THEN...: Ogni WHEN accetta una Predicate. Ogni THEN accetta una ScalarExpression (il valore da restituire).
                 Una clausola ELSE opzionale: Accetta una ScalarExpression (il valore predefinito).
             Esempio: CASE WHEN Age >= 18 THEN 'Adult' ELSE 'Minor' END
         ScalarSubquery:

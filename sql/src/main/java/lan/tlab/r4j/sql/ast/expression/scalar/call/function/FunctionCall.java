@@ -88,7 +88,7 @@ public interface FunctionCall extends ScalarExpression {
     Alcuni DBMS hanno funzioni che agiscono come brevi condizionali.
         IF(condition, value_if_true, value_if_false) (MySQL)
             Descrizione: Valuta una condizione e restituisce un valore basato su TRUE/FALSE.
-            Parametri: 1 BooleanExpression (per la condizione), 2 ScalarExpression (per i valori di ritorno).
+            Parametri: 1 Predicate (per la condizione), 2 ScalarExpression (per i valori di ritorno).
         COALESCE(expr1, expr2, ...)
             Descrizione: Restituisce il primo valore non NULL nella lista.
             Parametri: 2 o più ScalarExpression (di tipo compatibile).
