@@ -1,0 +1,30 @@
+package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import lan.tlab.r4j.sql.ast.expression.bool.In;
+import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.Visitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InPsStrategy;
+
+public class DefaultInPsStrategy implements InPsStrategy {
+    @Override
+    public PsDto handle(In in, Visitor<PsDto> visitor, AstContext ctx) {
+        PsDto expressionDto = in.getExpression().accept(visitor, ctx);
+
+        List<PsDto> valueDtos =
+                in.getValues().stream().map(value -> value.accept(visitor, ctx)).collect(Collectors.toList());
+
+        String valuesSql = valueDtos.stream().map(PsDto::sql).collect(Collectors.joining(", "));
+
+        String sql = expressionDto.sql() + " IN (" + valuesSql + ")";
+
+        List<Object> parameters = new ArrayList<>();
+        parameters.addAll(expressionDto.parameters());
+        valueDtos.forEach(dto -> parameters.addAll(dto.parameters()));
+
+        return new PsDto(sql, parameters);
+    }
+}
