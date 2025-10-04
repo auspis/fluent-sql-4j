@@ -55,7 +55,7 @@ class DefaultFromSubqueryPsStrategyTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(lan.tlab.r4j.sql.ast.clause.from.From.of(new Table("User")))
                 .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
-                        lan.tlab.r4j.sql.ast.expression.bool.Comparison.eq(
+                        lan.tlab.r4j.sql.ast.predicate.Comparison.eq(
                                 ColumnReference.of("User", "name"),
                                 lan.tlab.r4j.sql.ast.expression.scalar.Literal.of("John"))))
                 .build();

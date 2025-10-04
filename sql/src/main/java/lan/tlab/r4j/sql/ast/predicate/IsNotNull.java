@@ -1,6 +1,6 @@
-package lan.tlab.r4j.sql.ast.expression.bool.logical;
+package lan.tlab.r4j.sql.ast.predicate;
 
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
+import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,9 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class Not implements LogicalExpression {
+public class IsNotNull implements Predicate {
 
-    private final BooleanExpression expression;
+    private final ScalarExpression expression;
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {

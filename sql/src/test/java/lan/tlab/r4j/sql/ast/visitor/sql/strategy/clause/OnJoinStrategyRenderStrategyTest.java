@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType;
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
 import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
