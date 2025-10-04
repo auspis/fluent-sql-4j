@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.item.UpdateItem;
-import lan.tlab.r4j.sql.ast.statement.UpdateStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
