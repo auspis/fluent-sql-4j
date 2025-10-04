@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

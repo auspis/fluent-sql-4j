@@ -3,9 +3,9 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
@@ -28,7 +28,7 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void singleTable() {
-        Table table = new Table("User");
+        TableIdentifier table = new TableIdentifier("User");
         From from = From.of(table);
 
         PsDto result = strategy.handle(from, visitor, ctx);
@@ -49,8 +49,8 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void multipleTables() {
-        Table table1 = new Table("User");
-        Table table2 = new Table("Order");
+        TableIdentifier table1 = new TableIdentifier("User");
+        TableIdentifier table2 = new TableIdentifier("Order");
         From from = From.of(table1, table2);
 
         PsDto result = strategy.handle(from, visitor, ctx);
@@ -74,8 +74,8 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void innerJoin() {
-        var t1 = new Table("User");
-        var t2 = new Table("Order");
+        var t1 = new TableIdentifier("User");
+        var t2 = new TableIdentifier("Order");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
@@ -91,8 +91,8 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void leftJoin() {
-        var t1 = new Table("User");
-        var t2 = new Table("Profile");
+        var t1 = new TableIdentifier("User");
+        var t2 = new TableIdentifier("Profile");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
@@ -109,8 +109,8 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void rightJoin() {
-        var t1 = new Table("User");
-        var t2 = new Table("Department");
+        var t1 = new TableIdentifier("User");
+        var t2 = new TableIdentifier("Department");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.RIGHT,
@@ -127,8 +127,8 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void fullJoin() {
-        var t1 = new Table("User");
-        var t2 = new Table("Role");
+        var t1 = new TableIdentifier("User");
+        var t2 = new TableIdentifier("Role");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.FULL,
@@ -144,8 +144,8 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void crossJoin() {
-        var t1 = new Table("User");
-        var t2 = new Table("Settings");
+        var t1 = new TableIdentifier("User");
+        var t2 = new TableIdentifier("Settings");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1, lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.CROSS, t2, null);
         From from = From.of(join);
@@ -158,8 +158,8 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void joinWithParameters() {
-        var t1 = new Table("User");
-        var t2 = new Table("Order");
+        var t1 = new TableIdentifier("User");
+        var t2 = new TableIdentifier("Order");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
@@ -175,9 +175,9 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void multipleJoins() {
-        var t1 = new Table("User");
-        var t2 = new Table("Order");
-        var t3 = new Table("Product");
+        var t1 = new TableIdentifier("User");
+        var t2 = new TableIdentifier("Order");
+        var t3 = new TableIdentifier("Product");
 
         var join1 = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
@@ -203,9 +203,9 @@ class DefaultFromClausePsStrategyTest {
 
     @Test
     void mixedTablesAndJoins() {
-        var table = new Table("User");
-        var t1 = new Table("Order");
-        var t2 = new Table("Product");
+        var table = new TableIdentifier("User");
+        var t1 = new TableIdentifier("Order");
+        var t2 = new TableIdentifier("Product");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,

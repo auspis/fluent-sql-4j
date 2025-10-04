@@ -6,9 +6,9 @@ import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.As;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -31,9 +31,9 @@ class FromSubqueryRenderStrategyTest {
     void ok() {
         SelectStatement subquery = SelectStatement.builder()
                 .select(new Select())
-                .from(From.builder().source(new Table("Customer")).build())
+                .from(From.builder().source(new TableIdentifier("Customer")).build())
                 .build();
-        FromSubquery fromSubquery = FromSubquery.of(subquery, As.nullObject());
+        FromSubquery fromSubquery = FromSubquery.of(subquery, Alias.nullObject());
         String sql = strategy.render(fromSubquery, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("(SELECT * FROM \"Customer\")");
     }
@@ -42,9 +42,9 @@ class FromSubqueryRenderStrategyTest {
     void alias() {
         SelectStatement subquery = SelectStatement.builder()
                 .select(Select.of(
-                        new ScalarExpressionProjection(ColumnReference.of("Customer", "db_name"), new As("name")),
-                        new ScalarExpressionProjection(ColumnReference.of("Customer", "score"), new As("score"))))
-                .from(From.builder().source(new Table("Customer")).build())
+                        new ScalarExpressionProjection(ColumnReference.of("Customer", "db_name"), new Alias("name")),
+                        new ScalarExpressionProjection(ColumnReference.of("Customer", "score"), new Alias("score"))))
+                .from(From.builder().source(new TableIdentifier("Customer")).build())
                 .build();
         FromSubquery fromSubquery = FromSubquery.of(subquery, "tmp");
         String sql = strategy.render(fromSubquery, sqlRenderer, new AstContext());

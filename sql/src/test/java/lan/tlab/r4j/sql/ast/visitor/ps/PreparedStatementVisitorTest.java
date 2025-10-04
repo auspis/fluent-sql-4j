@@ -13,13 +13,6 @@ import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.item.As;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ReferencesItem;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
@@ -47,6 +40,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
 import lan.tlab.r4j.sql.ast.predicate.IsNull;
@@ -55,8 +50,13 @@ import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import org.junit.jupiter.api.Test;
@@ -76,7 +76,7 @@ class PreparedStatementVisitorTest {
     }
 
     static InsertStatement buildInsertStatementFromUser(User user) {
-        Table table = new Table("User");
+        TableIdentifier table = new TableIdentifier("User");
         List<ColumnReference> columns = List.of(
                 ColumnReference.of("User", "id"),
                 ColumnReference.of("User", "name"),
@@ -102,8 +102,8 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testInsertStatementWithDefaultValues() {
-        Table table = new Table("User");
-        var defaultValues = new lan.tlab.r4j.sql.ast.expression.item.InsertData.DefaultValues();
+        TableIdentifier table = new TableIdentifier("User");
+        var defaultValues = new lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues();
         InsertStatement insertStatement =
                 InsertStatement.builder().table(table).data(defaultValues).build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -118,7 +118,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("User", "id")),
                         new ScalarExpressionProjection(ColumnReference.of("User", "name"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -129,8 +129,9 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testSelectAllColumns() {
-        SelectStatement selectStmt =
-                SelectStatement.builder().from(From.of(new Table("users"))).build();
+        SelectStatement selectStmt = SelectStatement.builder()
+                .from(From.of(new TableIdentifier("users")))
+                .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\"");
@@ -155,7 +156,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereGreaterThan() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -168,7 +169,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereLessThan() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.lt(ColumnReference.of("User", "id"), Literal.of(5))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -181,7 +182,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereGreaterThanOrEquals() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gte(ColumnReference.of("User", "id"), Literal.of(7))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -194,7 +195,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereLessThanOrEquals() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.lte(ColumnReference.of("User", "id"), Literal.of(3))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -207,7 +208,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereNotEquals() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.ne(ColumnReference.of("User", "id"), Literal.of(99))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -220,7 +221,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereAnd() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(AndOr.and(
                         Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
                         Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20)))))
@@ -235,7 +236,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereOr() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(AndOr.or(
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob")))))
@@ -250,7 +251,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereAndOrNested() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(AndOr.or(
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
                         AndOr.and(
@@ -268,7 +269,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereNot() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new Not(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -281,7 +282,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereIsNull() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new IsNull(ColumnReference.of("User", "email"))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -294,7 +295,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereIsNotNull() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new IsNotNull(ColumnReference.of("User", "email"))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -307,7 +308,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereNotAnd() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new Not(AndOr.and(
                         Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
                         Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
@@ -322,7 +323,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereNotOr() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new Not(AndOr.or(
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob"))))))
@@ -337,7 +338,7 @@ class PreparedStatementVisitorTest {
     void testSelectCount() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -349,7 +350,7 @@ class PreparedStatementVisitorTest {
     void testSelectSum() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -361,7 +362,7 @@ class PreparedStatementVisitorTest {
     void testSelectAvg() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -373,7 +374,7 @@ class PreparedStatementVisitorTest {
     void testSelectMin() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -385,7 +386,7 @@ class PreparedStatementVisitorTest {
     void testSelectMax() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -397,7 +398,7 @@ class PreparedStatementVisitorTest {
     void testSelectCountGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -410,7 +411,7 @@ class PreparedStatementVisitorTest {
     void testSelectSumGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -423,7 +424,7 @@ class PreparedStatementVisitorTest {
     void testSelectAvgGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -436,7 +437,7 @@ class PreparedStatementVisitorTest {
     void testSelectMinGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -449,7 +450,7 @@ class PreparedStatementVisitorTest {
     void testSelectMaxGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -462,9 +463,9 @@ class PreparedStatementVisitorTest {
     void testSelectScalarProjectionWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
-                        new ScalarExpressionProjection(ColumnReference.of("User", "id"), new As("userId")),
-                        new ScalarExpressionProjection(ColumnReference.of("User", "name"), new As("userName"))))
-                .from(From.of(new Table("User")))
+                        new ScalarExpressionProjection(ColumnReference.of("User", "id"), new Alias("userId")),
+                        new ScalarExpressionProjection(ColumnReference.of("User", "name"), new Alias("userName"))))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -475,8 +476,9 @@ class PreparedStatementVisitorTest {
     @Test
     void testSelectScalarProjectionWithAliasAndWhere() {
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"), new As("userId"))))
-                .from(From.of(new Table("User")))
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("User", "id"), new Alias("userId"))))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice"))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -489,8 +491,8 @@ class PreparedStatementVisitorTest {
     void testSelectAggregationProjectionWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(
-                        AggregateCall.count(ColumnReference.of("User", "id")), new As("totalUsers"))))
-                .from(From.of(new Table("User")))
+                        AggregateCall.count(ColumnReference.of("User", "id")), new Alias("totalUsers"))))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -502,8 +504,8 @@ class PreparedStatementVisitorTest {
     void testSelectAggregationProjectionWithAliasGroupBy() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(
-                        AggregateCall.sum(ColumnReference.of("User", "id")), new As("sumId"))))
-                .from(From.of(new Table("User")))
+                        AggregateCall.sum(ColumnReference.of("User", "id")), new Alias("sumId"))))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -517,10 +519,10 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
                         new AggregateCallProjection(
-                                AggregateCall.avg(ColumnReference.of("User", "id")), new As("avgId")),
+                                AggregateCall.avg(ColumnReference.of("User", "id")), new Alias("avgId")),
                         new AggregateCallProjection(
-                                AggregateCall.max(ColumnReference.of("User", "id")), new As("maxId"))))
-                .from(From.of(new Table("User")))
+                                AggregateCall.max(ColumnReference.of("User", "id")), new Alias("maxId"))))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -532,7 +534,7 @@ class PreparedStatementVisitorTest {
     void testSelectOrderByIdAsc() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -545,7 +547,7 @@ class PreparedStatementVisitorTest {
     void testSelectOrderByIdDesc() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -558,7 +560,7 @@ class PreparedStatementVisitorTest {
     void testSelectOrderByIdDefault() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.by(ColumnReference.of("User", "id"))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -573,7 +575,7 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("User", "id")),
                         new ScalarExpressionProjection(ColumnReference.of("User", "name"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(
                         Sorting.asc(ColumnReference.of("User", "id")),
                         Sorting.desc(ColumnReference.of("User", "name"))))
@@ -588,7 +590,7 @@ class PreparedStatementVisitorTest {
     void testSelectOrderByWithWhere() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
@@ -602,7 +604,7 @@ class PreparedStatementVisitorTest {
     void testSelectLimitOnly() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(10).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -615,7 +617,7 @@ class PreparedStatementVisitorTest {
     void testSelectLimitAndOffset() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(10).offset(10).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -628,7 +630,7 @@ class PreparedStatementVisitorTest {
     void testSelectWhereLimitOffset() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
                 .fetch(Fetch.builder().rows(5).offset(5).build())
                 .build();
@@ -643,7 +645,7 @@ class PreparedStatementVisitorTest {
     void testSelectOrderByLimitOffset() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
                 .fetch(Fetch.builder().rows(3).offset(3).build())
                 .build();
@@ -658,7 +660,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByLimitOffset() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .fetch(Fetch.builder().rows(2).offset(4).build())
                 .build();
@@ -671,8 +673,8 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testSelectInnerJoin() {
-        var t1 = new Table("t1");
-        var t2 = new Table("t2");
+        var t1 = new TableIdentifier("t1");
+        var t2 = new TableIdentifier("t2");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
@@ -693,8 +695,8 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testSelectLeftJoinWithWhere() {
-        var t1 = new Table("t1");
-        var t2 = new Table("t2");
+        var t1 = new TableIdentifier("t1");
+        var t2 = new TableIdentifier("t2");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
@@ -717,8 +719,8 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testSelectRightJoinWithOrderBy() {
-        var t1 = new Table("t1");
-        var t2 = new Table("t2");
+        var t1 = new TableIdentifier("t1");
+        var t2 = new TableIdentifier("t2");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.RIGHT,
@@ -741,8 +743,8 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testSelectFullJoinWithGroupBy() {
-        var t1 = new Table("t1");
-        var t2 = new Table("t2");
+        var t1 = new TableIdentifier("t1");
+        var t2 = new TableIdentifier("t2");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.FULL,
@@ -765,8 +767,8 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testSelectCrossJoinWithLimitOffset() {
-        var t1 = new Table("t1");
-        var t2 = new Table("t2");
+        var t1 = new TableIdentifier("t1");
+        var t2 = new TableIdentifier("t2");
         var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1, lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.CROSS, t2, null);
         SelectStatement stmt = SelectStatement.builder()
@@ -785,9 +787,9 @@ class PreparedStatementVisitorTest {
 
     @Test
     void testSelectMultipleJoins() {
-        var t1 = new Table("t1");
-        var t2 = new Table("t2");
-        var t3 = new Table("t3");
+        var t1 = new TableIdentifier("t1");
+        var t2 = new TableIdentifier("t2");
+        var t3 = new TableIdentifier("t3");
         var join1 = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
                 t1,
                 lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
@@ -817,7 +819,7 @@ class PreparedStatementVisitorTest {
     void testSelectCountGroupByHaving() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(1))))
@@ -833,7 +835,7 @@ class PreparedStatementVisitorTest {
     void testSelectSumGroupByHavingAnd() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         lan.tlab.r4j.sql.ast.predicate.logical.AndOr.and(
@@ -852,7 +854,7 @@ class PreparedStatementVisitorTest {
     void testSelectAvgGroupByHavingOr() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         lan.tlab.r4j.sql.ast.predicate.logical.AndOr.or(
@@ -871,8 +873,8 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByHavingWithAlias() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(
-                        AggregateCall.count(ColumnReference.of("User", "id")), new As("total"))))
-                .from(From.of(new Table("User")))
+                        AggregateCall.count(ColumnReference.of("User", "id")), new Alias("total"))))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         Comparison.gte(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(2))))
@@ -889,7 +891,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByMultipleColumnsHaving() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email"), ColumnReference.of("User", "name")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         Comparison.ne(AggregateCall.max(ColumnReference.of("User", "id")), Literal.of(0))))
@@ -905,7 +907,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByHavingWithWhereOrderByLimit() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
@@ -925,7 +927,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByHavingIsNull() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         new IsNull(AggregateCall.max(ColumnReference.of("User", "email")))))
@@ -941,7 +943,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByHavingIsNotNull() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         new IsNotNull(AggregateCall.max(ColumnReference.of("User", "email")))))
@@ -957,7 +959,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByHavingBetween() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         new lan.tlab.r4j.sql.ast.predicate.Between(
@@ -974,7 +976,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByHavingIn() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(new lan.tlab.r4j.sql.ast.predicate.In(
                         AggregateCall.count(ColumnReference.of("User", "id")),
@@ -991,7 +993,7 @@ class PreparedStatementVisitorTest {
     void testSelectGroupByHavingNotNested() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         new Not(lan.tlab.r4j.sql.ast.predicate.logical.AndOr.or(
@@ -1010,7 +1012,7 @@ class PreparedStatementVisitorTest {
     void testSelectfetchFirstPage() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(10).offset(0).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1023,7 +1025,7 @@ class PreparedStatementVisitorTest {
     void testSelectfetchLargeOffset() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(25).offset(225).build())
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1037,7 +1039,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("User", "id")))) // Only project "id"
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(AndOr.and(
                         Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100)),
                         new Like(ColumnReference.of("User", "name"), "John%"))))
@@ -1058,12 +1060,12 @@ class PreparedStatementVisitorTest {
     void unionOfTwoSelectStatements() {
         SelectStatement select1 = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                 .build();
         SelectStatement select2 = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(2))))
                 .build();
         UnionExpression union = UnionExpression.union(select1, select2);
@@ -1079,7 +1081,7 @@ class PreparedStatementVisitorTest {
     void selectFromSubquery() {
         var subquery = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .build();
 
@@ -1102,7 +1104,7 @@ class PreparedStatementVisitorTest {
     void selectWhereNullPredicate() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new NullPredicate()))
                 .build();
 
@@ -1115,7 +1117,7 @@ class PreparedStatementVisitorTest {
 
     @Test
     void deleteStatement() {
-        Table table = new Table("users");
+        TableIdentifier table = new TableIdentifier("users");
         // Delete con where
         Comparison whereExpr = Comparison.eq(ColumnReference.of("", "id"), Literal.of(42));
         Where where = Where.builder().condition(whereExpr).build();
@@ -1137,7 +1139,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         ArithmeticExpression.addition(ColumnReference.of("Product", "price"), Literal.of(10)))))
-                .from(From.of(new Table("Product")))
+                .from(From.of(new TableIdentifier("Product")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1150,7 +1152,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         ArithmeticExpression.subtraction(Literal.of(100), ColumnReference.of("Product", "discount")))))
-                .from(From.of(new Table("Product")))
+                .from(From.of(new TableIdentifier("Product")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1163,7 +1165,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ArithmeticExpression.multiplication(
                         ColumnReference.of("Order", "quantity"), ColumnReference.of("Product", "price")))))
-                .from(From.of(new Table("Order")))
+                .from(From.of(new TableIdentifier("Order")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1176,7 +1178,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         ArithmeticExpression.division(ColumnReference.of("Customer", "score"), Literal.of(2)))))
-                .from(From.of(new Table("Customer")))
+                .from(From.of(new TableIdentifier("Customer")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1189,7 +1191,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         ArithmeticExpression.modulo(ColumnReference.of("User", "id"), Literal.of(10)))))
-                .from(From.of(new Table("User")))
+                .from(From.of(new TableIdentifier("User")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1202,7 +1204,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         ArithmeticExpression.negation(ColumnReference.of("Customer", "score")))))
-                .from(From.of(new Table("Customer")))
+                .from(From.of(new TableIdentifier("Customer")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1214,7 +1216,7 @@ class PreparedStatementVisitorTest {
     void selectWithArithmeticNegationLiteral() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ArithmeticExpression.negation(Literal.of(100)))))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1226,7 +1228,7 @@ class PreparedStatementVisitorTest {
     void selectWithCastLiteralToVarchar() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(Cast.of(Literal.of("hello"), "VARCHAR(50)"))))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1238,7 +1240,7 @@ class PreparedStatementVisitorTest {
     void selectWithCastColumnToInt() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(Cast.of(ColumnReference.of("users", "age"), "INT"))))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1250,7 +1252,7 @@ class PreparedStatementVisitorTest {
     void selectWithCastNumberToDate() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(Cast.of(Literal.of(123), "DATE"))))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1263,7 +1265,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(
                         new ScalarExpressionProjection(Concat.concat(Literal.of("Hello"), Literal.of("World")))))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1276,7 +1278,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         Concat.concat(Literal.of("Name: "), ColumnReference.of("users", "name")))))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1289,7 +1291,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         Concat.concatWithSeparator(" - ", Literal.of("First"), Literal.of("Second")))))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1301,7 +1303,7 @@ class PreparedStatementVisitorTest {
     void selectWithCurrentDate() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(new CurrentDate())))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1313,7 +1315,7 @@ class PreparedStatementVisitorTest {
     void selectWithCurrentDateInComparison() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("orders", "created_date"))))
-                .from(From.of(new Table("orders")))
+                .from(From.of(new TableIdentifier("orders")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("orders", "created_date"), new CurrentDate())))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1327,7 +1329,7 @@ class PreparedStatementVisitorTest {
     void selectWithCurrentDateTime() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(new CurrentDateTime())))
-                .from(From.of(new Table("Test")))
+                .from(From.of(new TableIdentifier("Test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1339,7 +1341,7 @@ class PreparedStatementVisitorTest {
     void selectWithCurrentDateTimeInComparison() {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("events", "timestamp"))))
-                .from(From.of(new Table("events")))
+                .from(From.of(new TableIdentifier("events")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("events", "timestamp"), new CurrentDateTime())))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1355,7 +1357,7 @@ class PreparedStatementVisitorTest {
         var dateAdd = DateArithmetic.add(ColumnReference.of("orders", "created_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
-                .from(From.of(new Table("orders")))
+                .from(From.of(new TableIdentifier("orders")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1369,7 +1371,7 @@ class PreparedStatementVisitorTest {
         var dateSub = DateArithmetic.subtract(ColumnReference.of("events", "event_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateSub)))
-                .from(From.of(new Table("events")))
+                .from(From.of(new TableIdentifier("events")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1383,7 +1385,7 @@ class PreparedStatementVisitorTest {
         var dateAdd = DateArithmetic.add(ColumnReference.of("subscriptions", "start_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
-                .from(From.of(new Table("subscriptions")))
+                .from(From.of(new TableIdentifier("subscriptions")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1396,7 +1398,7 @@ class PreparedStatementVisitorTest {
         var extractYear = ExtractDatePart.year(ColumnReference.of("orders", "created_date"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(extractYear)))
-                .from(From.of(new Table("orders")))
+                .from(From.of(new TableIdentifier("orders")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1409,7 +1411,7 @@ class PreparedStatementVisitorTest {
         var extractMonth = ExtractDatePart.month(ColumnReference.of("events", "event_date"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(extractMonth)))
-                .from(From.of(new Table("events")))
+                .from(From.of(new TableIdentifier("events")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1422,7 +1424,7 @@ class PreparedStatementVisitorTest {
         var extractDay = ExtractDatePart.day(ColumnReference.of("logs", "timestamp"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("logs", "id"))))
-                .from(From.of(new Table("logs")))
+                .from(From.of(new TableIdentifier("logs")))
                 .where(Where.of(Comparison.eq(extractDay, Literal.of(25))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1436,7 +1438,7 @@ class PreparedStatementVisitorTest {
         var leftFunction = Left.of(ColumnReference.of("users", "full_name"), 5);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(leftFunction)))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1449,7 +1451,7 @@ class PreparedStatementVisitorTest {
         var leftFunction = Left.of(Literal.of("Hello World"), 3);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(leftFunction)))
-                .from(From.of(new Table("test")))
+                .from(From.of(new TableIdentifier("test")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1462,7 +1464,7 @@ class PreparedStatementVisitorTest {
         var leftFunction = Left.of(ColumnReference.of("products", "code"), 2);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(leftFunction)))
-                .from(From.of(new Table("products")))
+                .from(From.of(new TableIdentifier("products")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1475,7 +1477,7 @@ class PreparedStatementVisitorTest {
         var leftFunction = Left.of(ColumnReference.of("products", "code"), 2);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("products", "id"))))
-                .from(From.of(new Table("products")))
+                .from(From.of(new TableIdentifier("products")))
                 .where(Where.of(Comparison.eq(leftFunction, Literal.of("AB"))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1489,7 +1491,7 @@ class PreparedStatementVisitorTest {
         var lengthFunction = new Length(ColumnReference.of("users", "email"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(lengthFunction)))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1502,7 +1504,7 @@ class PreparedStatementVisitorTest {
         var lengthFunction = new Length(Literal.of("Test String"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(lengthFunction)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1515,7 +1517,7 @@ class PreparedStatementVisitorTest {
         var lengthFunction = new Length(ColumnReference.of("users", "username"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "id"))))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .where(Where.of(Comparison.gt(lengthFunction, Literal.of(8))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1529,7 +1531,7 @@ class PreparedStatementVisitorTest {
         var charLengthFunction = new CharLength(ColumnReference.of("users", "email"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(charLengthFunction)))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1542,7 +1544,7 @@ class PreparedStatementVisitorTest {
         var charLengthFunction = new CharLength(Literal.of("Test String"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(charLengthFunction)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1555,7 +1557,7 @@ class PreparedStatementVisitorTest {
         var charLengthFunction = new CharLength(ColumnReference.of("products", "code"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("products", "id"))))
-                .from(From.of(new Table("products")))
+                .from(From.of(new TableIdentifier("products")))
                 .where(Where.of(Comparison.eq(charLengthFunction, Literal.of(10))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1569,7 +1571,7 @@ class PreparedStatementVisitorTest {
         var characterLengthFunction = new CharacterLength(ColumnReference.of("users", "full_name"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(characterLengthFunction)))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1582,7 +1584,7 @@ class PreparedStatementVisitorTest {
         var characterLengthFunction = new CharacterLength(Literal.of("Test String"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(characterLengthFunction)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1595,7 +1597,7 @@ class PreparedStatementVisitorTest {
         var characterLengthFunction = new CharacterLength(ColumnReference.of("comments", "content"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("comments", "id"))))
-                .from(From.of(new Table("comments")))
+                .from(From.of(new TableIdentifier("comments")))
                 .where(Where.of(Comparison.lt(characterLengthFunction, Literal.of(280))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1609,7 +1611,7 @@ class PreparedStatementVisitorTest {
         var dataLengthFunction = new DataLength(ColumnReference.of("files", "content"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dataLengthFunction)))
-                .from(From.of(new Table("files")))
+                .from(From.of(new TableIdentifier("files")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1622,7 +1624,7 @@ class PreparedStatementVisitorTest {
         var dataLengthFunction = new DataLength(Literal.of("Hello World"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dataLengthFunction)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1635,7 +1637,7 @@ class PreparedStatementVisitorTest {
         var dataLengthFunction = new DataLength(ColumnReference.of("files", "binary_data"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("files", "id"))))
-                .from(From.of(new Table("files")))
+                .from(From.of(new TableIdentifier("files")))
                 .where(Where.of(Comparison.gt(dataLengthFunction, Literal.of(1024))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1649,7 +1651,7 @@ class PreparedStatementVisitorTest {
         var modFunction = new Mod(ColumnReference.of("orders", "total"), Literal.of(100));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(modFunction)))
-                .from(From.of(new Table("orders")))
+                .from(From.of(new TableIdentifier("orders")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1662,7 +1664,7 @@ class PreparedStatementVisitorTest {
         var modFunction = new Mod(Literal.of(17), Literal.of(5));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(modFunction)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1675,7 +1677,7 @@ class PreparedStatementVisitorTest {
         var modFunction = new Mod(ColumnReference.of("numbers", "value"), Literal.of(3));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("numbers", "id"))))
-                .from(From.of(new Table("numbers")))
+                .from(From.of(new TableIdentifier("numbers")))
                 .where(Where.of(Comparison.eq(modFunction, Literal.of(0))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1689,7 +1691,7 @@ class PreparedStatementVisitorTest {
         var nullExpression = new NullScalarExpression();
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(nullExpression)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1702,7 +1704,7 @@ class PreparedStatementVisitorTest {
         var nullExpression = new NullScalarExpression();
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "id"))))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("users", "status"), nullExpression)))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1716,7 +1718,7 @@ class PreparedStatementVisitorTest {
         var powerFunction = new Power(Literal.of(2), Literal.of(8));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(powerFunction)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1729,7 +1731,7 @@ class PreparedStatementVisitorTest {
         var powerFunction = new Power(ColumnReference.of("math", "base"), Literal.of(3));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(powerFunction)))
-                .from(From.of(new Table("math")))
+                .from(From.of(new TableIdentifier("math")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1742,7 +1744,7 @@ class PreparedStatementVisitorTest {
         var powerFunction = new Power(ColumnReference.of("calculations", "value"), Literal.of(2));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("calculations", "id"))))
-                .from(From.of(new Table("calculations")))
+                .from(From.of(new TableIdentifier("calculations")))
                 .where(Where.of(Comparison.gt(powerFunction, Literal.of(100))))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1756,7 +1758,7 @@ class PreparedStatementVisitorTest {
         var replaceFunction = Replace.of(Literal.of("Hello World"), Literal.of("World"), Literal.of("Universe"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
-                .from(From.of(new Table("dummy")))
+                .from(From.of(new TableIdentifier("dummy")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1770,7 +1772,7 @@ class PreparedStatementVisitorTest {
                 Replace.of(ColumnReference.of("users", "email"), Literal.of("@old.com"), Literal.of("@new.com"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
         PsDto result = visitor.visit(selectStmt, new AstContext());
@@ -1783,7 +1785,7 @@ class PreparedStatementVisitorTest {
         var replaceFunction = Replace.of(ColumnReference.of("content", "text"), Literal.of("old"), Literal.of("new"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("content", "id"))))
-                .from(From.of(new Table("content")))
+                .from(From.of(new TableIdentifier("content")))
                 .where(Where.of(new Like(replaceFunction, "%new%")))
                 .build();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1795,7 +1797,7 @@ class PreparedStatementVisitorTest {
     @Test
     void createTableStatement() {
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("users"))
+                .table(new TableIdentifier("users"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build()))
@@ -1814,7 +1816,7 @@ class PreparedStatementVisitorTest {
     @Test
     void createTableStatementWithUniqueConstraint() {
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("users"))
+                .table(new TableIdentifier("users"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("email").build()))
@@ -1834,7 +1836,7 @@ class PreparedStatementVisitorTest {
     void createTableStatementWithForeignKeyConstraint() {
         ReferencesItem references = new ReferencesItem("users", "id");
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("orders"))
+                .table(new TableIdentifier("orders"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.integer("user_id").build()))
@@ -1856,7 +1858,7 @@ class PreparedStatementVisitorTest {
     void createTableStatementWithCheckConstraint() {
         Comparison ageCheck = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("users"))
+                .table(new TableIdentifier("users"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.integer("age").build()))
@@ -1887,7 +1889,7 @@ class PreparedStatementVisitorTest {
     void scalarSubqueryIntegration() {
         SelectStatement innerSelect = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.countStar())))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("users", "active"), Literal.of(true))))
                 .build();
 
@@ -1909,8 +1911,8 @@ class PreparedStatementVisitorTest {
     void roundInSelectClause() {
         Round roundFunction = Round.of(ColumnReference.of("products", "price"), Literal.of(2));
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(roundFunction, new As("rounded_price"))))
-                .from(From.of(new Table("products")))
+                .select(Select.of(new ScalarExpressionProjection(roundFunction, new Alias("rounded_price"))))
+                .from(From.of(new TableIdentifier("products")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1925,7 +1927,7 @@ class PreparedStatementVisitorTest {
         Round roundFunction = Round.of(ColumnReference.of("orders", "total"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("orders", "id"))))
-                .from(From.of(new Table("orders")))
+                .from(From.of(new TableIdentifier("orders")))
                 .where(Where.of(Comparison.gt(roundFunction, Literal.of(100))))
                 .build();
 
@@ -1940,8 +1942,8 @@ class PreparedStatementVisitorTest {
     void roundWithMixedParameters() {
         Round roundFunction = Round.of(Literal.of(3.14159), ColumnReference.of("settings", "precision"));
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(roundFunction, new As("pi_rounded"))))
-                .from(From.of(new Table("settings")))
+                .select(Select.of(new ScalarExpressionProjection(roundFunction, new Alias("pi_rounded"))))
+                .from(From.of(new TableIdentifier("settings")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1955,8 +1957,8 @@ class PreparedStatementVisitorTest {
     void substringInSelectClause() {
         Substring substringFunction = Substring.of(ColumnReference.of("users", "name"), 1, 10);
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(substringFunction, new As("short_name"))))
-                .from(From.of(new Table("users")))
+                .select(Select.of(new ScalarExpressionProjection(substringFunction, new Alias("short_name"))))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1971,7 +1973,7 @@ class PreparedStatementVisitorTest {
         Substring substringFunction = Substring.of(ColumnReference.of("posts", "content"), 1, 50);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("posts", "id"))))
-                .from(From.of(new Table("posts")))
+                .from(From.of(new TableIdentifier("posts")))
                 .where(Where.of(new Like(substringFunction, "%search%")))
                 .build();
 
@@ -1986,8 +1988,8 @@ class PreparedStatementVisitorTest {
     void substringWithoutLength() {
         Substring substringFunction = Substring.of(Literal.of("Hello World"), 7);
         SelectStatement selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(substringFunction, new As("greeting"))))
-                .from(From.of(new Table("dual")))
+                .select(Select.of(new ScalarExpressionProjection(substringFunction, new Alias("greeting"))))
+                .from(From.of(new TableIdentifier("dual")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -2001,8 +2003,8 @@ class PreparedStatementVisitorTest {
     void trimInSelectClause() {
         var trimFunction = Trim.trim(ColumnReference.of("users", "name"));
         var selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(trimFunction, new As("clean_name"))))
-                .from(From.of(new Table("users")))
+                .select(Select.of(new ScalarExpressionProjection(trimFunction, new Alias("clean_name"))))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -2017,7 +2019,7 @@ class PreparedStatementVisitorTest {
         var trimFunction = Trim.trimBoth(ColumnReference.of("products", "code"));
         var selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("products", "id"))))
-                .from(From.of(new Table("products")))
+                .from(From.of(new TableIdentifier("products")))
                 .where(Where.of(Comparison.eq(trimFunction, Literal.of("ABC123"))))
                 .build();
 
@@ -2032,8 +2034,8 @@ class PreparedStatementVisitorTest {
     void trimWithCharactersToRemove() {
         var trimFunction = Trim.trimLeading(Literal.of("*"), Literal.of("***data***"));
         var selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(trimFunction, new As("cleaned"))))
-                .from(From.of(new Table("dual")))
+                .select(Select.of(new ScalarExpressionProjection(trimFunction, new Alias("cleaned"))))
+                .from(From.of(new TableIdentifier("dual")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -2047,8 +2049,8 @@ class PreparedStatementVisitorTest {
     void unaryNumericInSelectClause() {
         var absFunction = UnaryNumeric.abs(ColumnReference.of("transactions", "amount"));
         var selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(absFunction, new As("abs_amount"))))
-                .from(From.of(new Table("transactions")))
+                .select(Select.of(new ScalarExpressionProjection(absFunction, new Alias("abs_amount"))))
+                .from(From.of(new TableIdentifier("transactions")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -2063,7 +2065,7 @@ class PreparedStatementVisitorTest {
         var sqrtFunction = UnaryNumeric.sqrt(Literal.of(16));
         var selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("data", "id"))))
-                .from(From.of(new Table("data")))
+                .from(From.of(new TableIdentifier("data")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("data", "value"), sqrtFunction)))
                 .build();
 
@@ -2080,9 +2082,9 @@ class PreparedStatementVisitorTest {
         var floorFunction = UnaryNumeric.floor(Literal.of(9.8));
         var selectStmt = SelectStatement.builder()
                 .select(Select.of(
-                        new ScalarExpressionProjection(ceilFunction, new As("rounded_up")),
-                        new ScalarExpressionProjection(floorFunction, new As("rounded_down"))))
-                .from(From.of(new Table("orders")))
+                        new ScalarExpressionProjection(ceilFunction, new Alias("rounded_up")),
+                        new ScalarExpressionProjection(floorFunction, new Alias("rounded_down"))))
+                .from(From.of(new TableIdentifier("orders")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -2097,8 +2099,8 @@ class PreparedStatementVisitorTest {
     void unaryStringInSelectClause() {
         var upperFunction = UnaryString.upper(ColumnReference.of("users", "name"));
         var selectStmt = SelectStatement.builder()
-                .select(Select.of(new ScalarExpressionProjection(upperFunction, new As("upper_name"))))
-                .from(From.of(new Table("users")))
+                .select(Select.of(new ScalarExpressionProjection(upperFunction, new Alias("upper_name"))))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -2113,7 +2115,7 @@ class PreparedStatementVisitorTest {
         var lowerFunction = UnaryString.lower(Literal.of("ADMIN"));
         var selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "id"))))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .where(Where.of(Comparison.eq(UnaryString.lower(ColumnReference.of("users", "role")), lowerFunction)))
                 .build();
 
@@ -2130,9 +2132,9 @@ class PreparedStatementVisitorTest {
         var lowerFunction = UnaryString.lower(ColumnReference.of("products", "category"));
         var selectStmt = SelectStatement.builder()
                 .select(Select.of(
-                        new ScalarExpressionProjection(upperFunction, new As("greeting")),
-                        new ScalarExpressionProjection(lowerFunction, new As("lower_category"))))
-                .from(From.of(new Table("products")))
+                        new ScalarExpressionProjection(upperFunction, new Alias("greeting")),
+                        new ScalarExpressionProjection(lowerFunction, new Alias("lower_category"))))
+                .from(From.of(new TableIdentifier("products")))
                 .build();
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();

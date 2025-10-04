@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.ast.clause.selection.projection;
 
-import lan.tlab.r4j.sql.ast.expression.item.As;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
@@ -15,7 +15,7 @@ public class AggregateCallProjection extends Projection {
         super(expression, as);
     }
 
-    public AggregateCallProjection(AggregateCall expression, As as) {
+    public AggregateCallProjection(AggregateCall expression, Alias as) {
         super(expression, as);
     }
 

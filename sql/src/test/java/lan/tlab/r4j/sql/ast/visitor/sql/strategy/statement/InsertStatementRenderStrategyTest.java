@@ -7,15 +7,15 @@ import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertSource;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDate;
 import lan.tlab.r4j.sql.ast.expression.set.SetExpression;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -37,7 +37,7 @@ class InsertStatementRenderStrategyTest {
     @Test
     void ok() {
         InsertStatement statement = InsertStatement.builder()
-                .table(new Table("Logs"))
+                .table(new TableIdentifier("Logs"))
                 .columns(List.of(
                         ColumnReference.of("Logs", "message"),
                         ColumnReference.of("Logs", "statusCode"),
@@ -59,7 +59,7 @@ class InsertStatementRenderStrategyTest {
     @Test
     void noColumns() {
         InsertStatement statement = InsertStatement.builder()
-                .table(new Table("Logs"))
+                .table(new TableIdentifier("Logs"))
                 .data(InsertValues.of(Literal.of("Success"), Literal.of(200), Literal.of(LocalDate.of(2025, 8, 28))))
                 .build();
 
@@ -73,7 +73,7 @@ class InsertStatementRenderStrategyTest {
     @Test
     void defaultValues() {
         InsertStatement statement =
-                InsertStatement.builder().table(new Table("Logs")).build();
+                InsertStatement.builder().table(new TableIdentifier("Logs")).build();
 
         String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("INSERT INTO \"Logs\" DEFAULT VALUES");
@@ -82,7 +82,7 @@ class InsertStatementRenderStrategyTest {
     @Test
     void valuesAndFunctions() {
         InsertStatement statement = InsertStatement.builder()
-                .table(new Table("Logs"))
+                .table(new TableIdentifier("Logs"))
                 .columns(List.of(
                         ColumnReference.of("Logs", "message"),
                         ColumnReference.of("Logs", "statusCode"),
@@ -111,7 +111,7 @@ class InsertStatementRenderStrategyTest {
                 .build();
 
         InsertStatement statement = InsertStatement.builder()
-                .table(new Table("Archive"))
+                .table(new TableIdentifier("Archive"))
                 .data(new InsertSource(select))
                 .build();
 
@@ -143,7 +143,7 @@ class InsertStatementRenderStrategyTest {
         SetExpression union = UnionExpression.union(select1, select2);
 
         InsertStatement statement = InsertStatement.builder()
-                .table(new Table("Archive"))
+                .table(new TableIdentifier("Archive"))
                 .columns(List.of(ColumnReference.of("Archive", "id"), ColumnReference.of("Archive", "name")))
                 .data(new InsertSource(union))
                 .build();
@@ -165,7 +165,7 @@ class InsertStatementRenderStrategyTest {
     @Test
     void insertWithSpecialTableName() {
         InsertStatement statement = InsertStatement.builder()
-                .table(new Table("Order"))
+                .table(new TableIdentifier("Order"))
                 .data(InsertValues.of(Literal.of("Test")))
                 .build();
 
@@ -176,7 +176,7 @@ class InsertStatementRenderStrategyTest {
     @Test
     void specialColumnNames() {
         InsertStatement statement = InsertStatement.builder()
-                .table(new Table("Logs"))
+                .table(new TableIdentifier("Logs"))
                 .columns(List.of(ColumnReference.of("Logs", "select"), ColumnReference.of("Logs", "from")))
                 .data(InsertValues.of(Literal.of("A"), Literal.of("B")))
                 .build();

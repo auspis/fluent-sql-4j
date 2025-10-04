@@ -1,22 +1,22 @@
-package lan.tlab.r4j.sql.ast.expression.item.ddl;
+package lan.tlab.r4j.sql.ast.statement.ddl.definition;
 
 import java.util.List;
 import java.util.stream.Stream;
-import lan.tlab.r4j.sql.ast.expression.item.SqlItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ReferencesItem implements SqlItem {
+public class Index implements Visitable {
 
-    private final String table;
-    private final List<String> columns;
+    private final String name;
+    private final List<String> columnNames;
 
-    public ReferencesItem(String table, String... columns) {
-        this(table, Stream.of(columns).toList());
+    public Index(String name, String... columns) {
+        this(name, Stream.of(columns).toList());
     }
 
     @Override

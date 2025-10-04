@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.expression.item;
+package lan.tlab.r4j.sql.ast.statement.dml.item;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;

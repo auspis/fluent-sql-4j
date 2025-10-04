@@ -2,10 +2,10 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.constraint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.CheckConstraint;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;

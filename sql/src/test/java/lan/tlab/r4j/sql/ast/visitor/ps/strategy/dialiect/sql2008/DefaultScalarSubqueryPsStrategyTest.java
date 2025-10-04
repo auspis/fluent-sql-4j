@@ -7,11 +7,11 @@ import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -30,7 +30,7 @@ class DefaultScalarSubqueryPsStrategyTest {
     void scalarSubqueryWithSimpleSelect() {
         SelectStatement innerSelect = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "name"))))
-                .from(From.of(new Table("users")))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
 
         ScalarSubquery subquery =
@@ -49,7 +49,7 @@ class DefaultScalarSubqueryPsStrategyTest {
     void scalarSubqueryWithParameters() {
         SelectStatement innerSelect = SelectStatement.builder()
                 .select(Select.of(new AggregateCallProjection(AggregateCall.countStar())))
-                .from(From.of(new Table("orders")))
+                .from(From.of(new TableIdentifier("orders")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("orders", "status"), Literal.of("active"))))
                 .build();
 

@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.As;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -46,7 +46,7 @@ class DefaultScalarExpressionProjectionPsStrategyTest {
     @Test
     void alias() {
         ScalarExpression expr = new StubScalarExpression(new PsDto("bar", List.of()));
-        ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new As("aliasName"));
+        ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new Alias("aliasName"));
         PsDto dto = strategy.handle(projection, null, new AstContext());
         assertThat(dto.sql()).isEqualTo("bar AS \"aliasName\"");
         assertThat(dto.parameters()).isEmpty();
@@ -55,7 +55,7 @@ class DefaultScalarExpressionProjectionPsStrategyTest {
     @Test
     void doesNotAddAliasIfAliasIsBlank() {
         ScalarExpression expr = new StubScalarExpression(new PsDto("baz", List.of("x")));
-        ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new As("   "));
+        ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new Alias("   "));
         PsDto dto = strategy.handle(projection, null, new AstContext());
         assertThat(dto.sql()).isEqualTo("baz");
         assertThat(dto.parameters()).containsExactly("x");
@@ -64,7 +64,7 @@ class DefaultScalarExpressionProjectionPsStrategyTest {
     @Test
     void propagatesParametersFromExpression() {
         ScalarExpression expr = new StubScalarExpression(new PsDto("col", List.of(42, "foo")));
-        ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new As("a"));
+        ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new Alias("a"));
         PsDto dto = strategy.handle(projection, null, new AstContext());
         assertThat(dto.sql()).isEqualTo("col AS \"a\"");
         assertThat(dto.parameters()).containsExactly(42, "foo");
