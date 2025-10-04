@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item;
 
 import java.util.stream.Collectors;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 

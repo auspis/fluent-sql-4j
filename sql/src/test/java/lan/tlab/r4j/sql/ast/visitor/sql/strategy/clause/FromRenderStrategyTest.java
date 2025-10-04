@@ -9,8 +9,8 @@ import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -58,9 +58,9 @@ class FromRenderStrategyTest {
     @Test
     void innerJoin() {
         OnJoin join = new OnJoin(
-                new Table("users", "u"),
+                new TableIdentifier("users", "u"),
                 JoinType.INNER,
-                new Table("orders", "o"),
+                new TableIdentifier("orders", "o"),
                 Comparison.eq(ColumnReference.of("u", "id"), ColumnReference.of("o", "user_id")));
         From from = From.of(join);
         String sql = strategy.render(from, sqlRenderer, new AstContext());
@@ -69,7 +69,7 @@ class FromRenderStrategyTest {
 
     @Test
     void multipleTablesImplicitCrossJoin() {
-        From from = From.of(new Table("table1"), new Table("table2"));
+        From from = From.of(new TableIdentifier("table1"), new TableIdentifier("table2"));
         String sql = strategy.render(from, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("FROM \"table1\", \"table2\"");
     }
@@ -77,14 +77,14 @@ class FromRenderStrategyTest {
     @Test
     void chainedJoin() {
         FromSource join1 = new OnJoin(
-                new Table("a"),
+                new TableIdentifier("a"),
                 JoinType.INNER,
-                new Table("b"),
+                new TableIdentifier("b"),
                 Comparison.eq(ColumnReference.of("a", "id"), ColumnReference.of("b", "a_id")));
         FromSource join2 = new OnJoin(
                 join1,
                 JoinType.LEFT,
-                new Table("c"),
+                new TableIdentifier("c"),
                 Comparison.eq(ColumnReference.of("b", "id"), ColumnReference.of("c", "b_id")));
         From from = From.of(join2);
         String sql = strategy.render(from, sqlRenderer, new AstContext());

@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDateTime;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -31,7 +31,7 @@ class UpdateStatementRenderStrategyTest {
     @Test
     void valuesAndFunctions() {
         UpdateStatement statement = UpdateStatement.builder()
-                .table(new Table("users"))
+                .table(new TableIdentifier("users"))
                 .set(List.of(
                         UpdateItem.of("status", Literal.of("active")),
                         UpdateItem.of("updatedAt", new CurrentDateTime())))
@@ -51,7 +51,7 @@ class UpdateStatementRenderStrategyTest {
     @Test
     void noWhere() {
         UpdateStatement statement = UpdateStatement.builder()
-                .table(new Table("users"))
+                .table(new TableIdentifier("users"))
                 .set(List.of(UpdateItem.of("status", Literal.of("active"))))
                 .build();
 

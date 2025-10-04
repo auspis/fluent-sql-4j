@@ -1,7 +1,7 @@
-package lan.tlab.r4j.sql.ast.expression.item.ddl;
+package lan.tlab.r4j.sql.ast.statement.ddl.definition;
 
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;

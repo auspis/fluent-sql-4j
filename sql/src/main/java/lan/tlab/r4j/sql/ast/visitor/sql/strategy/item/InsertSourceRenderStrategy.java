@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item;
 
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertSource;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 

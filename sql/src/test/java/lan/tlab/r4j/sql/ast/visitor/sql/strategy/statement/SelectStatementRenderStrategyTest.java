@@ -10,10 +10,10 @@ import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.CountStar;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -36,7 +36,7 @@ class SelectStatementRenderStrategyTest {
     @Test
     void star() {
         SelectStatement statement = SelectStatement.builder()
-                .from(From.builder().source(new Table("users")).build())
+                .from(From.builder().source(new TableIdentifier("users")).build())
                 .build();
 
         String sql = strategy.render(statement, renderer, new AstContext());
@@ -102,7 +102,7 @@ class SelectStatementRenderStrategyTest {
     @Test
     void orderBy() {
         SelectStatement statement = SelectStatement.builder()
-                .from(From.builder().source(new Table("orders")).build())
+                .from(From.builder().source(new TableIdentifier("orders")).build())
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("orders", "orderDate"))))
                 .build();
 
