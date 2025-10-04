@@ -64,7 +64,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
@@ -228,7 +228,7 @@ public interface Visitor<T> {
 
     T visit(PrimaryKey item, AstContext ctx);
 
-    T visit(Index index, AstContext ctx);
+    T visit(IndexDefinition indexDefinition, AstContext ctx);
 
     T visit(NotNullConstraint constraint, AstContext ctx);
 

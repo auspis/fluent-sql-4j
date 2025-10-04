@@ -12,7 +12,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -120,8 +120,8 @@ class TableDefinitionRenderStrategyTest {
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
                         ColumnDefinitionBuilder.varchar("email").build()))
-                .index(new Index("idx_name", "name"))
-                .index(new Index("idx_email", "email"))
+                .index(new IndexDefinition("idx_name", "name"))
+                .index(new IndexDefinition("idx_email", "email"))
                 .build();
 
         String sql = strategy.render(tableDef, renderer, new AstContext());
