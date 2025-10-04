@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.DeleteStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;

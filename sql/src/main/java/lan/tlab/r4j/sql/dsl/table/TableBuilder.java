@@ -12,7 +12,7 @@ import lan.tlab.r4j.sql.ast.expression.item.ddl.ReferencesItem;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
-import lan.tlab.r4j.sql.ast.statement.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 

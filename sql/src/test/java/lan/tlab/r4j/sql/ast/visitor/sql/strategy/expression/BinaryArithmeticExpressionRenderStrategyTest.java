@@ -11,7 +11,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
-import lan.tlab.r4j.sql.ast.statement.SelectStatement;
+import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
