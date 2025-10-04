@@ -14,10 +14,10 @@ import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
@@ -183,7 +183,7 @@ public class SelectBuilder {
     }
 
     // Helper to combine conditions with functional approach
-    static Where combineConditions(Where currentWhere, BooleanExpression newCondition, LogicalCombinator combinator) {
+    static Where combineConditions(Where currentWhere, Predicate newCondition, LogicalCombinator combinator) {
         return Optional.ofNullable(currentWhere)
                 .filter(SelectBuilder::hasValidCondition)
                 .map(where -> combineWithExisting(where, newCondition, combinator))
@@ -191,16 +191,16 @@ public class SelectBuilder {
     }
 
     static boolean hasValidCondition(Where where) {
-        return !(where.getCondition() instanceof NullBooleanExpression);
+        return !(where.getCondition() instanceof NullPredicate);
     }
 
-    static Where combineWithExisting(Where where, BooleanExpression newCondition, LogicalCombinator combinator) {
-        BooleanExpression existingCondition = where.getCondition();
-        BooleanExpression combinedCondition = combinator.combine(existingCondition, newCondition);
+    static Where combineWithExisting(Where where, Predicate newCondition, LogicalCombinator combinator) {
+        Predicate existingCondition = where.getCondition();
+        Predicate combinedCondition = combinator.combine(existingCondition, newCondition);
         return Where.of(combinedCondition);
     }
 
-    SelectBuilder addWhereCondition(BooleanExpression condition, LogicalCombinator combinator) {
+    SelectBuilder addWhereCondition(Predicate condition, LogicalCombinator combinator) {
         return updateWhere(where -> SelectBuilder.combineConditions(where, condition, combinator));
     }
 
