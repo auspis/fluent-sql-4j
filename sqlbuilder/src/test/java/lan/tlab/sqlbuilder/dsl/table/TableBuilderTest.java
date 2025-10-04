@@ -314,6 +314,6 @@ class TableBuilderTest {
                 .contains("\"order_id\" INTEGER NOT NULL")
                 .contains("\"quantity\" INTEGER")
                 .contains(
-                        "PRIMARY KEY (\"order_id\", \"item_id\")"); // Ordine corretto indipendente dalla dichiarazione
+                        "PRIMARY KEY (\"order_id\", \"item_id\")"); // Correct order independent of declaration
     }
 }
