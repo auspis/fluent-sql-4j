@@ -4,11 +4,11 @@ import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.statement.InsertStatement;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 
 public class InsertStatementBuilderFromObject {
     public static InsertStatement fromObject(String tableName, Object obj) {
@@ -29,7 +29,7 @@ public class InsertStatementBuilderFromObject {
             throw new IllegalArgumentException("Only records are supported in this version");
         }
         return InsertStatement.builder()
-                .table(new Table(tableName))
+                .table(new TableIdentifier(tableName))
                 .columns(columns)
                 .data(new InsertValues(values))
                 .build();
