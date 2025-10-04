@@ -24,6 +24,7 @@ import lan.tlab.sqlbuilder.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.sqlbuilder.ast.visitor.ps.PsDto;
 import lan.tlab.sqlbuilder.ast.visitor.sql.SqlRenderer;
 
+// TODO: Add support for SELECT AggregateCalls, JOINs, GROUP BY, HAVING, subqueries, and other SQL features as needed.
 public class SelectBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final SqlRenderer sqlRenderer;
