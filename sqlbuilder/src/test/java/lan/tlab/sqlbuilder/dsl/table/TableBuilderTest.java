@@ -313,7 +313,6 @@ class TableBuilderTest {
                 .contains("\"item_id\" INTEGER NOT NULL")
                 .contains("\"order_id\" INTEGER NOT NULL")
                 .contains("\"quantity\" INTEGER")
-                .contains(
-                        "PRIMARY KEY (\"order_id\", \"item_id\")"); // Correct order independent of declaration
+                .contains("PRIMARY KEY (\"order_id\", \"item_id\")"); // Correct order independent of declaration
     }
 }
