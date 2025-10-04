@@ -3,22 +3,22 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IndexPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IndexDefinitionPsStrategy;
 import org.junit.jupiter.api.Test;
 
 class DefaultIndexPsStrategyTest {
 
-    private final IndexPsStrategy strategy = new DefaultIndexPsStrategy();
+    private final IndexDefinitionPsStrategy strategy = new DefaultIndexPsStrategy();
     private final PreparedStatementVisitor visitor = new PreparedStatementVisitor();
     private final AstContext ctx = new AstContext();
 
     @Test
     void singleColumnIndex() {
-        Index index = new Index("idx_name", "name");
+        IndexDefinition index = new IndexDefinition("idx_name", "name");
 
         PsDto result = strategy.handle(index, visitor, ctx);
 
@@ -28,7 +28,7 @@ class DefaultIndexPsStrategyTest {
 
     @Test
     void multiColumnIndex() {
-        Index index = new Index("idx_user_created", "user_id", "created_at");
+        IndexDefinition index = new IndexDefinition("idx_user_created", "user_id", "created_at");
 
         PsDto result = strategy.handle(index, visitor, ctx);
 
@@ -38,7 +38,7 @@ class DefaultIndexPsStrategyTest {
 
     @Test
     void threeColumnIndex() {
-        Index index = new Index("idx_composite", "year", "month", "day");
+        IndexDefinition index = new IndexDefinition("idx_composite", "year", "month", "day");
 
         PsDto result = strategy.handle(index, visitor, ctx);
 
@@ -48,7 +48,7 @@ class DefaultIndexPsStrategyTest {
 
     @Test
     void indexWithListConstructor() {
-        Index index = new Index("idx_columns", List.of("column1", "column2"));
+        IndexDefinition index = new IndexDefinition("idx_columns", List.of("column1", "column2"));
 
         PsDto result = strategy.handle(index, visitor, ctx);
 
@@ -58,7 +58,7 @@ class DefaultIndexPsStrategyTest {
 
     @Test
     void indexWithSpecialCharacters() {
-        Index index = new Index("idx-special_name", "user-id", "created_at");
+        IndexDefinition index = new IndexDefinition("idx-special_name", "user-id", "created_at");
 
         PsDto result = strategy.handle(index, visitor, ctx);
 
@@ -68,7 +68,7 @@ class DefaultIndexPsStrategyTest {
 
     @Test
     void indexWithUnderscoreNaming() {
-        Index index = new Index("idx_table_field", "table_field");
+        IndexDefinition index = new IndexDefinition("idx_table_field", "table_field");
 
         PsDto result = strategy.handle(index, visitor, ctx);
 
