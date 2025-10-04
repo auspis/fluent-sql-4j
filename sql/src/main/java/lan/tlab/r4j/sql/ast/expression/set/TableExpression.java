@@ -13,7 +13,7 @@ public interface TableExpression extends SetExpression {
      */
 
     /*
-    (Table Expressions / Row Sets)
+    (TableIdentifier Expressions / Row Sets)
        - Definizione: Producono un set di righe e colonne (una tabella).
     - Dove possono essere usate:
            - SELECT (NO): Non puoi proiettare direttamente un'intera tabella come un "valore" in una colonna (a meno che non sia una subquery scalare, che è un caso specifico).

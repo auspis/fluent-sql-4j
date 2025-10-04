@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.ast.statement.ddl;
 
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;

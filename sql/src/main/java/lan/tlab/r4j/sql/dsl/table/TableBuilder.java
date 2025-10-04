@@ -2,17 +2,17 @@ package lan.tlab.r4j.sql.dsl.table;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.DataType;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Index;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ReferencesItem;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 

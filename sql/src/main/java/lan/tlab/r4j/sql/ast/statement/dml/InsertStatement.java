@@ -2,10 +2,10 @@ package lan.tlab.r4j.sql.ast.statement.dml;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.Builder;

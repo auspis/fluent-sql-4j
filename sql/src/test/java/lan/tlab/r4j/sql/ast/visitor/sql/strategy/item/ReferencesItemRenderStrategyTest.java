@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ReferencesItem;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;

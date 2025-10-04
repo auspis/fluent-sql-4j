@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.expression.item;
+package lan.tlab.r4j.sql.ast.identifier;
 
 import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
@@ -9,17 +9,17 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class Table implements SqlItem, TableExpression, FromSource {
+public class TableIdentifier implements TableExpression, FromSource {
 
     private String name = "";
-    private As as = As.nullObject();
+    private Alias alias = Alias.nullObject();
 
-    public Table(String name) {
-        this(name, As.nullObject());
+    public TableIdentifier(String name) {
+        this(name, Alias.nullObject());
     }
 
-    public Table(String name, String alias) {
-        this(name, new As(alias));
+    public TableIdentifier(String name, String aliasName) {
+        this(name, new Alias(aliasName));
     }
 
     @Override
@@ -28,6 +28,10 @@ public class Table implements SqlItem, TableExpression, FromSource {
     }
 
     public String getTableReference() {
-        return as.getName().isEmpty() ? name : as.getName();
+        return alias.getName().isEmpty() ? name : alias.getName();
+    }
+
+    public Alias getAs() {
+        return alias;
     }
 }

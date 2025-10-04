@@ -1,9 +1,9 @@
-package lan.tlab.r4j.sql.ast.expression.item.ddl;
+package lan.tlab.r4j.sql.ast.statement.ddl.definition;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.PrimaryKey;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
@@ -35,7 +35,7 @@ public class TableDefinition implements Visitable {
 
     public static class TableDefinitionBuilder {
         public TableDefinitionBuilder name(String value) {
-            return table(new Table(value));
+            return table(new TableIdentifier(value));
         }
     }
 }

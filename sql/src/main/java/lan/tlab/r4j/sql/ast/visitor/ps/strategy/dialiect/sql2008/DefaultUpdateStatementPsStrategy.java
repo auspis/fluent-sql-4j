@@ -2,8 +2,8 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -12,7 +12,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrategy {
     @Override
     public PsDto handle(UpdateStatement stmt, PreparedStatementVisitor visitor, AstContext ctx) {
-        // Table name
+        // TableIdentifier name
         PsDto tableDto = stmt.getTable().accept(visitor, ctx); // Usa il visitor su qualunque TableExpression
         String tableName = tableDto.sql();
 
