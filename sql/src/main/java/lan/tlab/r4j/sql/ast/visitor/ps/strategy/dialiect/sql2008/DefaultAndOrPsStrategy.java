@@ -2,9 +2,9 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.LogicalOperator;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.predicate.logical.LogicalOperator;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -16,7 +16,7 @@ public class DefaultAndOrPsStrategy implements AndOrPsStrategy {
         String operator = expression.getOperator() == LogicalOperator.AND ? "AND" : "OR";
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-        for (BooleanExpression expr : expression.getOperands()) {
+        for (Predicate expr : expression.getOperands()) {
             PsDto res = expr.accept(visitor, ctx);
             sqlParts.add("(" + res.sql() + ")");
             params.addAll(res.parameters());

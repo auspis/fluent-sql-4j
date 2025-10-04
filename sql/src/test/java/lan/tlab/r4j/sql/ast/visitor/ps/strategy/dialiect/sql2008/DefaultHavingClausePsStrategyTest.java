@@ -3,11 +3,11 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.clause.conditional.having.Having;
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -38,8 +38,8 @@ class DefaultHavingClausePsStrategyTest {
     }
 
     @Test
-    void nullBooleanExpression() {
-        Having having = Having.of(new NullBooleanExpression());
+    void nullPredicate() {
+        Having having = Having.of(new NullPredicate());
 
         PsDto result = strategy.handle(having, visitor, ctx);
 

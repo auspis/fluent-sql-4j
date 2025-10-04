@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.ast.clause.from.source.join;
 
 import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ public class OnJoin implements FromSource {
     private final FromSource left;
     private final JoinType type;
     private final FromSource right;
-    private final BooleanExpression onCondition;
+    private final Predicate onCondition;
 
     public enum JoinType {
         INNER,

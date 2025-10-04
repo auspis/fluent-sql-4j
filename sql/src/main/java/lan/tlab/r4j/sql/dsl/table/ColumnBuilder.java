@@ -1,10 +1,10 @@
 package lan.tlab.r4j.sql.dsl.table;
 
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.NotNullConstraint;
 import lan.tlab.r4j.sql.ast.expression.item.ddl.DataType;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
 
 public class ColumnBuilder {
     private final TableBuilder tableBuilder;
@@ -75,7 +75,7 @@ public class ColumnBuilder {
         return tableBuilder.foreignKey(columnDef.getName(), refTable, refColumns);
     }
 
-    public TableBuilder check(BooleanExpression expr) {
+    public TableBuilder check(Predicate expr) {
         buildAndAdd();
         return tableBuilder.check(expr);
     }

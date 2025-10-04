@@ -2,9 +2,9 @@ package lan.tlab.r4j.sql.ast.expression.item.ddl;
 
 import java.util.List;
 import java.util.stream.Stream;
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
 import lan.tlab.r4j.sql.ast.expression.item.SqlItem;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
@@ -81,7 +81,7 @@ public interface Constraint extends SqlItem {
     @EqualsAndHashCode
     @ToString
     public static class CheckConstraint implements Constraint {
-        private final BooleanExpression expression;
+        private final Predicate expression;
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
