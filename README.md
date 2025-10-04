@@ -3,7 +3,7 @@
 ## Project structure
 
 The project is split into Maven modules:
-- `sqlbuilder`: contains the main code and unit tests
+- `sql`: contains the SQL AST, DSL and unit tests
 - `test-integration`: contains integration tests (fast H2 tests and slow E2E tests with Testcontainers)
 
 ## Install GIT hook
@@ -67,11 +67,11 @@ This naming convention allows for:
 ### Technical details
 
 - Running `./mvnw test` will execute:
-  - **Unit tests** in the `sqlbuilder` module
+  - **Unit tests** in the `sql` module
   - **H2 integration tests** in the `test-integration` module (fast, in-memory database)
 - Running `./mvnw verify` will additionally execute:
   - **E2E tests** with Testcontainers in the `test-integration` module (slower, real databases)
-- The `test-integration` module depends on `sqlbuilder` and contains all the necessary dependencies for testing (JUnit, Testcontainers, H2, etc).
+- The `test-integration` module depends on `sql` and contains all the necessary dependencies for testing (JUnit, Testcontainers, H2, etc).
 - **H2 integration tests** are named with the `*Test.java` suffix and run with Surefire.
 - **E2E tests** are named with the `*E2E.java` suffix and run with Failsafe.
 - This ensures optimal development workflow: fast feedback with `test`, complete validation with `verify`.
