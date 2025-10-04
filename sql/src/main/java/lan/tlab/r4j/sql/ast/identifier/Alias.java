@@ -1,21 +1,22 @@
-package lan.tlab.r4j.sql.ast.expression.item;
+package lan.tlab.r4j.sql.ast.identifier;
 
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.Getter;
 
 @Getter
-public class As implements SqlItem {
+public class Alias implements Visitable {
 
     @Getter
     private final String name;
 
-    public As(String name) {
+    public Alias(String name) {
         this.name = name;
     }
 
-    public static As nullObject() {
-        return new As("");
+    public static Alias nullObject() {
+        return new Alias("");
     }
 
     @Override

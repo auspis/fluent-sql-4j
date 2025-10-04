@@ -15,16 +15,16 @@ import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.DataType;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -58,7 +58,7 @@ public class StandardSqlRendererMySqlE2E {
         renderer = SqlRendererFactory.mysql();
         // Create table using CreateTableStatement and renderer
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("Customer"))
+                .table(new TableIdentifier("Customer"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
@@ -72,13 +72,13 @@ public class StandardSqlRendererMySqlE2E {
             stmt.execute(createTableSql);
 
             InsertStatement insertAlice = InsertStatement.builder()
-                    .table(new Table("Customer"))
-                    .data(lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues.of(
+                    .table(new TableIdentifier("Customer"))
+                    .data(lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues.of(
                             Literal.of(1), Literal.of("Alice"), Literal.of(400), Literal.of("2025-08-31 23:23:23")))
                     .build();
             InsertStatement insertBob = InsertStatement.builder()
-                    .table(new Table("Customer"))
-                    .data(lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues.of(
+                    .table(new TableIdentifier("Customer"))
+                    .data(lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues.of(
                             Literal.of(2), Literal.of("Bob"), Literal.of(500), Literal.of("2025-08-31 23:23:24")))
                     .build();
             stmt.execute(insertAlice.accept(renderer, new AstContext()));

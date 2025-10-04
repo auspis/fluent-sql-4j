@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -27,9 +27,9 @@ class OnJoinStrategyRenderStrategyTest {
     @Test
     void innerJoin() {
         OnJoin onJoin = new OnJoin(
-                new Table("Customer", "c"),
+                new TableIdentifier("Customer", "c"),
                 JoinType.INNER,
-                new Table("Address", "a"),
+                new TableIdentifier("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
         String sql = strategy.render(onJoin, standardSql2008, new AstContext());
@@ -40,9 +40,9 @@ class OnJoinStrategyRenderStrategyTest {
     @Test
     void leftJoin() {
         OnJoin onJoin = new OnJoin(
-                new Table("Customer", "c"),
+                new TableIdentifier("Customer", "c"),
                 JoinType.LEFT,
-                new Table("Address", "a"),
+                new TableIdentifier("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
         String sql = strategy.render(onJoin, standardSql2008, new AstContext());
@@ -53,9 +53,9 @@ class OnJoinStrategyRenderStrategyTest {
     @Test
     void fullJoin() {
         OnJoin onJoin = new OnJoin(
-                new Table("Customer", "c"),
+                new TableIdentifier("Customer", "c"),
                 JoinType.FULL,
-                new Table("Address", "a"),
+                new TableIdentifier("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
         String sql = strategy.render(onJoin, standardSql2008, new AstContext());
@@ -66,9 +66,9 @@ class OnJoinStrategyRenderStrategyTest {
     @Test
     void corssJoin() {
         OnJoin onJoin = new OnJoin(
-                new Table("Customer", "c"),
+                new TableIdentifier("Customer", "c"),
                 JoinType.CROSS,
-                new Table("Address", "a"),
+                new TableIdentifier("Address", "a"),
                 Comparison.eq(ColumnReference.of("c", "id"), ColumnReference.of("a", "customer_id")));
 
         String sql = strategy.render(onJoin, standardSql2008, new AstContext());
