@@ -17,7 +17,6 @@ public class DefaultColumnDefinitionPsStrategy implements ColumnDefinitionPsStra
     public PsDto handle(ColumnDefinition columnDefinition, PreparedStatementVisitor visitor, AstContext ctx) {
         System.out.println("quii " + columnDefinition.equals(ColumnDefinition.nullObject()));
         System.out.println("quii " + columnDefinition);
-        System.out.println("quii " + ColumnDefinition.nullObject());
         if (columnDefinition.equals(ColumnDefinition.nullObject())) {
             return new PsDto("", List.of());
         }
