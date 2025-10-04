@@ -9,7 +9,7 @@ import lan.tlab.r4j.sql.ast.expression.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.UpdateStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.statement;
+package lan.tlab.r4j.sql.ast.statement.dql;
 
 import lan.tlab.r4j.sql.ast.clause.conditional.having.Having;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
@@ -16,7 +16,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class SelectStatement implements Statement, TableExpression {
+public class SelectStatement implements DataQueryStatement, TableExpression {
 
     @Default
     private final Select select = Select.builder().build();
