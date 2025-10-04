@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -101,7 +101,7 @@ public class TableBuilder {
 
     public TableBuilder index(String indexName, String... columns) {
         if (indexName != null && columns != null && columns.length > 0) {
-            definitionBuilder = definitionBuilder.index(new Index(indexName, columns));
+            definitionBuilder = definitionBuilder.index(new IndexDefinition(indexName, columns));
         }
         return this;
     }

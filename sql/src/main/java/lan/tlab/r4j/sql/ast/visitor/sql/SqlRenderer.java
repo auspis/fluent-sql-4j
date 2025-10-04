@@ -64,7 +64,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
@@ -136,7 +136,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.InsertValueRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.TableRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.UpdateItemRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.ColumnDefinitionRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.IndexRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.IndexDefinitionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.ParameterizedDataTypeRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.ReferencesItemRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.SimpleDataTypeRenderStrategy;
@@ -384,7 +384,7 @@ public class SqlRenderer implements Visitor<String> {
     private final PrimaryKeyRenderStrategy primaryKeyStrategy = new PrimaryKeyRenderStrategy();
 
     @Default
-    private final IndexRenderStrategy indexStrategy = new IndexRenderStrategy();
+    private final IndexDefinitionRenderStrategy indexDefinitionStrategy = new IndexDefinitionRenderStrategy();
 
     @Default
     private final NotNullConstraintRenderStrategy notNullConstraintStrategy = new NotNullConstraintRenderStrategy();
@@ -756,8 +756,8 @@ public class SqlRenderer implements Visitor<String> {
     }
 
     @Override
-    public String visit(Index index, AstContext ctx) {
-        return indexStrategy.render(index, this, ctx);
+    public String visit(IndexDefinition indexDefinition, AstContext ctx) {
+        return indexDefinitionStrategy.render(indexDefinition, this, ctx);
     }
 
     @Override

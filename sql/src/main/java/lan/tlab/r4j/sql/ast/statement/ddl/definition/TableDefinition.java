@@ -26,7 +26,7 @@ public class TableDefinition implements Visitable {
     private final List<Constraint> constraints;
 
     @Singular
-    private final List<Index> indexes;
+    private final List<IndexDefinition> indexes;
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
