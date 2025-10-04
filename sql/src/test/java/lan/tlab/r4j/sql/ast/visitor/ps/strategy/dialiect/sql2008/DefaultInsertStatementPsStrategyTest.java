@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.DefaultValues;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -31,7 +31,7 @@ class DefaultInsertStatementPsStrategyTest {
 
     @Test
     void insertWithDefaultValues() {
-        Table table = new Table("User");
+        TableIdentifier table = new TableIdentifier("User");
         DefaultValues defaultValues = new DefaultValues();
         InsertStatement stmt =
                 InsertStatement.builder().table(table).data(defaultValues).build();
@@ -44,7 +44,7 @@ class DefaultInsertStatementPsStrategyTest {
 
     @Test
     void insertWithSingleColumn() {
-        Table table = new Table("User");
+        TableIdentifier table = new TableIdentifier("User");
         List<ColumnReference> columns = List.of(ColumnReference.of("User", "name"));
         List<Expression> values = List.of(Literal.of("John"));
         InsertValues insertValues = new InsertValues(values);
@@ -63,7 +63,7 @@ class DefaultInsertStatementPsStrategyTest {
 
     @Test
     void insertWithMultipleColumns() {
-        Table table = new Table("User");
+        TableIdentifier table = new TableIdentifier("User");
         List<ColumnReference> columns = List.of(
                 ColumnReference.of("User", "id"),
                 ColumnReference.of("User", "name"),
@@ -85,7 +85,7 @@ class DefaultInsertStatementPsStrategyTest {
 
     @Test
     void insertWithMixedTypes() {
-        Table table = new Table("Product");
+        TableIdentifier table = new TableIdentifier("Product");
         List<ColumnReference> columns = List.of(
                 ColumnReference.of("Product", "id"),
                 ColumnReference.of("Product", "name"),
@@ -109,7 +109,7 @@ class DefaultInsertStatementPsStrategyTest {
 
     @Test
     void insertWithTableNameSpecialCharacters() {
-        Table table = new Table("order_items");
+        TableIdentifier table = new TableIdentifier("order_items");
         List<ColumnReference> columns = List.of(ColumnReference.of("order_items", "item_id"));
         List<Expression> values = List.of(Literal.of(42));
         InsertValues insertValues = new InsertValues(values);

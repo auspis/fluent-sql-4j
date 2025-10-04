@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.expression.item;
+package lan.tlab.r4j.sql.ast.statement.dml.item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,11 +7,12 @@ import lan.tlab.r4j.sql.ast.expression.Expression;
 import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
 import lan.tlab.r4j.sql.ast.expression.set.SetExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public interface InsertData extends SqlItem {
+public interface InsertData extends Visitable {
 
     @AllArgsConstructor
     @Getter

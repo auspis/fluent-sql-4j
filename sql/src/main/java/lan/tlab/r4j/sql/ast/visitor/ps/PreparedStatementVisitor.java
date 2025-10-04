@@ -13,24 +13,6 @@ import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.As;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.DefaultValues;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertSource;
-import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.UpdateItem;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.CheckConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.ForeignKeyConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.UniqueConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.DataType.ParameterizedDataType;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.DataType.SimpleDataType;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Index;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ReferencesItem;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
@@ -62,6 +44,8 @@ import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.identifier.Alias;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Between;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.In;
@@ -72,9 +56,25 @@ import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.ForeignKeyConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
@@ -494,7 +494,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(Table table, AstContext ctx) {
+    public PsDto visit(TableIdentifier table, AstContext ctx) {
         return tablePsStrategy.handle(table, this, ctx);
     }
 
@@ -739,7 +739,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(As item, AstContext ctx) {
+    public PsDto visit(Alias item, AstContext ctx) {
         return asPsStrategy.handle(item, this, ctx);
     }
 

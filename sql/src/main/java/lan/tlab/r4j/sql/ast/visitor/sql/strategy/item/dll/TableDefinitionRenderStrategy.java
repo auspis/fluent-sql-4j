@@ -2,10 +2,10 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Index;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.SqlItemRenderStrategy;

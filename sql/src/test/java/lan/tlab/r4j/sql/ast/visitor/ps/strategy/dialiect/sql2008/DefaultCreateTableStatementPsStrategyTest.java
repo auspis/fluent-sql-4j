@@ -3,10 +3,10 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -29,7 +29,7 @@ class DefaultCreateTableStatementPsStrategyTest {
     @Test
     void simpleCreateTable() {
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("users"))
+                .table(new TableIdentifier("users"))
                 .columns(List.of(ColumnDefinitionBuilder.integer("id").build()))
                 .build());
 
@@ -44,7 +44,7 @@ class DefaultCreateTableStatementPsStrategyTest {
     @Test
     void createTableWithMultipleColumns() {
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("users"))
+                .table(new TableIdentifier("users"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build()))
@@ -62,7 +62,7 @@ class DefaultCreateTableStatementPsStrategyTest {
     @Test
     void createTableWithSchema() {
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
-                .table(new Table("myschema", "users"))
+                .table(new TableIdentifier("myschema", "users"))
                 .columns(List.of(ColumnDefinitionBuilder.integer("id").build()))
                 .build());
 

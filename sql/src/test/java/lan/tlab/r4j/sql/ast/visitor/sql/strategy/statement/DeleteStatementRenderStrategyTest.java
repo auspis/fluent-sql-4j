@@ -3,9 +3,9 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -28,7 +28,7 @@ class DeleteStatementRenderStrategyTest {
     @Test
     void ok() {
         DeleteStatement statement = DeleteStatement.builder()
-                .table(new Table("Customer"))
+                .table(new TableIdentifier("Customer"))
                 .where(Where.of(Comparison.eq(ColumnReference.of("Customer", "status"), Literal.of("inactive"))))
                 .build();
 
@@ -44,7 +44,7 @@ class DeleteStatementRenderStrategyTest {
     @Test
     void noWhere() {
         DeleteStatement statement =
-                DeleteStatement.builder().table(new Table("Customer")).build();
+                DeleteStatement.builder().table(new TableIdentifier("Customer")).build();
 
         String sql = strategy.render(statement, renderer, new AstContext());
         assertThat(sql).isEqualTo("DELETE FROM \"Customer\"");

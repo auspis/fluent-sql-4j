@@ -3,17 +3,17 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.CheckConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Constraint.UniqueConstraint;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.Index;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -34,7 +34,7 @@ class TableDefinitionRenderStrategyTest {
     @Test
     void ok() {
         TableDefinition tableDef = TableDefinition.builder()
-                .table(new Table("my_table"))
+                .table(new TableIdentifier("my_table"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build()))
@@ -56,7 +56,7 @@ class TableDefinitionRenderStrategyTest {
     void withPrimaryKeyAndNotNull() {
         PrimaryKey pk = new PrimaryKey("id");
         TableDefinition tableDef = TableDefinition.builder()
-                .table(new Table("my_table"))
+                .table(new TableIdentifier("my_table"))
                 .primaryKey(pk)
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
@@ -83,7 +83,7 @@ class TableDefinitionRenderStrategyTest {
     void constraints() {
         PrimaryKey pk = new PrimaryKey("id");
         TableDefinition tableDef = TableDefinition.builder()
-                .table(new Table("my_table"))
+                .table(new TableIdentifier("my_table"))
                 .primaryKey(pk)
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
@@ -115,7 +115,7 @@ class TableDefinitionRenderStrategyTest {
     @Test
     void index() {
         TableDefinition tableDef = TableDefinition.builder()
-                .table(new Table("my_table"))
+                .table(new TableIdentifier("my_table"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
