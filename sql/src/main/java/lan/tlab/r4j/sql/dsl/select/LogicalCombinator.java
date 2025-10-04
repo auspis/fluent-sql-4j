@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.dsl.select;
 
-import lan.tlab.r4j.sql.ast.expression.bool.BooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 
 /**
  * Represents how to combine boolean expressions in WHERE clauses.
@@ -10,16 +10,16 @@ import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
 public enum LogicalCombinator {
     AND {
         @Override
-        public BooleanExpression combine(BooleanExpression left, BooleanExpression right) {
+        public Predicate combine(Predicate left, Predicate right) {
             return AndOr.and(left, right);
         }
     },
     OR {
         @Override
-        public BooleanExpression combine(BooleanExpression left, BooleanExpression right) {
+        public Predicate combine(Predicate left, Predicate right) {
             return AndOr.or(left, right);
         }
     };
 
-    public abstract BooleanExpression combine(BooleanExpression left, BooleanExpression right);
+    public abstract Predicate combine(Predicate left, Predicate right);
 }

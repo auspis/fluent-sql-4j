@@ -12,15 +12,6 @@ import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.bool.Between;
-import lan.tlab.r4j.sql.ast.expression.bool.Comparison;
-import lan.tlab.r4j.sql.ast.expression.bool.In;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNotNull;
-import lan.tlab.r4j.sql.ast.expression.bool.IsNull;
-import lan.tlab.r4j.sql.ast.expression.bool.Like;
-import lan.tlab.r4j.sql.ast.expression.bool.NullBooleanExpression;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.AndOr;
-import lan.tlab.r4j.sql.ast.expression.bool.logical.Not;
 import lan.tlab.r4j.sql.ast.expression.item.As;
 import lan.tlab.r4j.sql.ast.expression.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.expression.item.InsertData.InsertSource;
@@ -70,6 +61,15 @@ import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.predicate.Between;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.predicate.In;
+import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
+import lan.tlab.r4j.sql.ast.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.predicate.Like;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.InsertStatement;
@@ -115,7 +115,7 @@ public interface Visitor<T> {
     T visit(Fetch clause, AstContext ctx);
 
     // boolean expressions
-    T visit(NullBooleanExpression expression, AstContext ctx);
+    T visit(NullPredicate expression, AstContext ctx);
 
     T visit(Between expression, AstContext ctx);
 

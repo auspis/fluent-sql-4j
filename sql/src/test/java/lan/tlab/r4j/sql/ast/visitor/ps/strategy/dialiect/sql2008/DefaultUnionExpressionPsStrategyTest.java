@@ -20,15 +20,13 @@ class DefaultUnionExpressionPsStrategyTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new lan.tlab.r4j.sql.ast.expression.item.Table("User")))
                 .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
-                        lan.tlab.r4j.sql.ast.expression.bool.Comparison.eq(
-                                ColumnReference.of("User", "id"), Literal.of(1))))
+                        lan.tlab.r4j.sql.ast.predicate.Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                 .build();
         SelectStatement select2 = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new lan.tlab.r4j.sql.ast.expression.item.Table("User")))
                 .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
-                        lan.tlab.r4j.sql.ast.expression.bool.Comparison.eq(
-                                ColumnReference.of("User", "id"), Literal.of(2))))
+                        lan.tlab.r4j.sql.ast.predicate.Comparison.eq(ColumnReference.of("User", "id"), Literal.of(2))))
                 .build();
         UnionExpression union = UnionExpression.union(select1, select2);
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();

@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.expression.bool;
+package lan.tlab.r4j.sql.ast.predicate;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class Comparison implements BooleanExpression {
+public class Comparison implements Predicate {
 
     private final ScalarExpression lhs;
     private final ComparisonOperator operator;

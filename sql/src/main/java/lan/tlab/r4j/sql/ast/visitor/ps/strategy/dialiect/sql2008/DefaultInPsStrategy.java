@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.sql.ast.expression.bool.In;
+import lan.tlab.r4j.sql.ast.predicate.In;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
