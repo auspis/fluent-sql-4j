@@ -17,7 +17,7 @@ public class DefaultDeleteStatementPsStrategy implements DeleteStatementPsStrate
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
         String tableName =
-                table instanceof lan.tlab.r4j.sql.ast.expression.item.Table t ? t.getName() : table.toString();
+                table instanceof lan.tlab.r4j.sql.ast.identifier.TableIdentifier t ? t.getName() : table.toString();
         sql.append("DELETE FROM ").append(tableName);
         Where where = stmt.getWhere();
         if (where != null

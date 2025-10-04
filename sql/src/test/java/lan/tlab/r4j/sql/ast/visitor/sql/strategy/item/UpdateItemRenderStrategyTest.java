@@ -2,11 +2,11 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDateTime;
+import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
