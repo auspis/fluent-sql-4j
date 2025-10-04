@@ -1,0 +1,10 @@
+package lan.tlab.r4j.sql.ast.visitor.ps.strategy;
+
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Round;
+import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
+
+public interface RoundPsStrategy {
+    PsDto handle(Round round, PreparedStatementVisitor visitor, AstContext ctx);
+}
