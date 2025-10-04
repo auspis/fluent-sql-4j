@@ -296,7 +296,7 @@ class TableBuilderTest {
 
     @Test
     void primaryKeyWithExplicitOrderControl() {
-        // Dimostra il controllo esplicito dell'ordine delle colonne nella primary key
+        // Demonstrates explicit control of the order of columns in the primary key
         String sql = createTable("OrderItems")
                 .column("item_id")
                 .integer()
