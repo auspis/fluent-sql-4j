@@ -6,15 +6,15 @@ import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.item.Table;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.expression.item.ddl.TableDefinition;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.CreateTableStatement;
-import lan.tlab.r4j.sql.ast.statement.InsertStatement;
-import lan.tlab.r4j.sql.ast.statement.SelectStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
+import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -26,7 +26,7 @@ public class SpikeObjectToJdbcMain {
     public static void main(String[] args) throws Exception {
         SqlRenderer sqlRenderer = SqlRendererFactory.standardSql2008();
         TableDefinition userTableDefinition = TableDefinition.builder()
-                .table(new Table("User"))
+                .table(new TableIdentifier("User"))
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
@@ -78,7 +78,7 @@ public class SpikeObjectToJdbcMain {
                     .select(Select.of(
                             new ScalarExpressionProjection(ColumnReference.of("User", "id")),
                             new ScalarExpressionProjection(ColumnReference.of("User", "name"))))
-                    .from(From.of(new Table("User")))
+                    .from(From.of(new TableIdentifier("User")))
                     .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                     .build();
             PreparedStatementVisitor selectVisitor = new PreparedStatementVisitor();

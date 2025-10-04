@@ -65,7 +65,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Index;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
@@ -109,7 +109,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.FromSubqueryPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.HavingClausePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IndexPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IndexDefinitionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InsertSourcePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InsertValuesPsStrategy;
@@ -408,7 +408,7 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     private final PrimaryKeyPsStrategy primaryKeyPsStrategy = new DefaultPrimaryKeyPsStrategy();
 
     @Default
-    private final IndexPsStrategy indexPsStrategy = new DefaultIndexPsStrategy();
+    private final IndexDefinitionPsStrategy indexDefinitionPsStrategy = new DefaultIndexPsStrategy();
 
     @Default
     private final NotNullConstraintPsStrategy notNullConstraintPsStrategy = new DefaultNotNullConstraintPsStrategy();
@@ -779,8 +779,8 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(Index index, AstContext ctx) {
-        return indexPsStrategy.handle(index, this, ctx);
+    public PsDto visit(IndexDefinition indexDefinition, AstContext ctx) {
+        return indexDefinitionPsStrategy.handle(indexDefinition, this, ctx);
     }
 
     @Override
