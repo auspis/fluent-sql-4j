@@ -42,7 +42,7 @@ jobs:
       with:
         name: surefire-reports
         path: |
-          sqlbuilder/target/surefire-reports/
+          sql/target/surefire-reports/
           test-integration/target/surefire-reports/
     - name: Upload Failsafe reports
       if: always()

@@ -17,10 +17,10 @@ This repository is a multi-module Java project managed with Maven. It is structu
 
 - Root directory contains:
   - `pom.xml` (parent POM)
-  - Subfolders for each module (e.g., `sqlbuilder/`, `test-integration/`, etc.)
+  - Subfolders for each module (e.g., `sql/`, `test-integration/`, etc.)
   - `.github/` for GitHub-specific configuration
 - Common modules:
-  - `sqlbuilder/`: Core SQL builder logic
+  - `sql/`: Core SQL AST and DSL logic
   - `test-integration/`: Integration tests, uses Testcontainers
   - Other modules for shared code, applications, and services
 
