@@ -37,18 +37,18 @@ class SelectBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementWithJoinCompilesWithoutError() {
-        SelectBuilder builder = DSL.select("name", "email")
+        String sql = DSL.select("name", "email")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
                 .on("u.id", "o.user_id")
                 .where("status")
-                .eq("active");
+                .eq("active")
+                .build();
 
-        assertThat(builder).isNotNull();
-
-        assertThat(builder.getClass().getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("buildPrepared"));
+        assertThat(sql)
+                .isEqualTo(
+                        "SELECT \"u\".\"name\", \"u\".\"email\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" WHERE \"u\".\"status\" = 'active'");
     }
 }
