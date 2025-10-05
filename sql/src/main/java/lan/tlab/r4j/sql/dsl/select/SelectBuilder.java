@@ -77,24 +77,24 @@ public class SelectBuilder {
         return this;
     }
 
-    public JoinBuilder innerJoin(String tableName) {
+    public JoinClauseBuilder innerJoin(String tableName) {
         validateFromExists();
-        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.INNER, tableName);
+        return new JoinClauseBuilder(this, currentFromSource, OnJoin.JoinType.INNER, tableName);
     }
 
-    public JoinBuilder leftJoin(String tableName) {
+    public JoinClauseBuilder leftJoin(String tableName) {
         validateFromExists();
-        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.LEFT, tableName);
+        return new JoinClauseBuilder(this, currentFromSource, OnJoin.JoinType.LEFT, tableName);
     }
 
-    public JoinBuilder rightJoin(String tableName) {
+    public JoinClauseBuilder rightJoin(String tableName) {
         validateFromExists();
-        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.RIGHT, tableName);
+        return new JoinClauseBuilder(this, currentFromSource, OnJoin.JoinType.RIGHT, tableName);
     }
 
-    public JoinBuilder fullJoin(String tableName) {
+    public JoinClauseBuilder fullJoin(String tableName) {
         validateFromExists();
-        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.FULL, tableName);
+        return new JoinClauseBuilder(this, currentFromSource, OnJoin.JoinType.FULL, tableName);
     }
 
     public SelectBuilder crossJoin(String tableName) {
