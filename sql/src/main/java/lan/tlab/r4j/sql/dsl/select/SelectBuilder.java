@@ -10,6 +10,8 @@ import java.util.function.Function;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
 import lan.tlab.r4j.sql.ast.clause.from.From;
+import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
+import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
@@ -24,10 +26,12 @@ import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-// TODO: Add support for SELECT AggregateCalls, JOINs, GROUP BY, HAVING, subqueries, and other SQL features as needed.
+// TODO: Add support for SELECT AggregateCalls, GROUP BY, HAVING, subqueries, and other SQL features as needed.
 public class SelectBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final SqlRenderer sqlRenderer;
+    private FromSource currentFromSource;
+    private TableIdentifier baseTable;
 
     public SelectBuilder(SqlRenderer sqlRenderer, String... columns) {
         this.sqlRenderer = sqlRenderer;
@@ -44,6 +48,8 @@ public class SelectBuilder {
         }
 
         TableIdentifier table = new TableIdentifier(tableName);
+        baseTable = table;
+        currentFromSource = table;
         statementBuilder = statementBuilder.from(From.of(table));
 
         updateSelectClauseWithTable(table);
@@ -64,9 +70,50 @@ public class SelectBuilder {
                 (TableIdentifier) currentFrom.getSources().get(0);
         TableIdentifier tableWithAlias = new TableIdentifier(currentTable.getName(), alias);
 
+        baseTable = tableWithAlias;
+        currentFromSource = tableWithAlias;
         statementBuilder = statementBuilder.from(From.of(tableWithAlias));
         updateSelectClauseWithTable(tableWithAlias);
         return this;
+    }
+
+    public JoinBuilder innerJoin(String tableName) {
+        validateFromExists();
+        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.INNER, tableName);
+    }
+
+    public JoinBuilder leftJoin(String tableName) {
+        validateFromExists();
+        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.LEFT, tableName);
+    }
+
+    public JoinBuilder rightJoin(String tableName) {
+        validateFromExists();
+        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.RIGHT, tableName);
+    }
+
+    public JoinBuilder fullJoin(String tableName) {
+        validateFromExists();
+        return new JoinBuilder(this, currentFromSource, OnJoin.JoinType.FULL, tableName);
+    }
+
+    public SelectBuilder crossJoin(String tableName) {
+        validateFromExists();
+        TableIdentifier rightTable = new TableIdentifier(tableName);
+        OnJoin join = new OnJoin(currentFromSource, OnJoin.JoinType.CROSS, rightTable, null);
+        return addJoin(join);
+    }
+
+    SelectBuilder addJoin(OnJoin join) {
+        currentFromSource = join;
+        statementBuilder = statementBuilder.from(From.of(join));
+        return this;
+    }
+
+    private void validateFromExists() {
+        if (currentFromSource == null) {
+            throw new IllegalStateException("FROM table must be specified before adding a join");
+        }
     }
 
     private SelectStatement getCurrentStatement() {
@@ -74,16 +121,13 @@ public class SelectBuilder {
     }
 
     String getTableReference() {
-        From from = getCurrentStatement().getFrom();
-        if (from == null || from.getSources().isEmpty()) {
+        if (baseTable == null) {
             return "";
         }
-
-        TableIdentifier table = (TableIdentifier) from.getSources().get(0);
-        if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
-            return table.getAs().getName();
+        if (baseTable.getAs() != null && !baseTable.getAs().getName().isEmpty()) {
+            return baseTable.getAs().getName();
         }
-        return table.getName();
+        return baseTable.getName();
     }
 
     private void updateSelectClauseWithTable(TableIdentifier table) {
