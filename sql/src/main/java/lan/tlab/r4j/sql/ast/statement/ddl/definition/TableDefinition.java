@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.statement.ddl.definition;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
@@ -20,10 +20,10 @@ public class TableDefinition implements Visitable {
     @Singular
     private final List<ColumnDefinition> columns;
 
-    private final PrimaryKey primaryKey;
+    private final PrimaryKeyDefinition primaryKey;
 
     @Singular
-    private final List<Constraint> constraints;
+    private final List<ConstraintDefinition> constraints;
 
     @Singular
     private final List<IndexDefinition> indexes;

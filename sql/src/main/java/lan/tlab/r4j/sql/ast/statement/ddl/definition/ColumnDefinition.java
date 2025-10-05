@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.ast.statement.ddl.definition;
 
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
@@ -23,8 +23,8 @@ public class ColumnDefinition implements Visitable {
     @Default
     private final DataType type = DataType.varchar(255);
 
-    private final NotNullConstraint notNullConstraint;
-    private final DefaultConstraint defaultConstraint;
+    private final NotNullConstraintDefinition notNullConstraint;
+    private final DefaultConstraintDefinition defaultConstraint;
 
     public static ColumnDefinition nullObject() {
         return builder().build();

@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.constraint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -22,7 +22,7 @@ class NotNullConstraintRenderStrategyTest {
 
     @Test
     void ok() {
-        NotNullConstraint constraint = new NotNullConstraint();
+        NotNullConstraintDefinition constraint = new NotNullConstraintDefinition();
         String sql = strategy.render(constraint, renderer, new AstContext());
         assertThat(sql).isEqualTo("NOT NULL");
     }
