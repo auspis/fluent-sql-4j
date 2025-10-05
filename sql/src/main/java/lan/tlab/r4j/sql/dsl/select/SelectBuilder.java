@@ -255,11 +255,6 @@ public class SelectBuilder {
         return selectStatement.accept(sqlRenderer, new AstContext());
     }
 
-    public SelectStatement buildStatement() {
-        validateState();
-        return getCurrentStatement();
-    }
-
     public PreparedStatement buildPrepared(Connection connection) throws SQLException {
         validateState();
         SelectStatement stmt = getCurrentStatement();
