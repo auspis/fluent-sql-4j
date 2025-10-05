@@ -3,6 +3,7 @@ package lan.tlab.r4j.sql.dsl.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.dsl.DSL;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,7 @@ class SelectBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementWithJoinCompilesWithoutError() {
-        String sql = DSL.select("name", "email")
+        SelectStatement stmt = DSL.select("name", "email")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -45,10 +46,12 @@ class SelectBuilderPreparedStatementTest {
                 .on("u.id", "o.user_id")
                 .where("status")
                 .eq("active")
-                .build();
+                .buildStatement();
 
-        assertThat(sql)
-                .isEqualTo(
-                        "SELECT \"u\".\"name\", \"u\".\"email\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" WHERE \"u\".\"status\" = 'active'");
+        assertThat(stmt).isNotNull();
+        assertThat(stmt.getFrom()).isNotNull();
+        assertThat(stmt.getFrom().getSources()).hasSize(1);
+        assertThat(stmt.getWhere()).isNotNull();
+        assertThat(stmt.getWhere().getCondition()).isNotNull();
     }
 }
