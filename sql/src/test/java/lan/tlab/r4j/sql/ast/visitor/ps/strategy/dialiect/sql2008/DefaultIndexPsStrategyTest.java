@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class DefaultIndexPsStrategyTest {
 
-    private final IndexDefinitionPsStrategy strategy = new DefaultIndexPsStrategy();
+    private final IndexDefinitionPsStrategy strategy = new DefaultIndexDefinitionPsStrategy();
     private final PreparedStatementVisitor visitor = new PreparedStatementVisitor();
     private final AstContext ctx = new AstContext();
 
