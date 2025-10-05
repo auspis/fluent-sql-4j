@@ -12,6 +12,7 @@ import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
+import lan.tlab.r4j.sql.ast.clause.groupby.GroupBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
@@ -169,6 +170,32 @@ public class SelectBuilder {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
         return new WhereConditionBuilder(this, column, LogicalCombinator.AND);
+    }
+
+    public SelectBuilder groupBy(String... columns) {
+        if (columns == null || columns.length == 0) {
+            throw new IllegalArgumentException("At least one column must be specified for GROUP BY");
+        }
+
+        ColumnReference[] groupingColumns = java.util.Arrays.stream(columns)
+                .map(column -> {
+                    if (column == null || column.trim().isEmpty()) {
+                        throw new IllegalArgumentException("Column name cannot be null or empty");
+                    }
+                    return parseColumnReference(column);
+                })
+                .toArray(ColumnReference[]::new);
+
+        statementBuilder = statementBuilder.groupBy(GroupBy.of(groupingColumns));
+        return this;
+    }
+
+    private ColumnReference parseColumnReference(String column) {
+        if (column.contains(".")) {
+            String[] parts = column.split("\\.", 2);
+            return ColumnReference.of(parts[0], parts[1]);
+        }
+        return ColumnReference.of(getTableReference(), column);
     }
 
     public SelectBuilder orderBy(String column) {
