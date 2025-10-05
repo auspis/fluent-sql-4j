@@ -57,12 +57,12 @@ import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.ForeignKeyConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
@@ -183,7 +183,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultFromSubq
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultGroupByClausePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultHavingClausePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIndexPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultIndexDefinitionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertSourcePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008.DefaultInsertValuesPsStrategy;
@@ -263,229 +263,230 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
     private final OrderByClausePsStrategy orderByClauseStrategy = new DefaultOrderByClausePsStrategy();
 
     @Default
-    private final TablePsStrategy tablePsStrategy = new DefaultTablePsStrategy();
+    private final TablePsStrategy tableStrategy = new DefaultTablePsStrategy();
 
     @Default
-    private final ColumnReferencePsStrategy columnReferencePsStrategy = new DefaultColumnReferencePsStrategy();
+    private final ColumnReferencePsStrategy columnReferenceStrategy = new DefaultColumnReferencePsStrategy();
 
     @Default
-    private final ComparisonPsStrategy comparisonPsStrategy = new DefaultComparisonPsStrategy();
+    private final ComparisonPsStrategy comparisonStrategy = new DefaultComparisonPsStrategy();
 
     @Default
-    private final LiteralPsStrategy literalPsStrategy = new DefaultLiteralPsStrategy();
+    private final LiteralPsStrategy literalStrategy = new DefaultLiteralPsStrategy();
 
     @Default
-    private final SortingPsStrategy sortingPsStrategy = new DefaultSortingPsStrategy();
+    private final SortingPsStrategy sortingStrategy = new DefaultSortingPsStrategy();
 
     @Default
-    private final OnJoinPsStrategy onJoinPsStrategy = new DefaultOnJoinPsStrategy();
+    private final OnJoinPsStrategy onJoinStrategy = new DefaultOnJoinPsStrategy();
 
     @Default
-    private final AndOrPsStrategy andOrPsStrategy = new DefaultAndOrPsStrategy();
+    private final AndOrPsStrategy andOrStrategy = new DefaultAndOrPsStrategy();
 
     @Default
-    private final NotPsStrategy notPsStrategy = new DefaultNotPsStrategy();
+    private final NotPsStrategy notStrategy = new DefaultNotPsStrategy();
 
     @Default
-    private final AggregationFunctionProjectionPsStrategy aggregationFunctionProjectionPsStrategy =
+    private final AggregationFunctionProjectionPsStrategy aggregationFunctionProjectionStrategy =
             new DefaultAggregationFunctionProjectionPsStrategy();
 
     @Default
-    private final ScalarExpressionProjectionPsStrategy scalarExpressionProjectionPsStrategy =
+    private final ScalarExpressionProjectionPsStrategy scalarExpressionProjectionStrategy =
             new DefaultScalarExpressionProjectionPsStrategy();
 
     @Default
-    private final AggregateCallPsStrategy aggregateCallPsStrategy = new DefaultAggregateCallPsStrategy();
+    private final AggregateCallPsStrategy aggregateCallStrategy = new DefaultAggregateCallPsStrategy();
 
     @Default
-    private final InsertValuesPsStrategy insertValuesPsStrategy = new DefaultInsertValuesPsStrategy();
+    private final InsertValuesPsStrategy insertValuesStrategy = new DefaultInsertValuesPsStrategy();
 
     @Default
-    private final InsertSourcePsStrategy insertSourcePsStrategy = new DefaultInsertSourcePsStrategy();
+    private final InsertSourcePsStrategy insertSourceStrategy = new DefaultInsertSourcePsStrategy();
 
     @Default
-    private final DefaultValuesPsStrategy defaultValuesPsStrategy = new DefaultDefaultValuesPsStrategy();
+    private final DefaultValuesPsStrategy defaultValuesStrategy = new DefaultDefaultValuesPsStrategy();
 
     @Default
-    private final IsNullPsStrategy isNullPsStrategy = new DefaultIsNullPsStrategy();
+    private final IsNullPsStrategy isNullStrategy = new DefaultIsNullPsStrategy();
 
     @Default
-    private final IsNotNullPsStrategy isNotNullPsStrategy = new DefaultIsNotNullPsStrategy();
+    private final IsNotNullPsStrategy isNotNullStrategy = new DefaultIsNotNullPsStrategy();
 
     @Default
-    private final InsertStatementPsStrategy insertStatementPsStrategy = new DefaultInsertStatementPsStrategy();
+    private final InsertStatementPsStrategy insertStatementStrategy = new DefaultInsertStatementPsStrategy();
 
     @Default
-    private final SelectStatementPsStrategy selectStatementPsStrategy = new DefaultSelectStatementPsStrategy();
+    private final SelectStatementPsStrategy selectStatementStrategy = new DefaultSelectStatementPsStrategy();
 
     @Default
-    private final FetchPsStrategy paginationPsStrategy = new DefaultPaginationPsStrategy();
+    private final FetchPsStrategy paginationStrategy = new DefaultPaginationPsStrategy();
 
     @Default
-    private final LikePsStrategy likePsStrategy = new DefaultLikePsStrategy();
+    private final LikePsStrategy likeStrategy = new DefaultLikePsStrategy();
 
     @Default
-    private final UnionExpressionPsStrategy unionExpressionPsStrategy = new DefaultUnionExpressionPsStrategy();
+    private final UnionExpressionPsStrategy unionExpressionStrategy = new DefaultUnionExpressionPsStrategy();
 
     @Default
-    private final BetweenPsStrategy betweenPsStrategy = new DefaultBetweenPsStrategy();
+    private final BetweenPsStrategy betweenStrategy = new DefaultBetweenPsStrategy();
 
     @Default
-    private final BinaryArithmeticExpressionPsStrategy binaryArithmeticExpressionPsStrategy =
+    private final BinaryArithmeticExpressionPsStrategy binaryArithmeticExpressionStrategy =
             new DefaultBinaryArithmeticExpressionPsStrategy();
 
     @Default
-    private final UnaryArithmeticExpressionPsStrategy unaryArithmeticExpressionPsStrategy =
+    private final UnaryArithmeticExpressionPsStrategy unaryArithmeticExpressionStrategy =
             new DefaultUnaryArithmeticExpressionPsStrategy();
 
     @Default
-    private final CastPsStrategy castPsStrategy = new DefaultCastPsStrategy();
+    private final CastPsStrategy castStrategy = new DefaultCastPsStrategy();
 
     @Default
-    private final ConcatPsStrategy concatPsStrategy = new DefaultConcatPsStrategy();
+    private final ConcatPsStrategy concatStrategy = new DefaultConcatPsStrategy();
 
     @Default
-    private final CurrentDatePsStrategy currentDatePsStrategy = new DefaultCurrentDatePsStrategy();
+    private final CurrentDatePsStrategy currentDateStrategy = new DefaultCurrentDatePsStrategy();
 
     @Default
-    private final CurrentDateTimePsStrategy currentDateTimePsStrategy = new DefaultCurrentDateTimePsStrategy();
+    private final CurrentDateTimePsStrategy currentDateTimeStrategy = new DefaultCurrentDateTimePsStrategy();
 
     @Default
-    private final DateArithmeticPsStrategy dateArithmeticPsStrategy = new DefaultDateArithmeticPsStrategy();
+    private final DateArithmeticPsStrategy dateArithmeticStrategy = new DefaultDateArithmeticPsStrategy();
 
     @Default
-    private final ExceptExpressionPsStrategy exceptExpressionPsStrategy = new DefaultExceptExpressionPsStrategy();
+    private final ExceptExpressionPsStrategy exceptExpressionStrategy = new DefaultExceptExpressionPsStrategy();
 
     @Default
-    private final ExtractDatePartPsStrategy extractDatePartPsStrategy = new DefaultExtractDatePartPsStrategy();
+    private final ExtractDatePartPsStrategy extractDatePartStrategy = new DefaultExtractDatePartPsStrategy();
 
     @Default
-    private final IntersectExpressionPsStrategy intersectExpressionPsStrategy =
+    private final IntersectExpressionPsStrategy intersectExpressionStrategy =
             new DefaultIntersectExpressionPsStrategy();
 
     @Default
-    private final IntervalPsStrategy intervalPsStrategy = new DefaultIntervalPsStrategy();
+    private final IntervalPsStrategy intervalStrategy = new DefaultIntervalPsStrategy();
 
     @Default
-    private final LeftPsStrategy leftPsStrategy = new DefaultLeftPsStrategy();
+    private final LeftPsStrategy leftStrategy = new DefaultLeftPsStrategy();
 
     @Default
-    private final LengthPsStrategy lengthPsStrategy = new DefaultLengthPsStrategy();
+    private final LengthPsStrategy lengthStrategy = new DefaultLengthPsStrategy();
 
     @Default
-    private final ModPsStrategy modPsStrategy = new DefaultModPsStrategy();
+    private final ModPsStrategy modStrategy = new DefaultModPsStrategy();
 
     @Default
-    private final NullScalarExpressionPsStrategy nullScalarExpressionPsStrategy =
+    private final NullScalarExpressionPsStrategy nullScalarExpressionStrategy =
             new DefaultNullScalarExpressionPsStrategy();
 
     @Default
-    private final NullSetExpressionPsStrategy nullSetExpressionPsStrategy = new DefaultNullSetExpressionPsStrategy();
+    private final NullSetExpressionPsStrategy nullSetExpressionStrategy = new DefaultNullSetExpressionPsStrategy();
 
     @Default
-    private final PowerPsStrategy powerPsStrategy = new DefaultPowerPsStrategy();
+    private final PowerPsStrategy powerStrategy = new DefaultPowerPsStrategy();
 
     @Default
-    private final ReplacePsStrategy replacePsStrategy = new DefaultReplacePsStrategy();
+    private final ReplacePsStrategy replaceStrategy = new DefaultReplacePsStrategy();
 
     @Default
-    private final ReferencesItemPsStrategy referencesItemPsStrategy = new DefaultReferencesItemPsStrategy();
+    private final ReferencesItemPsStrategy referencesItemStrategy = new DefaultReferencesItemPsStrategy();
 
     @Default
-    private final TableDefinitionPsStrategy tableDefinitionPsStrategy = new DefaultTableDefinitionPsStrategy();
+    private final TableDefinitionPsStrategy tableDefinitionStrategy = new DefaultTableDefinitionPsStrategy();
 
     @Default
-    private final ColumnDefinitionPsStrategy columnDefinitionPsStrategy = new DefaultColumnDefinitionPsStrategy();
+    private final ColumnDefinitionPsStrategy columnDefinitionStrategy = new DefaultColumnDefinitionPsStrategy();
 
     @Default
-    private final SimpleDataTypePsStrategy simpleDataTypePsStrategy = new DefaultSimpleDataTypePsStrategy();
+    private final SimpleDataTypePsStrategy simpleDataTypeStrategy = new DefaultSimpleDataTypePsStrategy();
 
     @Default
-    private final ParameterizedDataTypePsStrategy parameterizedDataTypePsStrategy =
+    private final ParameterizedDataTypePsStrategy parameterizedDataTypeStrategy =
             new DefaultParameterizedDataTypePsStrategy();
 
     @Default
-    private final PrimaryKeyPsStrategy primaryKeyPsStrategy = new DefaultPrimaryKeyPsStrategy();
+    private final PrimaryKeyPsStrategy primaryKeyDefinitionStrategy = new DefaultPrimaryKeyPsStrategy();
 
     @Default
-    private final IndexDefinitionPsStrategy indexDefinitionPsStrategy = new DefaultIndexPsStrategy();
+    private final IndexDefinitionPsStrategy indexDefinitionStrategy = new DefaultIndexDefinitionPsStrategy();
 
     @Default
-    private final NotNullConstraintPsStrategy notNullConstraintPsStrategy = new DefaultNotNullConstraintPsStrategy();
+    private final NotNullConstraintPsStrategy notNullConstraintDefinitionStrategy =
+            new DefaultNotNullConstraintPsStrategy();
 
     @Default
-    private final UniqueConstraintPsStrategy uniqueConstraintPsStrategy = new DefaultUniqueConstraintPsStrategy();
+    private final UniqueConstraintPsStrategy uniqueConstraintStrategy = new DefaultUniqueConstraintPsStrategy();
 
     @Default
-    private final ForeignKeyConstraintPsStrategy foreignKeyConstraintPsStrategy =
+    private final ForeignKeyConstraintPsStrategy foreignKeyConstraintStrategy =
             new DefaultForeignKeyConstraintPsStrategy();
 
     @Default
-    private final CheckConstraintPsStrategy checkConstraintPsStrategy = new DefaultCheckConstraintPsStrategy();
+    private final CheckConstraintPsStrategy checkConstraintStrategy = new DefaultCheckConstraintPsStrategy();
 
     @Default
-    private final DefaultConstraintPsStrategy defaultConstraintPsStrategy = new DefaultDefaultConstraintPsStrategy();
+    private final DefaultConstraintPsStrategy defaultConstraintStrategy = new DefaultDefaultConstraintPsStrategy();
 
     @Default
-    private final RoundPsStrategy roundPsStrategy = new DefaultRoundPsStrategy();
+    private final RoundPsStrategy roundStrategy = new DefaultRoundPsStrategy();
 
     @Default
-    private final SubstringPsStrategy substringPsStrategy = new DefaultSubstringPsStrategy();
+    private final SubstringPsStrategy substringStrategy = new DefaultSubstringPsStrategy();
 
     @Default
-    private final TrimPsStrategy trimPsStrategy = new DefaultTrimPsStrategy();
+    private final TrimPsStrategy trimStrategy = new DefaultTrimPsStrategy();
 
     @Default
-    private final UnaryNumericPsStrategy unaryNumericPsStrategy = new DefaultUnaryNumericPsStrategy();
+    private final UnaryNumericPsStrategy unaryNumericStrategy = new DefaultUnaryNumericPsStrategy();
 
     @Default
-    private final UnaryStringPsStrategy unaryStringPsStrategy = new DefaultUnaryStringPsStrategy();
+    private final UnaryStringPsStrategy unaryStringStrategy = new DefaultUnaryStringPsStrategy();
 
     @Default
-    private final ScalarSubqueryPsStrategy scalarSubqueryPsStrategy = new DefaultScalarSubqueryPsStrategy();
+    private final ScalarSubqueryPsStrategy scalarSubqueryStrategy = new DefaultScalarSubqueryPsStrategy();
 
     @Default
-    private final CreateTableStatementPsStrategy createTableStatementPsStrategy =
+    private final CreateTableStatementPsStrategy createTableStatementStrategy =
             new DefaultCreateTableStatementPsStrategy();
 
     @Default
-    private final CharLengthPsStrategy charLengthPsStrategy = new DefaultCharLengthPsStrategy();
+    private final CharLengthPsStrategy charLengthStrategy = new DefaultCharLengthPsStrategy();
 
     @Default
-    private final CharacterLengthPsStrategy characterLengthPsStrategy = new DefaultCharacterLengthPsStrategy();
+    private final CharacterLengthPsStrategy characterLengthStrategy = new DefaultCharacterLengthPsStrategy();
 
     @Default
-    private final DataLengthPsStrategy dataLengthPsStrategy = new DefaultDataLengthPsStrategy();
+    private final DataLengthPsStrategy dataLengthStrategy = new DefaultDataLengthPsStrategy();
 
     @Default
-    private final InPsStrategy inPsStrategy = new DefaultInPsStrategy();
+    private final InPsStrategy inStrategy = new DefaultInPsStrategy();
 
     @Default
-    private final AsPsStrategy asPsStrategy = new DefaultAsPsStrategy();
+    private final AsPsStrategy asStrategy = new DefaultAsPsStrategy();
 
     @Default
-    private final FromSubqueryPsStrategy fromSubqueryPsStrategy = new DefaultFromSubqueryPsStrategy();
+    private final FromSubqueryPsStrategy fromSubqueryStrategy = new DefaultFromSubqueryPsStrategy();
 
     @Default
-    private final NullPredicatePsStrategy nullPredicatePsStrategy = new DefaultNullPredicatePsStrategy();
+    private final NullPredicatePsStrategy nullPredicateStrategy = new DefaultNullPredicatePsStrategy();
 
     @Default
-    private final UpdateItemPsStrategy updateItemPsStrategy = new DefaultUpdateItemPsStrategy();
+    private final UpdateItemPsStrategy updateItemStrategy = new DefaultUpdateItemPsStrategy();
 
     @Default
-    private final UpdateStatementPsStrategy updateStatementPsStrategy = new DefaultUpdateStatementPsStrategy();
+    private final UpdateStatementPsStrategy updateStatementStrategy = new DefaultUpdateStatementPsStrategy();
 
     @Default
-    private final DeleteStatementPsStrategy deleteStatementPsStrategy = new DefaultDeleteStatementPsStrategy();
+    private final DeleteStatementPsStrategy deleteStatementStrategy = new DefaultDeleteStatementPsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
-        return insertStatementPsStrategy.handle(stmt, this, ctx);
+        return insertStatementStrategy.handle(stmt, this, ctx);
     }
 
     @Override
     public PsDto visit(SelectStatement stmt, AstContext ctx) {
-        return selectStatementPsStrategy.handle(stmt, this, ctx);
+        return selectStatementStrategy.handle(stmt, this, ctx);
     }
 
     @Override
@@ -495,17 +496,17 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(TableIdentifier table, AstContext ctx) {
-        return tablePsStrategy.handle(table, this, ctx);
+        return tableStrategy.handle(table, this, ctx);
     }
 
     @Override
     public PsDto visit(ColumnReference col, AstContext ctx) {
-        return columnReferencePsStrategy.handle(col, this, ctx);
+        return columnReferenceStrategy.handle(col, this, ctx);
     }
 
     @Override
     public PsDto visit(Comparison cmp, AstContext ctx) {
-        return comparisonPsStrategy.handle(cmp, this, ctx);
+        return comparisonStrategy.handle(cmp, this, ctx);
     }
 
     @Override
@@ -515,32 +516,32 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Literal<?> literal, AstContext ctx) {
-        return literalPsStrategy.handle(literal, this, ctx);
+        return literalStrategy.handle(literal, this, ctx);
     }
 
     @Override
     public PsDto visit(UpdateStatement updateStatement, AstContext ctx) {
-        return updateStatementPsStrategy.handle(updateStatement, this, ctx);
+        return updateStatementStrategy.handle(updateStatement, this, ctx);
     }
 
     @Override
     public PsDto visit(DeleteStatement deleteStatement, AstContext ctx) {
-        return deleteStatementPsStrategy.handle(deleteStatement, this, ctx);
+        return deleteStatementStrategy.handle(deleteStatement, this, ctx);
     }
 
     @Override
     public PsDto visit(CreateTableStatement createTableStatement, AstContext ctx) {
-        return createTableStatementPsStrategy.handle(createTableStatement, this, ctx);
+        return createTableStatementStrategy.handle(createTableStatement, this, ctx);
     }
 
     @Override
     public PsDto visit(AggregateCallProjection aggregationFunctionProjection, AstContext ctx) {
-        return aggregationFunctionProjectionPsStrategy.handle(aggregationFunctionProjection, this, ctx);
+        return aggregationFunctionProjectionStrategy.handle(aggregationFunctionProjection, this, ctx);
     }
 
     @Override
     public PsDto visit(ScalarExpressionProjection scalarExpressionProjection, AstContext ctx) {
-        return scalarExpressionProjectionPsStrategy.handle(scalarExpressionProjection, this, ctx);
+        return scalarExpressionProjectionStrategy.handle(scalarExpressionProjection, this, ctx);
     }
 
     @Override
@@ -550,12 +551,12 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(OnJoin join, AstContext ctx) {
-        return onJoinPsStrategy.handle(join, this, ctx);
+        return onJoinStrategy.handle(join, this, ctx);
     }
 
     @Override
     public PsDto visit(FromSubquery fromSubquery, AstContext ctx) {
-        return fromSubqueryPsStrategy.handle(fromSubquery, this, ctx);
+        return fromSubqueryStrategy.handle(fromSubquery, this, ctx);
     }
 
     @Override
@@ -575,267 +576,267 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Sorting sorting, AstContext ctx) {
-        return sortingPsStrategy.handle(sorting, this, ctx);
+        return sortingStrategy.handle(sorting, this, ctx);
     }
 
     @Override
     public PsDto visit(Fetch clause, AstContext ctx) {
-        return paginationPsStrategy.handle(clause, this, ctx);
+        return paginationStrategy.handle(clause, this, ctx);
     }
 
     @Override
     public PsDto visit(NullPredicate expression, AstContext ctx) {
-        return nullPredicatePsStrategy.handle(expression, this, ctx);
+        return nullPredicateStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(Between expression, AstContext ctx) {
-        return betweenPsStrategy.handle(expression, this, ctx);
+        return betweenStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(In expression, AstContext ctx) {
-        return inPsStrategy.handle(expression, this, ctx);
+        return inStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(AndOr expression, AstContext ctx) {
-        return andOrPsStrategy.handle(expression, this, ctx);
+        return andOrStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(Not expression, AstContext ctx) {
-        return notPsStrategy.handle(expression, this, ctx);
+        return notStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(BinaryArithmeticExpression expression, AstContext ctx) {
-        return binaryArithmeticExpressionPsStrategy.handle(expression, this, ctx);
+        return binaryArithmeticExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(UnaryArithmeticExpression expression, AstContext ctx) {
-        return unaryArithmeticExpressionPsStrategy.handle(expression, this, ctx);
+        return unaryArithmeticExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(Cast functionCall, AstContext ctx) {
-        return castPsStrategy.handle(functionCall, this, ctx);
+        return castStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Concat functionCall, AstContext ctx) {
-        return concatPsStrategy.handle(functionCall, this, ctx);
+        return concatStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(CurrentDate functionCall, AstContext ctx) {
-        return currentDatePsStrategy.handle(functionCall, this, ctx);
+        return currentDateStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(CurrentDateTime functionCall, AstContext ctx) {
-        return currentDateTimePsStrategy.handle(functionCall, this, ctx);
+        return currentDateTimeStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(DateArithmetic functionCall, AstContext ctx) {
-        return dateArithmeticPsStrategy.handle(functionCall, this, ctx);
+        return dateArithmeticStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(ExtractDatePart functionCall, AstContext ctx) {
-        return extractDatePartPsStrategy.handle(functionCall, this, ctx);
+        return extractDatePartStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Left functionCall, AstContext ctx) {
-        return leftPsStrategy.handle(functionCall, this, ctx);
+        return leftStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Length functionCall, AstContext ctx) {
-        return lengthPsStrategy.handle(functionCall, this, ctx);
+        return lengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(CharLength functionCall, AstContext ctx) {
-        return charLengthPsStrategy.handle(functionCall, this, ctx);
+        return charLengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(CharacterLength functionCall, AstContext ctx) {
-        return characterLengthPsStrategy.handle(functionCall, this, ctx);
+        return characterLengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(DataLength functionCall, AstContext ctx) {
-        return dataLengthPsStrategy.handle(functionCall, this, ctx);
+        return dataLengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Mod functionCall, AstContext ctx) {
-        return modPsStrategy.handle(functionCall, this, ctx);
+        return modStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(NullScalarExpression expression, AstContext ctx) {
-        return nullScalarExpressionPsStrategy.handle(expression, this, ctx);
+        return nullScalarExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(Power functionCall, AstContext ctx) {
-        return powerPsStrategy.handle(functionCall, this, ctx);
+        return powerStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Replace functionCall, AstContext ctx) {
-        return replacePsStrategy.handle(functionCall, this, ctx);
+        return replaceStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Round functionCall, AstContext ctx) {
-        return roundPsStrategy.handle(functionCall, this, ctx);
+        return roundStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Substring functionCall, AstContext ctx) {
-        return substringPsStrategy.handle(functionCall, this, ctx);
+        return substringStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(Trim functionCall, AstContext ctx) {
-        return trimPsStrategy.handle(functionCall, this, ctx);
+        return trimStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(UnaryNumeric functionCall, AstContext ctx) {
-        return unaryNumericPsStrategy.handle(functionCall, this, ctx);
+        return unaryNumericStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(UnaryString functionCall, AstContext ctx) {
-        return unaryStringPsStrategy.handle(functionCall, this, ctx);
+        return unaryStringStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
     public PsDto visit(NullSetExpression expression, AstContext ctx) {
-        return nullSetExpressionPsStrategy.handle(expression, this, ctx);
+        return nullSetExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(ExceptExpression expression, AstContext ctx) {
-        return exceptExpressionPsStrategy.handle(expression, this, ctx);
+        return exceptExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(IntersectExpression expression, AstContext ctx) {
-        return intersectExpressionPsStrategy.handle(expression, this, ctx);
+        return intersectExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(UnionExpression expression, AstContext ctx) {
-        return unionExpressionPsStrategy.handle(expression, this, ctx);
+        return unionExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(Alias item, AstContext ctx) {
-        return asPsStrategy.handle(item, this, ctx);
+        return asStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(UpdateItem item, AstContext ctx) {
-        return updateItemPsStrategy.handle(item, this, ctx);
+        return updateItemStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(ReferencesItem item, AstContext ctx) {
-        return referencesItemPsStrategy.handle(item, this, ctx);
+        return referencesItemStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(TableDefinition item, AstContext ctx) {
-        return tableDefinitionPsStrategy.handle(item, this, ctx);
+        return tableDefinitionStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(ColumnDefinition item, AstContext ctx) {
-        return columnDefinitionPsStrategy.handle(item, this, ctx);
+        return columnDefinitionStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(SimpleDataType type, AstContext ctx) {
-        return simpleDataTypePsStrategy.handle(type, this, ctx);
+        return simpleDataTypeStrategy.handle(type, this, ctx);
     }
 
     @Override
     public PsDto visit(ParameterizedDataType type, AstContext ctx) {
-        return parameterizedDataTypePsStrategy.handle(type, this, ctx);
+        return parameterizedDataTypeStrategy.handle(type, this, ctx);
     }
 
     @Override
-    public PsDto visit(PrimaryKey item, AstContext ctx) {
-        return primaryKeyPsStrategy.handle(item, this, ctx);
+    public PsDto visit(PrimaryKeyDefinition constraintDefinition, AstContext ctx) {
+        return primaryKeyDefinitionStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(IndexDefinition indexDefinition, AstContext ctx) {
-        return indexDefinitionPsStrategy.handle(indexDefinition, this, ctx);
+    public PsDto visit(IndexDefinition constraintDefinition, AstContext ctx) {
+        return indexDefinitionStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(NotNullConstraint constraint, AstContext ctx) {
-        return notNullConstraintPsStrategy.handle(constraint, this, ctx);
+    public PsDto visit(NotNullConstraintDefinition constraintDefinition, AstContext ctx) {
+        return notNullConstraintDefinitionStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(UniqueConstraint constraint, AstContext ctx) {
-        return uniqueConstraintPsStrategy.handle(constraint, this, ctx);
+    public PsDto visit(UniqueConstraintDefinition constraintDefinition, AstContext ctx) {
+        return uniqueConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(ForeignKeyConstraint constraint, AstContext ctx) {
-        return foreignKeyConstraintPsStrategy.handle(constraint, this, ctx);
+    public PsDto visit(ForeignKeyConstraintDefinition constraintDefinition, AstContext ctx) {
+        return foreignKeyConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(CheckConstraint constraint, AstContext ctx) {
-        return checkConstraintPsStrategy.handle(constraint, this, ctx);
+    public PsDto visit(CheckConstraintDefinition constraintDefinition, AstContext ctx) {
+        return checkConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(DefaultConstraint constraint, AstContext ctx) {
-        return defaultConstraintPsStrategy.handle(constraint, this, ctx);
+    public PsDto visit(DefaultConstraintDefinition constraintDefinition, AstContext ctx) {
+        return defaultConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
     public PsDto visit(ScalarSubquery expression, AstContext ctx) {
-        return scalarSubqueryPsStrategy.handle(expression, this, ctx);
+        return scalarSubqueryStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(Interval interval, AstContext ctx) {
-        return intervalPsStrategy.handle(interval, this, ctx);
+        return intervalStrategy.handle(interval, this, ctx);
     }
 
     @Override
     public PsDto visit(AggregateCall expression, AstContext ctx) {
-        return aggregateCallPsStrategy.handle(expression, this, ctx);
+        return aggregateCallStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(InsertValues item, AstContext ctx) {
-        return insertValuesPsStrategy.handle(item, this, ctx);
+        return insertValuesStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(InsertSource item, AstContext ctx) {
-        return insertSourcePsStrategy.handle(item, this, ctx);
+        return insertSourceStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(DefaultValues item, AstContext ctx) {
-        return defaultValuesPsStrategy.handle(item, this, ctx);
+        return defaultValuesStrategy.handle(item, this, ctx);
     }
 
     // Handle FromSource dispatch for FROM clause
@@ -845,16 +846,16 @@ public class PreparedStatementVisitor implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(Like expression, AstContext ctx) {
-        return likePsStrategy.handle(expression, this, ctx);
+        return likeStrategy.handle(expression, this, ctx);
     }
 
     @Override
     public PsDto visit(IsNull expr, AstContext ctx) {
-        return isNullPsStrategy.handle(expr, this, ctx);
+        return isNullStrategy.handle(expr, this, ctx);
     }
 
     @Override
     public PsDto visit(IsNotNull expr, AstContext ctx) {
-        return isNotNullPsStrategy.handle(expr, this, ctx);
+        return isNotNullStrategy.handle(expr, this, ctx);
     }
 }

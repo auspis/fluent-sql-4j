@@ -9,7 +9,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IndexDefinitionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 
-public class DefaultIndexPsStrategy implements IndexDefinitionPsStrategy {
+public class DefaultIndexDefinitionPsStrategy implements IndexDefinitionPsStrategy {
 
     private final SqlRenderer sqlRenderer = SqlRendererFactory.standardSql2008();
 

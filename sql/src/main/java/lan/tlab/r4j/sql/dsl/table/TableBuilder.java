@@ -6,9 +6,9 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
@@ -33,7 +33,7 @@ public class TableBuilder {
 
     public TableBuilder primaryKey(String... columnNames) {
         if (columnNames.length > 0) {
-            definitionBuilder = definitionBuilder.primaryKey(new PrimaryKey(List.of(columnNames)));
+            definitionBuilder = definitionBuilder.primaryKey(new PrimaryKeyDefinition(List.of(columnNames)));
         }
         return this;
     }
@@ -42,7 +42,7 @@ public class TableBuilder {
         ColumnDefinition columnDef = ColumnDefinition.builder()
                 .name(columnName)
                 .type(DataType.integer())
-                .notNullConstraint(new NotNullConstraint())
+                .notNullConstraint(new NotNullConstraintDefinition())
                 .build();
 
         addColumn(columnDef);
@@ -53,7 +53,7 @@ public class TableBuilder {
         ColumnDefinition columnDef = ColumnDefinition.builder()
                 .name(columnName)
                 .type(DataType.varchar(length))
-                .notNullConstraint(new NotNullConstraint())
+                .notNullConstraint(new NotNullConstraintDefinition())
                 .build();
 
         addColumn(columnDef);
@@ -64,7 +64,7 @@ public class TableBuilder {
         ColumnDefinition columnDef = ColumnDefinition.builder()
                 .name(columnName)
                 .type(DataType.timestamp())
-                .notNullConstraint(new NotNullConstraint())
+                .notNullConstraint(new NotNullConstraintDefinition())
                 .build();
 
         addColumn(columnDef);
@@ -75,7 +75,7 @@ public class TableBuilder {
         ColumnDefinition columnDef = ColumnDefinition.builder()
                 .name(columnName)
                 .type(DataType.varchar(length))
-                .notNullConstraint(new NotNullConstraint())
+                .notNullConstraint(new NotNullConstraintDefinition())
                 .build();
 
         addColumn(columnDef);
@@ -86,7 +86,7 @@ public class TableBuilder {
         ColumnDefinition columnDef = ColumnDefinition.builder()
                 .name(columnName)
                 .type(DataType.decimal(precision, scale))
-                .notNullConstraint(new NotNullConstraint())
+                .notNullConstraint(new NotNullConstraintDefinition())
                 .build();
 
         addColumn(columnDef);
@@ -108,7 +108,8 @@ public class TableBuilder {
 
     public TableBuilder unique(String... columns) {
         if (columns != null && columns.length > 0) {
-            definitionBuilder = definitionBuilder.constraint(new Constraint.UniqueConstraint(columns));
+            definitionBuilder =
+                    definitionBuilder.constraint(new ConstraintDefinition.UniqueConstraintDefinition(columns));
         }
         return this;
     }
@@ -118,22 +119,23 @@ public class TableBuilder {
      */
     public TableBuilder foreignKey(String column, String refTable, String... refColumns) {
         if (column != null && refTable != null) {
-            definitionBuilder = definitionBuilder.constraint(
-                    new Constraint.ForeignKeyConstraint(List.of(column), new ReferencesItem(refTable, refColumns)));
+            definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.ForeignKeyConstraintDefinition(
+                    List.of(column), new ReferencesItem(refTable, refColumns)));
         }
         return this;
     }
 
     public TableBuilder check(Predicate expr) {
         if (expr != null) {
-            definitionBuilder = definitionBuilder.constraint(new Constraint.CheckConstraint(expr));
+            definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.CheckConstraintDefinition(expr));
         }
         return this;
     }
 
     public TableBuilder defaultConstraint(ScalarExpression value) {
         if (value != null) {
-            definitionBuilder = definitionBuilder.constraint(new Constraint.DefaultConstraint(value));
+            definitionBuilder =
+                    definitionBuilder.constraint(new ConstraintDefinition.DefaultConstraintDefinition(value));
         }
         return this;
     }
@@ -145,7 +147,7 @@ public class TableBuilder {
                 ColumnDefinition updated = ColumnDefinition.builder()
                         .name(c.getName())
                         .type(c.getType())
-                        .notNullConstraint(new NotNullConstraint())
+                        .notNullConstraint(new NotNullConstraintDefinition())
                         .defaultConstraint(c.getDefaultConstraint())
                         .build();
 

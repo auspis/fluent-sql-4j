@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -17,7 +17,7 @@ class DefaultUniqueConstraintPsStrategyTest {
 
     @Test
     void uniqueConstraintGeneratesCorrectSql() {
-        UniqueConstraint constraint = new UniqueConstraint("id", "name");
+        UniqueConstraintDefinition constraint = new UniqueConstraintDefinition("id", "name");
 
         PsDto result = strategy.handle(constraint, visitor, ctx);
 
@@ -27,7 +27,7 @@ class DefaultUniqueConstraintPsStrategyTest {
 
     @Test
     void uniqueConstraintSingleColumn() {
-        UniqueConstraint constraint = new UniqueConstraint("email");
+        UniqueConstraintDefinition constraint = new UniqueConstraintDefinition("email");
 
         PsDto result = strategy.handle(constraint, visitor, ctx);
 
@@ -37,8 +37,8 @@ class DefaultUniqueConstraintPsStrategyTest {
 
     @Test
     void multipleInstancesSameResult() {
-        UniqueConstraint constraint1 = new UniqueConstraint("col1");
-        UniqueConstraint constraint2 = new UniqueConstraint("col1");
+        UniqueConstraintDefinition constraint1 = new UniqueConstraintDefinition("col1");
+        UniqueConstraintDefinition constraint2 = new UniqueConstraintDefinition("col1");
 
         PsDto result1 = strategy.handle(constraint1, visitor, ctx);
         PsDto result2 = strategy.handle(constraint2, visitor, ctx);

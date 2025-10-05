@@ -14,17 +14,17 @@ import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.ToString;
 
-public interface Constraint extends Visitable {
+public interface ConstraintDefinition extends Visitable {
 
     @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
     @ToString
-    public static class PrimaryKey implements Constraint {
+    public static class PrimaryKeyDefinition implements ConstraintDefinition {
         @Singular
         private final List<String> columns;
 
-        public PrimaryKey(String... columns) {
+        public PrimaryKeyDefinition(String... columns) {
             this(Stream.of(columns).toList());
         }
 
@@ -37,7 +37,7 @@ public interface Constraint extends Visitable {
     @NoArgsConstructor
     @EqualsAndHashCode
     @ToString
-    public static class NotNullConstraint implements Constraint {
+    public static class NotNullConstraintDefinition implements ConstraintDefinition {
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
             return visitor.visit(this, ctx);
@@ -48,11 +48,11 @@ public interface Constraint extends Visitable {
     @Getter
     @EqualsAndHashCode
     @ToString
-    public class UniqueConstraint implements Constraint {
+    public class UniqueConstraintDefinition implements ConstraintDefinition {
 
         private final List<String> columns;
 
-        public UniqueConstraint(String... columns) {
+        public UniqueConstraintDefinition(String... columns) {
             this(Stream.of(columns).toList());
         }
 
@@ -66,7 +66,7 @@ public interface Constraint extends Visitable {
     @Getter
     @EqualsAndHashCode
     @ToString
-    public static class ForeignKeyConstraint implements Constraint {
+    public static class ForeignKeyConstraintDefinition implements ConstraintDefinition {
         private final List<String> columns;
         private final ReferencesItem references;
 
@@ -80,7 +80,7 @@ public interface Constraint extends Visitable {
     @Getter
     @EqualsAndHashCode
     @ToString
-    public static class CheckConstraint implements Constraint {
+    public static class CheckConstraintDefinition implements ConstraintDefinition {
         private final Predicate expression;
 
         @Override
@@ -93,7 +93,7 @@ public interface Constraint extends Visitable {
     @Getter
     @EqualsAndHashCode
     @ToString
-    public static class DefaultConstraint implements Constraint {
+    public static class DefaultConstraintDefinition implements ConstraintDefinition {
         private final ScalarExpression value;
 
         @Override

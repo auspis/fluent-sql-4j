@@ -56,12 +56,12 @@ import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.ForeignKeyConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
@@ -226,17 +226,17 @@ public interface Visitor<T> {
 
     T visit(ParameterizedDataType type, AstContext ctx);
 
-    T visit(PrimaryKey item, AstContext ctx);
+    T visit(PrimaryKeyDefinition constraintDefinition, AstContext ctx);
 
-    T visit(IndexDefinition indexDefinition, AstContext ctx);
+    T visit(IndexDefinition constraintDefinition, AstContext ctx);
 
-    T visit(NotNullConstraint constraint, AstContext ctx);
+    T visit(NotNullConstraintDefinition constraintDefinition, AstContext ctx);
 
-    T visit(UniqueConstraint constraint, AstContext ctx);
+    T visit(UniqueConstraintDefinition constraintDefinition, AstContext ctx);
 
-    T visit(ForeignKeyConstraint constraint, AstContext ctx);
+    T visit(ForeignKeyConstraintDefinition constraintDefinition, AstContext ctx);
 
-    T visit(CheckConstraint constraint, AstContext ctx);
+    T visit(CheckConstraintDefinition constraintDefinition, AstContext ctx);
 
-    T visit(DefaultConstraint constraint, AstContext ctx);
+    T visit(DefaultConstraintDefinition constraintDefinition, AstContext ctx);
 }

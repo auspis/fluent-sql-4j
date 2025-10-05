@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.constraint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -22,7 +22,7 @@ class UniqueConstraintRenderStrategyTest {
 
     @Test
     void ok() {
-        UniqueConstraint unique = new UniqueConstraint("email");
+        UniqueConstraintDefinition unique = new UniqueConstraintDefinition("email");
 
         String sql = strategy.render(unique, renderer, new AstContext());
         assertThat(sql).isEqualTo("UNIQUE (\"email\")");
@@ -30,7 +30,7 @@ class UniqueConstraintRenderStrategyTest {
 
     @Test
     void composite() {
-        UniqueConstraint unique = new UniqueConstraint("customer_id", "order_id");
+        UniqueConstraintDefinition unique = new UniqueConstraintDefinition("customer_id", "order_id");
 
         String sql = strategy.render(unique, renderer, new AstContext());
         assertThat(sql).isEqualTo("UNIQUE (\"customer_id\", \"order_id\")");
