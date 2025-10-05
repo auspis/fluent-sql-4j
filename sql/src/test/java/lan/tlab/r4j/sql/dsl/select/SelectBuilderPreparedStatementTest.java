@@ -34,4 +34,21 @@ class SelectBuilderPreparedStatementTest {
         assertThat(builder.getClass().getDeclaredMethods())
                 .anyMatch(method -> method.getName().equals("buildPrepared"));
     }
+
+    @Test
+    void buildPreparedStatementWithJoinCompilesWithoutError() {
+        SelectBuilder builder = DSL.select("name", "email")
+                .from("users")
+                .as("u")
+                .innerJoin("orders")
+                .as("o")
+                .on("u.id", "o.user_id")
+                .where("status")
+                .eq("active");
+
+        assertThat(builder).isNotNull();
+
+        assertThat(builder.getClass().getDeclaredMethods())
+                .anyMatch(method -> method.getName().equals("buildPrepared"));
+    }
 }
