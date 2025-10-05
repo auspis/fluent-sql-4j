@@ -27,7 +27,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-// TODO: Add support for SELECT AggregateCalls, GROUP BY, HAVING, subqueries, and other SQL features as needed.
+// TODO: Add support for SELECT AggregateCalls, HAVING, subqueries, and other SQL features as needed.
 public class SelectBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final SqlRenderer sqlRenderer;
