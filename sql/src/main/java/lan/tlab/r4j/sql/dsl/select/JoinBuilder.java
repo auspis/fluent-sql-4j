@@ -3,7 +3,6 @@ package lan.tlab.r4j.sql.dsl.select;
 import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 
@@ -11,54 +10,26 @@ public class JoinBuilder {
     private final SelectBuilder parent;
     private final FromSource left;
     private final OnJoin.JoinType joinType;
-    private final String rightTableName;
-    private String rightTableAlias;
+    private final FromSource right;
 
-    public JoinBuilder(SelectBuilder parent, FromSource left, OnJoin.JoinType joinType, String rightTableName) {
+    public JoinBuilder(SelectBuilder parent, FromSource left, OnJoin.JoinType joinType, FromSource right) {
         this.parent = parent;
         this.left = left;
         this.joinType = joinType;
-        this.rightTableName = rightTableName;
+        this.right = right;
     }
 
-    public JoinBuilder as(String alias) {
-        if (alias == null || alias.trim().isEmpty()) {
-            throw new IllegalArgumentException("Alias cannot be null or empty");
+    public SelectBuilder on(ColumnReference leftColumn, ColumnReference rightColumn) {
+        if (leftColumn == null) {
+            throw new IllegalArgumentException("Left column cannot be null");
         }
-        this.rightTableAlias = alias;
-        return this;
-    }
-
-    public SelectBuilder on(String leftColumn, String rightColumn) {
-        if (leftColumn == null || leftColumn.trim().isEmpty()) {
-            throw new IllegalArgumentException("Left column cannot be null or empty");
-        }
-        if (rightColumn == null || rightColumn.trim().isEmpty()) {
-            throw new IllegalArgumentException("Right column cannot be null or empty");
+        if (rightColumn == null) {
+            throw new IllegalArgumentException("Right column cannot be null");
         }
 
-        String[] leftParts = parseColumnReference(leftColumn);
-        String[] rightParts = parseColumnReference(rightColumn);
-
-        ColumnReference leftColRef = ColumnReference.of(leftParts[0], leftParts[1]);
-        ColumnReference rightColRef = ColumnReference.of(rightParts[0], rightParts[1]);
-
-        Predicate onCondition = Comparison.eq(leftColRef, rightColRef);
-
-        FromSource right = rightTableAlias != null
-                ? new TableIdentifier(rightTableName, rightTableAlias)
-                : new TableIdentifier(rightTableName);
-
+        Predicate onCondition = Comparison.eq(leftColumn, rightColumn);
         OnJoin join = new OnJoin(left, joinType, right, onCondition);
 
         return parent.addJoin(join);
-    }
-
-    private String[] parseColumnReference(String column) {
-        if (column.contains(".")) {
-            String[] parts = column.split("\\.", 2);
-            return new String[] {parts[0], parts[1]};
-        }
-        return new String[] {"", column};
     }
 }

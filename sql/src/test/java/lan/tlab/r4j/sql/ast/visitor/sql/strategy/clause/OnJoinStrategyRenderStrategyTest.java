@@ -75,4 +75,13 @@ class OnJoinStrategyRenderStrategyTest {
         assertThat(sql)
                 .isEqualTo("\"Customer\" AS c CROSS JOIN \"Address\" AS a ON \"c\".\"id\" = \"a\".\"customer_id\"");
     }
+
+    @Test
+    void crossJoinWithoutOnCondition() {
+        OnJoin onJoin = new OnJoin(
+                new TableIdentifier("Customer", "c"), JoinType.CROSS, new TableIdentifier("Address", "a"), null);
+
+        String sql = strategy.render(onJoin, standardSql2008, new AstContext());
+        assertThat(sql).isEqualTo("\"Customer\" AS c CROSS JOIN \"Address\" AS a");
+    }
 }
