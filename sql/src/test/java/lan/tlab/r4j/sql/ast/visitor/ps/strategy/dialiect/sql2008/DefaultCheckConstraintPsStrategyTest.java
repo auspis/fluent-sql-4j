@@ -6,7 +6,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Between;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -22,7 +22,7 @@ class DefaultCheckConstraintPsStrategyTest {
     @Test
     void checkConstraintGeneratesCorrectSql() {
         Comparison expression = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
-        CheckConstraint constraint = new CheckConstraint(expression);
+        CheckConstraintDefinition constraint = new CheckConstraintDefinition(expression);
 
         PsDto result = strategy.handle(constraint, visitor, ctx);
 
@@ -33,7 +33,7 @@ class DefaultCheckConstraintPsStrategyTest {
     @Test
     void checkConstraintWithComplexExpression() {
         Between expression = new Between(ColumnReference.of("", "salary"), Literal.of(1000), Literal.of(10000));
-        CheckConstraint constraint = new CheckConstraint(expression);
+        CheckConstraintDefinition constraint = new CheckConstraintDefinition(expression);
 
         PsDto result = strategy.handle(constraint, visitor, ctx);
 
@@ -47,8 +47,8 @@ class DefaultCheckConstraintPsStrategyTest {
     void multipleInstancesSameResult() {
         Comparison expression1 = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
         Comparison expression2 = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
-        CheckConstraint constraint1 = new CheckConstraint(expression1);
-        CheckConstraint constraint2 = new CheckConstraint(expression2);
+        CheckConstraintDefinition constraint1 = new CheckConstraintDefinition(expression1);
+        CheckConstraintDefinition constraint2 = new CheckConstraintDefinition(expression2);
 
         PsDto result1 = strategy.handle(constraint1, visitor, ctx);
         PsDto result2 = strategy.handle(constraint2, visitor, ctx);

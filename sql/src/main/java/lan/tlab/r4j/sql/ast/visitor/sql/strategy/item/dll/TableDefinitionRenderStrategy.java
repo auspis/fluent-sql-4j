@@ -2,8 +2,8 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -25,7 +25,7 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
         return builder.toString();
     }
 
-    private String constraints(List<Constraint> constraints, SqlRenderer sqlRenderer, AstContext ctx) {
+    private String constraints(List<ConstraintDefinition> constraints, SqlRenderer sqlRenderer, AstContext ctx) {
         if (constraints == null || constraints.isEmpty()) {
             return "";
         }
@@ -39,7 +39,7 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
         return ", " + indexes.stream().map(i -> sqlRenderer.visit(i, ctx)).collect(Collectors.joining(", "));
     }
 
-    private String primaryKey(PrimaryKey primaryKey, SqlRenderer sqlRenderer, AstContext ctx) {
+    private String primaryKey(PrimaryKeyDefinition primaryKey, SqlRenderer sqlRenderer, AstContext ctx) {
         if (primaryKey == null) {
             return "";
         }

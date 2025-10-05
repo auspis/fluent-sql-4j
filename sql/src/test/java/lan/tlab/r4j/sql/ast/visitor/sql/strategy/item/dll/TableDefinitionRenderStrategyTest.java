@@ -8,10 +8,10 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -54,14 +54,14 @@ class TableDefinitionRenderStrategyTest {
 
     @Test
     void withPrimaryKeyAndNotNull() {
-        PrimaryKey pk = new PrimaryKey("id");
+        PrimaryKeyDefinition pk = new PrimaryKeyDefinition("id");
         TableDefinition tableDef = TableDefinition.builder()
                 .table(new TableIdentifier("my_table"))
                 .primaryKey(pk)
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name")
-                                .notNullConstraint(new NotNullConstraint())
+                                .notNullConstraint(new NotNullConstraintDefinition())
                                 .build()))
                 .build();
 
@@ -81,7 +81,7 @@ class TableDefinitionRenderStrategyTest {
 
     @Test
     void constraints() {
-        PrimaryKey pk = new PrimaryKey("id");
+        PrimaryKeyDefinition pk = new PrimaryKeyDefinition("id");
         TableDefinition tableDef = TableDefinition.builder()
                 .table(new TableIdentifier("my_table"))
                 .primaryKey(pk)
@@ -90,8 +90,8 @@ class TableDefinitionRenderStrategyTest {
                         ColumnDefinitionBuilder.varchar("name").build(),
                         ColumnDefinitionBuilder.varchar("email").build(),
                         ColumnDefinitionBuilder.integer("age").build()))
-                .constraint(new UniqueConstraint("email"))
-                .constraint(new CheckConstraint(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
+                .constraint(new UniqueConstraintDefinition("email"))
+                .constraint(new CheckConstraintDefinition(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
                 .build();
 
         String sql = strategy.render(tableDef, renderer, new AstContext());

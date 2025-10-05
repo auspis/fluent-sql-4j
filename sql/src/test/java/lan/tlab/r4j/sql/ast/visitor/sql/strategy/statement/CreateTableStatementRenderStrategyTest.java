@@ -9,10 +9,10 @@ import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -95,8 +95,8 @@ class CreateTableStatementRenderStrategyTest {
         CreateTableStatement statement = new CreateTableStatement(TableDefinition.builder()
                 .table(new TableIdentifier("multi_constraint"))
                 .columns(List.of(ColumnDefinitionBuilder.varchar("code")
-                        .notNullConstraint(new NotNullConstraint())
-                        .defaultConstraint(new DefaultConstraint(Literal.of("UNKNOWN")))
+                        .notNullConstraint(new NotNullConstraintDefinition())
+                        .defaultConstraint(new DefaultConstraintDefinition(Literal.of("UNKNOWN")))
                         .build()))
                 .build());
         String sql = strategy.render(statement, renderer, new AstContext());
@@ -118,7 +118,7 @@ class CreateTableStatementRenderStrategyTest {
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name").build(),
                         ColumnDefinitionBuilder.varchar("email").build()))
-                .primaryKey(new PrimaryKey("id"))
+                .primaryKey(new PrimaryKeyDefinition("id"))
                 .index(new IndexDefinition("idx_name", "name"))
                 .index(new IndexDefinition("idx_email", "email"))
                 .build());
@@ -160,17 +160,17 @@ class CreateTableStatementRenderStrategyTest {
 
     @Test
     void withPrimaryKeyAndConstraint() {
-        PrimaryKey pk = new PrimaryKey("id");
+        PrimaryKeyDefinition pk = new PrimaryKeyDefinition("id");
         CreateTableStatement statement = new CreateTableStatement(TableDefinition.builder()
                 .table(new TableIdentifier("my_table"))
                 .primaryKey(pk)
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("name")
-                                .notNullConstraint(new NotNullConstraint())
+                                .notNullConstraint(new NotNullConstraintDefinition())
                                 .build(),
                         ColumnDefinitionBuilder.integer("age").build()))
-                .constraint(new CheckConstraint(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
+                .constraint(new CheckConstraintDefinition(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18))))
                 .build());
 
         String sql = strategy.render(statement, renderer, new AstContext());
