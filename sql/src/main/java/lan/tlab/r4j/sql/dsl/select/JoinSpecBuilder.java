@@ -5,21 +5,21 @@ import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 
-public class JoinClauseBuilder {
+public class JoinSpecBuilder {
     private final SelectBuilder parent;
     private final FromSource left;
     private final OnJoin.JoinType joinType;
     private final String rightTableName;
     private String rightTableAlias;
 
-    public JoinClauseBuilder(SelectBuilder parent, FromSource left, OnJoin.JoinType joinType, String rightTableName) {
+    public JoinSpecBuilder(SelectBuilder parent, FromSource left, OnJoin.JoinType joinType, String rightTableName) {
         this.parent = parent;
         this.left = left;
         this.joinType = joinType;
         this.rightTableName = rightTableName;
     }
 
-    public JoinClauseBuilder as(String alias) {
+    public JoinSpecBuilder as(String alias) {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
