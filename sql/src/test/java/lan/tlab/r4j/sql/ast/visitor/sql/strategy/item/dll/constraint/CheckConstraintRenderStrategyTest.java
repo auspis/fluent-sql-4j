@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -26,7 +26,7 @@ class CheckConstraintRenderStrategyTest {
     @Test
     void ok() {
         Comparison expr = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
-        CheckConstraint constraint = new CheckConstraint(expr);
+        CheckConstraintDefinition constraint = new CheckConstraintDefinition(expr);
         String sql = strategy.render(constraint, renderer, new AstContext());
         assertThat(sql).isEqualTo("CHECK (\"age\" > 18)");
     }

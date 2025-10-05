@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.dsl.table;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
 
 public class ColumnBuilder {
@@ -46,7 +46,7 @@ public class ColumnBuilder {
     }
 
     public ColumnBuilder notNull() {
-        columnBuilder.notNullConstraint(new NotNullConstraint());
+        columnBuilder.notNullConstraint(new NotNullConstraintDefinition());
         return this;
     }
 
