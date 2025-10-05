@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -17,7 +17,7 @@ class DefaultNotNullConstraintPsStrategyTest {
 
     @Test
     void notNullConstraint() {
-        NotNullConstraint constraint = new NotNullConstraint();
+        NotNullConstraintDefinition constraint = new NotNullConstraintDefinition();
 
         PsDto result = strategy.handle(constraint, visitor, ctx);
 
@@ -27,8 +27,8 @@ class DefaultNotNullConstraintPsStrategyTest {
 
     @Test
     void multipleInstancesSameResult() {
-        NotNullConstraint constraint1 = new NotNullConstraint();
-        NotNullConstraint constraint2 = new NotNullConstraint();
+        NotNullConstraintDefinition constraint1 = new NotNullConstraintDefinition();
+        NotNullConstraintDefinition constraint2 = new NotNullConstraintDefinition();
 
         PsDto result1 = strategy.handle(constraint1, visitor, ctx);
         PsDto result2 = strategy.handle(constraint2, visitor, ctx);
@@ -42,7 +42,7 @@ class DefaultNotNullConstraintPsStrategyTest {
 
     @Test
     void constraintWithDifferentContexts() {
-        NotNullConstraint constraint = new NotNullConstraint();
+        NotNullConstraintDefinition constraint = new NotNullConstraintDefinition();
         AstContext ctx1 = new AstContext();
         AstContext ctx2 = new AstContext();
 

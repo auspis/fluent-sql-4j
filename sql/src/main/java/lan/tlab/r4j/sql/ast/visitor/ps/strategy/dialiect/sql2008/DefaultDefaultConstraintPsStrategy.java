@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -14,7 +14,7 @@ public class DefaultDefaultConstraintPsStrategy implements DefaultConstraintPsSt
     private final SqlRenderer sqlRenderer = SqlRendererFactory.standardSql2008();
 
     @Override
-    public PsDto handle(DefaultConstraint constraint, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(DefaultConstraintDefinition constraint, PreparedStatementVisitor visitor, AstContext ctx) {
         // Default constraints are static DDL elements without parameters
         String sql = constraint.accept(sqlRenderer, ctx);
         return new PsDto(sql, List.of());

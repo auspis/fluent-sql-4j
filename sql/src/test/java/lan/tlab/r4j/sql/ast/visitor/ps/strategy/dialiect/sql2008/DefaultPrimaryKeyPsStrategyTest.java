@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -18,7 +18,7 @@ class DefaultPrimaryKeyPsStrategyTest {
 
     @Test
     void singleColumnPrimaryKey() {
-        PrimaryKey primaryKey = new PrimaryKey("id");
+        PrimaryKeyDefinition primaryKey = new PrimaryKeyDefinition("id");
 
         PsDto result = strategy.handle(primaryKey, visitor, ctx);
 
@@ -28,7 +28,7 @@ class DefaultPrimaryKeyPsStrategyTest {
 
     @Test
     void multiColumnPrimaryKey() {
-        PrimaryKey primaryKey = new PrimaryKey("user_id", "account_id");
+        PrimaryKeyDefinition primaryKey = new PrimaryKeyDefinition("user_id", "account_id");
 
         PsDto result = strategy.handle(primaryKey, visitor, ctx);
 
@@ -38,7 +38,7 @@ class DefaultPrimaryKeyPsStrategyTest {
 
     @Test
     void threeColumnPrimaryKey() {
-        PrimaryKey primaryKey = new PrimaryKey("year", "month", "day");
+        PrimaryKeyDefinition primaryKey = new PrimaryKeyDefinition("year", "month", "day");
 
         PsDto result = strategy.handle(primaryKey, visitor, ctx);
 
@@ -48,7 +48,7 @@ class DefaultPrimaryKeyPsStrategyTest {
 
     @Test
     void primaryKeyWithListConstructor() {
-        PrimaryKey primaryKey = new PrimaryKey(List.of("column1", "column2"));
+        PrimaryKeyDefinition primaryKey = new PrimaryKeyDefinition(List.of("column1", "column2"));
 
         PsDto result = strategy.handle(primaryKey, visitor, ctx);
 
@@ -58,7 +58,7 @@ class DefaultPrimaryKeyPsStrategyTest {
 
     @Test
     void primaryKeyWithSpecialCharacters() {
-        PrimaryKey primaryKey = new PrimaryKey("user-id", "created_at");
+        PrimaryKeyDefinition primaryKey = new PrimaryKeyDefinition("user-id", "created_at");
 
         PsDto result = strategy.handle(primaryKey, visitor, ctx);
 
