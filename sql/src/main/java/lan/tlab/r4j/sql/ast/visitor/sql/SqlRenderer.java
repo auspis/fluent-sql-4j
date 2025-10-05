@@ -56,12 +56,12 @@ import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.CheckConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.ForeignKeyConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.UniqueConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
@@ -751,37 +751,37 @@ public class SqlRenderer implements Visitor<String> {
     }
 
     @Override
-    public String visit(PrimaryKey item, AstContext ctx) {
-        return primaryKeyStrategy.render(item, this, ctx);
+    public String visit(PrimaryKeyDefinition constraintDefinition, AstContext ctx) {
+        return primaryKeyStrategy.render(constraintDefinition, this, ctx);
     }
 
     @Override
-    public String visit(IndexDefinition indexDefinition, AstContext ctx) {
-        return indexDefinitionStrategy.render(indexDefinition, this, ctx);
+    public String visit(IndexDefinition constraintDefinition, AstContext ctx) {
+        return indexDefinitionStrategy.render(constraintDefinition, this, ctx);
     }
 
     @Override
-    public String visit(NotNullConstraint constraint, AstContext ctx) {
-        return notNullConstraintStrategy.render(constraint, this, ctx);
+    public String visit(NotNullConstraintDefinition constraintDefinition, AstContext ctx) {
+        return notNullConstraintStrategy.render(constraintDefinition, this, ctx);
     }
 
     @Override
-    public String visit(UniqueConstraint constraint, AstContext ctx) {
-        return uniqueConstraintStrategy.render(constraint, this, ctx);
+    public String visit(UniqueConstraintDefinition constraintDefinition, AstContext ctx) {
+        return uniqueConstraintStrategy.render(constraintDefinition, this, ctx);
     }
 
     @Override
-    public String visit(ForeignKeyConstraint constraint, AstContext ctx) {
-        return foreignKeyConstraintStrategy.render(constraint, this, ctx);
+    public String visit(ForeignKeyConstraintDefinition constraintDefinition, AstContext ctx) {
+        return foreignKeyConstraintStrategy.render(constraintDefinition, this, ctx);
     }
 
     @Override
-    public String visit(CheckConstraint constraint, AstContext ctx) {
-        return checkConstraintStrategy.render(constraint, this, ctx);
+    public String visit(CheckConstraintDefinition constraintDefinition, AstContext ctx) {
+        return checkConstraintStrategy.render(constraintDefinition, this, ctx);
     }
 
     @Override
-    public String visit(DefaultConstraint constraint, AstContext ctx) {
-        return defaultConstraintStrategy.render(constraint, this, ctx);
+    public String visit(DefaultConstraintDefinition constraintDefinition, AstContext ctx) {
+        return defaultConstraintStrategy.render(constraintDefinition, this, ctx);
     }
 }

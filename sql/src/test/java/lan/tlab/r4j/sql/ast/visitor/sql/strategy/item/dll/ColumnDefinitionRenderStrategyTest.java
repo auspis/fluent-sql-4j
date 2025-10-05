@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.DefaultConstraint;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.NotNullConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -42,7 +42,7 @@ class ColumnDefinitionRenderStrategyTest {
     @Test
     void notNullConstraint() {
         ColumnDefinition column = ColumnDefinition.builder("name", DataType.varchar(255))
-                .notNullConstraint(new NotNullConstraint())
+                .notNullConstraint(new NotNullConstraintDefinition())
                 .build();
 
         String sql = strategy.render(column, renderer, new AstContext());
@@ -52,7 +52,7 @@ class ColumnDefinitionRenderStrategyTest {
     @Test
     void defaultConstraint() {
         ColumnDefinition column = ColumnDefinitionBuilder.varchar("name")
-                .defaultConstraint(new DefaultConstraint(Literal.of("def-val")))
+                .defaultConstraint(new DefaultConstraintDefinition(Literal.of("def-val")))
                 .build();
 
         String sql = strategy.render(column, renderer, new AstContext());
@@ -62,8 +62,8 @@ class ColumnDefinitionRenderStrategyTest {
     @Test
     void notNullAndDefault() {
         ColumnDefinition column = ColumnDefinitionBuilder.varchar("name")
-                .notNullConstraint(new NotNullConstraint())
-                .defaultConstraint(new DefaultConstraint(Literal.of("def-val")))
+                .notNullConstraint(new NotNullConstraintDefinition())
+                .defaultConstraint(new DefaultConstraintDefinition(Literal.of("def-val")))
                 .build();
 
         String sql = strategy.render(column, renderer, new AstContext());

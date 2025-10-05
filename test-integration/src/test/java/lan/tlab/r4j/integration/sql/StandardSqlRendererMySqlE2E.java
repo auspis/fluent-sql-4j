@@ -22,7 +22,7 @@ import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.PrimaryKey;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
@@ -65,7 +65,7 @@ public class StandardSqlRendererMySqlE2E {
                         ColumnDefinitionBuilder.integer("score").build(),
                         ColumnDefinition.builder("createdAt", DataType.timestamp())
                                 .build()))
-                .primaryKey(new PrimaryKey("id"))
+                .primaryKey(new PrimaryKeyDefinition("id"))
                 .build());
         String createTableSql = createTable.accept(renderer, new AstContext());
         try (Statement stmt = connection.createStatement()) {

@@ -51,7 +51,7 @@ import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.predicate.logical.Not;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
@@ -1820,7 +1820,7 @@ class PreparedStatementVisitorTest {
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.varchar("email").build()))
-                .constraint(new Constraint.UniqueConstraint("email"))
+                .constraint(new ConstraintDefinition.UniqueConstraintDefinition("email"))
                 .build());
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1840,7 +1840,7 @@ class PreparedStatementVisitorTest {
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.integer("user_id").build()))
-                .constraint(new Constraint.ForeignKeyConstraint(List.of("user_id"), references))
+                .constraint(new ConstraintDefinition.ForeignKeyConstraintDefinition(List.of("user_id"), references))
                 .build());
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1862,7 +1862,7 @@ class PreparedStatementVisitorTest {
                 .columns(List.of(
                         ColumnDefinitionBuilder.integer("id").build(),
                         ColumnDefinitionBuilder.integer("age").build()))
-                .constraint(new Constraint.CheckConstraint(ageCheck))
+                .constraint(new ConstraintDefinition.CheckConstraintDefinition(ageCheck))
                 .build());
 
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
@@ -1876,7 +1876,8 @@ class PreparedStatementVisitorTest {
 
     @Test
     void defaultConstraintIntegration() {
-        Constraint.DefaultConstraint constraint = new Constraint.DefaultConstraint(Literal.of("active"));
+        ConstraintDefinition.DefaultConstraintDefinition constraint =
+                new ConstraintDefinition.DefaultConstraintDefinition(Literal.of("active"));
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
 
         PsDto result = visitor.visit(constraint, new AstContext());

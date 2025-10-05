@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialiect.sql2008;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.ForeignKeyConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
@@ -20,7 +20,7 @@ class DefaultForeignKeyConstraintPsStrategyTest {
     @Test
     void foreignKeyConstraintGeneratesCorrectSql() {
         ReferencesItem references = new ReferencesItem("users", "id");
-        ForeignKeyConstraint constraint = new ForeignKeyConstraint(List.of("user_id"), references);
+        ForeignKeyConstraintDefinition constraint = new ForeignKeyConstraintDefinition(List.of("user_id"), references);
 
         PsDto result = strategy.handle(constraint, visitor, ctx);
 
@@ -34,7 +34,8 @@ class DefaultForeignKeyConstraintPsStrategyTest {
     @Test
     void foreignKeyConstraintMultipleColumns() {
         ReferencesItem references = new ReferencesItem("addresses", "country_id", "city_id");
-        ForeignKeyConstraint constraint = new ForeignKeyConstraint(List.of("country_id", "city_id"), references);
+        ForeignKeyConstraintDefinition constraint =
+                new ForeignKeyConstraintDefinition(List.of("country_id", "city_id"), references);
 
         PsDto result = strategy.handle(constraint, visitor, ctx);
 
@@ -50,8 +51,10 @@ class DefaultForeignKeyConstraintPsStrategyTest {
     void multipleInstancesSameResult() {
         ReferencesItem references1 = new ReferencesItem("users", "id");
         ReferencesItem references2 = new ReferencesItem("users", "id");
-        ForeignKeyConstraint constraint1 = new ForeignKeyConstraint(List.of("user_id"), references1);
-        ForeignKeyConstraint constraint2 = new ForeignKeyConstraint(List.of("user_id"), references2);
+        ForeignKeyConstraintDefinition constraint1 =
+                new ForeignKeyConstraintDefinition(List.of("user_id"), references1);
+        ForeignKeyConstraintDefinition constraint2 =
+                new ForeignKeyConstraintDefinition(List.of("user_id"), references2);
 
         PsDto result1 = strategy.handle(constraint1, visitor, ctx);
         PsDto result2 = strategy.handle(constraint2, visitor, ctx);

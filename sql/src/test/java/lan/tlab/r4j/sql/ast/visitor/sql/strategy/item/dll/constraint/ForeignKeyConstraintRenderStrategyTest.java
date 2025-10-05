@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.dll.constraint;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.Constraint.ForeignKeyConstraint;
+import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -24,15 +24,15 @@ class ForeignKeyConstraintRenderStrategyTest {
 
     @Test
     void singleColumn() {
-        ForeignKeyConstraint fk =
-                new ForeignKeyConstraint(List.of("customer_id"), new ReferencesItem("customer", "id"));
+        ForeignKeyConstraintDefinition fk =
+                new ForeignKeyConstraintDefinition(List.of("customer_id"), new ReferencesItem("customer", "id"));
         String sql = strategy.render(fk, renderer, new AstContext());
         assertThat(sql).isEqualTo("FOREIGN KEY (\"customer_id\") REFERENCES \"customer\" (\"id\")");
     }
 
     @Test
     void composite() {
-        ForeignKeyConstraint fk = new ForeignKeyConstraint(
+        ForeignKeyConstraintDefinition fk = new ForeignKeyConstraintDefinition(
                 List.of("order_id", "product_id"), new ReferencesItem("order_product", "order_id", "product_id"));
         String sql = strategy.render(fk, renderer, new AstContext());
         assertThat(sql)
