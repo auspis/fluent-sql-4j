@@ -50,6 +50,34 @@ This repository is a multi-module Java project managed with Maven. It is structu
 - Keep modules decoupled and reusable
 - Prefer immutable data structures where possible
 
+### Java Helper Classes
+
+A helper class provides functionalities necessary for the overall running of a Java program. Helper classes contain methods used by other classes to perform repetitive tasks, which aren't the core purpose of an application.
+
+As the name suggests, they help other classes by providing some functionalities that complement the services provided by those classes.
+
+They contain methods for implementing mundane and repetitive tasks, making the overall code base modular and reusable across multiple classes.
+
+A helper class can be instantiated and may contain instance variables, instance, and static methods.
+
+Multiple instances of a helper class can exist in our application. When different classes have common functionalities, we can group these functionalities together to form a helper class that's accessible across certain classes in our application.
+
+### Java Utility Classes
+
+A utility class in Java is a class that provides static methods that are accessible for use across an application. The static methods in utility classes are used for performing common routines in our application.
+
+Utility classes cannot be instantiated and are sometimes stateless without static variables. We declare a utility class as final, and all its methods must be static.
+
+Since we don't want our utility classes to be instantiated, a private constructor is introduced. Having a private constructor means that Java won't create a default constructor for our utility class. The constructor can be empty.
+
+The purpose of a utility class is to provide methods for executing certain functionalities within a program, while the main class focuses on the core problem it solves.
+
+Methods of a utility are accessed via the class name. It makes our code more flexible for use while remaining modular.
+
+Java has utility classes such as java.util.Arrays, java.lang.Math, java.util.Scanner, java.util.Collections, etc.
+
+For more details: https://www.baeldung.com/java-helper-vs-utility-classes
+
 ## How to Add a Module
 
 1. Create a new directory at the root
