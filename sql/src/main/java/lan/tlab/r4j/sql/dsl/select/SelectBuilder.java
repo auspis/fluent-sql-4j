@@ -26,6 +26,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.ColumnReferenceUtil;
 
 // TODO: Add support for SELECT AggregateCalls, HAVING, subqueries, and other SQL features as needed.
 public class SelectBuilder {
@@ -178,24 +179,17 @@ public class SelectBuilder {
         }
 
         ColumnReference[] groupingColumns = java.util.Arrays.stream(columns)
-                .map(column -> {
+                .filter(column -> {
                     if (column == null || column.trim().isEmpty()) {
                         throw new IllegalArgumentException("Column name cannot be null or empty");
                     }
-                    return parseColumnReference(column);
+                    return true;
                 })
+                .map(column -> ColumnReferenceUtil.parseColumnReference(column, getTableReference()))
                 .toArray(ColumnReference[]::new);
 
         statementBuilder = statementBuilder.groupBy(GroupBy.of(groupingColumns));
         return this;
-    }
-
-    private ColumnReference parseColumnReference(String column) {
-        if (column.contains(".")) {
-            String[] parts = column.split("\\.", 2);
-            return ColumnReference.of(parts[0], parts[1]);
-        }
-        return ColumnReference.of(getTableReference(), column);
     }
 
     public SelectBuilder orderBy(String column) {
