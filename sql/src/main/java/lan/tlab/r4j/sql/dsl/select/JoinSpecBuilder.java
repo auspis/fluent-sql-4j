@@ -4,6 +4,7 @@ import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.dsl.ColumnReferenceUtil;
 
 public class JoinSpecBuilder {
     private final SelectBuilder parent;
@@ -35,8 +36,8 @@ public class JoinSpecBuilder {
             throw new IllegalArgumentException("Right column cannot be null or empty");
         }
 
-        ColumnReference leftColRef = parseColumnReference(leftColumn);
-        ColumnReference rightColRef = parseColumnReference(rightColumn);
+        ColumnReference leftColRef = ColumnReferenceUtil.parseColumnReference(leftColumn, "");
+        ColumnReference rightColRef = ColumnReferenceUtil.parseColumnReference(rightColumn, "");
 
         FromSource right = rightTableAlias != null
                 ? new TableIdentifier(rightTableName, rightTableAlias)
@@ -44,13 +45,5 @@ public class JoinSpecBuilder {
 
         JoinBuilder joinBuilder = new JoinBuilder(parent, left, joinType, right);
         return joinBuilder.on(leftColRef, rightColRef);
-    }
-
-    private ColumnReference parseColumnReference(String column) {
-        if (column.contains(".")) {
-            String[] parts = column.split("\\.", 2);
-            return ColumnReference.of(parts[0], parts[1]);
-        }
-        return ColumnReference.of("", column);
     }
 }
