@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.dsl;
+package lan.tlab.r4j.sql.dsl.util;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 

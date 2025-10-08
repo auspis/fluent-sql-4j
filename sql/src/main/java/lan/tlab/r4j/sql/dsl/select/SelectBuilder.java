@@ -26,7 +26,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.dsl.ColumnReferenceUtil;
+import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
 
 // TODO: Add support for SELECT AggregateCalls, HAVING, subqueries, and other SQL features as needed.
 public class SelectBuilder {
