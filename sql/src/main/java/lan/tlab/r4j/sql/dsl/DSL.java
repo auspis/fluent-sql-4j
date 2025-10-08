@@ -2,6 +2,7 @@ package lan.tlab.r4j.sql.dsl;
 
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.dsl.insert.InsertBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import lan.tlab.r4j.sql.dsl.table.TableBuilder;
 
@@ -19,5 +20,9 @@ public class DSL {
 
     public static SelectBuilder selectAll() {
         return new SelectBuilder(SQL_RENDERER, "*");
+    }
+
+    public static InsertBuilder insertInto(String tableName) {
+        return new InsertBuilder(SQL_RENDERER, tableName);
     }
 }
