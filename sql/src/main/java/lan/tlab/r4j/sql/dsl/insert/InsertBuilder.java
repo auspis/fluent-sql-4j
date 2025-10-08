@@ -1,0 +1,118 @@
+package lan.tlab.r4j.sql.dsl.insert;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import lan.tlab.r4j.sql.ast.expression.Expression;
+import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+
+public class InsertBuilder {
+    private final SqlRenderer sqlRenderer;
+    private TableIdentifier table;
+    private final List<ColumnReference> columns = new ArrayList<>();
+    private InsertData data = new DefaultValues();
+
+    public InsertBuilder(SqlRenderer sqlRenderer, String tableName) {
+        if (tableName == null || tableName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Table name cannot be null or empty");
+        }
+        this.sqlRenderer = sqlRenderer;
+        this.table = new TableIdentifier(tableName);
+    }
+
+    public InsertBuilder columns(String... columnNames) {
+        if (columnNames == null || columnNames.length == 0) {
+            throw new IllegalArgumentException("At least one column must be specified");
+        }
+
+        for (String columnName : columnNames) {
+            if (columnName == null || columnName.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            columns.add(ColumnReference.of(table.getName(), columnName));
+        }
+        return this;
+    }
+
+    public InsertBuilder values(Object... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be specified");
+        }
+
+        List<Expression> expressions = new ArrayList<>();
+        for (Object value : values) {
+            if (value == null) {
+                expressions.add(Literal.ofNull());
+            } else if (value instanceof Number) {
+                expressions.add(Literal.of((Number) value));
+            } else if (value instanceof Boolean) {
+                expressions.add(Literal.of((Boolean) value));
+            } else {
+                expressions.add(Literal.of(value.toString()));
+            }
+        }
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder defaultValues() {
+        this.data = new DefaultValues();
+        return this;
+    }
+
+    public String build() {
+        validateState();
+        InsertStatement statement = getCurrentStatement();
+        return statement.accept(sqlRenderer, new AstContext());
+    }
+
+    public PreparedStatement buildPrepared(Connection connection) throws SQLException {
+        validateState();
+        InsertStatement stmt = getCurrentStatement();
+        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PsDto result = stmt.accept(visitor, new AstContext());
+
+        PreparedStatement ps = connection.prepareStatement(result.sql());
+        for (int i = 0; i < result.parameters().size(); i++) {
+            ps.setObject(i + 1, result.parameters().get(i));
+        }
+        return ps;
+    }
+
+    private void validateState() {
+        if (table == null) {
+            throw new IllegalStateException("Table must be specified");
+        }
+        if (!columns.isEmpty() && data instanceof DefaultValues) {
+            throw new IllegalStateException("Columns specified but no values provided");
+        }
+        if (data instanceof InsertValues insertValues) {
+            if (!columns.isEmpty()
+                    && columns.size() != insertValues.getValueExpressions().size()) {
+                throw new IllegalStateException(
+                        "Number of columns (" + columns.size() + ") does not match number of values ("
+                                + insertValues.getValueExpressions().size() + ")");
+            }
+        }
+    }
+
+    private InsertStatement getCurrentStatement() {
+        return InsertStatement.builder()
+                .table(table)
+                .columns(columns)
+                .data(data)
+                .build();
+    }
+}
