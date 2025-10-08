@@ -62,6 +62,30 @@ A helper class can be instantiated and may contain instance variables, instance,
 
 Multiple instances of a helper class can exist in our application. When different classes have common functionalities, we can group these functionalities together to form a helper class that's accessible across certain classes in our application.
 
+**Package Convention**: Helper classes must be placed in a package named `*.helper` (e.g., `lan.tlab.r4j.sql.dsl.helper`).
+
+**Example of a Helper Class**:
+
+```java
+package lan.tlab.r4j.sql.dsl.helper;
+
+public class QueryBuilderHelper {
+    private String schema;
+    
+    public QueryBuilderHelper(String schema) {
+        this.schema = schema;
+    }
+    
+    public String buildQualifiedTableName(String tableName) {
+        return schema + "." + tableName;
+    }
+    
+    public static String escapeIdentifier(String identifier) {
+        return "\"" + identifier.replace("\"", "\"\"") + "\"";
+    }
+}
+```
+
 ### Java Utility Classes
 
 A utility class in Java is a class that provides static methods that are accessible for use across an application. The static methods in utility classes are used for performing common routines in our application.
@@ -75,6 +99,37 @@ The purpose of a utility class is to provide methods for executing certain funct
 Methods of a utility are accessed via the class name. It makes our code more flexible for use while remaining modular.
 
 Java has utility classes such as java.util.Arrays, java.lang.Math, java.util.Scanner, java.util.Collections, etc.
+
+**Package Convention**: Utility classes must be placed in a package named `*.util` (e.g., `lan.tlab.r4j.sql.dsl.util`).
+
+**Mandatory Requirements for Utility Classes**:
+- The class must be declared as `final`
+- All methods must be `static`
+- The class must have a `private` no-args constructor to prevent instantiation
+- The class cannot be instantiated
+
+**Example of a Utility Class**:
+
+```java
+package lan.tlab.r4j.sql.dsl.util;
+
+import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+
+public final class ColumnReferenceUtil {
+
+    private ColumnReferenceUtil() {
+        // Utility class - prevent instantiation
+    }
+
+    public static ColumnReference parseColumnReference(String column, String defaultTableReference) {
+        if (column.contains(".")) {
+            String[] parts = column.split("\\.", 2);
+            return ColumnReference.of(parts[0], parts[1]);
+        }
+        return ColumnReference.of(defaultTableReference, column);
+    }
+}
+```
 
 For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 
