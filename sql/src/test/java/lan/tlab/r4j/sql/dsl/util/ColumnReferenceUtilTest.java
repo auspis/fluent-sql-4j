@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.dsl;
+package lan.tlab.r4j.sql.dsl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
