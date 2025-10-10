@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.dsl.delete;
+package lan.tlab.r4j.sql.dsl;
 
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
