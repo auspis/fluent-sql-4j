@@ -40,63 +40,23 @@ public class InsertBuilder {
     }
 
     public InsertBuilder set(String columnName, String value) {
-        if (columnName == null || columnName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        columns.add(ColumnReference.of(table.getName(), columnName));
-
-        List<Expression> expressions = getOrCreateExpressionList();
-        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
-        this.data = new InsertValues(expressions);
-        return this;
+        return setValue(columnName, value);
     }
 
     public InsertBuilder set(String columnName, Number value) {
-        if (columnName == null || columnName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        columns.add(ColumnReference.of(table.getName(), columnName));
-
-        List<Expression> expressions = getOrCreateExpressionList();
-        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
-        this.data = new InsertValues(expressions);
-        return this;
+        return setValue(columnName, value);
     }
 
     public InsertBuilder set(String columnName, Boolean value) {
-        if (columnName == null || columnName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        columns.add(ColumnReference.of(table.getName(), columnName));
-
-        List<Expression> expressions = getOrCreateExpressionList();
-        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
-        this.data = new InsertValues(expressions);
-        return this;
+        return setValue(columnName, value);
     }
 
     public InsertBuilder set(String columnName, LocalDate value) {
-        if (columnName == null || columnName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        columns.add(ColumnReference.of(table.getName(), columnName));
-
-        List<Expression> expressions = getOrCreateExpressionList();
-        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
-        this.data = new InsertValues(expressions);
-        return this;
+        return setValue(columnName, value);
     }
 
     public InsertBuilder set(String columnName, LocalDateTime value) {
-        if (columnName == null || columnName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        columns.add(ColumnReference.of(table.getName(), columnName));
-
-        List<Expression> expressions = getOrCreateExpressionList();
-        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
-        this.data = new InsertValues(expressions);
-        return this;
+        return setValue(columnName, value);
     }
 
     private List<Expression> getOrCreateExpressionList() {
@@ -106,13 +66,36 @@ public class InsertBuilder {
         return new ArrayList<>();
     }
 
+    private InsertBuilder setValue(String columnName, Object value) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        columns.add(ColumnReference.of(table.getName(), columnName));
+
+        List<Expression> expressions = getOrCreateExpressionList();
+        expressions.add(value == null ? Literal.ofNull() : createLiteral(value));
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    private Expression createLiteral(Object value) {
+        return switch (value) {
+            case String s -> Literal.of(s);
+            case Number n -> Literal.of(n);
+            case Boolean b -> Literal.of(b);
+            case LocalDate d -> Literal.of(d);
+            case LocalDateTime dt -> Literal.of(dt);
+            default -> throw new IllegalArgumentException("Unsupported type: " + value.getClass());
+        };
+    }
+
     public String build() {
         validateState();
         InsertStatement statement = getCurrentStatement();
         return statement.accept(sqlRenderer, new AstContext());
     }
 
-    public PreparedStatement buildPrepared(Connection connection) throws SQLException {
+    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         InsertStatement stmt = getCurrentStatement();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
