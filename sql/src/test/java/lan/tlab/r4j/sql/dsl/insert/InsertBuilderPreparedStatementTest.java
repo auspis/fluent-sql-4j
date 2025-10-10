@@ -12,7 +12,7 @@ class InsertBuilderPreparedStatementTest {
     void buildPreparedStatementRequiresConnection() {
         InsertBuilder builder = insertInto("users").set("name", "John");
 
-        assertThatThrownBy(() -> builder.buildPrepared(null)).isInstanceOf(Exception.class);
+        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(Exception.class);
     }
 
     @Test
