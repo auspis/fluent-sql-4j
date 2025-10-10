@@ -3,6 +3,8 @@ package lan.tlab.r4j.sql.dsl.insert;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.Expression;
@@ -109,6 +111,73 @@ public class InsertBuilder {
     public InsertBuilder defaultValues() {
         this.data = new DefaultValues();
         return this;
+    }
+
+    public InsertBuilder set(String columnName, String value) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        columns.add(ColumnReference.of(table.getName(), columnName));
+
+        List<Expression> expressions = getOrCreateExpressionList();
+        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder set(String columnName, Number value) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        columns.add(ColumnReference.of(table.getName(), columnName));
+
+        List<Expression> expressions = getOrCreateExpressionList();
+        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder set(String columnName, Boolean value) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        columns.add(ColumnReference.of(table.getName(), columnName));
+
+        List<Expression> expressions = getOrCreateExpressionList();
+        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder set(String columnName, LocalDate value) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        columns.add(ColumnReference.of(table.getName(), columnName));
+
+        List<Expression> expressions = getOrCreateExpressionList();
+        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder set(String columnName, LocalDateTime value) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        columns.add(ColumnReference.of(table.getName(), columnName));
+
+        List<Expression> expressions = getOrCreateExpressionList();
+        expressions.add(value == null ? Literal.ofNull() : Literal.of(value));
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    private List<Expression> getOrCreateExpressionList() {
+        if (data instanceof InsertValues insertValues) {
+            return new ArrayList<>(insertValues.getValueExpressions());
+        }
+        return new ArrayList<>();
     }
 
     public String build() {
