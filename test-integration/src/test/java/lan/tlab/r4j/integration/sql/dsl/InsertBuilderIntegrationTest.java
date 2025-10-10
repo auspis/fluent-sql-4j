@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.dsl.DSL;
 import org.junit.jupiter.api.AfterEach;
@@ -59,6 +61,8 @@ class InsertBuilderIntegrationTest {
                 .set("email", "jane@example.com")
                 .set("age", 25)
                 .set("active", true)
+                .set("birthdate", LocalDate.of(1999, 5, 15))
+                .set("createdAt", LocalDateTime.of(2023, 10, 10, 12, 0, 0))
                 .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
@@ -73,6 +77,9 @@ class InsertBuilderIntegrationTest {
             assertThat(rs.getString("email")).isEqualTo("jane@example.com");
             assertThat(rs.getInt("age")).isEqualTo(25);
             assertThat(rs.getBoolean("active")).isTrue();
+            assertThat(rs.getDate("birthdate").toLocalDate()).isEqualTo(LocalDate.of(1999, 5, 15));
+            assertThat(rs.getTimestamp("createdAt").toLocalDateTime())
+                    .isEqualTo(LocalDateTime.of(2023, 10, 10, 12, 0, 0));
             assertThat(rs.next()).isFalse();
         }
     }
@@ -206,6 +213,8 @@ class InsertBuilderIntegrationTest {
                 .set("email", "emily@example.com")
                 .set("age", 28)
                 .set("active", true)
+                .set("birthdate", LocalDate.of(1996, 3, 20))
+                .set("createdAt", LocalDateTime.of(2023, 10, 10, 14, 30, 0))
                 .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
@@ -220,6 +229,9 @@ class InsertBuilderIntegrationTest {
             assertThat(rs.getString("email")).isEqualTo("emily@example.com");
             assertThat(rs.getInt("age")).isEqualTo(28);
             assertThat(rs.getBoolean("active")).isTrue();
+            assertThat(rs.getDate("birthdate").toLocalDate()).isEqualTo(LocalDate.of(1996, 3, 20));
+            assertThat(rs.getTimestamp("createdAt").toLocalDateTime())
+                    .isEqualTo(LocalDateTime.of(2023, 10, 10, 14, 30, 0));
             assertThat(rs.next()).isFalse();
         }
     }
