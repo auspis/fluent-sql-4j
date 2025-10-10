@@ -3,11 +3,11 @@ package lan.tlab.r4j.integration.sql.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.dsl.DSL;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,20 +19,9 @@ class InsertBuilderIntegrationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        // H2 in-memory database with standard SQL mode
-        String jdbcUrl = "jdbc:h2:mem:testdb;MODE=REGULAR;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
-        connection = DriverManager.getConnection(jdbcUrl, "sa", "");
-
-        createTestTables();
-    }
-
-    private void createTestTables() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(
-                    "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(50), email VARCHAR(100), age INTEGER, active BOOLEAN)");
-            stmt.execute(
-                    "CREATE TABLE products (id INTEGER PRIMARY KEY, name VARCHAR(50), price DECIMAL(10,2), quantity INTEGER)");
-        }
+        connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersTable(connection);
+        TestDatabaseUtil.createProductsTable(connection);
     }
 
     @AfterEach

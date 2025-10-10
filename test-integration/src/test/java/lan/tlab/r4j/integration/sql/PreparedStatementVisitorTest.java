@@ -3,9 +3,8 @@ package lan.tlab.r4j.integration.sql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
+import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
@@ -27,18 +26,11 @@ class PreparedStatementVisitorTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        // H2 in-memory database with standard SQL mode
-        String jdbcUrl = "jdbc:h2:mem:testdb;MODE=REGULAR;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
-        connection = DriverManager.getConnection(jdbcUrl, "sa", "");
+        connection = TestDatabaseUtil.createH2Connection();
         visitor = new PreparedStatementVisitor();
 
-        // Create a simple test table
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(
-                    "CREATE TABLE users (id INTEGER PRIMARY KEY, first_name VARCHAR(50), last_name VARCHAR(50), age INTEGER)");
-            stmt.execute("INSERT INTO users VALUES (1, 'John', 'Doe', 30)");
-            stmt.execute("INSERT INTO users VALUES (2, 'Jane', 'Smith', 25)");
-        }
+        TestDatabaseUtil.createUsersTableWithNames(connection);
+        TestDatabaseUtil.insertSampleUsersWithNames(connection);
     }
 
     @AfterEach
