@@ -39,19 +39,6 @@ public final class TestDatabaseUtil {
     }
 
     /**
-     * Creates a users table with first_name and last_name columns: id, first_name, last_name, age.
-     *
-     * @param connection the database connection
-     * @throws SQLException if table creation fails
-     */
-    public static void createUsersTableWithNames(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(
-                    "CREATE TABLE users (\"id\" INTEGER PRIMARY KEY, \"first_name\" VARCHAR(50), \"last_name\" VARCHAR(50), \"age\" INTEGER)");
-        }
-    }
-
-    /**
      * Creates a standard products table with columns: id, name, price, quantity.
      *
      * @param connection the database connection
@@ -65,15 +52,17 @@ public final class TestDatabaseUtil {
     }
 
     /**
-     * Inserts sample data into the users table (with first_name and last_name).
+     * Inserts sample data into the users table.
      *
      * @param connection the database connection
      * @throws SQLException if insert fails
      */
-    public static void insertSampleUsersWithNames(Connection connection) throws SQLException {
+    public static void insertSampleUsers(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO users VALUES (1, 'John', 'Doe', 30)");
-            stmt.execute("INSERT INTO users VALUES (2, 'Jane', 'Smith', 25)");
+            stmt.execute(
+                    "INSERT INTO users VALUES (1, 'John Doe', 'john@example.com', 30, true, '1990-01-01', '2023-01-01')");
+            stmt.execute(
+                    "INSERT INTO users VALUES (2, 'Jane Smith', 'jane@example.com', 25, true, '1995-01-01', '2023-01-01')");
         }
     }
 }
