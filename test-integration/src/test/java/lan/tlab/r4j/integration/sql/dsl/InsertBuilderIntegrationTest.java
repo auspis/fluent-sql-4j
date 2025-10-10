@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.dsl.DSL;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,10 +45,8 @@ class InsertBuilderIntegrationTest {
     @Test
     void insertSingleStringValueAndVerify() throws SQLException {
         // Insert using DSL
-        PreparedStatement ps = DSL.insertInto("users")
-                .columns("id", "name")
-                .values(Literal.of(1), Literal.of("John"))
-                .buildPrepared(connection);
+        PreparedStatement ps =
+                DSL.insertInto("users").set("id", 1).set("name", "John").buildPrepared(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -68,13 +65,11 @@ class InsertBuilderIntegrationTest {
     void insertMultipleColumnsWithMixedTypesAndVerify() throws SQLException {
         // Insert using DSL with mixed types
         PreparedStatement ps = DSL.insertInto("users")
-                .columns("id", "name", "email", "age", "active")
-                .values(
-                        Literal.of(2),
-                        Literal.of("Jane"),
-                        Literal.of("jane@example.com"),
-                        Literal.of(25),
-                        Literal.of(true))
+                .set("id", 2)
+                .set("name", "Jane")
+                .set("email", "jane@example.com")
+                .set("age", 25)
+                .set("active", true)
                 .buildPrepared(connection);
 
         int rowsAffected = ps.executeUpdate();
@@ -97,8 +92,10 @@ class InsertBuilderIntegrationTest {
     void insertWithNullValuesAndVerify() throws SQLException {
         // Insert with null values
         PreparedStatement ps = DSL.insertInto("users")
-                .columns("id", "name", "email", "age")
-                .values(Literal.of(3), Literal.of("Bob"), Literal.ofNull(), Literal.ofNull())
+                .set("id", 3)
+                .set("name", "Bob")
+                .set("email", (String) null)
+                .set("age", (Integer) null)
                 .buildPrepared(connection);
 
         int rowsAffected = ps.executeUpdate();
@@ -120,8 +117,10 @@ class InsertBuilderIntegrationTest {
     void insertWithDecimalValuesAndVerify() throws SQLException {
         // Insert numeric values including decimals
         PreparedStatement ps = DSL.insertInto("products")
-                .columns("id", "name", "price", "quantity")
-                .values(Literal.of(1), Literal.of("Widget"), Literal.of(19.99), Literal.of(100))
+                .set("id", 1)
+                .set("name", "Widget")
+                .set("price", 19.99)
+                .set("quantity", 100)
                 .buildPrepared(connection);
 
         int rowsAffected = ps.executeUpdate();
@@ -143,15 +142,17 @@ class InsertBuilderIntegrationTest {
     void insertMultipleRowsAndVerify() throws SQLException {
         // Insert first row
         PreparedStatement ps1 = DSL.insertInto("users")
-                .columns("id", "name", "active")
-                .values(Literal.of(10), Literal.of("Alice"), Literal.of(true))
+                .set("id", 10)
+                .set("name", "Alice")
+                .set("active", true)
                 .buildPrepared(connection);
         assertThat(ps1.executeUpdate()).isEqualTo(1);
 
         // Insert second row
         PreparedStatement ps2 = DSL.insertInto("users")
-                .columns("id", "name", "active")
-                .values(Literal.of(11), Literal.of("Charlie"), Literal.of(false))
+                .set("id", 11)
+                .set("name", "Charlie")
+                .set("active", false)
                 .buildPrepared(connection);
         assertThat(ps2.executeUpdate()).isEqualTo(1);
 
@@ -174,17 +175,19 @@ class InsertBuilderIntegrationTest {
 
     @Test
     void insertWithTypeSpecificMethodsAndVerify() throws SQLException {
-        // Test string-only values method
+        // Test string values
         PreparedStatement ps1 = DSL.insertInto("users")
-                .columns("id", "name", "email")
-                .values("20", "David", "david@example.com")
+                .set("id", 20)
+                .set("name", "David")
+                .set("email", "david@example.com")
                 .buildPrepared(connection);
         assertThat(ps1.executeUpdate()).isEqualTo(1);
 
-        // Test numeric-only values method
+        // Test numeric values
         PreparedStatement ps2 = DSL.insertInto("products")
-                .columns("id", "price", "quantity")
-                .values(20, 29.99, 50)
+                .set("id", 20)
+                .set("price", 29.99)
+                .set("quantity", 50)
                 .buildPrepared(connection);
         assertThat(ps2.executeUpdate()).isEqualTo(1);
 

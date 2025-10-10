@@ -148,6 +148,21 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 - When you need to run integration tests try to run only the needed ones
 - Integration tests are located in `test-integration/`
 
+## Code Formatting
+
+**IMPORTANT**: Before each commit, you must run `./mvnw spotless:apply` to format the code correctly. This prevents pipeline failures due to formatting issues.
+
+```bash
+./mvnw spotless:apply
+```
+
+This command will:
+- Format all Java files according to the project's code style
+- Sort POM files
+- Format Markdown files
+
+Always run this before committing changes to ensure the CI/CD pipeline succeeds.
+
 ## Additional Notes
 
 - The repository may contain scripts in `data/scripts/` for development automation
