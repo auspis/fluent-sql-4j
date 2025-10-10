@@ -29,8 +29,8 @@ class PreparedStatementVisitorTest {
         connection = TestDatabaseUtil.createH2Connection();
         visitor = new PreparedStatementVisitor();
 
-        TestDatabaseUtil.createUsersTableWithNames(connection);
-        TestDatabaseUtil.insertSampleUsersWithNames(connection);
+        TestDatabaseUtil.createUsersTable(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
     }
 
     @AfterEach
@@ -46,7 +46,7 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of()) // Empty select generates SELECT *
                 .from(From.fromTable("users"))
-                .where(Where.of(Comparison.eq(ColumnReference.of("users", "first_name"), Literal.of("John"))))
+                .where(Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John Doe"))))
                 .build();
 
         // Generate SQL and parameters using PreparedStatementVisitor
@@ -54,8 +54,8 @@ class PreparedStatementVisitorTest {
         PsDto result = selectStmt.accept(visitor, context);
 
         // Verify generated SQL and parameters
-        assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\" WHERE \"first_name\" = ?");
-        assertThat(result.parameters()).containsExactly("John");
+        assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\" WHERE \"name\" = ?");
+        assertThat(result.parameters()).containsExactly("John Doe");
 
         // Execute the generated SQL on real H2 database to verify it works
         try (var ps = connection.prepareStatement(result.sql())) {
@@ -65,8 +65,7 @@ class PreparedStatementVisitorTest {
 
             var rs = ps.executeQuery();
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("first_name")).isEqualTo("John");
-            assertThat(rs.getString("last_name")).isEqualTo("Doe");
+            assertThat(rs.getString("name")).isEqualTo("John Doe");
             assertThat(rs.getInt("age")).isEqualTo(30);
             assertThat(rs.next()).isFalse();
         }
