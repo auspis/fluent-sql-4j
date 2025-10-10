@@ -11,6 +11,7 @@ import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderTest {
