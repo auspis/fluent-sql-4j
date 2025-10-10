@@ -4,6 +4,7 @@ import static lan.tlab.r4j.sql.dsl.DSL.insertInto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import org.junit.jupiter.api.Test;
 
 class InsertBuilderTest {
@@ -31,7 +32,7 @@ class InsertBuilderTest {
     void insertWithMultipleColumnsAndValues() {
         String sql = insertInto("users")
                 .columns("id", "name", "email")
-                .values(1, "John", "john@example.com")
+                .values(Literal.of(1), Literal.of("John"), Literal.of("john@example.com"))
                 .build();
 
         assertThat(sql)
@@ -59,7 +60,7 @@ class InsertBuilderTest {
     void insertWithBooleanValue() {
         String sql = insertInto("users")
                 .columns("name", "active")
-                .values("John", true)
+                .values(Literal.of("John"), Literal.of(true))
                 .build();
 
         assertThat(sql)
@@ -120,14 +121,14 @@ class InsertBuilderTest {
 
     @Test
     void invalidEmptyValues() {
-        assertThatThrownBy(() -> insertInto("users").columns("name").values())
+        assertThatThrownBy(() -> insertInto("users").columns("name").values(new String[0]))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be specified");
     }
 
     @Test
     void invalidNullValues() {
-        assertThatThrownBy(() -> insertInto("users").columns("name").values((Object[]) null))
+        assertThatThrownBy(() -> insertInto("users").columns("name").values((String[]) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be specified");
     }
@@ -154,7 +155,7 @@ class InsertBuilderTest {
     void insertWithMixedDataTypes() {
         String sql = insertInto("mixed_table")
                 .columns("text_col", "int_col", "bool_col", "null_col")
-                .values("test", 42, false, null)
+                .values(Literal.of("test"), Literal.of(42), Literal.of(false), Literal.ofNull())
                 .build();
 
         assertThat(sql)

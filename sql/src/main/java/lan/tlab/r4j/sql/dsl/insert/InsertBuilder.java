@@ -46,24 +46,63 @@ public class InsertBuilder {
         return this;
     }
 
-    public InsertBuilder values(Object... values) {
+    public InsertBuilder values(String... values) {
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException("At least one value must be specified");
         }
 
         List<Expression> expressions = new ArrayList<>();
-        for (Object value : values) {
+        for (String value : values) {
             if (value == null) {
                 expressions.add(Literal.ofNull());
-            } else if (value instanceof Number) {
-                expressions.add(Literal.of((Number) value));
-            } else if (value instanceof Boolean) {
-                expressions.add(Literal.of((Boolean) value));
             } else {
-                expressions.add(Literal.of(value.toString()));
+                expressions.add(Literal.of(value));
             }
         }
         this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder values(Number... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be specified");
+        }
+
+        List<Expression> expressions = new ArrayList<>();
+        for (Number value : values) {
+            if (value == null) {
+                expressions.add(Literal.ofNull());
+            } else {
+                expressions.add(Literal.of(value));
+            }
+        }
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder values(Boolean... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be specified");
+        }
+
+        List<Expression> expressions = new ArrayList<>();
+        for (Boolean value : values) {
+            if (value == null) {
+                expressions.add(Literal.ofNull());
+            } else {
+                expressions.add(Literal.of(value));
+            }
+        }
+        this.data = new InsertValues(expressions);
+        return this;
+    }
+
+    public InsertBuilder values(Expression... expressions) {
+        if (expressions == null || expressions.length == 0) {
+            throw new IllegalArgumentException("At least one value must be specified");
+        }
+
+        this.data = new InsertValues(List.of(expressions));
         return this;
     }
 
