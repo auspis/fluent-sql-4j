@@ -13,6 +13,11 @@ This repository is a multi-module Java project managed with Maven. It is structu
 - Maven (multi-module project)
 - Each module contains its own `pom.xml` and is managed from the root `pom.xml`.
 
+## How to Build
+
+- To compile the entire project, run `./mvnw clean compile` from the root directory.
+- Since this is a multi-module project, when compiling a specific module, you may need to add `-am` to also compile dependencies: `./mvnw clean compile -am -pl <module>`
+
 ## Project Structure
 
 - Root directory contains:

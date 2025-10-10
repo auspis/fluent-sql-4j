@@ -22,7 +22,7 @@ class InsertBuilderPreparedStatementTest {
         assertThat(builder).isNotNull();
 
         assertThat(builder.getClass().getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("buildPrepared"));
+                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
     }
 
     @Test
@@ -32,6 +32,6 @@ class InsertBuilderPreparedStatementTest {
         assertThat(builder).isNotNull();
 
         assertThat(builder.getClass().getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("buildPrepared"));
+                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
     }
 }
