@@ -10,14 +10,14 @@ class InsertBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementRequiresConnection() {
-        InsertBuilder builder = insertInto("users").columns("name").values("John");
+        InsertBuilder builder = insertInto("users").set("name", "John");
 
         assertThatThrownBy(() -> builder.buildPrepared(null)).isInstanceOf(Exception.class);
     }
 
     @Test
     void buildPreparedStatementCompilesWithoutError() {
-        InsertBuilder builder = insertInto("users").columns("name", "email").values("John", "john@example.com");
+        InsertBuilder builder = insertInto("users").set("name", "John").set("email", "john@example.com");
 
         assertThat(builder).isNotNull();
 
