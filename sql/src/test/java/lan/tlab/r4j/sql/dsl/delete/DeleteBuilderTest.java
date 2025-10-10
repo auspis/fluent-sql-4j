@@ -1,0 +1,197 @@
+package lan.tlab.r4j.sql.dsl.delete;
+
+import static lan.tlab.r4j.sql.dsl.DSL.deleteFrom;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
+import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import org.junit.jupiter.api.Test;
+
+class DeleteBuilderTest {
+
+    @Test
+    void ok() {
+        String result = deleteFrom("users").where("status").eq("inactive").build();
+        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"status\" = 'inactive'");
+    }
+
+    @Test
+    void noWhere() {
+        String result = deleteFrom("users").build();
+        assertThat(result).isEqualTo("DELETE FROM \"users\"");
+    }
+
+    @Test
+    void whereWithNumber() {
+        String result = deleteFrom("users").where("id").eq(42).build();
+        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"id\" = 42");
+    }
+
+    @Test
+    void and() {
+        String result = deleteFrom("users")
+                .where("status")
+                .eq("inactive")
+                .and("age")
+                .lt(18)
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        "DELETE FROM \"users\" WHERE (\"users\".\"status\" = 'inactive') AND (\"users\".\"age\" < 18)");
+    }
+
+    @Test
+    void or() {
+        String result = deleteFrom("users")
+                .where("status")
+                .eq("deleted")
+                .or("status")
+                .eq("banned")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        "DELETE FROM \"users\" WHERE (\"users\".\"status\" = 'deleted') OR (\"users\".\"status\" = 'banned')");
+    }
+
+    @Test
+    void andOr() {
+        String result = deleteFrom("users")
+                .where("status")
+                .eq("inactive")
+                .and("age")
+                .lt(18)
+                .or("role")
+                .eq("guest")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        "DELETE FROM \"users\" WHERE ((\"users\".\"status\" = 'inactive') AND (\"users\".\"age\" < 18)) OR (\"users\".\"role\" = 'guest')");
+    }
+
+    @Test
+    void isNull() {
+        String result = deleteFrom("users").where("deleted_at").isNotNull().build();
+
+        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"deleted_at\" IS NOT NULL");
+    }
+
+    @Test
+    void like() {
+        String result = deleteFrom("users").where("email").like("%@temp.com").build();
+
+        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"email\" LIKE '%@temp.com'");
+    }
+
+    @Test
+    void allComparisonOperators() {
+        String result = deleteFrom("products")
+                .where("price")
+                .gt(100)
+                .and("discount")
+                .lt(50)
+                .and("rating")
+                .gte(4)
+                .and("stock")
+                .lte(10)
+                .and("category")
+                .ne("deprecated")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        "DELETE FROM \"products\" WHERE ((((\"products\".\"price\" > 100) AND (\"products\".\"discount\" < 50)) AND (\"products\".\"rating\" >= 4)) AND (\"products\".\"stock\" <= 10)) AND (\"products\".\"category\" != 'deprecated')");
+    }
+
+    @Test
+    void invalidTableName() {
+        assertThatThrownBy(() -> deleteFrom(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Table name cannot be null or empty");
+    }
+
+    @Test
+    void invalidColumnName() {
+        assertThatThrownBy(() -> deleteFrom("users").where(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    // Tests for static helper methods
+    @Test
+    void hasValidConditionReturnsTrueForValidComparison() {
+        Where whereWithComparison = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        assertThat(DeleteBuilder.hasValidCondition(whereWithComparison)).isTrue();
+    }
+
+    @Test
+    void hasValidConditionReturnsFalseForNullPredicate() {
+        Where whereWithNull = Where.of(new NullPredicate());
+
+        assertThat(DeleteBuilder.hasValidCondition(whereWithNull)).isFalse();
+    }
+
+    @Test
+    void combineWithExistingCreatesAndCondition() {
+        Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Where result = DeleteBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.AND);
+
+        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+    }
+
+    @Test
+    void combineWithExistingCreatesOrCondition() {
+        Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Where result = DeleteBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.OR);
+
+        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+        AndOr andOr = (AndOr) result.getCondition();
+        assertThat(andOr.getOperator()).isEqualTo(lan.tlab.r4j.sql.ast.predicate.logical.LogicalOperator.OR);
+    }
+
+    @Test
+    void combineConditionsWithNullWhereCreatesNewCondition() {
+        Predicate condition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+
+        Where result = DeleteBuilder.combineConditions(null, condition, LogicalCombinator.AND);
+
+        assertThat(result.getCondition()).isEqualTo(condition);
+    }
+
+    @Test
+    void combineConditionsWithValidWhereCreatesCombinedCondition() {
+        Where existingWhere = Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Where result = DeleteBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.OR);
+
+        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+    }
+
+    @Test
+    void combineConditionsWithNullPredicateCreatesNewCondition() {
+        Where existingWhere = Where.of(new NullPredicate());
+
+        Predicate newCondition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+
+        Where result = DeleteBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.AND);
+
+        assertThat(result.getCondition()).isEqualTo(newCondition);
+    }
+}
