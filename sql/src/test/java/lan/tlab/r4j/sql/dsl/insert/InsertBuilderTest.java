@@ -4,7 +4,6 @@ import static lan.tlab.r4j.sql.dsl.DSL.insertInto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import org.junit.jupiter.api.Test;
 
 class InsertBuilderTest {
@@ -20,7 +19,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithSingleColumnAndValue() {
-        String sql = insertInto("users").columns("name").values("John").build();
+        String sql = insertInto("users").set("name", "John").build();
 
         assertThat(sql)
                 .isEqualTo("""
@@ -31,8 +30,9 @@ class InsertBuilderTest {
     @Test
     void insertWithMultipleColumnsAndValues() {
         String sql = insertInto("users")
-                .columns("id", "name", "email")
-                .values(Literal.of(1), Literal.of("John"), Literal.of("john@example.com"))
+                .set("id", 1)
+                .set("name", "John")
+                .set("email", "john@example.com")
                 .build();
 
         assertThat(sql)
@@ -45,8 +45,8 @@ class InsertBuilderTest {
     @Test
     void insertWithNullValue() {
         String sql = insertInto("users")
-                .columns("name", "email")
-                .values("John", null)
+                .set("name", "John")
+                .set("email", (String) null)
                 .build();
 
         assertThat(sql)
@@ -58,10 +58,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithBooleanValue() {
-        String sql = insertInto("users")
-                .columns("name", "active")
-                .values(Literal.of("John"), Literal.of(true))
-                .build();
+        String sql = insertInto("users").set("name", "John").set("active", true).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -73,8 +70,9 @@ class InsertBuilderTest {
     @Test
     void insertWithNumericValues() {
         String sql = insertInto("products")
-                .columns("id", "price", "quantity")
-                .values(1, 19.99, 100)
+                .set("id", 1)
+                .set("price", 19.99)
+                .set("quantity", 100)
                 .build();
 
         assertThat(sql)
@@ -99,63 +97,26 @@ class InsertBuilderTest {
     }
 
     @Test
-    void invalidEmptyColumns() {
-        assertThatThrownBy(() -> insertInto("users").columns())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least one column must be specified");
-    }
-
-    @Test
-    void invalidNullColumns() {
-        assertThatThrownBy(() -> insertInto("users").columns((String[]) null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least one column must be specified");
-    }
-
-    @Test
     void invalidEmptyColumnName() {
-        assertThatThrownBy(() -> insertInto("users").columns("name", ""))
+        assertThatThrownBy(() -> insertInto("users").set("", "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
-    void invalidEmptyValues() {
-        assertThatThrownBy(() -> insertInto("users").columns("name").values(new String[0]))
+    void invalidNullColumnName() {
+        assertThatThrownBy(() -> insertInto("users").set(null, "value"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least one value must be specified");
-    }
-
-    @Test
-    void invalidNullValues() {
-        assertThatThrownBy(() -> insertInto("users").columns("name").values((String[]) null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least one value must be specified");
-    }
-
-    @Test
-    void columnsWithoutValues() {
-        assertThatThrownBy(() -> insertInto("users").columns("name").build())
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Columns specified but no values provided");
-    }
-
-    @Test
-    void mismatchedColumnsAndValues() {
-        assertThatThrownBy(() -> insertInto("users")
-                        .columns("name", "email")
-                        .values("John")
-                        .build())
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Number of columns")
-                .hasMessageContaining("does not match number of values");
+                .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void insertWithMixedDataTypes() {
         String sql = insertInto("mixed_table")
-                .columns("text_col", "int_col", "bool_col", "null_col")
-                .values(Literal.of("test"), Literal.of(42), Literal.of(false), Literal.ofNull())
+                .set("text_col", "test")
+                .set("int_col", 42)
+                .set("bool_col", false)
+                .set("null_col", (String) null)
                 .build();
 
         assertThat(sql)
