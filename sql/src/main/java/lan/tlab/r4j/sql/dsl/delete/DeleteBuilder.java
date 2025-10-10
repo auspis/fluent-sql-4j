@@ -14,8 +14,11 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.LogicalCombinator;
+import lan.tlab.r4j.sql.dsl.SupportsWhere;
+import lan.tlab.r4j.sql.dsl.WhereConditionBuilder;
 
-public class DeleteBuilder {
+public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
     private DeleteStatement.DeleteStatementBuilder statementBuilder = DeleteStatement.builder();
     private final SqlRenderer sqlRenderer;
     private TableIdentifier table;
@@ -29,22 +32,23 @@ public class DeleteBuilder {
         statementBuilder = statementBuilder.table(table);
     }
 
-    public WhereConditionBuilder where(String column) {
+    public WhereConditionBuilder<DeleteBuilder> where(String column) {
         if (column == null || column.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
-        return new WhereConditionBuilder(this, column, LogicalCombinator.AND);
+        return new WhereConditionBuilder<>(this, column, LogicalCombinator.AND);
     }
 
-    public WhereConditionBuilder and(String column) {
-        return new WhereConditionBuilder(this, column, LogicalCombinator.AND);
+    public WhereConditionBuilder<DeleteBuilder> and(String column) {
+        return new WhereConditionBuilder<>(this, column, LogicalCombinator.AND);
     }
 
-    public WhereConditionBuilder or(String column) {
-        return new WhereConditionBuilder(this, column, LogicalCombinator.OR);
+    public WhereConditionBuilder<DeleteBuilder> or(String column) {
+        return new WhereConditionBuilder<>(this, column, LogicalCombinator.OR);
     }
 
-    String getTableReference() {
+    @Override
+    public String getTableReference() {
         if (table == null) {
             return "";
         }
@@ -54,7 +58,8 @@ public class DeleteBuilder {
         return table.getName();
     }
 
-    DeleteBuilder updateWhere(Function<Where, Where> updater) {
+    @Override
+    public DeleteBuilder updateWhere(Function<Where, Where> updater) {
         Where currentWhere = getCurrentStatement().getWhere();
         Where newWhere = updater.apply(currentWhere);
         statementBuilder = statementBuilder.where(newWhere);
@@ -78,7 +83,8 @@ public class DeleteBuilder {
         return Where.of(combinedCondition);
     }
 
-    DeleteBuilder addWhereCondition(Predicate condition, LogicalCombinator combinator) {
+    @Override
+    public DeleteBuilder addWhereCondition(Predicate condition, LogicalCombinator combinator) {
         return updateWhere(where -> DeleteBuilder.combineConditions(where, condition, combinator));
     }
 

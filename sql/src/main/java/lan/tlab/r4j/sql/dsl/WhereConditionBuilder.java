@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.dsl.delete;
+package lan.tlab.r4j.sql.dsl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,165 +11,164 @@ import lan.tlab.r4j.sql.ast.predicate.Like;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 
-public class WhereConditionBuilder {
-    private final DeleteBuilder parent;
+/**
+ * Generic builder for WHERE conditions that can work with any builder type.
+ *
+ * @param <T> the parent builder type
+ */
+public class WhereConditionBuilder<T extends SupportsWhere<T>> {
+    private final T parent;
     private final String column;
     private final LogicalCombinator combinator;
 
-    public WhereConditionBuilder(DeleteBuilder parent, String column, LogicalCombinator combinator) {
+    public WhereConditionBuilder(T parent, String column, LogicalCombinator combinator) {
         this.parent = parent;
         this.column = column;
         this.combinator = combinator;
     }
 
     // String comparisons
-    public DeleteBuilder eq(String value) {
+    public T eq(String value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder ne(String value) {
+    public T ne(String value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gt(String value) {
+    public T gt(String value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lt(String value) {
+    public T lt(String value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gte(String value) {
+    public T gte(String value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lte(String value) {
+    public T lte(String value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // Number comparisons
-    public DeleteBuilder eq(Number value) {
+    public T eq(Number value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder ne(Number value) {
+    public T ne(Number value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gt(Number value) {
+    public T gt(Number value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lt(Number value) {
+    public T lt(Number value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gte(Number value) {
+    public T gte(Number value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lte(Number value) {
+    public T lte(Number value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // Boolean comparisons
-    public DeleteBuilder eq(Boolean value) {
+    public T eq(Boolean value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder ne(Boolean value) {
+    public T ne(Boolean value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
     // LocalDate comparisons
-    public DeleteBuilder eq(LocalDate value) {
+    public T eq(LocalDate value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder ne(LocalDate value) {
+    public T ne(LocalDate value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gt(LocalDate value) {
+    public T gt(LocalDate value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lt(LocalDate value) {
+    public T lt(LocalDate value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gte(LocalDate value) {
+    public T gte(LocalDate value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lte(LocalDate value) {
+    public T lte(LocalDate value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // LocalDateTime comparisons
-    public DeleteBuilder eq(LocalDateTime value) {
+    public T eq(LocalDateTime value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder ne(LocalDateTime value) {
+    public T ne(LocalDateTime value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gt(LocalDateTime value) {
+    public T gt(LocalDateTime value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lt(LocalDateTime value) {
+    public T lt(LocalDateTime value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder gte(LocalDateTime value) {
+    public T gte(LocalDateTime value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public DeleteBuilder lte(LocalDateTime value) {
+    public T lte(LocalDateTime value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // String-specific operations
-    public DeleteBuilder like(String pattern) {
+    public T like(String pattern) {
         return addCondition(new Like(getColumnRef(), pattern));
     }
 
     // Null checks
-    public DeleteBuilder isNull() {
+    public T isNull() {
         return addCondition(new IsNull(getColumnRef()));
     }
 
-    public DeleteBuilder isNotNull() {
+    public T isNotNull() {
         return addCondition(new IsNotNull(getColumnRef()));
     }
 
     // Convenience methods for date ranges
-    public DeleteBuilder between(LocalDate startDate, LocalDate endDate) {
-        return parent.updateWhere(where -> {
-            Predicate condition = AndOr.and(
-                    Comparison.gte(getColumnRef(), Literal.of(startDate)),
-                    Comparison.lte(getColumnRef(), Literal.of(endDate)));
-            return DeleteBuilder.combineConditions(where, condition, combinator);
-        });
+    public T between(LocalDate startDate, LocalDate endDate) {
+        Predicate condition = AndOr.and(
+                Comparison.gte(getColumnRef(), Literal.of(startDate)),
+                Comparison.lte(getColumnRef(), Literal.of(endDate)));
+        return addCondition(condition);
     }
 
-    public DeleteBuilder between(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        return parent.updateWhere(where -> {
-            Predicate condition = AndOr.and(
-                    Comparison.gte(getColumnRef(), Literal.of(startDateTime)),
-                    Comparison.lte(getColumnRef(), Literal.of(endDateTime)));
-            return DeleteBuilder.combineConditions(where, condition, combinator);
-        });
+    public T between(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        Predicate condition = AndOr.and(
+                Comparison.gte(getColumnRef(), Literal.of(startDateTime)),
+                Comparison.lte(getColumnRef(), Literal.of(endDateTime)));
+        return addCondition(condition);
     }
 
-    public DeleteBuilder between(Number min, Number max) {
-        return parent.updateWhere(where -> {
-            Predicate condition = AndOr.and(
-                    Comparison.gte(getColumnRef(), Literal.of(min)), Comparison.lte(getColumnRef(), Literal.of(max)));
-            return DeleteBuilder.combineConditions(where, condition, combinator);
-        });
+    public T between(Number min, Number max) {
+        Predicate condition = AndOr.and(
+                Comparison.gte(getColumnRef(), Literal.of(min)), Comparison.lte(getColumnRef(), Literal.of(max)));
+        return addCondition(condition);
     }
 
     // Helper methods
@@ -177,7 +176,7 @@ public class WhereConditionBuilder {
         return ColumnReference.of(parent.getTableReference(), column);
     }
 
-    private DeleteBuilder addCondition(Predicate condition) {
-        return parent.updateWhere(where -> DeleteBuilder.combineConditions(where, condition, combinator));
+    private T addCondition(Predicate condition) {
+        return parent.addWhereCondition(condition, combinator);
     }
 }
