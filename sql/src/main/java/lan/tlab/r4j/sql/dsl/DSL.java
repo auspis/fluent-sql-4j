@@ -6,6 +6,7 @@ import lan.tlab.r4j.sql.dsl.delete.DeleteBuilder;
 import lan.tlab.r4j.sql.dsl.insert.InsertBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import lan.tlab.r4j.sql.dsl.table.TableBuilder;
+import lan.tlab.r4j.sql.dsl.update.UpdateBuilder;
 
 public class DSL {
 
@@ -29,5 +30,9 @@ public class DSL {
 
     public static DeleteBuilder deleteFrom(String tableName) {
         return new DeleteBuilder(SQL_RENDERER, tableName);
+    }
+
+    public static UpdateBuilder update(String tableName) {
+        return new UpdateBuilder(SQL_RENDERER, tableName);
     }
 }
