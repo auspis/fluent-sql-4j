@@ -49,13 +49,7 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
 
     @Override
     public String getTableReference() {
-        if (table == null) {
-            return "";
-        }
-        if (table.getAs() != null && !table.getAs().getName().isEmpty()) {
-            return table.getAs().getName();
-        }
-        return table.getName();
+        return table != null ? table.getTableReference() : "";
     }
 
     @Override
