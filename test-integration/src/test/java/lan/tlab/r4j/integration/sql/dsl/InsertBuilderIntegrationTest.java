@@ -24,7 +24,10 @@ class InsertBuilderIntegrationTest {
         String jdbcUrl = "jdbc:h2:mem:testdb;MODE=REGULAR;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
         connection = DriverManager.getConnection(jdbcUrl, "sa", "");
 
-        // Create test tables
+        createTestTables();
+    }
+
+    private void createTestTables() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(
                     "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(50), email VARCHAR(100), age INTEGER, active BOOLEAN)");
@@ -199,6 +202,33 @@ class InsertBuilderIntegrationTest {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getBigDecimal("price")).isEqualByComparingTo("29.99");
             assertThat(rs.getInt("quantity")).isEqualTo(50);
+        }
+    }
+
+    @Test
+    void insertWithSetMethodAndVerify() throws SQLException {
+        // Test new set() method with fluent API
+        PreparedStatement ps = DSL.insertInto("users")
+                .set("id", 30)
+                .set("name", "Emily")
+                .set("email", "emily@example.com")
+                .set("age", 28)
+                .set("active", true)
+                .buildPrepared(connection);
+
+        int rowsAffected = ps.executeUpdate();
+        assertThat(rowsAffected).isEqualTo(1);
+
+        // Verify the insert
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = 30")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(30);
+            assertThat(rs.getString("name")).isEqualTo("Emily");
+            assertThat(rs.getString("email")).isEqualTo("emily@example.com");
+            assertThat(rs.getInt("age")).isEqualTo(28);
+            assertThat(rs.getBoolean("active")).isTrue();
+            assertThat(rs.next()).isFalse();
         }
     }
 }
