@@ -13,7 +13,7 @@ class SelectBuilderPreparedStatementTest {
     void buildPreparedStatementRequiresConnection() {
         SelectBuilder builder = DSL.selectAll().from("users").where("age").gt(20);
 
-        assertThatThrownBy(() -> builder.buildPrepared(null)).isInstanceOf(Exception.class);
+        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(Exception.class);
     }
 
     @Test
