@@ -26,7 +26,7 @@ public final class TestDatabaseUtil {
     }
 
     /**
-     * Creates a standard users table with columns: id, name, email, age, active.
+     * Creates a standard users table with columns: id, name, email, age, active, birthdate, createdAt.
      *
      * @param connection the database connection
      * @throws SQLException if table creation fails
@@ -34,7 +34,7 @@ public final class TestDatabaseUtil {
     public static void createUsersTable(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(
-                    "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(50), email VARCHAR(100), age INTEGER, active BOOLEAN)");
+                    "CREATE TABLE users (\"id\" INTEGER PRIMARY KEY, \"name\" VARCHAR(50), \"email\" VARCHAR(100), \"age\" INTEGER, \"active\" BOOLEAN, \"birthdate\" DATE, \"createdAt\" TIMESTAMP)");
         }
     }
 
@@ -47,7 +47,7 @@ public final class TestDatabaseUtil {
     public static void createUsersTableWithNames(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(
-                    "CREATE TABLE users (id INTEGER PRIMARY KEY, first_name VARCHAR(50), last_name VARCHAR(50), age INTEGER)");
+                    "CREATE TABLE users (\"id\" INTEGER PRIMARY KEY, \"first_name\" VARCHAR(50), \"last_name\" VARCHAR(50), \"age\" INTEGER)");
         }
     }
 
@@ -60,7 +60,7 @@ public final class TestDatabaseUtil {
     public static void createProductsTable(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(
-                    "CREATE TABLE products (id INTEGER PRIMARY KEY, name VARCHAR(50), price DECIMAL(10,2), quantity INTEGER)");
+                    "CREATE TABLE products (\"id\" INTEGER PRIMARY KEY, \"name\" VARCHAR(50), \"price\" DECIMAL(10,2), \"quantity\" INTEGER)");
         }
     }
 
