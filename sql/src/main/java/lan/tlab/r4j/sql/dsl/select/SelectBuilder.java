@@ -276,7 +276,7 @@ public class SelectBuilder {
         return selectStatement.accept(sqlRenderer, new AstContext());
     }
 
-    public PreparedStatement buildPrepared(Connection connection) throws SQLException {
+    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         SelectStatement stmt = getCurrentStatement();
         PreparedStatementVisitor visitor = new PreparedStatementVisitor();
