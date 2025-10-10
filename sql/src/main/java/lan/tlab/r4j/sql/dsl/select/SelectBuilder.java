@@ -26,10 +26,13 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.LogicalCombinator;
+import lan.tlab.r4j.sql.dsl.SupportsWhere;
+import lan.tlab.r4j.sql.dsl.WhereConditionBuilder;
 import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
 
 // TODO: Add support for SELECT AggregateCalls, HAVING, subqueries, and other SQL features as needed.
-public class SelectBuilder {
+public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final SqlRenderer sqlRenderer;
     private FromSource currentFromSource;
@@ -122,7 +125,8 @@ public class SelectBuilder {
         return statementBuilder.build();
     }
 
-    String getTableReference() {
+    @Override
+    public String getTableReference() {
         if (baseTable == null) {
             return "";
         }
@@ -166,11 +170,11 @@ public class SelectBuilder {
         return this;
     }
 
-    public WhereConditionBuilder where(String column) {
+    public WhereConditionBuilder<SelectBuilder> where(String column) {
         if (column == null || column.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
-        return new WhereConditionBuilder(this, column, LogicalCombinator.AND);
+        return new WhereConditionBuilder<>(this, column, LogicalCombinator.AND);
     }
 
     public SelectBuilder groupBy(String... columns) {
@@ -232,16 +236,17 @@ public class SelectBuilder {
         });
     }
 
-    public WhereConditionBuilder and(String column) {
-        return new WhereConditionBuilder(this, column, LogicalCombinator.AND);
+    public WhereConditionBuilder<SelectBuilder> and(String column) {
+        return new WhereConditionBuilder<>(this, column, LogicalCombinator.AND);
     }
 
-    public WhereConditionBuilder or(String column) {
-        return new WhereConditionBuilder(this, column, LogicalCombinator.OR);
+    public WhereConditionBuilder<SelectBuilder> or(String column) {
+        return new WhereConditionBuilder<>(this, column, LogicalCombinator.OR);
     }
 
     // Functional WHERE updater
-    SelectBuilder updateWhere(Function<Where, Where> updater) {
+    @Override
+    public SelectBuilder updateWhere(Function<Where, Where> updater) {
         Where currentWhere = getCurrentStatement().getWhere();
         Where newWhere = updater.apply(currentWhere);
         statementBuilder = statementBuilder.where(newWhere);
@@ -266,7 +271,8 @@ public class SelectBuilder {
         return Where.of(combinedCondition);
     }
 
-    SelectBuilder addWhereCondition(Predicate condition, LogicalCombinator combinator) {
+    @Override
+    public SelectBuilder addWhereCondition(Predicate condition, LogicalCombinator combinator) {
         return updateWhere(where -> SelectBuilder.combineConditions(where, condition, combinator));
     }
 
