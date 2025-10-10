@@ -127,13 +127,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
     @Override
     public String getTableReference() {
-        if (baseTable == null) {
-            return "";
-        }
-        if (baseTable.getAs() != null && !baseTable.getAs().getName().isEmpty()) {
-            return baseTable.getAs().getName();
-        }
-        return baseTable.getName();
+        return baseTable != null ? baseTable.getTableReference() : "";
     }
 
     private void updateSelectClauseWithTable(TableIdentifier table) {
