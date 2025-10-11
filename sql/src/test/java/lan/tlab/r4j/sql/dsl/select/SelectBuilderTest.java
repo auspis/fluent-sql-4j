@@ -398,4 +398,74 @@ class SelectBuilderTest {
 
         assertThat(result.getCondition()).isEqualTo(newCondition);
     }
+
+    @Test
+    void fromSubquery() {
+        SelectBuilder subquery = select("id", "name").from("users").where("age").gt(18);
+
+        String sql = select("*").from(subquery, "u").build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        SELECT * FROM (SELECT "users"."id", "users"."name" FROM "users" WHERE "users"."age" > 18) AS u\
+                        """);
+    }
+
+    @Test
+    void fromSubqueryWithWhere() {
+        SelectBuilder subquery =
+                select("id", "total").from("orders").where("status").eq("completed");
+
+        String sql = select("*").from(subquery, "o").where("total").gt(100).build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        SELECT * FROM (SELECT "orders"."id", "orders"."total" FROM "orders" WHERE "orders"."status" = 'completed') AS o WHERE "o"."total" > 100\
+                        """);
+    }
+
+    @Test
+    void whereWithScalarSubquery() {
+        SelectBuilder subquery = select("*").from("users").where("age").gt(50);
+
+        String sql = select("name").from("employees").where("age").gt(subquery).build();
+
+        assertThat(sql)
+                .contains("WHERE \"employees\".\"age\" > (SELECT * FROM \"users\" WHERE \"users\".\"age\" > 50)");
+    }
+
+    @Test
+    void whereWithScalarSubqueryEquals() {
+        SelectBuilder maxAgeSubquery = select("*").from("users");
+
+        String sql =
+                select("*").from("employees").where("age").eq(maxAgeSubquery).build();
+
+        assertThat(sql).contains("WHERE \"employees\".\"age\" = (SELECT * FROM \"users\")");
+    }
+
+    @Test
+    void fromSubqueryNullSubquery() {
+        assertThatThrownBy(() -> select("*").from((SelectBuilder) null, "alias"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Subquery cannot be null");
+    }
+
+    @Test
+    void fromSubqueryNullAlias() {
+        SelectBuilder subquery = select("*").from("users");
+        assertThatThrownBy(() -> select("*").from(subquery, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Alias cannot be null or empty for subquery");
+    }
+
+    @Test
+    void fromSubqueryEmptyAlias() {
+        SelectBuilder subquery = select("*").from("users");
+        assertThatThrownBy(() -> select("*").from(subquery, ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Alias cannot be null or empty for subquery");
+    }
 }
