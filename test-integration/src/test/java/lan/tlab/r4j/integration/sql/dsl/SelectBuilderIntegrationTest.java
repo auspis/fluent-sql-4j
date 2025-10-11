@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
@@ -513,6 +514,133 @@ class SelectBuilderIntegrationTest {
                 count++;
             }
             assertThat(count).isGreaterThanOrEqualTo(0);
+        }
+    }
+
+    @Test
+    void groupByWithHaving() throws SQLException {
+        // First, let's create a table to test GROUP BY with HAVING properly
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE orders (\"id\" INTEGER, \"customer_id\" INTEGER, \"amount\" INTEGER)");
+            stmt.execute("INSERT INTO orders VALUES (1, 100, 50)");
+            stmt.execute("INSERT INTO orders VALUES (2, 100, 150)");
+            stmt.execute("INSERT INTO orders VALUES (3, 200, 75)");
+            stmt.execute("INSERT INTO orders VALUES (4, 200, 25)");
+            stmt.execute("INSERT INTO orders VALUES (5, 300, 300)");
+        }
+
+        PreparedStatement ps = DSL.select("customer_id")
+                .from("orders")
+                .groupBy("customer_id")
+                .having("customer_id")
+                .gt(100)
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("customer_id")).isEqualTo(200);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("customer_id")).isEqualTo(300);
+
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void groupByWithHavingAndCondition() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE sales (\"region\" VARCHAR(50), \"sales_amount\" INTEGER)");
+            stmt.execute("INSERT INTO sales VALUES ('North', 100)");
+            stmt.execute("INSERT INTO sales VALUES ('North', 150)");
+            stmt.execute("INSERT INTO sales VALUES ('South', 75)");
+            stmt.execute("INSERT INTO sales VALUES ('South', 25)");
+            stmt.execute("INSERT INTO sales VALUES ('East', 200)");
+        }
+
+        PreparedStatement ps = DSL.select("region")
+                .from("sales")
+                .groupBy("region")
+                .having("region")
+                .ne("South")
+                .andHaving("region")
+                .ne("East")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("region")).isEqualTo("North");
+
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void groupByWithHavingOrCondition() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE inventory (\"category\" VARCHAR(50), \"stock\" INTEGER)");
+            stmt.execute("INSERT INTO inventory VALUES ('Electronics', 50)");
+            stmt.execute("INSERT INTO inventory VALUES ('Books', 100)");
+            stmt.execute("INSERT INTO inventory VALUES ('Clothing', 75)");
+        }
+
+        PreparedStatement ps = DSL.select("category")
+                .from("inventory")
+                .groupBy("category")
+                .having("category")
+                .eq("Electronics")
+                .orHaving("category")
+                .eq("Books")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            String firstCategory = rs.getString("category");
+
+            assertThat(rs.next()).isTrue();
+            String secondCategory = rs.getString("category");
+
+            assertThat(rs.next()).isFalse();
+
+            assertThat(firstCategory).isIn("Electronics", "Books");
+            assertThat(secondCategory).isIn("Electronics", "Books");
+            assertThat(firstCategory).isNotEqualTo(secondCategory);
+        }
+    }
+
+    @Test
+    void whereGroupByHavingOrderBy() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(
+                    "CREATE TABLE transactions (\"id\" INTEGER, \"user_id\" INTEGER, \"amount\" INTEGER, \"status\" VARCHAR(20))");
+            stmt.execute("INSERT INTO transactions VALUES (1, 1, 100, 'completed')");
+            stmt.execute("INSERT INTO transactions VALUES (2, 1, 200, 'completed')");
+            stmt.execute("INSERT INTO transactions VALUES (3, 2, 50, 'completed')");
+            stmt.execute("INSERT INTO transactions VALUES (4, 2, 25, 'pending')");
+            stmt.execute("INSERT INTO transactions VALUES (5, 3, 300, 'completed')");
+        }
+
+        PreparedStatement ps = DSL.select("user_id")
+                .from("transactions")
+                .where("status")
+                .eq("completed")
+                .groupBy("user_id")
+                .having("user_id")
+                .gt(0)
+                .orderBy("user_id")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("user_id")).isEqualTo(1);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("user_id")).isEqualTo(2);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("user_id")).isEqualTo(3);
+
+            assertThat(rs.next()).isFalse();
         }
     }
 }
