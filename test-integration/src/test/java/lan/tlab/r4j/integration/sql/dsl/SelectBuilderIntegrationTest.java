@@ -863,4 +863,75 @@ class SelectBuilderIntegrationTest {
             assertThat(rs.next()).isFalse();
         }
     }
+
+    @Test
+    void selectColumn() throws SQLException {
+        PreparedStatement ps = DSL.select().column("name").from("users").buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("John Doe");
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Bob");
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Alice");
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectColumnWithAlias() throws SQLException {
+        PreparedStatement ps =
+                DSL.select().column("name").as("user_name").from("users").buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("user_name")).isEqualTo("John Doe");
+            assertThat(rs.next()).isTrue();
+        }
+    }
+
+    @Test
+    void selectMultipleColumns() throws SQLException {
+        PreparedStatement ps =
+                DSL.select().column("name").column("email").from("users").buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("John Doe");
+            assertThat(rs.getString("email")).isEqualTo("john@example.com");
+            assertThat(rs.next()).isTrue();
+        }
+    }
+
+    @Test
+    void selectMixedColumnsAndAggregates() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE scores (\"name\" VARCHAR(50), \"score\" INTEGER)");
+            stmt.execute("INSERT INTO scores VALUES ('Alice', 85)");
+            stmt.execute("INSERT INTO scores VALUES ('Bob', 92)");
+            stmt.execute("INSERT INTO scores VALUES ('Charlie', 78)");
+        }
+
+        PreparedStatement ps = DSL.select()
+                .column("name")
+                .sum("score")
+                .as("total_score")
+                .from("scores")
+                .groupBy("name")
+                .orderBy("name")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Alice");
+            assertThat(rs.getInt("total_score")).isEqualTo(85);
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Bob");
+            assertThat(rs.getInt("total_score")).isEqualTo(92);
+            assertThat(rs.next()).isTrue();
+        }
+    }
 }

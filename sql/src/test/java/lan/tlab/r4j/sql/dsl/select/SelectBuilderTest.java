@@ -773,4 +773,85 @@ class SelectBuilderTest {
                         SELECT SUM("users"."score"), MAX("users"."createdAt") AS latest FROM "users"\
                         """);
     }
+
+    @Test
+    void selectColumn() {
+        String result = DSL.select().column("name").from("users").build();
+        assertThat(result).isEqualTo("""
+            SELECT "users"."name" FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectColumnWithAlias() {
+        String result =
+                DSL.select().column("name").as("user_name").from("users").build();
+        assertThat(result).isEqualTo("""
+            SELECT "users"."name" AS user_name FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectMultipleColumns() {
+        String result =
+                DSL.select().column("name").column("email").from("users").build();
+        assertThat(result)
+                .isEqualTo("""
+            SELECT "users"."name", "users"."email" FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectMultipleColumnsWithAliases() {
+        String result = DSL.select()
+                .column("name")
+                .as("user_name")
+                .column("email")
+                .as("user_email")
+                .from("users")
+                .build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT "users"."name" AS user_name, "users"."email" AS user_email FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectMultipleColumnsWithOneAlias() {
+        String result = DSL.select()
+                .column("name")
+                .column("email")
+                .as("user_email")
+                .from("users")
+                .build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT "users"."name", "users"."email" AS user_email FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectTableQualifiedColumn() {
+        String result = DSL.select().column("users", "name").from("users").build();
+        assertThat(result).isEqualTo("""
+            SELECT "users"."name" FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectMixedColumnsAndAggregates() {
+        String result = DSL.select()
+                .column("name")
+                .sum("score")
+                .as("total_score")
+                .from("users")
+                .build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT "users"."name", SUM("users"."score") AS total_score FROM "users"\
+            """);
+    }
 }
