@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
+import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
@@ -722,6 +724,48 @@ class SelectBuilderTest {
                 .isEqualTo(
                         """
                         SELECT AVG("employees"."salary") FROM "employees" GROUP BY "employees"."department" HAVING "employees"."department" != 'HR'\
+                        """);
+    }
+
+    @Test
+    void selectMultipleAggregatesWithoutAliases() {
+        String result = DSL.select(
+                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "score"))),
+                        new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", "createdAt"))))
+                .from("users")
+                .build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+                        SELECT SUM("users"."score"), MAX("users"."createdAt") FROM "users"\
+                        """);
+    }
+
+    @Test
+    void selectMultipleAggregatesWithAliases() {
+        String result = DSL.select(
+                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "score")), "total_score"),
+                        new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", "createdAt")), "latest"))
+                .from("users")
+                .build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+                        SELECT SUM("users"."score") AS total_score, MAX("users"."createdAt") AS latest FROM "users"\
+                        """);
+    }
+
+    @Test
+    void selectMultipleAggregatesWithOneAlias() {
+        String result = DSL.select(
+                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "score"))),
+                        new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", "createdAt")), "latest"))
+                .from("users")
+                .build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+                        SELECT SUM("users"."score"), MAX("users"."createdAt") AS latest FROM "users"\
                         """);
     }
 }
