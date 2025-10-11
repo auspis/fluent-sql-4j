@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -446,7 +447,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void fromSubquery() throws SQLException {
-        lan.tlab.r4j.sql.dsl.select.SelectBuilder subquery =
+        SelectBuilder subquery =
                 DSL.select("name", "age").from("users").where("age").gt(20);
 
         PreparedStatement ps = DSL.select("name", "age").from(subquery, "u").buildPreparedStatement(connection);
@@ -470,7 +471,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void fromSubqueryWithWhere() throws SQLException {
-        lan.tlab.r4j.sql.dsl.select.SelectBuilder subquery =
+        SelectBuilder subquery =
                 DSL.select("name", "age").from("users").where("active").eq(true);
 
         PreparedStatement ps = DSL.select("name", "age")
@@ -495,8 +496,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void whereWithScalarSubquery() throws SQLException {
         // Create a subquery that returns a single value (average age)
-        lan.tlab.r4j.sql.dsl.select.SelectBuilder avgAgeSubquery =
-                DSL.select("age").from("users").fetch(1);
+        SelectBuilder avgAgeSubquery = DSL.select("age").from("users").fetch(1);
 
         // This test verifies the scalar subquery is generated correctly in SQL
         PreparedStatement ps = DSL.select("name", "age")
