@@ -61,6 +61,26 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return this;
     }
 
+    public SelectBuilder from(SelectBuilder subquery, String alias) {
+        if (subquery == null) {
+            throw new IllegalArgumentException("Subquery cannot be null");
+        }
+        if (alias == null || alias.trim().isEmpty()) {
+            throw new IllegalArgumentException("Alias cannot be null or empty for subquery");
+        }
+
+        lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery fromSubquery =
+                lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery.of(subquery.getCurrentStatement(), alias);
+        currentFromSource = fromSubquery;
+
+        // Create a dummy TableIdentifier with the alias as the table reference
+        // This allows WHERE clauses to properly reference columns from the subquery
+        baseTable = new TableIdentifier(alias);
+
+        statementBuilder = statementBuilder.from(From.of(fromSubquery));
+        return this;
+    }
+
     public SelectBuilder as(String alias) {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
@@ -123,6 +143,10 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
     private SelectStatement getCurrentStatement() {
         return statementBuilder.build();
+    }
+
+    public SelectStatement getStatement() {
+        return getCurrentStatement();
     }
 
     @Override
