@@ -207,7 +207,9 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         if (subquery == null) {
             throw new IllegalArgumentException("Subquery cannot be null");
         }
-        return ScalarSubquery.builder().tableExpression(subquery.getStatement()).build();
+        return ScalarSubquery.builder()
+                .tableExpression(subquery.getCurrentStatement())
+                .build();
     }
 
     private T addCondition(Predicate condition) {

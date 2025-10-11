@@ -11,6 +11,7 @@ import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
+import lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery;
 import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.clause.groupby.GroupBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
@@ -69,8 +70,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
             throw new IllegalArgumentException("Alias cannot be null or empty for subquery");
         }
 
-        lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery fromSubquery =
-                lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery.of(subquery.getCurrentStatement(), alias);
+        FromSubquery fromSubquery = FromSubquery.of(subquery.getCurrentStatement(), alias);
         currentFromSource = fromSubquery;
 
         // Create a dummy TableIdentifier with the alias as the table reference
@@ -141,12 +141,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         }
     }
 
-    private SelectStatement getCurrentStatement() {
+    public SelectStatement getCurrentStatement() {
         return statementBuilder.build();
-    }
-
-    public SelectStatement getStatement() {
-        return getCurrentStatement();
     }
 
     @Override
