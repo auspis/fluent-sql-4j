@@ -69,4 +69,16 @@ public final class TestDatabaseUtil {
                     "INSERT INTO users VALUES (4, 'Alice', 'alice@example.com', 35, true, '1990-01-01', '2023-01-01')");
         }
     }
+
+    /**
+     * Closes the database connection if it is not null and not already closed.
+     *
+     * @param connection the database connection to close
+     * @throws SQLException if closing the connection fails
+     */
+    public static void closeConnection(Connection connection) throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+        }
+    }
 }
