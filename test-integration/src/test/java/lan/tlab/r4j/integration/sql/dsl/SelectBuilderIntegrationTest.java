@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
@@ -23,7 +22,15 @@ class SelectBuilderIntegrationTest {
         connection = TestDatabaseUtil.createH2Connection();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.createProductsTable(connection);
+        TestDatabaseUtil.createOrdersTable(connection);
+        TestDatabaseUtil.createSalesTable(connection);
+        TestDatabaseUtil.createEmployeesTable(connection);
+        TestDatabaseUtil.createScoresTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.insertSampleOrders(connection);
+        TestDatabaseUtil.insertSampleSales(connection);
+        TestDatabaseUtil.insertSampleEmployees(connection);
+        TestDatabaseUtil.insertSampleScores(connection);
     }
 
     @AfterEach
@@ -519,16 +526,6 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void groupByWithHaving() throws SQLException {
-        // First, let's create a table to test GROUP BY with HAVING properly
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE orders (\"id\" INTEGER, \"customer_id\" INTEGER, \"amount\" INTEGER)");
-            stmt.execute("INSERT INTO orders VALUES (1, 100, 50)");
-            stmt.execute("INSERT INTO orders VALUES (2, 100, 150)");
-            stmt.execute("INSERT INTO orders VALUES (3, 200, 75)");
-            stmt.execute("INSERT INTO orders VALUES (4, 200, 25)");
-            stmt.execute("INSERT INTO orders VALUES (5, 300, 300)");
-        }
-
         PreparedStatement ps = DSL.select("customer_id")
                 .from("orders")
                 .groupBy("customer_id")
@@ -549,27 +546,18 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void groupByWithHavingAndCondition() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE sales (\"region\" VARCHAR(50), \"sales_amount\" INTEGER)");
-            stmt.execute("INSERT INTO sales VALUES ('North', 100)");
-            stmt.execute("INSERT INTO sales VALUES ('North', 150)");
-            stmt.execute("INSERT INTO sales VALUES ('South', 75)");
-            stmt.execute("INSERT INTO sales VALUES ('South', 25)");
-            stmt.execute("INSERT INTO sales VALUES ('East', 200)");
-        }
-
-        PreparedStatement ps = DSL.select("region")
+        PreparedStatement ps = DSL.select("customer_id")
                 .from("sales")
-                .groupBy("region")
-                .having("region")
-                .ne("South")
-                .andHaving("region")
-                .ne("East")
+                .groupBy("customer_id")
+                .having("customer_id")
+                .ne(2)
+                .andHaving("customer_id")
+                .gt(0)
                 .buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("region")).isEqualTo("North");
+            assertThat(rs.getInt("customer_id")).isEqualTo(1);
 
             assertThat(rs.next()).isFalse();
         }
@@ -577,68 +565,48 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void groupByWithHavingOrCondition() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE inventory (\"category\" VARCHAR(50), \"stock\" INTEGER)");
-            stmt.execute("INSERT INTO inventory VALUES ('Electronics', 50)");
-            stmt.execute("INSERT INTO inventory VALUES ('Books', 100)");
-            stmt.execute("INSERT INTO inventory VALUES ('Clothing', 75)");
-        }
-
-        PreparedStatement ps = DSL.select("category")
-                .from("inventory")
-                .groupBy("category")
-                .having("category")
-                .eq("Electronics")
-                .orHaving("category")
-                .eq("Books")
+        PreparedStatement ps = DSL.select("department")
+                .from("employees")
+                .groupBy("department")
+                .having("department")
+                .eq("IT")
+                .orHaving("department")
+                .eq("HR")
                 .buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            String firstCategory = rs.getString("category");
+            String firstDept = rs.getString("department");
 
             assertThat(rs.next()).isTrue();
-            String secondCategory = rs.getString("category");
+            String secondDept = rs.getString("department");
 
             assertThat(rs.next()).isFalse();
 
-            assertThat(firstCategory).isIn("Electronics", "Books");
-            assertThat(secondCategory).isIn("Electronics", "Books");
-            assertThat(firstCategory).isNotEqualTo(secondCategory);
+            assertThat(firstDept).isIn("IT", "HR");
+            assertThat(secondDept).isIn("IT", "HR");
+            assertThat(firstDept).isNotEqualTo(secondDept);
         }
     }
 
     @Test
     void whereGroupByHavingOrderBy() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(
-                    "CREATE TABLE transactions (\"id\" INTEGER, \"user_id\" INTEGER, \"amount\" INTEGER, \"status\" VARCHAR(20))");
-            stmt.execute("INSERT INTO transactions VALUES (1, 1, 100, 'completed')");
-            stmt.execute("INSERT INTO transactions VALUES (2, 1, 200, 'completed')");
-            stmt.execute("INSERT INTO transactions VALUES (3, 2, 50, 'completed')");
-            stmt.execute("INSERT INTO transactions VALUES (4, 2, 25, 'pending')");
-            stmt.execute("INSERT INTO transactions VALUES (5, 3, 300, 'completed')");
-        }
-
-        PreparedStatement ps = DSL.select("user_id")
-                .from("transactions")
-                .where("status")
-                .eq("completed")
-                .groupBy("user_id")
-                .having("user_id")
+        PreparedStatement ps = DSL.select("customer_id")
+                .from("orders")
+                .where("amount")
                 .gt(0)
-                .orderBy("user_id")
+                .groupBy("customer_id")
+                .having("customer_id")
+                .gt(100)
+                .orderBy("customer_id")
                 .buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("user_id")).isEqualTo(1);
+            assertThat(rs.getInt("customer_id")).isEqualTo(200);
 
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("user_id")).isEqualTo(2);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("user_id")).isEqualTo(3);
+            assertThat(rs.getInt("customer_id")).isEqualTo(300);
 
             assertThat(rs.next()).isFalse();
         }
@@ -669,14 +637,6 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectSumWithGroupBy() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE sales (\"customer_id\" INTEGER, \"amount\" INTEGER)");
-            stmt.execute("INSERT INTO sales VALUES (1, 100)");
-            stmt.execute("INSERT INTO sales VALUES (1, 150)");
-            stmt.execute("INSERT INTO sales VALUES (2, 200)");
-            stmt.execute("INSERT INTO sales VALUES (2, 50)");
-        }
-
         PreparedStatement ps = DSL.select()
                 .sum("amount")
                 .as("total_amount")
@@ -698,14 +658,6 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectAvgWithGroupByAndHaving() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE employees (\"department\" VARCHAR(50), \"salary\" INTEGER)");
-            stmt.execute("INSERT INTO employees VALUES ('IT', 60000)");
-            stmt.execute("INSERT INTO employees VALUES ('IT', 80000)");
-            stmt.execute("INSERT INTO employees VALUES ('HR', 50000)");
-            stmt.execute("INSERT INTO employees VALUES ('Sales', 70000)");
-        }
-
         PreparedStatement ps = DSL.select()
                 .avg("salary")
                 .as("avg_salary")
@@ -729,14 +681,6 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectMaxAndMin() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE scores (\"student_id\" INTEGER, \"score\" INTEGER)");
-            stmt.execute("INSERT INTO scores VALUES (1, 85)");
-            stmt.execute("INSERT INTO scores VALUES (2, 92)");
-            stmt.execute("INSERT INTO scores VALUES (3, 78)");
-            stmt.execute("INSERT INTO scores VALUES (4, 95)");
-        }
-
         PreparedStatement psMax =
                 DSL.select().max("score").as("max_score").from("scores").buildPreparedStatement(connection);
 
@@ -758,14 +702,6 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectCountDistinct() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE orders (\"customer_id\" INTEGER, \"order_id\" INTEGER)");
-            stmt.execute("INSERT INTO orders VALUES (1, 101)");
-            stmt.execute("INSERT INTO orders VALUES (1, 102)");
-            stmt.execute("INSERT INTO orders VALUES (2, 103)");
-            stmt.execute("INSERT INTO orders VALUES (1, 104)");
-        }
-
         PreparedStatement ps = DSL.select()
                 .countDistinct("customer_id")
                 .as("unique_customers")
@@ -774,7 +710,7 @@ class SelectBuilderIntegrationTest {
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("unique_customers")).isEqualTo(2);
+            assertThat(rs.getInt("unique_customers")).isEqualTo(3); // 100, 200, 300
             assertThat(rs.next()).isFalse();
         }
     }
@@ -798,19 +734,12 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectMultipleAggregatesWithoutAliases() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE scores (\"id\" INTEGER, \"score\" INTEGER, \"created_at\" TIMESTAMP)");
-            stmt.execute("INSERT INTO scores VALUES (1, 85, TIMESTAMP '2024-01-01 10:00:00')");
-            stmt.execute("INSERT INTO scores VALUES (2, 92, TIMESTAMP '2024-01-02 10:00:00')");
-            stmt.execute("INSERT INTO scores VALUES (3, 78, TIMESTAMP '2024-01-03 10:00:00')");
-        }
-
         PreparedStatement ps =
-                DSL.select().sum("score").max("created_at").from("scores").buildPreparedStatement(connection);
+                DSL.select().sum("age").max("createdAt").from("users").buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(255);
+            assertThat(rs.getInt(1)).isEqualTo(105); // 30 + 25 + 15 + 35
             assertThat(rs.getTimestamp(2)).isNotNull();
             assertThat(rs.next()).isFalse();
         }
@@ -818,24 +747,17 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectMultipleAggregatesWithAliases() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE stats (\"id\" INTEGER, \"value\" INTEGER, \"updated_at\" TIMESTAMP)");
-            stmt.execute("INSERT INTO stats VALUES (1, 100, TIMESTAMP '2024-01-01 10:00:00')");
-            stmt.execute("INSERT INTO stats VALUES (2, 200, TIMESTAMP '2024-01-02 10:00:00')");
-            stmt.execute("INSERT INTO stats VALUES (3, 150, TIMESTAMP '2024-01-03 10:00:00')");
-        }
-
         PreparedStatement ps = DSL.select()
-                .sum("value")
-                .as("total_value")
-                .max("updated_at")
+                .sum("age")
+                .as("total_age")
+                .max("createdAt")
                 .as("latest_update")
-                .from("stats")
+                .from("users")
                 .buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("total_value")).isEqualTo(450);
+            assertThat(rs.getInt("total_age")).isEqualTo(105); // 30 + 25 + 15 + 35
             assertThat(rs.getTimestamp("latest_update")).isNotNull();
             assertThat(rs.next()).isFalse();
         }
@@ -843,23 +765,17 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectMultipleAggregatesWithOneAlias() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE metrics (\"id\" INTEGER, \"amount\" INTEGER, \"timestamp\" TIMESTAMP)");
-            stmt.execute("INSERT INTO metrics VALUES (1, 50, TIMESTAMP '2024-01-01 10:00:00')");
-            stmt.execute("INSERT INTO metrics VALUES (2, 75, TIMESTAMP '2024-01-02 10:00:00')");
-        }
-
         PreparedStatement ps = DSL.select()
                 .sum("amount")
-                .max("timestamp")
-                .as("last_timestamp")
-                .from("metrics")
+                .max("customer_id")
+                .as("max_customer")
+                .from("orders")
                 .buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(125);
-            assertThat(rs.getTimestamp("last_timestamp")).isNotNull();
+            assertThat(rs.getInt(1)).isEqualTo(600); // 50 + 150 + 75 + 25 + 300
+            assertThat(rs.getInt("max_customer")).isEqualTo(300);
             assertThat(rs.next()).isFalse();
         }
     }
@@ -908,30 +824,29 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectMixedColumnsAndAggregates() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE scores (\"name\" VARCHAR(50), \"score\" INTEGER)");
-            stmt.execute("INSERT INTO scores VALUES ('Alice', 85)");
-            stmt.execute("INSERT INTO scores VALUES ('Bob', 92)");
-            stmt.execute("INSERT INTO scores VALUES ('Charlie', 78)");
-        }
-
         PreparedStatement ps = DSL.select()
-                .column("name")
+                .column("student_id")
                 .sum("score")
                 .as("total_score")
                 .from("scores")
-                .groupBy("name")
-                .orderBy("name")
+                .groupBy("student_id")
+                .orderBy("student_id")
                 .buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
+            assertThat(rs.getInt("student_id")).isEqualTo(1);
             assertThat(rs.getInt("total_score")).isEqualTo(85);
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
+            assertThat(rs.getInt("student_id")).isEqualTo(2);
             assertThat(rs.getInt("total_score")).isEqualTo(92);
             assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("student_id")).isEqualTo(3);
+            assertThat(rs.getInt("total_score")).isEqualTo(78);
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("student_id")).isEqualTo(4);
+            assertThat(rs.getInt("total_score")).isEqualTo(95);
+            assertThat(rs.next()).isFalse();
         }
     }
 }
