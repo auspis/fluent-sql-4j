@@ -63,9 +63,9 @@ public final class TestDatabaseUtil {
                     "INSERT INTO users VALUES (1, 'John Doe', 'john@example.com', 30, true, '1990-01-01', '2023-01-01')");
             stmt.execute(
                     "INSERT INTO users VALUES (2, 'Jane Smith', 'jane@example.com', 25, true, '1995-01-01', '2023-01-01')");
-            stmt.executeUpdate(
+            stmt.execute(
                     "INSERT INTO users VALUES (3, 'Bob', 'bob@example.com', 15, false, '2005-01-01', '2023-01-01')");
-            stmt.executeUpdate(
+            stmt.execute(
                     "INSERT INTO users VALUES (4, 'Alice', 'alice@example.com', 35, true, '1990-01-01', '2023-01-01')");
         }
     }
