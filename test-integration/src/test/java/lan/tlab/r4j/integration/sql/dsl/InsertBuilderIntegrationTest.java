@@ -28,9 +28,7 @@ class InsertBuilderIntegrationTest {
 
     @AfterEach
     void tearDown() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        TestDatabaseUtil.closeConnection(connection);
     }
 
     @Test
