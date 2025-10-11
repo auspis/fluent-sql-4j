@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import lan.tlab.r4j.sql.ast.clause.conditional.having.Having;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
 import lan.tlab.r4j.sql.ast.clause.from.From;
@@ -27,13 +28,15 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.HavingConditionBuilder;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
+import lan.tlab.r4j.sql.dsl.SupportsHaving;
 import lan.tlab.r4j.sql.dsl.SupportsWhere;
 import lan.tlab.r4j.sql.dsl.WhereConditionBuilder;
 import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
 
-// TODO: Add support for SELECT AggregateCalls, HAVING, subqueries, and other SQL features as needed.
-public class SelectBuilder implements SupportsWhere<SelectBuilder> {
+// TODO: Add support for SELECT AggregateCalls, subqueries, and other SQL features as needed.
+public class SelectBuilder implements SupportsWhere<SelectBuilder>, SupportsHaving<SelectBuilder> {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final SqlRenderer sqlRenderer;
     private FromSource currentFromSource;
@@ -288,6 +291,54 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     @Override
     public SelectBuilder addWhereCondition(Predicate condition, LogicalCombinator combinator) {
         return updateWhere(where -> SelectBuilder.combineConditions(where, condition, combinator));
+    }
+
+    // HAVING clause support
+    public HavingConditionBuilder<SelectBuilder> having(String column) {
+        if (column == null || column.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        return new HavingConditionBuilder<>(this, column, LogicalCombinator.AND);
+    }
+
+    public HavingConditionBuilder<SelectBuilder> andHaving(String column) {
+        return new HavingConditionBuilder<>(this, column, LogicalCombinator.AND);
+    }
+
+    public HavingConditionBuilder<SelectBuilder> orHaving(String column) {
+        return new HavingConditionBuilder<>(this, column, LogicalCombinator.OR);
+    }
+
+    // Functional HAVING updater
+    @Override
+    public SelectBuilder updateHaving(Function<Having, Having> updater) {
+        Having currentHaving = getCurrentStatement().getHaving();
+        Having newHaving = updater.apply(currentHaving);
+        statementBuilder = statementBuilder.having(newHaving);
+        return this;
+    }
+
+    // Helper to combine HAVING conditions with functional approach
+    static Having combineHavingConditions(Having currentHaving, Predicate newCondition, LogicalCombinator combinator) {
+        return Optional.ofNullable(currentHaving)
+                .filter(SelectBuilder::hasValidHavingCondition)
+                .map(having -> combineHavingWithExisting(having, newCondition, combinator))
+                .orElse(Having.of(newCondition));
+    }
+
+    static boolean hasValidHavingCondition(Having having) {
+        return !(having.getCondition() instanceof NullPredicate);
+    }
+
+    static Having combineHavingWithExisting(Having having, Predicate newCondition, LogicalCombinator combinator) {
+        Predicate existingCondition = having.getCondition();
+        Predicate combinedCondition = combinator.combine(existingCondition, newCondition);
+        return Having.of(combinedCondition);
+    }
+
+    @Override
+    public SelectBuilder addHavingCondition(Predicate condition, LogicalCombinator combinator) {
+        return updateHaving(having -> SelectBuilder.combineHavingConditions(having, condition, combinator));
     }
 
     public String build() {
