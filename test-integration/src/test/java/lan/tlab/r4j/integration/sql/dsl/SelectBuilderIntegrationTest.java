@@ -8,6 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
+import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
+import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import org.junit.jupiter.api.AfterEach;
@@ -783,6 +786,76 @@ class SelectBuilderIntegrationTest {
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt("active_count")).isEqualTo(3);
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectMultipleAggregatesWithoutAliases() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE scores (\"id\" INTEGER, \"score\" INTEGER, \"created_at\" TIMESTAMP)");
+            stmt.execute("INSERT INTO scores VALUES (1, 85, TIMESTAMP '2024-01-01 10:00:00')");
+            stmt.execute("INSERT INTO scores VALUES (2, 92, TIMESTAMP '2024-01-02 10:00:00')");
+            stmt.execute("INSERT INTO scores VALUES (3, 78, TIMESTAMP '2024-01-03 10:00:00')");
+        }
+
+        PreparedStatement ps = DSL.select(
+                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "score"))),
+                        new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", "created_at"))))
+                .from("scores")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isEqualTo(255);
+            assertThat(rs.getTimestamp(2)).isNotNull();
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectMultipleAggregatesWithAliases() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE stats (\"id\" INTEGER, \"value\" INTEGER, \"updated_at\" TIMESTAMP)");
+            stmt.execute("INSERT INTO stats VALUES (1, 100, TIMESTAMP '2024-01-01 10:00:00')");
+            stmt.execute("INSERT INTO stats VALUES (2, 200, TIMESTAMP '2024-01-02 10:00:00')");
+            stmt.execute("INSERT INTO stats VALUES (3, 150, TIMESTAMP '2024-01-03 10:00:00')");
+        }
+
+        PreparedStatement ps = DSL.select(
+                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "value")), "total_value"),
+                        new AggregateCallProjection(
+                                AggregateCall.max(ColumnReference.of("", "updated_at")), "latest_update"))
+                .from("stats")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("total_value")).isEqualTo(450);
+            assertThat(rs.getTimestamp("latest_update")).isNotNull();
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectMultipleAggregatesWithOneAlias() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE metrics (\"id\" INTEGER, \"amount\" INTEGER, \"timestamp\" TIMESTAMP)");
+            stmt.execute("INSERT INTO metrics VALUES (1, 50, TIMESTAMP '2024-01-01 10:00:00')");
+            stmt.execute("INSERT INTO metrics VALUES (2, 75, TIMESTAMP '2024-01-02 10:00:00')");
+        }
+
+        PreparedStatement ps = DSL.select(
+                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "amount"))),
+                        new AggregateCallProjection(
+                                AggregateCall.max(ColumnReference.of("", "timestamp")), "last_timestamp"))
+                .from("metrics")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isEqualTo(125);
+            assertThat(rs.getTimestamp("last_timestamp")).isNotNull();
             assertThat(rs.next()).isFalse();
         }
     }
