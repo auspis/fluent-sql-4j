@@ -1,15 +1,11 @@
 package lan.tlab.r4j.sql.dsl;
 
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 import lan.tlab.r4j.sql.dsl.delete.DeleteBuilder;
 import lan.tlab.r4j.sql.dsl.insert.InsertBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
+import lan.tlab.r4j.sql.dsl.select.SelectProjectionBuilder;
 import lan.tlab.r4j.sql.dsl.table.CreateTableBuilder;
 import lan.tlab.r4j.sql.dsl.update.UpdateBuilder;
 
@@ -19,6 +15,10 @@ public class DSL {
 
     public static CreateTableBuilder createTable(String tableName) {
         return new CreateTableBuilder(SQL_RENDERER, tableName);
+    }
+
+    public static SelectProjectionBuilder select() {
+        return new SelectProjectionBuilder(SQL_RENDERER);
     }
 
     public static SelectBuilder select(String... columns) {
@@ -39,91 +39,5 @@ public class DSL {
 
     public static UpdateBuilder update(String tableName) {
         return new UpdateBuilder(SQL_RENDERER, tableName);
-    }
-
-    public static SelectBuilder selectSum(String column) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", column)))));
-    }
-
-    public static SelectBuilder selectSum(String column, String alias) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", column)), alias)));
-    }
-
-    public static SelectBuilder selectAvg(String column) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("", column)))));
-    }
-
-    public static SelectBuilder selectAvg(String column, String alias) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("", column)), alias)));
-    }
-
-    public static SelectBuilder selectCount(String column) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("", column)))));
-    }
-
-    public static SelectBuilder selectCount(String column, String alias) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("", column)), alias)));
-    }
-
-    public static SelectBuilder selectCountStar() {
-        return new SelectBuilder(SQL_RENDERER, Select.of(new AggregateCallProjection(AggregateCall.countStar())));
-    }
-
-    public static SelectBuilder selectCountStar(String alias) {
-        return new SelectBuilder(
-                SQL_RENDERER, Select.of(new AggregateCallProjection(AggregateCall.countStar(), alias)));
-    }
-
-    public static SelectBuilder selectCountDistinct(String column) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.countDistinct(ColumnReference.of("", column)))));
-    }
-
-    public static SelectBuilder selectCountDistinct(String column, String alias) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(
-                        AggregateCall.countDistinct(ColumnReference.of("", column)), alias)));
-    }
-
-    public static SelectBuilder selectMax(String column) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", column)))));
-    }
-
-    public static SelectBuilder selectMax(String column, String alias) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", column)), alias)));
-    }
-
-    public static SelectBuilder selectMin(String column) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("", column)))));
-    }
-
-    public static SelectBuilder selectMin(String column, String alias) {
-        return new SelectBuilder(
-                SQL_RENDERER,
-                Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("", column)), alias)));
-    }
-
-    public static SelectBuilder select(Projection... projections) {
-        return new SelectBuilder(SQL_RENDERER, Select.of(projections));
     }
 }
