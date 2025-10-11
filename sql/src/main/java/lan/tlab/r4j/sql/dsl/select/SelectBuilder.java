@@ -175,8 +175,16 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                         && scalarProj.getExpression() instanceof ColumnReference colRef) {
 
                     if (!"*".equals(colRef.getColumn())) {
-                        updatedProjections.add(new ScalarExpressionProjection(
-                                ColumnReference.of(table.getTableReference(), colRef.getColumn())));
+                        // Preserve the alias if present
+                        if (scalarProj.getAs() != null
+                                && !scalarProj.getAs().getName().isEmpty()) {
+                            updatedProjections.add(new ScalarExpressionProjection(
+                                    ColumnReference.of(table.getTableReference(), colRef.getColumn()),
+                                    scalarProj.getAs()));
+                        } else {
+                            updatedProjections.add(new ScalarExpressionProjection(
+                                    ColumnReference.of(table.getTableReference(), colRef.getColumn())));
+                        }
                     } else {
                         updatedProjections.add(scalarProj);
                     }
