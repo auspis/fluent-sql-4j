@@ -34,15 +34,13 @@ class InsertBuilderIntegrationTest {
     }
 
     @Test
-    void insertSingleStringValueAndVerify() throws SQLException {
-        // Insert using DSL
+    void singleStringValue() throws SQLException {
         PreparedStatement ps =
                 DSL.insertInto("users").set("id", 1).set("name", "John").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
 
-        // Verify the insert
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT id, name FROM users WHERE id = 1")) {
             assertThat(rs.next()).isTrue();
@@ -53,8 +51,7 @@ class InsertBuilderIntegrationTest {
     }
 
     @Test
-    void insertMultipleColumnsWithMixedTypesAndVerify() throws SQLException {
-        // Insert using DSL with mixed types
+    void multipleColumnsWithMixedTypes() throws SQLException {
         PreparedStatement ps = DSL.insertInto("users")
                 .set("id", 2)
                 .set("name", "Jane")
@@ -68,7 +65,6 @@ class InsertBuilderIntegrationTest {
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
 
-        // Verify the insert
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = 2")) {
             assertThat(rs.next()).isTrue();
@@ -85,8 +81,7 @@ class InsertBuilderIntegrationTest {
     }
 
     @Test
-    void insertWithNullValuesAndVerify() throws SQLException {
-        // Insert with null values
+    void nullValues() throws SQLException {
         PreparedStatement ps = DSL.insertInto("users")
                 .set("id", 3)
                 .set("name", "Bob")
@@ -97,7 +92,6 @@ class InsertBuilderIntegrationTest {
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
 
-        // Verify the insert
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT id, name, email, age FROM users WHERE id = 3")) {
             assertThat(rs.next()).isTrue();
@@ -110,8 +104,7 @@ class InsertBuilderIntegrationTest {
     }
 
     @Test
-    void insertWithDecimalValuesAndVerify() throws SQLException {
-        // Insert numeric values including decimals
+    void decimalValues() throws SQLException {
         PreparedStatement ps = DSL.insertInto("products")
                 .set("id", 1)
                 .set("name", "Widget")
@@ -122,7 +115,6 @@ class InsertBuilderIntegrationTest {
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
 
-        // Verify the insert
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM products WHERE id = 1")) {
             assertThat(rs.next()).isTrue();
@@ -135,8 +127,7 @@ class InsertBuilderIntegrationTest {
     }
 
     @Test
-    void insertMultipleRowsAndVerify() throws SQLException {
-        // Insert first row
+    void multipleRows() throws SQLException {
         PreparedStatement ps1 = DSL.insertInto("users")
                 .set("id", 10)
                 .set("name", "Alice")
@@ -152,7 +143,6 @@ class InsertBuilderIntegrationTest {
                 .buildPreparedStatement(connection);
         assertThat(ps2.executeUpdate()).isEqualTo(1);
 
-        // Verify both inserts
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT id, name, active FROM users WHERE id >= 10 ORDER BY id")) {
             assertThat(rs.next()).isTrue();
@@ -170,8 +160,7 @@ class InsertBuilderIntegrationTest {
     }
 
     @Test
-    void insertWithTypeSpecificMethodsAndVerify() throws SQLException {
-        // Test string values
+    void typeSpecificMethods() throws SQLException {
         PreparedStatement ps1 = DSL.insertInto("users")
                 .set("id", 20)
                 .set("name", "David")
@@ -179,7 +168,6 @@ class InsertBuilderIntegrationTest {
                 .buildPreparedStatement(connection);
         assertThat(ps1.executeUpdate()).isEqualTo(1);
 
-        // Test numeric values
         PreparedStatement ps2 = DSL.insertInto("products")
                 .set("id", 20)
                 .set("price", 29.99)
@@ -187,7 +175,6 @@ class InsertBuilderIntegrationTest {
                 .buildPreparedStatement(connection);
         assertThat(ps2.executeUpdate()).isEqualTo(1);
 
-        // Verify user insert
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT name, email FROM users WHERE id = 20")) {
             assertThat(rs.next()).isTrue();
@@ -195,7 +182,6 @@ class InsertBuilderIntegrationTest {
             assertThat(rs.getString("email")).isEqualTo("david@example.com");
         }
 
-        // Verify product insert
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT price, quantity FROM products WHERE id = 20")) {
             assertThat(rs.next()).isTrue();
@@ -205,8 +191,7 @@ class InsertBuilderIntegrationTest {
     }
 
     @Test
-    void insertWithSetMethodAndVerify() throws SQLException {
-        // Test new set() method with fluent API
+    void setMethod() throws SQLException {
         PreparedStatement ps = DSL.insertInto("users")
                 .set("id", 30)
                 .set("name", "Emily")
