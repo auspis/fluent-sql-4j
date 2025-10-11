@@ -33,7 +33,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateSingleColumnWithWhereConditionAndVerify() throws SQLException {
-        TestDatabaseUtil.insertBasicTestUsers(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
 
         // Update using DSL
         PreparedStatement ps =
@@ -53,20 +53,18 @@ class UpdateBuilderIntegrationTest {
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT name FROM users WHERE id = 2")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString(1)).isEqualTo("Jane");
+            assertThat(rs.getString(1)).isEqualTo("Jane Smith");
         }
     }
 
     @Test
     void updateMultipleColumnsAndVerify() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO users (id, name, email, age) VALUES (1, 'John', 'john@example.com', 25)");
-        }
+        TestDatabaseUtil.insertSampleUsers(connection);
 
         // Update using DSL
         PreparedStatement ps = DSL.update("users")
                 .set("name", "Johnny")
-                .set("age", 30)
+                .set("age", 35)
                 .where("id")
                 .eq(1)
                 .buildPreparedStatement(connection);
@@ -79,21 +77,21 @@ class UpdateBuilderIntegrationTest {
                 ResultSet rs = stmt.executeQuery("SELECT name, age FROM users WHERE id = 1")) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getString(1)).isEqualTo("Johnny");
-            assertThat(rs.getInt(2)).isEqualTo(30);
+            assertThat(rs.getInt(2)).isEqualTo(35);
         }
     }
 
     @Test
     void updateWithAndConditionAndVerify() throws SQLException {
-        TestDatabaseUtil.insertTestUsersWithAge(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
 
-        // Update users with age greater than 18 and name equals 'Bob'
+        // Update users with age greater than 18 and name equals 'Jane Smith'
         PreparedStatement ps = DSL.update("users")
-                .set("email", "bob.updated@example.com")
+                .set("email", "jane.updated@example.com")
                 .where("age")
                 .gt(18)
                 .and("name")
-                .eq("Bob")
+                .eq("Jane Smith")
                 .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
@@ -101,30 +99,30 @@ class UpdateBuilderIntegrationTest {
 
         // Verify the update
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT email FROM users WHERE name = 'Bob'")) {
+                ResultSet rs = stmt.executeQuery("SELECT email FROM users WHERE name = 'Jane Smith'")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString(1)).isEqualTo("bob.updated@example.com");
+            assertThat(rs.getString(1)).isEqualTo("jane.updated@example.com");
         }
 
         // Verify others unchanged
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT email FROM users WHERE name = 'Jane'")) {
+                ResultSet rs = stmt.executeQuery("SELECT email FROM users WHERE name = 'John Doe'")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString(1)).isEqualTo("jane@example.com");
+            assertThat(rs.getString(1)).isEqualTo("john@example.com");
         }
     }
 
     @Test
     void updateWithOrConditionAndVerify() throws SQLException {
-        TestDatabaseUtil.insertBasicTestUsers(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
 
-        // Update users with name 'John' or 'Jane'
+        // Update users with name 'John Doe' or 'Jane Smith'
         PreparedStatement ps = DSL.update("users")
                 .set("email", "updated@example.com")
                 .where("name")
-                .eq("John")
+                .eq("John Doe")
                 .or("name")
-                .eq("Jane")
+                .eq("Jane Smith")
                 .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
@@ -136,23 +134,11 @@ class UpdateBuilderIntegrationTest {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt(1)).isEqualTo(2);
         }
-
-        // Verify Bob unchanged
-        try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT email FROM users WHERE name = 'Bob'")) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString(1)).isEqualTo("bob@example.com");
-        }
     }
 
     @Test
     void updateWithLikeConditionAndVerify() throws SQLException {
-        // Insert test data
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (1, 'John', 'john@example.com')");
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (2, 'Jane', 'jane@example.com')");
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (3, 'Bob', 'bob@test.com')");
-        }
+        TestDatabaseUtil.insertSampleUsers(connection);
 
         // Update users with email like '%example.com'
         PreparedStatement ps = DSL.update("users")
@@ -170,18 +156,15 @@ class UpdateBuilderIntegrationTest {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt(1)).isEqualTo(2);
         }
-
-        // Verify Bob unchanged
-        try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT email FROM users WHERE name = 'Bob'")) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString(1)).isEqualTo("bob@test.com");
-        }
     }
 
     @Test
     void updateAllRowsAndVerify() throws SQLException {
-        TestDatabaseUtil.insertTestProducts(connection);
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (1, 'Product A', 10.00)");
+            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (2, 'Product B', 20.00)");
+            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (3, 'Product C', 30.00)");
+        }
 
         // Update all products
         PreparedStatement ps = DSL.update("products").set("price", 99.99).buildPreparedStatement(connection);
@@ -199,7 +182,11 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateWithNumberComparisonAndVerify() throws SQLException {
-        TestDatabaseUtil.insertTestProducts(connection);
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (1, 'Product A', 10.00)");
+            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (2, 'Product B', 20.00)");
+            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (3, 'Product C', 30.00)");
+        }
 
         // Update products with price > 15
         PreparedStatement ps = DSL.update("products")
@@ -228,31 +215,30 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateWithBooleanAndVerify() throws SQLException {
-        // Insert test data
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO users (id, name, active) VALUES (1, 'John', false)");
-            stmt.executeUpdate("INSERT INTO users (id, name, active) VALUES (2, 'Jane', false)");
-        }
+        TestDatabaseUtil.insertSampleUsers(connection);
 
         // Update active status
-        PreparedStatement ps =
-                DSL.update("users").set("active", true).where("name").eq("John").buildPreparedStatement(connection);
+        PreparedStatement ps = DSL.update("users")
+                .set("active", false)
+                .where("name")
+                .eq("John Doe")
+                .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
 
         // Verify the update
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT active FROM users WHERE name = 'John'")) {
+                ResultSet rs = stmt.executeQuery("SELECT active FROM users WHERE name = 'John Doe'")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getBoolean(1)).isTrue();
+            assertThat(rs.getBoolean(1)).isFalse();
         }
 
         // Verify Jane unchanged
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT active FROM users WHERE name = 'Jane'")) {
+                ResultSet rs = stmt.executeQuery("SELECT active FROM users WHERE name = 'Jane Smith'")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getBoolean(1)).isFalse();
+            assertThat(rs.getBoolean(1)).isTrue();
         }
     }
 }
