@@ -7,10 +7,10 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNul
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
 
 public class ColumnBuilder {
-    private final TableBuilder tableBuilder;
+    private final CreateTableBuilder tableBuilder;
     private final ColumnDefinition.ColumnDefinitionBuilder columnBuilder;
 
-    public ColumnBuilder(TableBuilder tableBuilder, String columnName) {
+    public ColumnBuilder(CreateTableBuilder tableBuilder, String columnName) {
         this.tableBuilder = tableBuilder;
         this.columnBuilder = ColumnDefinition.builder().name(columnName);
     }
@@ -55,32 +55,32 @@ public class ColumnBuilder {
         return new ColumnBuilder(tableBuilder, nextColumnName);
     }
 
-    public TableBuilder primaryKey(String... columnNames) {
+    public CreateTableBuilder primaryKey(String... columnNames) {
         buildAndAdd();
         return tableBuilder.primaryKey(columnNames);
     }
 
-    public TableBuilder index(String indexName, String... columns) {
+    public CreateTableBuilder index(String indexName, String... columns) {
         buildAndAdd();
         return tableBuilder.index(indexName, columns);
     }
 
-    public TableBuilder unique() {
+    public CreateTableBuilder unique() {
         ColumnDefinition columnDef = buildAndAdd();
         return tableBuilder.unique(columnDef.getName());
     }
 
-    public TableBuilder foreignKey(String refTable, String... refColumns) {
+    public CreateTableBuilder foreignKey(String refTable, String... refColumns) {
         ColumnDefinition columnDef = buildAndAdd();
         return tableBuilder.foreignKey(columnDef.getName(), refTable, refColumns);
     }
 
-    public TableBuilder check(Predicate expr) {
+    public CreateTableBuilder check(Predicate expr) {
         buildAndAdd();
         return tableBuilder.check(expr);
     }
 
-    public TableBuilder defaultValue(ScalarExpression value) {
+    public CreateTableBuilder defaultValue(ScalarExpression value) {
         buildAndAdd();
         return tableBuilder.defaultConstraint(value);
     }
