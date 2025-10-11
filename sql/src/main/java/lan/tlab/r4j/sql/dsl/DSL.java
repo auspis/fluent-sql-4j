@@ -2,6 +2,7 @@ package lan.tlab.r4j.sql.dsl;
 
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
+import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -120,5 +121,9 @@ public class DSL {
         return new SelectBuilder(
                 SQL_RENDERER,
                 Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("", column)), alias)));
+    }
+
+    public static SelectBuilder select(Projection... projections) {
+        return new SelectBuilder(SQL_RENDERER, Select.of(projections));
     }
 }
