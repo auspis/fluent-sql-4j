@@ -24,6 +24,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.dsl.SupportsWhere;
 import lan.tlab.r4j.sql.dsl.WhereConditionBuilder;
+import lan.tlab.r4j.sql.dsl.util.LiteralUtil;
 
 public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
     private UpdateStatement.UpdateStatementBuilder statementBuilder = UpdateStatement.builder();
@@ -75,20 +76,9 @@ public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
         if (columnName == null || columnName.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
-        ScalarExpression literal = value == null ? Literal.ofNull() : createLiteral(value);
+        ScalarExpression literal = value == null ? Literal.ofNull() : LiteralUtil.createLiteral(value);
         setItems.add(UpdateItem.of(columnName, literal));
         return this;
-    }
-
-    private ScalarExpression createLiteral(Object value) {
-        return switch (value) {
-            case String s -> Literal.of(s);
-            case Number n -> Literal.of(n);
-            case Boolean b -> Literal.of(b);
-            case LocalDate d -> Literal.of(d);
-            case LocalDateTime dt -> Literal.of(dt);
-            default -> throw new IllegalArgumentException("Unsupported type: " + value.getClass());
-        };
     }
 
     public WhereConditionBuilder<UpdateBuilder> where(String column) {
