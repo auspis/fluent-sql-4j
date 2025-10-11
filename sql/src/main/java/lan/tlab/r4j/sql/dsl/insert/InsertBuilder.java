@@ -19,6 +19,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.util.LiteralUtil;
 
 public class InsertBuilder {
     private final SqlRenderer sqlRenderer;
@@ -73,20 +74,9 @@ public class InsertBuilder {
         columns.add(ColumnReference.of(table.getName(), columnName));
 
         List<Expression> expressions = getOrCreateExpressionList();
-        expressions.add(value == null ? Literal.ofNull() : createLiteral(value));
+        expressions.add(value == null ? Literal.ofNull() : LiteralUtil.createLiteral(value));
         this.data = new InsertValues(expressions);
         return this;
-    }
-
-    private Expression createLiteral(Object value) {
-        return switch (value) {
-            case String s -> Literal.of(s);
-            case Number n -> Literal.of(n);
-            case Boolean b -> Literal.of(b);
-            case LocalDate d -> Literal.of(d);
-            case LocalDateTime dt -> Literal.of(dt);
-            default -> throw new IllegalArgumentException("Unsupported type: " + value.getClass());
-        };
     }
 
     public String build() {
