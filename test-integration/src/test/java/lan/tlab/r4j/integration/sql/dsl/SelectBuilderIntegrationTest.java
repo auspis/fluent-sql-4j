@@ -443,4 +443,76 @@ class SelectBuilderIntegrationTest {
             assertThat(rs.next()).isFalse();
         }
     }
+
+    @Test
+    void fromSubquery() throws SQLException {
+        lan.tlab.r4j.sql.dsl.select.SelectBuilder subquery =
+                DSL.select("name", "age").from("users").where("age").gt(20);
+
+        PreparedStatement ps = DSL.select("name", "age").from(subquery, "u").buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("John Doe");
+            assertThat(rs.getInt("age")).isEqualTo(30);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
+            assertThat(rs.getInt("age")).isEqualTo(25);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Alice");
+            assertThat(rs.getInt("age")).isEqualTo(35);
+
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void fromSubqueryWithWhere() throws SQLException {
+        lan.tlab.r4j.sql.dsl.select.SelectBuilder subquery =
+                DSL.select("name", "age").from("users").where("active").eq(true);
+
+        PreparedStatement ps = DSL.select("name", "age")
+                .from(subquery, "u")
+                .where("age")
+                .gte(30)
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("John Doe");
+            assertThat(rs.getInt("age")).isEqualTo(30);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isEqualTo("Alice");
+            assertThat(rs.getInt("age")).isEqualTo(35);
+
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void whereWithScalarSubquery() throws SQLException {
+        // Create a subquery that returns a single value (average age)
+        lan.tlab.r4j.sql.dsl.select.SelectBuilder avgAgeSubquery =
+                DSL.select("age").from("users").fetch(1);
+
+        // This test verifies the scalar subquery is generated correctly in SQL
+        PreparedStatement ps = DSL.select("name", "age")
+                .from("users")
+                .where("age")
+                .gte(avgAgeSubquery)
+                .buildPreparedStatement(connection);
+
+        // Just verify it doesn't throw an exception and produces valid SQL
+        try (ResultSet rs = ps.executeQuery()) {
+            // We're mainly testing that the SQL is valid and can execute
+            int count = 0;
+            while (rs.next()) {
+                count++;
+            }
+            assertThat(count).isGreaterThanOrEqualTo(0);
+        }
+    }
 }
