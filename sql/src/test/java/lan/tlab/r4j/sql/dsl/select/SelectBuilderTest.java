@@ -11,6 +11,7 @@ import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import org.junit.jupiter.api.Test;
 
@@ -561,5 +562,166 @@ class SelectBuilderTest {
         assertThatThrownBy(() -> select("*").from("users").groupBy("age").having(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void selectCountStar() {
+        String result = DSL.selectCountStar().from("users").build();
+        assertThat(result).isEqualTo("""
+            SELECT COUNT(*) FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectCountStarWithAlias() {
+        String result = DSL.selectCountStar("total").from("users").build();
+        assertThat(result).isEqualTo("""
+            SELECT COUNT(*) AS total FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectSum() {
+        String result = DSL.selectSum("amount").from("orders").build();
+        assertThat(result).isEqualTo("""
+            SELECT SUM("orders"."amount") FROM "orders"\
+            """);
+    }
+
+    @Test
+    void selectSumWithAlias() {
+        String result = DSL.selectSum("amount", "total_amount").from("orders").build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT SUM("orders"."amount") AS total_amount FROM "orders"\
+            """);
+    }
+
+    @Test
+    void selectAvg() {
+        String result = DSL.selectAvg("score").from("students").build();
+        assertThat(result).isEqualTo("""
+            SELECT AVG("students"."score") FROM "students"\
+            """);
+    }
+
+    @Test
+    void selectAvgWithAlias() {
+        String result = DSL.selectAvg("score", "avg_score").from("students").build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT AVG("students"."score") AS avg_score FROM "students"\
+            """);
+    }
+
+    @Test
+    void selectCount() {
+        String result = DSL.selectCount("id").from("users").build();
+        assertThat(result).isEqualTo("""
+            SELECT COUNT("users"."id") FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectCountWithAlias() {
+        String result = DSL.selectCount("id", "user_count").from("users").build();
+        assertThat(result)
+                .isEqualTo("""
+            SELECT COUNT("users"."id") AS user_count FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectCountDistinct() {
+        String result = DSL.selectCountDistinct("email").from("users").build();
+        assertThat(result)
+                .isEqualTo("""
+            SELECT COUNT(DISTINCT "users"."email") FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectCountDistinctWithAlias() {
+        String result =
+                DSL.selectCountDistinct("email", "unique_emails").from("users").build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT COUNT(DISTINCT "users"."email") AS unique_emails FROM "users"\
+            """);
+    }
+
+    @Test
+    void selectMax() {
+        String result = DSL.selectMax("price").from("products").build();
+        assertThat(result).isEqualTo("""
+            SELECT MAX("products"."price") FROM "products"\
+            """);
+    }
+
+    @Test
+    void selectMaxWithAlias() {
+        String result = DSL.selectMax("price", "max_price").from("products").build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT MAX("products"."price") AS max_price FROM "products"\
+            """);
+    }
+
+    @Test
+    void selectMin() {
+        String result = DSL.selectMin("price").from("products").build();
+        assertThat(result).isEqualTo("""
+            SELECT MIN("products"."price") FROM "products"\
+            """);
+    }
+
+    @Test
+    void selectMinWithAlias() {
+        String result = DSL.selectMin("price", "min_price").from("products").build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT MIN("products"."price") AS min_price FROM "products"\
+            """);
+    }
+
+    @Test
+    void selectSumWithGroupBy() {
+        String result =
+                DSL.selectSum("amount").from("orders").groupBy("customer_id").build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+            SELECT SUM("orders"."amount") FROM "orders" GROUP BY "orders"."customer_id"\
+            """);
+    }
+
+    @Test
+    void selectCountWithWhere() {
+        String result =
+                DSL.selectCountStar().from("users").where("active").eq(true).build();
+        assertThat(result)
+                .isEqualTo("""
+            SELECT COUNT(*) FROM "users" WHERE "users"."active" = true\
+            """);
+    }
+
+    @Test
+    void selectAvgWithGroupByAndHaving() {
+        String result = DSL.selectAvg("salary")
+                .from("employees")
+                .groupBy("department")
+                .having("department")
+                .ne("HR")
+                .build();
+        assertThat(result)
+                .isEqualTo(
+                        """
+                        SELECT AVG("employees"."salary") FROM "employees" GROUP BY "employees"."department" HAVING "employees"."department" != 'HR'\
+                        """);
     }
 }
