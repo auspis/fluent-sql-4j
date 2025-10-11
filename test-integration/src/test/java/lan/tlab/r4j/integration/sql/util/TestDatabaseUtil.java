@@ -65,46 +65,4 @@ public final class TestDatabaseUtil {
                     "INSERT INTO users VALUES (2, 'Jane Smith', 'jane@example.com', 25, true, '1995-01-01', '2023-01-01')");
         }
     }
-
-    /**
-     * Inserts basic test users for update/delete tests.
-     *
-     * @param connection the database connection
-     * @throws SQLException if insert fails
-     */
-    public static void insertBasicTestUsers(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO users (id, name, email) VALUES (1, 'John', 'john@example.com')");
-            stmt.execute("INSERT INTO users (id, name, email) VALUES (2, 'Jane', 'jane@example.com')");
-            stmt.execute("INSERT INTO users (id, name, email) VALUES (3, 'Bob', 'bob@example.com')");
-        }
-    }
-
-    /**
-     * Inserts test users with age for conditional tests.
-     *
-     * @param connection the database connection
-     * @throws SQLException if insert fails
-     */
-    public static void insertTestUsersWithAge(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO users (id, name, email, age) VALUES (1, 'John', 'john@example.com', 20)");
-            stmt.execute("INSERT INTO users (id, name, email, age) VALUES (2, 'Jane', 'jane@example.com', 25)");
-            stmt.execute("INSERT INTO users (id, name, email, age) VALUES (3, 'Bob', 'bob@example.com', 30)");
-        }
-    }
-
-    /**
-     * Inserts test products with price.
-     *
-     * @param connection the database connection
-     * @throws SQLException if insert fails
-     */
-    public static void insertTestProducts(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO products (id, name, price) VALUES (1, 'Product A', 10.00)");
-            stmt.execute("INSERT INTO products (id, name, price) VALUES (2, 'Product B', 20.00)");
-            stmt.execute("INSERT INTO products (id, name, price) VALUES (3, 'Product C', 30.00)");
-        }
-    }
 }
