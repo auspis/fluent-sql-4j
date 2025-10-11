@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import org.junit.jupiter.api.Test;
 
-class TableBuilderTest {
+class CreateTableBuilderTest {
 
     @Test
     void createUserTable() {
