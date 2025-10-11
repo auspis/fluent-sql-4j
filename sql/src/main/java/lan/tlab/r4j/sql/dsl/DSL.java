@@ -5,15 +5,15 @@ import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 import lan.tlab.r4j.sql.dsl.delete.DeleteBuilder;
 import lan.tlab.r4j.sql.dsl.insert.InsertBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
-import lan.tlab.r4j.sql.dsl.table.TableBuilder;
+import lan.tlab.r4j.sql.dsl.table.CreateTableBuilder;
 import lan.tlab.r4j.sql.dsl.update.UpdateBuilder;
 
 public class DSL {
 
     static final SqlRenderer SQL_RENDERER = SqlRendererFactory.standardSql2008();
 
-    public static TableBuilder createTable(String tableName) {
-        return new TableBuilder(SQL_RENDERER, tableName);
+    public static CreateTableBuilder createTable(String tableName) {
+        return new CreateTableBuilder(SQL_RENDERER, tableName);
     }
 
     public static SelectBuilder select(String... columns) {
