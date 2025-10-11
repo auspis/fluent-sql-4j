@@ -8,9 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import org.junit.jupiter.api.AfterEach;
@@ -649,7 +646,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectCountStar() throws SQLException {
-        PreparedStatement ps = DSL.selectCountStar().from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = DSL.select().countStar().from("users").buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -660,7 +657,8 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectCountStarWithAlias() throws SQLException {
-        PreparedStatement ps = DSL.selectCountStar("total_users").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps =
+                DSL.select().countStar().as("total_users").from("users").buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -679,7 +677,9 @@ class SelectBuilderIntegrationTest {
             stmt.execute("INSERT INTO sales VALUES (2, 50)");
         }
 
-        PreparedStatement ps = DSL.selectSum("amount", "total_amount")
+        PreparedStatement ps = DSL.select()
+                .sum("amount")
+                .as("total_amount")
                 .from("sales")
                 .groupBy("customer_id")
                 .orderBy("customer_id")
@@ -706,7 +706,9 @@ class SelectBuilderIntegrationTest {
             stmt.execute("INSERT INTO employees VALUES ('Sales', 70000)");
         }
 
-        PreparedStatement ps = DSL.selectAvg("salary", "avg_salary")
+        PreparedStatement ps = DSL.select()
+                .avg("salary")
+                .as("avg_salary")
                 .from("employees")
                 .groupBy("department")
                 .having("department")
@@ -736,7 +738,7 @@ class SelectBuilderIntegrationTest {
         }
 
         PreparedStatement psMax =
-                DSL.selectMax("score", "max_score").from("scores").buildPreparedStatement(connection);
+                DSL.select().max("score").as("max_score").from("scores").buildPreparedStatement(connection);
 
         try (ResultSet rs = psMax.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -745,7 +747,7 @@ class SelectBuilderIntegrationTest {
         }
 
         PreparedStatement psMin =
-                DSL.selectMin("score", "min_score").from("scores").buildPreparedStatement(connection);
+                DSL.select().min("score").as("min_score").from("scores").buildPreparedStatement(connection);
 
         try (ResultSet rs = psMin.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -764,7 +766,9 @@ class SelectBuilderIntegrationTest {
             stmt.execute("INSERT INTO orders VALUES (1, 104)");
         }
 
-        PreparedStatement ps = DSL.selectCountDistinct("customer_id", "unique_customers")
+        PreparedStatement ps = DSL.select()
+                .countDistinct("customer_id")
+                .as("unique_customers")
                 .from("orders")
                 .buildPreparedStatement(connection);
 
@@ -777,7 +781,9 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectCountWithWhere() throws SQLException {
-        PreparedStatement ps = DSL.selectCount("id", "active_count")
+        PreparedStatement ps = DSL.select()
+                .count("id")
+                .as("active_count")
                 .from("users")
                 .where("active")
                 .eq(true)
@@ -799,11 +805,8 @@ class SelectBuilderIntegrationTest {
             stmt.execute("INSERT INTO scores VALUES (3, 78, TIMESTAMP '2024-01-03 10:00:00')");
         }
 
-        PreparedStatement ps = DSL.select(
-                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "score"))),
-                        new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", "created_at"))))
-                .from("scores")
-                .buildPreparedStatement(connection);
+        PreparedStatement ps =
+                DSL.select().sum("score").max("created_at").from("scores").buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -822,10 +825,11 @@ class SelectBuilderIntegrationTest {
             stmt.execute("INSERT INTO stats VALUES (3, 150, TIMESTAMP '2024-01-03 10:00:00')");
         }
 
-        PreparedStatement ps = DSL.select(
-                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "value")), "total_value"),
-                        new AggregateCallProjection(
-                                AggregateCall.max(ColumnReference.of("", "updated_at")), "latest_update"))
+        PreparedStatement ps = DSL.select()
+                .sum("value")
+                .as("total_value")
+                .max("updated_at")
+                .as("latest_update")
                 .from("stats")
                 .buildPreparedStatement(connection);
 
@@ -845,10 +849,10 @@ class SelectBuilderIntegrationTest {
             stmt.execute("INSERT INTO metrics VALUES (2, 75, TIMESTAMP '2024-01-02 10:00:00')");
         }
 
-        PreparedStatement ps = DSL.select(
-                        new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", "amount"))),
-                        new AggregateCallProjection(
-                                AggregateCall.max(ColumnReference.of("", "timestamp")), "last_timestamp"))
+        PreparedStatement ps = DSL.select()
+                .sum("amount")
+                .max("timestamp")
+                .as("last_timestamp")
                 .from("metrics")
                 .buildPreparedStatement(connection);
 
