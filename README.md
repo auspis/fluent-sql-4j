@@ -431,6 +431,43 @@ This naming convention allows for:
 - **E2E tests** are named with the `*E2E.java` suffix and run with Failsafe.
 - This ensures optimal development workflow: fast feedback with `test`, complete validation with `verify`.
 
+## DSL Usage Examples
+
+### Aggregate Functions
+
+The DSL supports SQL aggregate functions with a fluent API:
+
+```java
+// COUNT all users
+String sql = DSL.selectCountStar().from("users").build();
+// → SELECT COUNT(*) FROM "users"
+
+// SUM with GROUP BY
+String sql = DSL.selectSum("amount", "total")
+    .from("orders")
+    .groupBy("customer_id")
+    .build();
+// → SELECT SUM("orders"."amount") AS total FROM "orders" GROUP BY "orders"."customer_id"
+
+// AVG with HAVING clause
+String sql = DSL.selectAvg("salary")
+    .from("employees")
+    .groupBy("department")
+    .having("department").ne("HR")
+    .build();
+// → SELECT AVG("employees"."salary") FROM "employees" 
+//   GROUP BY "employees"."department" 
+//   HAVING "employees"."department" != 'HR'
+
+// COUNT DISTINCT with WHERE
+String sql = DSL.selectCountDistinct("email", "unique_emails")
+    .from("users")
+    .where("active").eq(true)
+    .build();
+// → SELECT COUNT(DISTINCT "users"."email") AS unique_emails 
+//   FROM "users" WHERE "users"."active" = true
+```
+
 ## check updates
 
 ### dependencies
