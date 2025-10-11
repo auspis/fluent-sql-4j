@@ -84,18 +84,20 @@ The DSL supports SQL aggregate functions with a fluent API:
 
 ```java
 // COUNT all users
-String sql = DSL.selectCountStar().from("users").build();
+String sql = DSL.select().countStar().from("users").build();
 // → SELECT COUNT(*) FROM "users"
 
 // SUM with GROUP BY
-String sql = DSL.selectSum("amount", "total")
+String sql = DSL.select()
+    .sum("amount").as("total")
     .from("orders")
     .groupBy("customer_id")
     .build();
 // → SELECT SUM("orders"."amount") AS total FROM "orders" GROUP BY "orders"."customer_id"
 
 // AVG with HAVING clause
-String sql = DSL.selectAvg("salary")
+String sql = DSL.select()
+    .avg("salary")
     .from("employees")
     .groupBy("department")
     .having("department").ne("HR")
@@ -105,12 +107,38 @@ String sql = DSL.selectAvg("salary")
 //   HAVING "employees"."department" != 'HR'
 
 // COUNT DISTINCT with WHERE
-String sql = DSL.selectCountDistinct("email", "unique_emails")
+String sql = DSL.select()
+    .countDistinct("email").as("unique_emails")
     .from("users")
     .where("active").eq(true)
     .build();
 // → SELECT COUNT(DISTINCT "users"."email") AS unique_emails 
 //   FROM "users" WHERE "users"."active" = true
+
+// Multiple aggregates
+String sql = DSL.select()
+    .sum("score").as("total_score")
+    .max("createdAt").as("latest")
+    .from("users")
+    .build();
+// → SELECT SUM("users"."score") AS total_score, MAX("users"."createdAt") AS latest FROM "users"
+
+// Regular columns
+String sql = DSL.select()
+    .column("name")
+    .column("email")
+    .from("users")
+    .build();
+// → SELECT "users"."name", "users"."email" FROM "users"
+
+// Table-qualified columns
+String sql = DSL.select()
+    .sum("orders", "amount").as("total_amount")
+    .from("users").as("u")
+    .innerJoin("orders").as("o").on("u.id", "o.user_id")
+    .build();
+// → SELECT SUM("orders"."amount") AS total_amount FROM "users" AS "u" 
+//   INNER JOIN "orders" AS "o" ON "u"."id" = "o"."user_id"
 ```
 
 ## check updates
