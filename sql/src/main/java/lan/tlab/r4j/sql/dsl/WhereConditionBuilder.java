@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.ScalarSubquery;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
 import lan.tlab.r4j.sql.ast.predicate.IsNull;
 import lan.tlab.r4j.sql.ast.predicate.Like;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 
 /**
  * Generic builder for WHERE conditions that can work with any builder type.
@@ -171,9 +173,41 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         return addCondition(condition);
     }
 
+    // Subquery comparisons
+    public T eq(SelectBuilder subquery) {
+        return addCondition(Comparison.eq(getColumnRef(), toScalarSubquery(subquery)));
+    }
+
+    public T ne(SelectBuilder subquery) {
+        return addCondition(Comparison.ne(getColumnRef(), toScalarSubquery(subquery)));
+    }
+
+    public T gt(SelectBuilder subquery) {
+        return addCondition(Comparison.gt(getColumnRef(), toScalarSubquery(subquery)));
+    }
+
+    public T lt(SelectBuilder subquery) {
+        return addCondition(Comparison.lt(getColumnRef(), toScalarSubquery(subquery)));
+    }
+
+    public T gte(SelectBuilder subquery) {
+        return addCondition(Comparison.gte(getColumnRef(), toScalarSubquery(subquery)));
+    }
+
+    public T lte(SelectBuilder subquery) {
+        return addCondition(Comparison.lte(getColumnRef(), toScalarSubquery(subquery)));
+    }
+
     // Helper methods
     private ColumnReference getColumnRef() {
         return ColumnReference.of(parent.getTableReference(), column);
+    }
+
+    private ScalarSubquery toScalarSubquery(SelectBuilder subquery) {
+        if (subquery == null) {
+            throw new IllegalArgumentException("Subquery cannot be null");
+        }
+        return ScalarSubquery.builder().tableExpression(subquery.getStatement()).build();
     }
 
     private T addCondition(Predicate condition) {
