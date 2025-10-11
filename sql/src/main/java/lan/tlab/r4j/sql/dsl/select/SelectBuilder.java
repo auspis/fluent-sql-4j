@@ -18,8 +18,14 @@ import lan.tlab.r4j.sql.ast.clause.groupby.GroupBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
+import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
+import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCallImpl;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.CountDistinct;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.CountStar;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
@@ -47,6 +53,13 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
             statementBuilder = statementBuilder.select(Select.of(java.util.Arrays.stream(columns)
                     .map(column -> new ScalarExpressionProjection(ColumnReference.of("", column)))
                     .toArray(ScalarExpressionProjection[]::new)));
+        }
+    }
+
+    public SelectBuilder(SqlRenderer sqlRenderer, Select select) {
+        this.sqlRenderer = sqlRenderer;
+        if (select != null) {
+            statementBuilder = statementBuilder.select(select);
         }
     }
 
@@ -155,7 +168,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     private void updateSelectClauseWithTable(TableIdentifier table) {
         Select currentSelect = getCurrentStatement().getSelect();
         if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
-            List<ScalarExpressionProjection> updatedProjections = new ArrayList<>();
+            List<Projection> updatedProjections = new ArrayList<>();
 
             for (var projection : currentSelect.getProjections()) {
                 if (projection instanceof ScalarExpressionProjection scalarProj
@@ -167,16 +180,51 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                     } else {
                         updatedProjections.add(scalarProj);
                     }
+                } else if (projection instanceof AggregateCallProjection aggProj) {
+                    // Update aggregate call projections with table reference
+                    AggregateCall aggCall = (AggregateCall) aggProj.getExpression();
+                    AggregateCall updatedAggCall = updateAggregateCallWithTable(aggCall, table);
+                    if (aggProj.getAs() != null && !aggProj.getAs().getName().isEmpty()) {
+                        updatedProjections.add(new AggregateCallProjection(updatedAggCall, aggProj.getAs()));
+                    } else {
+                        updatedProjections.add(new AggregateCallProjection(updatedAggCall));
+                    }
                 } else {
-                    updatedProjections.add((ScalarExpressionProjection) projection);
+                    updatedProjections.add(projection);
                 }
             }
 
             if (!updatedProjections.isEmpty()) {
-                statementBuilder = statementBuilder.select(
-                        Select.of(updatedProjections.toArray(new ScalarExpressionProjection[0])));
+                statementBuilder = statementBuilder.select(Select.of(updatedProjections.toArray(new Projection[0])));
             }
         }
+    }
+
+    private AggregateCall updateAggregateCallWithTable(AggregateCall aggCall, TableIdentifier table) {
+        return switch (aggCall) {
+            case AggregateCallImpl impl -> {
+                if (impl.getExpression() instanceof ColumnReference colRef) {
+                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.getColumn());
+                    yield switch (impl.getOperator()) {
+                        case MAX -> AggregateCall.max(updatedColRef);
+                        case MIN -> AggregateCall.min(updatedColRef);
+                        case AVG -> AggregateCall.avg(updatedColRef);
+                        case SUM -> AggregateCall.sum(updatedColRef);
+                        case COUNT -> AggregateCall.count(updatedColRef);
+                    };
+                }
+                yield impl;
+            }
+            case CountDistinct cd -> {
+                if (cd.getExpression() instanceof ColumnReference colRef) {
+                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.getColumn());
+                    yield AggregateCall.countDistinct(updatedColRef);
+                }
+                yield cd;
+            }
+            case CountStar cs -> cs; // CountStar doesn't need table reference
+            default -> aggCall;
+        };
     }
 
     private SelectBuilder updateFetch(Function<Fetch, Fetch> updater) {
