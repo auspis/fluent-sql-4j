@@ -468,4 +468,98 @@ class SelectBuilderTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty for subquery");
     }
+
+    @Test
+    void havingWithSingleCondition() {
+        String sql =
+                select("*").from("users").groupBy("age").having("age").gt(18).build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        SELECT * FROM "users" GROUP BY "users"."age" HAVING "users"."age" > 18\
+                        """);
+    }
+
+    @Test
+    void havingWithAndCondition() {
+        String sql = select("*")
+                .from("users")
+                .groupBy("age")
+                .having("age")
+                .gt(18)
+                .andHaving("age")
+                .lt(65)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        SELECT * FROM "users" GROUP BY "users"."age" HAVING ("users"."age" > 18) AND ("users"."age" < 65)\
+                        """);
+    }
+
+    @Test
+    void havingWithOrCondition() {
+        String sql = select("*")
+                .from("users")
+                .groupBy("status")
+                .having("status")
+                .eq("active")
+                .orHaving("status")
+                .eq("pending")
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        SELECT * FROM "users" GROUP BY "users"."status" HAVING ("users"."status" = 'active') OR ("users"."status" = 'pending')\
+                        """);
+    }
+
+    @Test
+    void havingWithComplexConditions() {
+        String sql = select("*")
+                .from("orders")
+                .groupBy("customer_id")
+                .having("customer_id")
+                .gt(100)
+                .andHaving("customer_id")
+                .lt(500)
+                .orHaving("customer_id")
+                .eq(999)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        SELECT * FROM "orders" GROUP BY "orders"."customer_id" HAVING (("orders"."customer_id" > 100) AND ("orders"."customer_id" < 500)) OR ("orders"."customer_id" = 999)\
+                        """);
+    }
+
+    @Test
+    void havingWithWhereAndOrderBy() {
+        String sql = select("*")
+                .from("products")
+                .where("category")
+                .eq("electronics")
+                .groupBy("brand")
+                .having("brand")
+                .like("%Apple%")
+                .orderBy("brand")
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        SELECT * FROM "products" WHERE "products"."category" = 'electronics' GROUP BY "products"."brand" HAVING "products"."brand" LIKE '%Apple%' ORDER BY "products"."brand" ASC\
+                        """);
+    }
+
+    @Test
+    void invalidHavingColumn() {
+        assertThatThrownBy(() -> select("*").from("users").groupBy("age").having(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
 }
