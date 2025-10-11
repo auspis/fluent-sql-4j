@@ -643,4 +643,147 @@ class SelectBuilderIntegrationTest {
             assertThat(rs.next()).isFalse();
         }
     }
+
+    @Test
+    void selectCountStar() throws SQLException {
+        PreparedStatement ps = DSL.selectCountStar().from("users").buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isEqualTo(4);
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectCountStarWithAlias() throws SQLException {
+        PreparedStatement ps = DSL.selectCountStar("total_users").from("users").buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("total_users")).isEqualTo(4);
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectSumWithGroupBy() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE sales (\"customer_id\" INTEGER, \"amount\" INTEGER)");
+            stmt.execute("INSERT INTO sales VALUES (1, 100)");
+            stmt.execute("INSERT INTO sales VALUES (1, 150)");
+            stmt.execute("INSERT INTO sales VALUES (2, 200)");
+            stmt.execute("INSERT INTO sales VALUES (2, 50)");
+        }
+
+        PreparedStatement ps = DSL.selectSum("amount", "total_amount")
+                .from("sales")
+                .groupBy("customer_id")
+                .orderBy("customer_id")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("total_amount")).isEqualTo(250);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("total_amount")).isEqualTo(250);
+
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectAvgWithGroupByAndHaving() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE employees (\"department\" VARCHAR(50), \"salary\" INTEGER)");
+            stmt.execute("INSERT INTO employees VALUES ('IT', 60000)");
+            stmt.execute("INSERT INTO employees VALUES ('IT', 80000)");
+            stmt.execute("INSERT INTO employees VALUES ('HR', 50000)");
+            stmt.execute("INSERT INTO employees VALUES ('Sales', 70000)");
+        }
+
+        PreparedStatement ps = DSL.selectAvg("salary", "avg_salary")
+                .from("employees")
+                .groupBy("department")
+                .having("department")
+                .ne("HR")
+                .orderBy("department")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("avg_salary")).isEqualTo(70000);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("avg_salary")).isEqualTo(70000);
+
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectMaxAndMin() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE scores (\"student_id\" INTEGER, \"score\" INTEGER)");
+            stmt.execute("INSERT INTO scores VALUES (1, 85)");
+            stmt.execute("INSERT INTO scores VALUES (2, 92)");
+            stmt.execute("INSERT INTO scores VALUES (3, 78)");
+            stmt.execute("INSERT INTO scores VALUES (4, 95)");
+        }
+
+        PreparedStatement psMax =
+                DSL.selectMax("score", "max_score").from("scores").buildPreparedStatement(connection);
+
+        try (ResultSet rs = psMax.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("max_score")).isEqualTo(95);
+            assertThat(rs.next()).isFalse();
+        }
+
+        PreparedStatement psMin =
+                DSL.selectMin("score", "min_score").from("scores").buildPreparedStatement(connection);
+
+        try (ResultSet rs = psMin.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("min_score")).isEqualTo(78);
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectCountDistinct() throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE orders (\"customer_id\" INTEGER, \"order_id\" INTEGER)");
+            stmt.execute("INSERT INTO orders VALUES (1, 101)");
+            stmt.execute("INSERT INTO orders VALUES (1, 102)");
+            stmt.execute("INSERT INTO orders VALUES (2, 103)");
+            stmt.execute("INSERT INTO orders VALUES (1, 104)");
+        }
+
+        PreparedStatement ps = DSL.selectCountDistinct("customer_id", "unique_customers")
+                .from("orders")
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("unique_customers")).isEqualTo(2);
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void selectCountWithWhere() throws SQLException {
+        PreparedStatement ps = DSL.selectCount("id", "active_count")
+                .from("users")
+                .where("active")
+                .eq(true)
+                .buildPreparedStatement(connection);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("active_count")).isEqualTo(3);
+            assertThat(rs.next()).isFalse();
+        }
+    }
 }
