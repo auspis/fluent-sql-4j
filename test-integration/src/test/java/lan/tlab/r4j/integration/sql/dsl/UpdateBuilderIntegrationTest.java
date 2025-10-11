@@ -33,12 +33,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateSingleColumnWithWhereConditionAndVerify() throws SQLException {
-        // Insert test data
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (1, 'John', 'john@example.com')");
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (2, 'Jane', 'jane@example.com')");
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (3, 'Bob', 'bob@example.com')");
-        }
+        TestDatabaseUtil.insertBasicTestUsers(connection);
 
         // Update using DSL
         PreparedStatement ps =
@@ -64,7 +59,6 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateMultipleColumnsAndVerify() throws SQLException {
-        // Insert test data
         try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate("INSERT INTO users (id, name, email, age) VALUES (1, 'John', 'john@example.com', 25)");
         }
@@ -91,12 +85,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateWithAndConditionAndVerify() throws SQLException {
-        // Insert test data
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO users (id, name, email, age) VALUES (1, 'John', 'john@example.com', 20)");
-            stmt.executeUpdate("INSERT INTO users (id, name, email, age) VALUES (2, 'Jane', 'jane@example.com', 25)");
-            stmt.executeUpdate("INSERT INTO users (id, name, email, age) VALUES (3, 'Bob', 'bob@example.com', 30)");
-        }
+        TestDatabaseUtil.insertTestUsersWithAge(connection);
 
         // Update users with age greater than 18 and name equals 'Bob'
         PreparedStatement ps = DSL.update("users")
@@ -127,12 +116,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateWithOrConditionAndVerify() throws SQLException {
-        // Insert test data
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (1, 'John', 'john@example.com')");
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (2, 'Jane', 'jane@example.com')");
-            stmt.executeUpdate("INSERT INTO users (id, name, email) VALUES (3, 'Bob', 'bob@example.com')");
-        }
+        TestDatabaseUtil.insertBasicTestUsers(connection);
 
         // Update users with name 'John' or 'Jane'
         PreparedStatement ps = DSL.update("users")
@@ -197,12 +181,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateAllRowsAndVerify() throws SQLException {
-        // Insert test data
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (1, 'Product A', 10.00)");
-            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (2, 'Product B', 20.00)");
-            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (3, 'Product C', 30.00)");
-        }
+        TestDatabaseUtil.insertTestProducts(connection);
 
         // Update all products
         PreparedStatement ps = DSL.update("products").set("price", 99.99).buildPreparedStatement(connection);
@@ -220,12 +199,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void updateWithNumberComparisonAndVerify() throws SQLException {
-        // Insert test data
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (1, 'Product A', 10.00)");
-            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (2, 'Product B', 20.00)");
-            stmt.executeUpdate("INSERT INTO products (id, name, price) VALUES (3, 'Product C', 30.00)");
-        }
+        TestDatabaseUtil.insertTestProducts(connection);
 
         // Update products with price > 15
         PreparedStatement ps = DSL.update("products")
