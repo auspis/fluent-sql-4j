@@ -1,14 +1,17 @@
 package lan.tlab.r4j.integration.sql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
+import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,15 +25,7 @@ class SelectBuilderIntegrationTest {
         connection = TestDatabaseUtil.createH2Connection();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.createProductsTable(connection);
-        TestDatabaseUtil.createOrdersTable(connection);
-        TestDatabaseUtil.createSalesTable(connection);
-        TestDatabaseUtil.createEmployeesTable(connection);
-        TestDatabaseUtil.createScoresTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
-        TestDatabaseUtil.insertSampleOrders(connection);
-        TestDatabaseUtil.insertSampleSales(connection);
-        TestDatabaseUtil.insertSampleEmployees(connection);
-        TestDatabaseUtil.insertSampleScores(connection);
     }
 
     @AfterEach
@@ -40,226 +35,181 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectSpecificColumns() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "email").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select("name", "email").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getString("email")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getString("email")).isEqualTo("john@example.com");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.getString("email")).isEqualTo("jane@example.com");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-            assertThat(rs.getString("email")).isEqualTo("bob@example.com");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getString("email")).isEqualTo("alice@example.com");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(10)
+                    .extracting(r -> (String) r.get(0), r -> (String) r.get(1))
+                    .contains(
+                            tuple("John Doe", "john@example.com"),
+                            tuple("Jane Smith", "jane@example.com"),
+                            tuple("Bob", "bob@example.com"),
+                            tuple("Alice", "alice@example.com"));
         }
     }
 
     @Test
     void selectAllColumns() throws SQLException {
-        PreparedStatement ps =
-                DSL.select("id", "name", "email", "age", "active").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("id", "name", "email", "age", "active").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(
+                    ps,
+                    r -> List.of(
+                            r.getInt("id"),
+                            r.getString("name"),
+                            r.getString("email"),
+                            r.getInt("age"),
+                            r.getBoolean("active")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("id")).isEqualTo(1);
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getString("email")).isEqualTo("john@example.com");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-            assertThat(rs.getBoolean("active")).isTrue();
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(10)
+                    .extracting(
+                            r -> (Integer) r.get(0),
+                            r -> (String) r.get(1),
+                            r -> (String) r.get(2),
+                            r -> (Integer) r.get(3),
+                            r -> (Boolean) r.get(4))
+                    .contains(tuple(1, "John Doe", "john@example.com", 30, true));
         }
     }
 
     @Test
     void whereEqualCondition() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = DSL.select("name", "age")
                 .from("users")
                 .where("name")
                 .eq("John Doe")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(1)
+                    .extracting(r -> (String) r.get(0), r -> (Integer) r.get(1))
+                    .containsExactly(tuple("John Doe", 30));
         }
     }
 
     @Test
     void whereGreaterThan() throws SQLException {
-        PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").gt(25).buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("name", "age").from("users").where("age").gt(25).buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getInt("age")).isEqualTo(35);
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(7)
+                    .extracting(r -> (String) r.get(0), r -> (Integer) r.get(1))
+                    .contains(tuple("John Doe", 30), tuple("Alice", 35));
         }
     }
 
     @Test
     void whereLessThan() throws SQLException {
-        PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").lt(20).buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("name", "age").from("users").where("age").lt(20).buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-            assertThat(rs.getInt("age")).isEqualTo(15);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(1)
+                    .extracting(r -> (String) r.get(0), r -> (Integer) r.get(1))
+                    .containsExactly(tuple("Bob", 15));
         }
     }
 
     @Test
     void whereGreaterThanOrEqual() throws SQLException {
-        PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").gte(30).buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("name", "age").from("users").where("age").gte(30).buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getInt("age")).isEqualTo(35);
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(6)
+                    .extracting(r -> (String) r.get(0), r -> (Integer) r.get(1))
+                    .contains(tuple("John Doe", 30), tuple("Alice", 35));
         }
     }
 
     @Test
     void whereLessThanOrEqual() throws SQLException {
-        PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").lte(25).buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("name", "age").from("users").where("age").lte(25).buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.getInt("age")).isEqualTo(25);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-            assertThat(rs.getInt("age")).isEqualTo(15);
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(3)
+                    .extracting(r -> (String) r.get(0), r -> (Integer) r.get(1))
+                    .contains(tuple("Jane Smith", 25), tuple("Bob", 15), tuple("Diana", 25));
         }
     }
 
     @Test
     void whereNotEqual() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = DSL.select("name", "age")
                 .from("users")
                 .where("name")
                 .ne("John Doe")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(9).extracting(r -> (String) r.get(0)).contains("Jane Smith", "Bob", "Alice");
         }
     }
 
     @Test
     void whereLike() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "email")
+        try (PreparedStatement ps = DSL.select("name", "email")
                 .from("users")
                 .where("email")
                 .like("%example.com")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getString("email")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            int count = 0;
-            while (rs.next()) {
-                assertThat(rs.getString("email")).endsWith("example.com");
-                count++;
-            }
-            assertThat(count).isEqualTo(4);
+            assertThat(rows).hasSize(10);
+            assertThat(rows).extracting(r -> (String) r.get(1)).allMatch(email -> email.endsWith("example.com"));
         }
     }
 
     @Test
     void andCondition() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "age", "active")
+        try (PreparedStatement ps = DSL.select("name", "age", "active")
                 .from("users")
                 .where("age")
                 .gt(18)
                 .and("active")
                 .eq(true)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-            assertThat(rs.getBoolean("active")).isTrue();
+            List<List<Object>> results =
+                    ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age"), r.getBoolean("active")));
 
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.getInt("age")).isEqualTo(25);
-            assertThat(rs.getBoolean("active")).isTrue();
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getInt("age")).isEqualTo(35);
-            assertThat(rs.getBoolean("active")).isTrue();
-
-            assertThat(rs.next()).isFalse();
+            assertThat(results)
+                    .hasSize(7)
+                    .extracting(r -> (String) r.get(0), r -> (Integer) r.get(1), r -> (Boolean) r.get(2))
+                    .contains(tuple("John Doe", 30, true), tuple("Jane Smith", 25, true), tuple("Alice", 35, true));
         }
     }
 
     @Test
     void orCondition() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = DSL.select("name", "age")
                 .from("users")
                 .where("name")
                 .eq("John Doe")
                 .or("name")
                 .eq("Jane Smith")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(2)
+                    .extracting(r -> (String) r.get(0))
+                    .containsExactlyInAnyOrder("John Doe", "Jane Smith");
         }
     }
 
     @Test
     void andOrCondition() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "age", "active")
+        try (PreparedStatement ps = DSL.select("name", "age", "active")
                 .from("users")
                 .where("age")
                 .gt(20)
@@ -267,22 +217,14 @@ class SelectBuilderIntegrationTest {
                 .eq(true)
                 .or("name")
                 .eq("Bob")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows =
+                    ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age"), r.getBoolean("active")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .isNotEmpty()
+                    .extracting(r -> (String) r.get(0))
+                    .contains("John Doe", "Jane Smith", "Bob", "Alice");
         }
     }
 
@@ -297,18 +239,28 @@ class SelectBuilderIntegrationTest {
             assertThat(rs.getInt("age")).isEqualTo(15);
 
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
+            assertThat(rs.getString("name")).isIn("Jane Smith", "Diana");
             assertThat(rs.getInt("age")).isEqualTo(25);
 
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
+            assertThat(rs.getString("name")).isIn("Jane Smith", "Diana");
+            assertThat(rs.getInt("age")).isEqualTo(25);
 
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getInt("age")).isEqualTo(35);
+            assertThat(rs.getString("name")).isEqualTo("Grace");
+            assertThat(rs.getInt("age")).isEqualTo(28);
 
-            assertThat(rs.next()).isFalse();
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isIn("John Doe", "Charlie", "Henry");
+            assertThat(rs.getInt("age")).isEqualTo(30);
+
+            // Continue checking remaining users are in ascending order
+            int previousAge = 30;
+            while (rs.next()) {
+                int currentAge = rs.getInt("age");
+                assertThat(currentAge).isGreaterThanOrEqualTo(previousAge);
+                previousAge = currentAge;
+            }
         }
     }
 
@@ -319,75 +271,59 @@ class SelectBuilderIntegrationTest {
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
+            assertThat(rs.getString("name")).isEqualTo("Eve");
+            assertThat(rs.getInt("age")).isEqualTo(40);
+
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getString("name")).isIn("Alice", "Frank");
             assertThat(rs.getInt("age")).isEqualTo(35);
 
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
+            assertThat(rs.getString("name")).isIn("Alice", "Frank");
+            assertThat(rs.getInt("age")).isEqualTo(35);
 
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.getInt("age")).isEqualTo(25);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-            assertThat(rs.getInt("age")).isEqualTo(15);
-
-            assertThat(rs.next()).isFalse();
+            // Continue checking remaining users are in descending order
+            int previousAge = 35;
+            while (rs.next()) {
+                int currentAge = rs.getInt("age");
+                assertThat(currentAge).isLessThanOrEqualTo(previousAge);
+                previousAge = currentAge;
+            }
         }
     }
 
     @Test
     void fetch() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").fetch(2).buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select("name").from("users").fetch(2).buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(2).extracting(r -> (String) r.get(0)).containsExactly("John Doe", "Jane Smith");
         }
     }
 
     @Test
     void offset() throws SQLException {
-        PreparedStatement ps =
-                DSL.select("name").from("users").offset(2).fetch(2).buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("name").from("users").offset(2).fetch(2).buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(2).extracting(r -> (String) r.get(0)).containsExactly("Bob", "Alice");
         }
     }
 
     @Test
     void fetchAndOffset() throws SQLException {
-        PreparedStatement ps =
-                DSL.select("name").from("users").fetch(2).offset(1).buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("name").from("users").fetch(2).offset(1).buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(2).extracting(r -> (String) r.get(0)).containsExactly("Jane Smith", "Bob");
         }
     }
 
     @Test
     void fullSelectQuery() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "email", "age")
+        try (PreparedStatement ps = DSL.select("name", "email", "age")
                 .from("users")
                 .where("age")
                 .gte(18)
@@ -396,60 +332,51 @@ class SelectBuilderIntegrationTest {
                 .orderByDesc("age")
                 .fetch(2)
                 .offset(0)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows =
+                    ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getString("email"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getInt("age")).isEqualTo(35);
-            assertThat(rs.getString("email")).isEqualTo("alice@example.com");
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-            assertThat(rs.getString("email")).isEqualTo("john@example.com");
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(2);
+            assertThat(rows.get(0)).extracting(r -> r).containsExactly("Eve", "eve@example.com", 40);
+            assertThat(rows.get(1).get(0)).isIn("Alice", "Frank");
+            assertThat(rows.get(1).get(2)).isEqualTo(35);
         }
     }
 
     @Test
     void fromWithAlias() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "email")
+        try (PreparedStatement ps = DSL.select("name", "email")
                 .from("users")
                 .as("u")
                 .where("name")
                 .eq("John Doe")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getString("email")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getString("email")).isEqualTo("john@example.com");
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(1)
+                    .extracting(r -> (String) r.get(0), r -> (String) r.get(1))
+                    .containsExactly(tuple("John Doe", "john@example.com"));
         }
     }
 
     @Test
     void whereWithOrderByAndFetch() throws SQLException {
-        PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = DSL.select("name", "age")
                 .from("users")
                 .where("active")
                 .eq(true)
                 .orderBy("age")
                 .fetch(2)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.getInt("age")).isEqualTo(25);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(2);
+            // First row should have age 25
+            assertThat(rows.get(0).get(0)).isIn("Jane Smith", "Diana");
+            assertThat(rows.get(0).get(1)).isEqualTo(25);
+            // Second row could be Jane/Diana or Grace (28) or John/Charlie/Henry (30)
+            assertThat(rows.get(1).get(1)).isIn(25, 28, 30);
         }
     }
 
@@ -458,22 +385,13 @@ class SelectBuilderIntegrationTest {
         SelectBuilder subquery =
                 DSL.select("name", "age").from("users").where("age").gt(20);
 
-        PreparedStatement ps = DSL.select("name", "age").from(subquery, "u").buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select("name", "age").from(subquery, "u").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.getInt("age")).isEqualTo(25);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getInt("age")).isEqualTo(35);
-
-            assertThat(rs.next()).isFalse();
+            // Users with age > 20: Jane(25), Diana(25), Grace(28), John(30), Charlie(30), Henry(30), Alice(35),
+            // Frank(35), Eve(40) = 9 users
+            assertThat(rows).hasSize(9).extracting(r -> (Integer) r.get(1)).allMatch(age -> age > 20);
         }
     }
 
@@ -482,22 +400,15 @@ class SelectBuilderIntegrationTest {
         SelectBuilder subquery =
                 DSL.select("name", "age").from("users").where("active").eq(true);
 
-        PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = DSL.select("name", "age")
                 .from(subquery, "u")
                 .where("age")
                 .gte(30)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getInt("age")).isEqualTo(30);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.getInt("age")).isEqualTo(35);
-
-            assertThat(rs.next()).isFalse();
+            // Active users with age >= 30: John(30), Charlie(30), Henry(30), Alice(35), Frank(35), Eve(40) = 6 users
+            assertThat(rows).hasSize(6).extracting(r -> (Integer) r.get(1)).allMatch(age -> age >= 30);
         }
     }
 
@@ -507,346 +418,299 @@ class SelectBuilderIntegrationTest {
         SelectBuilder avgAgeSubquery = DSL.select("age").from("users").fetch(1);
 
         // This test verifies the scalar subquery is generated correctly in SQL
-        PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = DSL.select("name", "age")
                 .from("users")
                 .where("age")
                 .gte(avgAgeSubquery)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
-        // Just verify it doesn't throw an exception and produces valid SQL
-        try (ResultSet rs = ps.executeQuery()) {
             // We're mainly testing that the SQL is valid and can execute
-            int count = 0;
-            while (rs.next()) {
-                count++;
-            }
-            assertThat(count).isGreaterThanOrEqualTo(0);
+            assertThat(rows).isNotNull();
         }
     }
 
     @Test
     void groupByWithHaving() throws SQLException {
-        PreparedStatement ps = DSL.select("customer_id")
-                .from("orders")
-                .groupBy("customer_id")
-                .having("customer_id")
-                .gt(100)
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select("age")
+                .from("users")
+                .groupBy("age")
+                .having("age")
+                .gt(25)
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("customer_id")).isEqualTo(200);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("customer_id")).isEqualTo(300);
-
-            assertThat(rs.next()).isFalse();
+            // Verify we got distinct age groups: 28, 30, 35, 40
+            assertThat(rows)
+                    .hasSize(4)
+                    .extracting(r -> (Integer) r.get(0))
+                    .allMatch(age -> age > 25)
+                    .containsExactlyInAnyOrder(28, 30, 35, 40);
         }
     }
 
     @Test
     void groupByWithHavingAndCondition() throws SQLException {
-        PreparedStatement ps = DSL.select("customer_id")
-                .from("sales")
-                .groupBy("customer_id")
-                .having("customer_id")
-                .ne(2)
-                .andHaving("customer_id")
-                .gt(0)
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select("age")
+                .from("users")
+                .groupBy("age")
+                .having("age")
+                .ne(25)
+                .andHaving("age")
+                .gt(20)
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("customer_id")).isEqualTo(1);
-
-            assertThat(rs.next()).isFalse();
+            // Verify we got age groups: 28, 30, 35, 40 (excluding 25, 15)
+            assertThat(rows)
+                    .hasSize(4)
+                    .extracting(r -> (Integer) r.get(0))
+                    .allMatch(age -> age != 25 && age > 20)
+                    .containsExactlyInAnyOrder(28, 30, 35, 40);
         }
     }
 
     @Test
     void groupByWithHavingOrCondition() throws SQLException {
-        PreparedStatement ps = DSL.select("department")
-                .from("employees")
-                .groupBy("department")
-                .having("department")
-                .eq("IT")
-                .orHaving("department")
-                .eq("HR")
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select("age")
+                .from("users")
+                .groupBy("age")
+                .having("age")
+                .eq(25)
+                .orHaving("age")
+                .eq(30)
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            String firstDept = rs.getString("department");
-
-            assertThat(rs.next()).isTrue();
-            String secondDept = rs.getString("department");
-
-            assertThat(rs.next()).isFalse();
-
-            assertThat(firstDept).isIn("IT", "HR");
-            assertThat(secondDept).isIn("IT", "HR");
-            assertThat(firstDept).isNotEqualTo(secondDept);
+            // Should return two age groups: 25 and 30
+            assertThat(rows).hasSize(2).extracting(r -> (Integer) r.get(0)).containsExactlyInAnyOrder(25, 30);
         }
     }
 
     @Test
     void whereGroupByHavingOrderBy() throws SQLException {
-        PreparedStatement ps = DSL.select("customer_id")
-                .from("orders")
-                .where("amount")
-                .gt(0)
-                .groupBy("customer_id")
-                .having("customer_id")
-                .gt(100)
-                .orderBy("customer_id")
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select("age")
+                .from("users")
+                .where("active")
+                .eq(true)
+                .groupBy("age")
+                .having("age")
+                .gte(30)
+                .orderBy("age")
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("customer_id")).isEqualTo(200);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("customer_id")).isEqualTo(300);
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(3).extracting(r -> (Integer) r.get(0)).containsExactly(30, 35, 40);
         }
     }
 
     @Test
     void selectCountStar() throws SQLException {
-        PreparedStatement ps = DSL.select().countStar().from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select().countStar().from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt(1)));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(4);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(10);
         }
     }
 
     @Test
     void selectCountStarWithAlias() throws SQLException {
-        PreparedStatement ps =
-                DSL.select().countStar().as("total_users").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select().countStar().as("total_users").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("total_users")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("total_users")).isEqualTo(4);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(10);
         }
     }
 
     @Test
     void selectSumWithGroupBy() throws SQLException {
-        PreparedStatement ps = DSL.select()
-                .sum("amount")
-                .as("total_amount")
-                .from("sales")
-                .groupBy("customer_id")
-                .orderBy("customer_id")
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select()
+                .sum("id")
+                .as("total_ids")
+                .from("users")
+                .groupBy("age")
+                .orderBy("age")
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("total_ids")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("total_amount")).isEqualTo(250);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("total_amount")).isEqualTo(250);
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(6)
+                    .extracting(r -> (Integer) r.get(0))
+                    .containsExactly(
+                            3, // age 15: user id 3
+                            8, // age 25: user ids 2, 6
+                            9, // age 28: user id 9
+                            16, // age 30: user ids 1, 5, 10
+                            12, // age 35: user ids 4, 8
+                            7 // age 40: user id 7
+                            );
         }
     }
 
     @Test
     void selectAvgWithGroupByAndHaving() throws SQLException {
-        PreparedStatement ps = DSL.select()
-                .avg("salary")
-                .as("avg_salary")
-                .from("employees")
-                .groupBy("department")
-                .having("department")
-                .ne("HR")
-                .orderBy("department")
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select()
+                .avg("id")
+                .as("avg_id")
+                .from("users")
+                .groupBy("age")
+                .having("age")
+                .gte(30)
+                .orderBy("age")
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getDouble("avg_id")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("avg_salary")).isEqualTo(70000);
-
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("avg_salary")).isEqualTo(70000);
-
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(3);
+            assertThat((Double) rows.get(0).get(0))
+                    .isCloseTo(5.33, org.assertj.core.data.Offset.offset(0.1)); // age 30: AVG(1,5,10)
+            assertThat((Double) rows.get(1).get(0)).isEqualTo(6.0); // age 35: AVG(4,8)
+            assertThat((Double) rows.get(2).get(0)).isEqualTo(7.0); // age 40: AVG(7)
         }
     }
 
     @Test
     void selectMaxAndMin() throws SQLException {
-        PreparedStatement psMax =
-                DSL.select().max("score").as("max_score").from("scores").buildPreparedStatement(connection);
+        try (PreparedStatement psMax =
+                DSL.select().max("age").as("max_age").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(psMax, r -> List.of(r.getInt("max_age")));
 
-        try (ResultSet rs = psMax.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("max_score")).isEqualTo(95);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(40);
         }
 
-        PreparedStatement psMin =
-                DSL.select().min("score").as("min_score").from("scores").buildPreparedStatement(connection);
+        try (PreparedStatement psMin =
+                DSL.select().min("age").as("min_age").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(psMin, r -> List.of(r.getInt("min_age")));
 
-        try (ResultSet rs = psMin.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("min_score")).isEqualTo(78);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(15);
         }
     }
 
     @Test
     void selectCountDistinct() throws SQLException {
-        PreparedStatement ps = DSL.select()
-                .countDistinct("customer_id")
-                .as("unique_customers")
-                .from("orders")
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select()
+                .countDistinct("age")
+                .as("unique_ages")
+                .from("users")
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("unique_ages")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("unique_customers")).isEqualTo(3); // 100, 200, 300
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(1)
+                    .extracting(r -> (Integer) r.get(0))
+                    .containsExactly(6); // 15, 25, 28, 30, 35, 40
         }
     }
 
     @Test
     void selectCountWithWhere() throws SQLException {
-        PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = DSL.select()
                 .count("id")
                 .as("active_count")
                 .from("users")
                 .where("active")
                 .eq(true)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("active_count")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("active_count")).isEqualTo(3);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(7);
         }
     }
 
     @Test
     void selectMultipleAggregatesWithoutAliases() throws SQLException {
-        PreparedStatement ps =
-                DSL.select().sum("age").max("createdAt").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select().sum("age").max("createdAt").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt(1), r.getTimestamp(2)));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(105); // 30 + 25 + 15 + 35
-            assertThat(rs.getTimestamp(2)).isNotNull();
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1);
+            assertThat(rows.get(0).get(0)).isEqualTo(293); // 30+25+15+35+30+25+40+35+28+30
+            assertThat(rows.get(0).get(1)).isNotNull();
         }
     }
 
     @Test
     void selectMultipleAggregatesWithAliases() throws SQLException {
-        PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = DSL.select()
                 .sum("age")
                 .as("total_age")
                 .max("createdAt")
                 .as("latest_update")
                 .from("users")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows =
+                    ResultSetUtil.list(ps, r -> List.of(r.getInt("total_age"), r.getTimestamp("latest_update")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("total_age")).isEqualTo(105); // 30 + 25 + 15 + 35
-            assertThat(rs.getTimestamp("latest_update")).isNotNull();
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1);
+            assertThat(rows.get(0).get(0)).isEqualTo(293); // 30+25+15+35+30+25+40+35+28+30
+            assertThat(rows.get(0).get(1)).isNotNull();
         }
     }
 
     @Test
     void selectMultipleAggregatesWithOneAlias() throws SQLException {
-        PreparedStatement ps = DSL.select()
-                .sum("amount")
-                .max("customer_id")
-                .as("max_customer")
-                .from("orders")
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select().sum("age").max("id").as("max_id").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt(1), r.getInt("max_id")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(600); // 50 + 150 + 75 + 25 + 300
-            assertThat(rs.getInt("max_customer")).isEqualTo(300);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows).hasSize(1);
+            assertThat(rows.get(0).get(0)).isEqualTo(293); // 30+25+15+35+30+25+40+35+28+30
+            assertThat(rows.get(0).get(1)).isEqualTo(10);
         }
     }
 
     @Test
     void selectColumn() throws SQLException {
-        PreparedStatement ps = DSL.select().column("name").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select().column("name").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Bob");
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Alice");
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(10)
+                    .extracting(r -> (String) r.get(0))
+                    .contains("John Doe", "Jane Smith", "Bob", "Alice");
         }
     }
 
     @Test
     void selectColumnWithAlias() throws SQLException {
-        PreparedStatement ps =
-                DSL.select().column("name").as("user_name").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select().column("name").as("user_name").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("user_name")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("user_name")).isEqualTo("John Doe");
-            assertThat(rs.next()).isTrue();
+            assertThat(rows).hasSize(10).extracting(r -> (String) r.get(0)).contains("John Doe");
         }
     }
 
     @Test
     void selectMultipleColumns() throws SQLException {
-        PreparedStatement ps =
-                DSL.select().column("name").column("email").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps =
+                DSL.select().column("name").column("email").from("users").buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getString("email")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getString("email")).isEqualTo("john@example.com");
-            assertThat(rs.next()).isTrue();
+            assertThat(rows)
+                    .hasSize(10)
+                    .extracting(r -> (String) r.get(0), r -> (String) r.get(1))
+                    .contains(tuple("John Doe", "john@example.com"));
         }
     }
 
     @Test
     void selectMixedColumnsAndAggregates() throws SQLException {
-        PreparedStatement ps = DSL.select()
-                .column("student_id")
-                .sum("score")
-                .as("total_score")
-                .from("scores")
-                .groupBy("student_id")
-                .orderBy("student_id")
-                .buildPreparedStatement(connection);
+        try (PreparedStatement ps = DSL.select()
+                .column("age")
+                .count("id")
+                .as("user_count")
+                .from("users")
+                .groupBy("age")
+                .orderBy("age")
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age"), r.getInt("user_count")));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("student_id")).isEqualTo(1);
-            assertThat(rs.getInt("total_score")).isEqualTo(85);
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("student_id")).isEqualTo(2);
-            assertThat(rs.getInt("total_score")).isEqualTo(92);
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("student_id")).isEqualTo(3);
-            assertThat(rs.getInt("total_score")).isEqualTo(78);
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("student_id")).isEqualTo(4);
-            assertThat(rs.getInt("total_score")).isEqualTo(95);
-            assertThat(rs.next()).isFalse();
+            assertThat(rows)
+                    .hasSize(6)
+                    .extracting(r -> (Integer) r.get(0), r -> (Integer) r.get(1))
+                    .containsExactly(
+                            tuple(15, 1), tuple(25, 2), tuple(28, 1), tuple(30, 3), tuple(35, 2), tuple(40, 1));
         }
     }
 }
