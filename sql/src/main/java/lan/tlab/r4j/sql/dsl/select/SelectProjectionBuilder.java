@@ -22,9 +22,7 @@ public class SelectProjectionBuilder {
     }
 
     public SelectProjectionBuilder column(String column) {
-        finalizePendingProjection();
-        pendingProjection = new ScalarExpressionProjection(ColumnReference.of("", column));
-        return this;
+        return column("", column);
     }
 
     public SelectProjectionBuilder column(String table, String column) {
@@ -34,9 +32,7 @@ public class SelectProjectionBuilder {
     }
 
     public SelectProjectionBuilder sum(String column) {
-        finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("", column)));
-        return this;
+        return sum("", column);
     }
 
     public SelectProjectionBuilder sum(String table, String column) {
@@ -46,9 +42,7 @@ public class SelectProjectionBuilder {
     }
 
     public SelectProjectionBuilder avg(String column) {
-        finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("", column)));
-        return this;
+        return avg("", column);
     }
 
     public SelectProjectionBuilder avg(String table, String column) {
@@ -58,9 +52,7 @@ public class SelectProjectionBuilder {
     }
 
     public SelectProjectionBuilder count(String column) {
-        finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.count(ColumnReference.of("", column)));
-        return this;
+        return count("", column);
     }
 
     public SelectProjectionBuilder count(String table, String column) {
@@ -76,9 +68,7 @@ public class SelectProjectionBuilder {
     }
 
     public SelectProjectionBuilder countDistinct(String column) {
-        finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.countDistinct(ColumnReference.of("", column)));
-        return this;
+        return countDistinct("", column);
     }
 
     public SelectProjectionBuilder countDistinct(String table, String column) {
@@ -88,9 +78,7 @@ public class SelectProjectionBuilder {
     }
 
     public SelectProjectionBuilder max(String column) {
-        finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.max(ColumnReference.of("", column)));
-        return this;
+        return max("", column);
     }
 
     public SelectProjectionBuilder max(String table, String column) {
@@ -100,9 +88,7 @@ public class SelectProjectionBuilder {
     }
 
     public SelectProjectionBuilder min(String column) {
-        finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.min(ColumnReference.of("", column)));
-        return this;
+        return min("", column);
     }
 
     public SelectProjectionBuilder min(String table, String column) {
