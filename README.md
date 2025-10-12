@@ -15,6 +15,14 @@ String sql = DSL.select("name", "email")
     .where("age").gt(18)
     .build();
 
+// Column API support alias
+String sql = DSL.select()
+    .column("name")
+    .column("email").as("emailAddress")
+    .from("users")
+    .build();
+// → SELECT "users"."name", "users"."email" as emailAddress FROM "users"
+
 // Build a PreparedStatement directly
 PreparedStatement ps = DSL.select("name", "email")
     .from("users")
@@ -290,6 +298,61 @@ PreparedStatement ps = DSL.select("name", "email", "age")
     .buildPreparedStatement(connection);
 ```
 
+#### Aggregate Functions
+
+The DSL supports SQL aggregate functions with a fluent API:
+
+```java
+// COUNT all users
+String sql = DSL.select().countStar().from("users").build();
+// → SELECT COUNT(*) FROM "users"
+
+// SUM with GROUP BY
+String sql = DSL.select()
+    .sum("amount").as("total")
+    .from("orders")
+    .groupBy("customer_id")
+    .build();
+// → SELECT SUM("orders"."amount") AS total FROM "orders" GROUP BY "orders"."customer_id"
+
+// AVG with HAVING clause
+String sql = DSL.select()
+    .avg("salary")
+    .from("employees")
+    .groupBy("department")
+    .having("department").ne("HR")
+    .build();
+// → SELECT AVG("employees"."salary") FROM "employees" 
+//   GROUP BY "employees"."department" 
+//   HAVING "employees"."department" != 'HR'
+
+// COUNT DISTINCT with WHERE
+String sql = DSL.select()
+    .countDistinct("email").as("unique_emails")
+    .from("users")
+    .where("active").eq(true)
+    .build();
+// → SELECT COUNT(DISTINCT "users"."email") AS unique_emails 
+//   FROM "users" WHERE "users"."active" = true
+
+// Multiple aggregates
+String sql = DSL.select()
+    .sum("score").as("total_score")
+    .max("createdAt").as("latest")
+    .from("users")
+    .build();
+// → SELECT SUM("users"."score") AS total_score, MAX("users"."createdAt") AS latest FROM "users"
+
+// Table-qualified columns
+String sql = DSL.select()
+    .sum("orders", "amount").as("total_amount")
+    .from("users").as("u")
+    .innerJoin("orders").as("o").on("u.id", "o.user_id")
+    .build();
+// → SELECT SUM("orders"."amount") AS total_amount FROM "users" AS "u" 
+//   INNER JOIN "orders" AS "o" ON "u"."id" = "o"."user_id"
+```
+
 ### INSERT Statements
 
 ```java
@@ -430,71 +493,6 @@ This naming convention allows for:
 - **H2 integration tests** are named with the `*Test.java` suffix and run with Surefire.
 - **E2E tests** are named with the `*E2E.java` suffix and run with Failsafe.
 - This ensures optimal development workflow: fast feedback with `test`, complete validation with `verify`.
-
-## DSL Usage Examples
-
-### Aggregate Functions
-
-The DSL supports SQL aggregate functions with a fluent API:
-
-```java
-// COUNT all users
-String sql = DSL.select().countStar().from("users").build();
-// → SELECT COUNT(*) FROM "users"
-
-// SUM with GROUP BY
-String sql = DSL.select()
-    .sum("amount").as("total")
-    .from("orders")
-    .groupBy("customer_id")
-    .build();
-// → SELECT SUM("orders"."amount") AS total FROM "orders" GROUP BY "orders"."customer_id"
-
-// AVG with HAVING clause
-String sql = DSL.select()
-    .avg("salary")
-    .from("employees")
-    .groupBy("department")
-    .having("department").ne("HR")
-    .build();
-// → SELECT AVG("employees"."salary") FROM "employees" 
-//   GROUP BY "employees"."department" 
-//   HAVING "employees"."department" != 'HR'
-
-// COUNT DISTINCT with WHERE
-String sql = DSL.select()
-    .countDistinct("email").as("unique_emails")
-    .from("users")
-    .where("active").eq(true)
-    .build();
-// → SELECT COUNT(DISTINCT "users"."email") AS unique_emails 
-//   FROM "users" WHERE "users"."active" = true
-
-// Multiple aggregates
-String sql = DSL.select()
-    .sum("score").as("total_score")
-    .max("createdAt").as("latest")
-    .from("users")
-    .build();
-// → SELECT SUM("users"."score") AS total_score, MAX("users"."createdAt") AS latest FROM "users"
-
-// Regular columns
-String sql = DSL.select()
-    .column("name")
-    .column("email")
-    .from("users")
-    .build();
-// → SELECT "users"."name", "users"."email" FROM "users"
-
-// Table-qualified columns
-String sql = DSL.select()
-    .sum("orders", "amount").as("total_amount")
-    .from("users").as("u")
-    .innerJoin("orders").as("o").on("u.id", "o.user_id")
-    .build();
-// → SELECT SUM("orders"."amount") AS total_amount FROM "users" AS "u" 
-//   INNER JOIN "orders" AS "o" ON "u"."id" = "o"."user_id"
-```
 
 ## check updates
 
