@@ -56,7 +56,13 @@ public final class TestDatabaseUtil {
     public static void createProductsTable(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(
-                    "CREATE TABLE products (\"id\" INTEGER PRIMARY KEY, \"name\" VARCHAR(50), \"price\" DECIMAL(10,2), \"quantity\" INTEGER)");
+                    """
+                    CREATE TABLE products (\
+                    "id" INTEGER PRIMARY KEY, \
+                    "name" VARCHAR(50), \
+                    "price" DECIMAL(10,2), \
+                    "quantity" INTEGER)
+                    """);
         }
     }
 
@@ -88,115 +94,6 @@ public final class TestDatabaseUtil {
                     "INSERT INTO users VALUES (9, 'Grace', 'grace@example.com', 28, false, '1997-01-01', '2023-01-06')");
             stmt.execute(
                     "INSERT INTO users VALUES (10, 'Henry', 'henry@example.com', 30, true, '1995-01-01', '2023-01-07')");
-        }
-    }
-
-    /**
-     * Creates an orders table with columns: id, customer_id, amount.
-     *
-     * @param connection the database connection
-     * @throws SQLException if table creation fails
-     */
-    public static void createOrdersTable(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE orders (\"id\" INTEGER, \"customer_id\" INTEGER, \"amount\" INTEGER)");
-        }
-    }
-
-    /**
-     * Creates a sales table with columns: customer_id, amount.
-     *
-     * @param connection the database connection
-     * @throws SQLException if table creation fails
-     */
-    public static void createSalesTable(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE sales (\"customer_id\" INTEGER, \"amount\" INTEGER)");
-        }
-    }
-
-    /**
-     * Creates an employees table with columns: department, salary.
-     *
-     * @param connection the database connection
-     * @throws SQLException if table creation fails
-     */
-    public static void createEmployeesTable(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE employees (\"department\" VARCHAR(50), \"salary\" INTEGER)");
-        }
-    }
-
-    /**
-     * Creates a scores table with columns: student_id, score.
-     *
-     * @param connection the database connection
-     * @throws SQLException if table creation fails
-     */
-    public static void createScoresTable(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE scores (\"student_id\" INTEGER, \"score\" INTEGER)");
-        }
-    }
-
-    /**
-     * Inserts sample data into the orders table.
-     *
-     * @param connection the database connection
-     * @throws SQLException if insert fails
-     */
-    public static void insertSampleOrders(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO orders VALUES (1, 100, 50)");
-            stmt.execute("INSERT INTO orders VALUES (2, 100, 150)");
-            stmt.execute("INSERT INTO orders VALUES (3, 200, 75)");
-            stmt.execute("INSERT INTO orders VALUES (4, 200, 25)");
-            stmt.execute("INSERT INTO orders VALUES (5, 300, 300)");
-        }
-    }
-
-    /**
-     * Inserts sample data into the sales table.
-     *
-     * @param connection the database connection
-     * @throws SQLException if insert fails
-     */
-    public static void insertSampleSales(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO sales VALUES (1, 100)");
-            stmt.execute("INSERT INTO sales VALUES (1, 150)");
-            stmt.execute("INSERT INTO sales VALUES (2, 200)");
-            stmt.execute("INSERT INTO sales VALUES (2, 50)");
-        }
-    }
-
-    /**
-     * Inserts sample data into the employees table.
-     *
-     * @param connection the database connection
-     * @throws SQLException if insert fails
-     */
-    public static void insertSampleEmployees(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO employees VALUES ('IT', 60000)");
-            stmt.execute("INSERT INTO employees VALUES ('IT', 80000)");
-            stmt.execute("INSERT INTO employees VALUES ('HR', 50000)");
-            stmt.execute("INSERT INTO employees VALUES ('Sales', 70000)");
-        }
-    }
-
-    /**
-     * Inserts sample data into the scores table.
-     *
-     * @param connection the database connection
-     * @throws SQLException if insert fails
-     */
-    public static void insertSampleScores(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO scores VALUES (1, 85)");
-            stmt.execute("INSERT INTO scores VALUES (2, 92)");
-            stmt.execute("INSERT INTO scores VALUES (3, 78)");
-            stmt.execute("INSERT INTO scores VALUES (4, 95)");
         }
     }
 
