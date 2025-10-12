@@ -126,12 +126,12 @@ class UpdateBuilderIntegrationTest {
                 .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
-        assertThat(rowsAffected).isEqualTo(4);
+        assertThat(rowsAffected).isEqualTo(10);
 
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users WHERE email = 'verified@example.com'")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(4);
+            assertThat(rs.getInt(1)).isEqualTo(10);
         }
     }
 
@@ -141,12 +141,12 @@ class UpdateBuilderIntegrationTest {
                 DSL.update("users").set("email", "updated@example.com").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
-        assertThat(rowsAffected).isEqualTo(4);
+        assertThat(rowsAffected).isEqualTo(10);
 
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users WHERE email = 'updated@example.com'")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(4);
+            assertThat(rs.getInt(1)).isEqualTo(10);
         }
     }
 
@@ -159,12 +159,12 @@ class UpdateBuilderIntegrationTest {
                 .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
-        assertThat(rowsAffected).isEqualTo(1);
+        assertThat(rowsAffected).isEqualTo(3); // Alice (35), Frank (35), Eve (40)
 
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users WHERE name = 'Older User'")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(1);
+            assertThat(rs.getInt(1)).isEqualTo(3);
         }
 
         try (Statement stmt = connection.createStatement();
