@@ -34,7 +34,16 @@ public final class TestDatabaseUtil {
     public static void createUsersTable(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(
-                    "CREATE TABLE users (\"id\" INTEGER PRIMARY KEY, \"name\" VARCHAR(50), \"email\" VARCHAR(100), \"age\" INTEGER, \"active\" BOOLEAN, \"birthdate\" DATE, \"createdAt\" TIMESTAMP)");
+                    """
+                    CREATE TABLE users (\
+                    "id" INTEGER PRIMARY KEY, \
+                    "name" VARCHAR(50), \
+                    "email" VARCHAR(100), \
+                    "age" INTEGER, \
+                    "active" BOOLEAN, \
+                    "birthdate" DATE, \
+                    "createdAt" TIMESTAMP)
+                    """);
         }
     }
 
@@ -67,6 +76,18 @@ public final class TestDatabaseUtil {
                     "INSERT INTO users VALUES (3, 'Bob', 'bob@example.com', 15, false, '2005-01-01', '2023-01-01')");
             stmt.execute(
                     "INSERT INTO users VALUES (4, 'Alice', 'alice@example.com', 35, true, '1990-01-01', '2023-01-01')");
+            stmt.execute(
+                    "INSERT INTO users VALUES (5, 'Charlie', 'charlie@example.com', 30, true, '1991-01-01', '2023-01-02')");
+            stmt.execute(
+                    "INSERT INTO users VALUES (6, 'Diana', 'diana@example.com', 25, false, '1996-01-01', '2023-01-03')");
+            stmt.execute(
+                    "INSERT INTO users VALUES (7, 'Eve', 'eve@example.com', 40, true, '1985-01-01', '2023-01-04')");
+            stmt.execute(
+                    "INSERT INTO users VALUES (8, 'Frank', 'frank@example.com', 35, true, '1990-02-01', '2023-01-05')");
+            stmt.execute(
+                    "INSERT INTO users VALUES (9, 'Grace', 'grace@example.com', 28, false, '1997-01-01', '2023-01-06')");
+            stmt.execute(
+                    "INSERT INTO users VALUES (10, 'Henry', 'henry@example.com', 30, true, '1995-01-01', '2023-01-07')");
         }
     }
 

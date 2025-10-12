@@ -40,7 +40,7 @@ class DeleteBuilderIntegrationTest {
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(3);
+            assertThat(rs.getInt(1)).isEqualTo(9);
         }
 
         try (Statement stmt = connection.createStatement();
@@ -59,7 +59,7 @@ class DeleteBuilderIntegrationTest {
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(3);
+            assertThat(rs.getInt(1)).isEqualTo(9);
         }
     }
 
@@ -78,7 +78,7 @@ class DeleteBuilderIntegrationTest {
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(3);
+            assertThat(rs.getInt(1)).isEqualTo(9);
         }
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT name FROM users WHERE name = 'Alice'")) {
@@ -101,7 +101,7 @@ class DeleteBuilderIntegrationTest {
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt(1)).isEqualTo(2);
+            assertThat(rs.getInt(1)).isEqualTo(8);
         }
 
         try (Statement stmt = connection.createStatement();
@@ -122,7 +122,7 @@ class DeleteBuilderIntegrationTest {
                 DSL.deleteFrom("users").where("email").like("%example.com").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
-        assertThat(rowsAffected).isEqualTo(4);
+        assertThat(rowsAffected).isEqualTo(10);
 
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
@@ -136,7 +136,7 @@ class DeleteBuilderIntegrationTest {
         PreparedStatement ps = DSL.deleteFrom("users").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
-        assertThat(rowsAffected).isEqualTo(4);
+        assertThat(rowsAffected).isEqualTo(10);
 
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
