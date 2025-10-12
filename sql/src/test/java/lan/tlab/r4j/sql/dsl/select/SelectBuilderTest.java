@@ -565,7 +565,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectCountStar() {
+    void countStar() {
         String result = DSL.select().countStar().from("users").build();
         assertThat(result).isEqualTo("""
             SELECT COUNT(*) FROM "users"\
@@ -573,7 +573,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectCountStarWithAlias() {
+    void countStarWithAlias() {
         String result = DSL.select().countStar().as("total").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT COUNT(*) AS total FROM "users"\
@@ -581,7 +581,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectSum() {
+    void sum() {
         String result = DSL.select().sum("amount").from("orders").build();
         assertThat(result).isEqualTo("""
             SELECT SUM("orders"."amount") FROM "orders"\
@@ -589,7 +589,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectSumWithAlias() {
+    void sumWithAlias() {
         String result =
                 DSL.select().sum("amount").as("total_amount").from("orders").build();
         assertThat(result)
@@ -600,7 +600,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectAvg() {
+    void avg() {
         String result = DSL.select().avg("score").from("students").build();
         assertThat(result).isEqualTo("""
             SELECT AVG("students"."score") FROM "students"\
@@ -608,7 +608,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectAvgWithAlias() {
+    void avgWithAlias() {
         String result =
                 DSL.select().avg("score").as("avg_score").from("students").build();
         assertThat(result)
@@ -619,7 +619,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectCount() {
+    void count() {
         String result = DSL.select().count("id").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT COUNT("users"."id") FROM "users"\
@@ -627,7 +627,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectCountWithAlias() {
+    void countWithAlias() {
         String result = DSL.select().count("id").as("user_count").from("users").build();
         assertThat(result)
                 .isEqualTo("""
@@ -636,7 +636,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectCountDistinct() {
+    void countDistinct() {
         String result = DSL.select().countDistinct("email").from("users").build();
         assertThat(result)
                 .isEqualTo("""
@@ -645,7 +645,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectCountDistinctWithAlias() {
+    void countDistinctWithAlias() {
         String result = DSL.select()
                 .countDistinct("email")
                 .as("unique_emails")
@@ -659,7 +659,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMax() {
+    void max() {
         String result = DSL.select().max("price").from("products").build();
         assertThat(result).isEqualTo("""
             SELECT MAX("products"."price") FROM "products"\
@@ -667,7 +667,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMaxWithAlias() {
+    void maxWithAlias() {
         String result =
                 DSL.select().max("price").as("max_price").from("products").build();
         assertThat(result)
@@ -678,7 +678,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMin() {
+    void min() {
         String result = DSL.select().min("price").from("products").build();
         assertThat(result).isEqualTo("""
             SELECT MIN("products"."price") FROM "products"\
@@ -686,7 +686,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMinWithAlias() {
+    void minWithAlias() {
         String result =
                 DSL.select().min("price").as("min_price").from("products").build();
         assertThat(result)
@@ -697,7 +697,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectSumWithGroupBy() {
+    void sumWithGroupBy() {
         String result =
                 DSL.select().sum("amount").from("orders").groupBy("customer_id").build();
         assertThat(result)
@@ -708,7 +708,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectCountWithWhere() {
+    void countWithWhere() {
         String result =
                 DSL.select().countStar().from("users").where("active").eq(true).build();
         assertThat(result)
@@ -718,7 +718,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectAvgWithGroupByAndHaving() {
+    void avgWithGroupByAndHaving() {
         String result = DSL.select()
                 .avg("salary")
                 .from("employees")
@@ -734,7 +734,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMultipleAggregatesWithoutAliases() {
+    void multipleAggregatesWithoutAliases() {
         String result = DSL.select().sum("score").max("createdAt").from("users").build();
         assertThat(result)
                 .isEqualTo(
@@ -744,7 +744,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMultipleAggregatesWithAliases() {
+    void multipleAggregatesWithAliases() {
         String result = DSL.select()
                 .sum("score")
                 .as("total_score")
@@ -760,7 +760,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMultipleAggregatesWithOneAlias() {
+    void multipleAggregatesWithOneAlias() {
         String result = DSL.select()
                 .sum("score")
                 .max("createdAt")
@@ -775,7 +775,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectColumn() {
+    void column() {
         String result = DSL.select().column("name").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT "users"."name" FROM "users"\
@@ -783,7 +783,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectColumnWithAlias() {
+    void columnWithAlias() {
         String result =
                 DSL.select().column("name").as("user_name").from("users").build();
         assertThat(result).isEqualTo("""
@@ -792,7 +792,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMultipleColumns() {
+    void multipleColumns() {
         String result =
                 DSL.select().column("name").column("email").from("users").build();
         assertThat(result)
@@ -802,7 +802,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMultipleColumnsWithAliases() {
+    void multipleColumnsWithAliases() {
         String result = DSL.select()
                 .column("name")
                 .as("user_name")
@@ -818,7 +818,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMultipleColumnsWithOneAlias() {
+    void multipleColumnsWithOneAlias() {
         String result = DSL.select()
                 .column("name")
                 .column("email")
@@ -833,7 +833,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectTableQualifiedColumn() {
+    void tableQualifiedColumn() {
         String result = DSL.select().column("users", "name").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT "users"."name" FROM "users"\
@@ -841,7 +841,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectMixedColumnsAndAggregates() {
+    void mixedColumnsAndAggregates() {
         String result = DSL.select()
                 .column("name")
                 .sum("score")
