@@ -74,6 +74,64 @@ Implement a centralized registry that manages all SQL dialect plugins and provid
 
 ---
 
+### Issue 2.5: Add Version Specification Support
+
+**Title:** Implement semantic version handling for dialect compatibility
+
+**Description:**
+Add support for version specifications to allow applications to specify dialect version requirements. This enables compatibility checking and ensures the correct plugin version is selected.
+
+**Acceptance Criteria:**
+- [ ] Create `VersionSpecification` utility class in package `lan.tlab.r4j.sql.dsl.plugin.util`
+- [ ] Support version specification formats:
+- Exact version: `"8.0.1"`
+- Minimum version shorthand: `"8.0.0+"`
+- Minimum version Maven-style: `"[8.0.0,)"`
+- Maximum version: `"(,9.0.0)"`
+- Version ranges: `"[8.0.0,9.0.0)"`, `"(8.0.0,8.5.0]"`
+- [ ] Implement `VersionSpecification.parse(String spec)` method
+- [ ] Implement `boolean isSatisfiedBy(String version)` method
+- [ ] Add `boolean supportsVersion(String versionSpec)` method to `SqlDialectPlugin` interface
+- [ ] Update `SqlDialectRegistry` with `getRenderer(String dialect, String versionSpec)` method
+- [ ] Update `SqlDialectRegistry` with `isSupported(String dialect, String versionSpec)` method
+- [ ] Add `forDialect(String dialectName, String versionSpec)` to `DSL` class
+- [ ] Add `getDialectVersion()` method to `DSL` class
+- [ ] Implement semantic version comparison (MAJOR.MINOR.PATCH)
+- [ ] Create comprehensive unit tests for version parsing and matching
+- [ ] Create integration tests with version specifications
+
+**Technical Notes:**
+- Follow Maven/Gradle version specification conventions
+- Use semantic versioning (semver) for comparisons
+- Handle inclusive `[` and exclusive `(` boundary notation
+- Throw `IllegalArgumentException` for invalid version specifications
+- Default behavior when no version specified: use latest available
+- Utility class must be final with private constructor
+- All methods should be static
+
+**Version Specification Examples:**
+
+```java
+// Exact version
+DSL dsl = DSL.forDialect("mysql", "8.0.1");
+
+// Minimum version
+DSL dsl = DSL.forDialect("mysql", "8.0.0+");
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,)");
+
+// Version range
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,9.0.0)");
+
+// Latest (no version specified)
+DSL dsl = DSL.forDialect("mysql");
+```
+
+**Dependencies:** Issue 1 (SqlDialectPlugin interface), Issue 2 (SqlDialectRegistry)
+
+**Estimated Effort:** Medium (4-5 hours)
+
+---
+
 ## Phase 2: Built-in Dialect Plugins
 
 ### Issue 3: Create StandardSQLDialectPlugin for SQL:2008
