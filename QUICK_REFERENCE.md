@@ -104,8 +104,7 @@ thread-safety: ConcurrentHashMap
 
 ```java
 package: lan.tlab.r4j.sql.dsl
-new features: Instance-based API with dialect-specific renderers
-backward compatibility: All static methods remain unchanged
+new features: Instance-based API with dialect-specific renderers via forDialect()
 ```
 
 ### Key Technical Decisions
@@ -114,10 +113,10 @@ backward compatibility: All static methods remain unchanged
    - Standard Java mechanism (SPI)
    - Automatic discovery at startup
    - No manual registration code needed
-2. **Backward Compatibility is Mandatory**
-   - All existing static methods must work unchanged
-   - Existing tests must pass without modification
-   - Static methods delegate to standard() dialect
+2. **Modular Plugin Architecture**
+   - Each dialect is a separate Maven module under `/dialect-plugins/`
+   - Plugins distributed independently
+   - Only `forDialect()` method for instantiation
 3. **Thread Safety**
    - ConcurrentHashMap for plugin storage
    - Immutable DSL instances
@@ -130,16 +129,12 @@ backward compatibility: All static methods remain unchanged
    - Each plugin can support multiple names
    - Example: postgres, postgresql, pg → same plugin
    - Implemented via supports() method
-6. **No Breaking Changes**
+6. **Clean API Design**
    - Existing SqlRendererFactory unchanged
    - Existing builders unchanged
-   - Only DSL class gets new features
+   - DSL class simplified with only forDialect() factory method
 
 ## Common Questions
-
-### Q: Do I need to modify existing code to use this?
-
-**A:** No. All existing code continues to work unchanged. The plugin architecture adds new capabilities while maintaining full backward compatibility.
 
 ### Q: How do I create an external plugin?
 
@@ -155,15 +150,13 @@ backward compatibility: All static methods remain unchanged
 **A:**
 
 ```java
-// Old way (still works, uses standard SQL)
-DSL.select("name").from("users").build();
-
-// New way (dialect-specific)
-DSL mysql = DSL.mysql();
-mysql.select("name").from("users").build();
-
-// Or dynamically
+// Use dynamic dialect selection
 DSL dsl = DSL.forDialect("mysql");
+dsl.select("name").from("users").build();
+
+// Or store DSL instance for reuse
+DSL mysql = DSL.forDialect("mysql");
+mysql.select("name").from("users").build();
 ```
 
 ### Q: Can I have multiple dialects in the same application?
@@ -171,8 +164,8 @@ DSL dsl = DSL.forDialect("mysql");
 **A:** Yes! Create separate DSL instances:
 
 ```java
-DSL mysql = DSL.mysql();
-DSL postgres = DSL.postgresql();
+DSL mysql = DSL.forDialect("mysql");
+DSL postgres = DSL.forDialect("postgresql");
 
 String mysqlSql = mysql.select("name").from("users").build();
 String postgresSql = postgres.select("name").from("users").build();
@@ -234,31 +227,29 @@ Set<String> dialects = DSL.getSupportedDialects();
 
 ### Sprint 2: Built-in Plugins
 
-- [ ] Issue #3: StandardSQLDialectPlugin
-- [ ] Issue #4: MySQLDialectPlugin
-- [ ] Issue #5: PostgreSQLDialectPlugin
-- [ ] Issue #6: SqlServerDialectPlugin
-- [ ] Issue #8: META-INF/services configuration
+- [ ] Issue #3: StandardSQLDialectPlugin in `/dialect-plugins/standard`
+- [ ] Issue #4: MySQLDialectPlugin in `/dialect-plugins/mysql`
+- [ ] Issue #5: PostgreSQLDialectPlugin in `/dialect-plugins/postgresql`
+- [ ] Issue #6: SqlServerDialectPlugin in `/dialect-plugins/sqlserver`
+- [ ] Issue #8: META-INF/services configuration for each module
 - [ ] Test auto-discovery
 
 ### Sprint 3: DSL Integration
 
 - [ ] Issue #9: Refactor DSL class
 - [ ] Issue #10: Verify builders
-- [ ] Run existing tests (should pass)
-- [ ] Create backward compatibility tests
+- [ ] Create tests for forDialect() method
 
 ### Sprint 4: Documentation
 
 - [ ] Issue #11: Create documentation
 - [ ] Issue #12: Example external plugin
 - [ ] Update README.md
-- [ ] Create migration guide
 
 ### Sprint 5: Testing
 
 - [ ] Issue #13: Integration tests
-- [ ] Issue #14: Migration tests
+- [ ] Issue #14: Multi-dialect tests
 - [ ] Test with Testcontainers
 - [ ] Performance benchmarks
 
@@ -281,32 +272,31 @@ Set<String> dialects = DSL.getSupportedDialects();
 ```
 sql/src/main/java/lan/tlab/r4j/sql/dsl/plugin/
   ├── SqlDialectPlugin.java                     [Issue #1]
-  ├── SqlDialectRegistry.java                   [Issue #2]
-  └── builtin/
-      ├── StandardSQLDialectPlugin.java         [Issue #3]
-      ├── MySQLDialectPlugin.java               [Issue #4]
-      ├── PostgreSQLDialectPlugin.java          [Issue #5]
-      └── SqlServerDialectPlugin.java           [Issue #6]
+  └── SqlDialectRegistry.java                   [Issue #2]
 
-sql/src/main/resources/META-INF/services/
-  └── lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin  [Issue #8]
-
-sql/src/test/java/lan/tlab/r4j/sql/dsl/plugin/
-  ├── SqlDialectPluginTest.java
-  ├── SqlDialectRegistryTest.java
-  └── builtin/
-      ├── StandardSQLDialectPluginTest.java
-      ├── MySQLDialectPluginTest.java
-      ├── PostgreSQLDialectPluginTest.java
-      └── SqlServerDialectPluginTest.java
+dialect-plugins/                                [NEW parent module]
+  ├── standard/
+  │   └── src/main/java/.../plugin/builtin/
+  │       └── StandardSQLDialectPlugin.java     [Issue #3]
+  │   └── src/main/resources/META-INF/services/ [Issue #8]
+  ├── mysql/
+  │   └── src/main/java/.../plugin/builtin/
+  │       └── MySQLDialectPlugin.java           [Issue #4]
+  │   └── src/main/resources/META-INF/services/ [Issue #8]
+  ├── postgresql/
+  │   └── src/main/java/.../plugin/builtin/
+  │       └── PostgreSQLDialectPlugin.java      [Issue #5]
+  │   └── src/main/resources/META-INF/services/ [Issue #8]
+  └── sqlserver/
+      └── src/main/java/.../plugin/builtin/
+          └── SqlServerDialectPlugin.java       [Issue #6]
+      └── src/main/resources/META-INF/services/ [Issue #8]
 
 test-integration/src/test/java/lan/tlab/r4j/integration/sql/plugin/
-  ├── PluginSystemIntegrationTest.java          [Issue #13]
-  └── BackwardCompatibilityTest.java            [Issue #14]
+  └── PluginSystemIntegrationTest.java          [Issue #13]
 
 docs/
-  ├── PLUGIN_DEVELOPMENT.md                     [Issue #11]
-  └── MIGRATION_GUIDE.md                        [Issue #11]
+  └── PLUGIN_DEVELOPMENT.md                     [Issue #11]
 
 spike/ or examples/
   └── external-plugin-example/                  [Issue #12]
@@ -389,37 +379,36 @@ git push
 ### Must Have (MVP)
 
 - Core plugin interface and registry (Issues 1-2)
-- Built-in plugins for existing dialects (Issues 3-6, 8)
-- DSL refactoring with backward compatibility (Issues 9-10)
+- Built-in plugins as separate Maven modules (Issues 3-6, 8)
+- DSL refactoring with forDialect() method (Issues 9-10)
 - Basic integration tests (Issue 13)
 
 ### Should Have (Initial Release)
 
 - Comprehensive documentation (Issues 11-12)
-- Migration tests (Issue 14)
+- Multi-dialect tests (Issue 14)
 
 ### Nice to Have (Enhanced Release)
 
 - Performance optimization (Issue 15)
 - Feature detection API (Issue 16)
 - Plugin configuration (Issue 17)
-- Multi-module distribution (Issue 18)
+- Multi-module distribution refinements (Issue 18)
 
 ## Success Criteria
 
 ### Minimum Viable Product
 
 - [ ] Plugin system works with all built-in dialects
-- [ ] Backward compatibility: all existing tests pass unchanged
 - [ ] Auto-discovery via ServiceLoader works
-- [ ] Can use DSL.mysql(), DSL.postgresql(), etc.
+- [ ] Can use DSL.forDialect() for all dialects
+- [ ] Each dialect in separate Maven module
 - [ ] Can create external plugin with example
 
 ### Complete Initial Release
 
 - [ ] All MVP criteria met
 - [ ] Comprehensive documentation created
-- [ ] Migration guide available
 - [ ] Example external plugin created
 - [ ] Integration tests with Testcontainers pass
 - [ ] No performance regression
@@ -430,7 +419,6 @@ git push
 - [ ] Performance optimized
 - [ ] Feature detection API implemented
 - [ ] Plugin configuration system available
-- [ ] Multi-module distribution (optional)
 
 ## Contact & Support
 
@@ -454,8 +442,8 @@ For questions about this implementation:
 - **v1.0** - Initial documentation created
 - Contains 18 detailed issues for complete plugin architecture implementation
 - Organized in 8 phases from core infrastructure to advanced features
-- Includes backward compatibility requirements and migration path
+- Each dialect implemented as separate Maven module under `/dialect-plugins/`
 
 ---
 
-**Remember:** The goal is incremental, safe refactoring that adds powerful extensibility while maintaining 100% backward compatibility. Take it one issue at a time, test thoroughly, and document as you go.
+**Remember:** The goal is incremental, safe refactoring that adds powerful extensibility with clean separation of concerns. Each dialect is a separate Maven module, and the DSL uses dynamic dialect selection via `forDialect()`. Take it one issue at a time, test thoroughly, and document as you go.
