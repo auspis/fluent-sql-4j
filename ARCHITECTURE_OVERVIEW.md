@@ -7,8 +7,8 @@
 │                         User Application                         │
 │                                                                   │
 │  DSL.forDialect("mysql").select("name").from("users").build()   │
-│  DSL.forDialect("postgresql").select("name").from("users")...   │
-│  DSL.forDialect("oracle").select("name").from("users").build()  │
+│  DSL.forDialect("mysql", "8.0.1").select("name")...             │
+│  DSL.forDialect("postgresql", "[12.0,)")...                     │
 └───────────────────────────┬─────────────────────────────────────┘
                             │
                             ▼
@@ -17,8 +17,10 @@
 │                                                                   │
 │  - sqlRenderer: SqlRenderer                                      │
 │  - dialectName: String                                           │
+│  - dialectVersion: String                                        │
 │                                                                   │
 │  + forDialect(String): DSL                                       │
+│  + forDialect(String, String): DSL                               │
 │  + getSupportedDialects(): Set<String>                           │
 │                                                                   │
 │  Instance methods:                                               │
@@ -40,22 +42,25 @@
 │                                                                   │
 │  + register(SqlDialectPlugin): void                              │
 │  + getRenderer(String): SqlRenderer                              │
+│  + getRenderer(String, String): SqlRenderer                      │
 │  + getSupportedDialects(): Set<String>                           │
 │  + isSupported(String): boolean                                  │
+│  + isSupported(String, String): boolean                          │
 └───────────────────────────┬─────────────────────────────────────┘
                             │
                             │ auto-discovers via ServiceLoader
                             ▼
-              ┌─────────────────────────────┐
-              │  <<interface>>              │
-              │   SqlDialectPlugin          │
-              │                             │
-              │ + getDialectName(): String  │
-              │ + getVersion(): String      │
-              │ + createRenderer(): Renderer│
-              │ + supports(String): boolean │
-              │ + getSupportedFeatures(): Set│
-              └──────────────┬──────────────┘
+              ┌─────────────────────────────────┐
+              │  <<interface>>                  │
+              │   SqlDialectPlugin              │
+              │                                 │
+              │ + getDialectName(): String      │
+              │ + getVersion(): String          │
+              │ + createRenderer(): Renderer    │
+              │ + supports(String): boolean     │
+              │ + supportsVersion(String): bool │
+              │ + getSupportedFeatures(): Set   │
+              └──────────────┬──────────────────┘
                              │
                              │ implements
          ┌───────────────────┼───────────────────┬─────────────────────┐
@@ -108,9 +113,159 @@
 - **Purpose:** Contract that all dialect plugins must implement
 - **Key Methods:**
   - `getDialectName()`: Canonical name
+  - `getVersion()`: Version of the dialect implementation
   - `createRenderer()`: Factory for SqlRenderer
   - `supports(String)`: Check alias support
+  - `supportsVersion(String)`: Check version compatibility
   - `getSupportedFeatures()`: List dialect capabilities
+
+## Version Handling
+
+The plugin architecture supports semantic versioning for dialect compatibility. This allows applications to specify version requirements and ensures compatibility with specific database versions.
+
+### Version Specification Syntax
+
+Following Maven/Gradle conventions:
+
+```java
+// Latest version (default)
+DSL dsl = DSL.forDialect("mysql");
+
+// Exact version match
+DSL dsl = DSL.forDialect("mysql", "8.0.1");
+
+// Minimum version (inclusive) - shorthand
+DSL dsl = DSL.forDialect("mysql", "8.0.0+");
+
+// Minimum version (inclusive) - Maven style
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,)");
+
+// Maximum version (exclusive)
+DSL dsl = DSL.forDialect("mysql", "(,9.0.0)");
+
+// Version range [min, max)
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,9.0.0)");
+
+// Version range (min, max]
+DSL dsl = DSL.forDialect("mysql", "(8.0.0,8.5.0]");
+```
+
+### Version Specification Components
+
+**VersionSpecification Utility Class:**
+
+```java
+public class VersionSpecification {
+    /**
+     * Parses a version specification string.
+     * Supports:
+     * - Exact: "8.0.1"
+     * - Minimum: "8.0.0+", "[8.0.0,)"
+     * - Maximum: "(,9.0.0)"
+     * - Range: "[8.0.0,9.0.0)", "(8.0.0,8.5.0]"
+     */
+    public static VersionSpecification parse(String spec);
+    
+    /**
+     * Checks if a version satisfies this specification.
+     */
+    public boolean isSatisfiedBy(String version);
+}
+```
+
+### Updated Interface Methods
+
+**SqlDialectPlugin:**
+
+```java
+public interface SqlDialectPlugin {
+    String getDialectName();
+    String getVersion();
+    SqlRenderer createRenderer();
+    boolean supports(String dialectName);
+    
+    /**
+     * Checks if this plugin supports the specified version.
+     * @param versionSpec Version specification (exact, range, or constraint)
+     * @return true if this plugin's version satisfies the specification
+     */
+    boolean supportsVersion(String versionSpec);
+    
+    Set<String> getSupportedFeatures();
+}
+```
+
+**SqlDialectRegistry:**
+
+```java
+public class SqlDialectRegistry {
+    /**
+     * Get renderer for dialect with version constraint.
+     * @param dialect Dialect name
+     * @param versionSpec Version specification
+     * @return SqlRenderer for matching plugin
+     * @throws IllegalArgumentException if no compatible plugin found
+     */
+    public static SqlRenderer getRenderer(String dialect, String versionSpec);
+    
+    /**
+     * Check if dialect with version is supported.
+     */
+    public static boolean isSupported(String dialect, String versionSpec);
+}
+```
+
+**DSL Class:**
+
+```java
+public class DSL {
+    private final String dialectVersion;
+    
+    /**
+     * Create DSL for specific dialect and version.
+     * @param dialectName Dialect name (e.g., "mysql")
+     * @param versionSpec Version specification (e.g., "8.0.1", "[8.0,9.0)")
+     */
+    public static DSL forDialect(String dialectName, String versionSpec);
+    
+    /**
+     * Get the version of the dialect in use.
+     */
+    public String getDialectVersion();
+}
+```
+
+### Version Matching Examples
+
+```java
+// Plugin implementation
+public class MySQLDialectPlugin implements SqlDialectPlugin {
+    @Override
+    public String getVersion() {
+        return "8.0.30";
+    }
+    
+    @Override
+    public boolean supportsVersion(String versionSpec) {
+        return VersionSpecification.parse(versionSpec)
+                                   .isSatisfiedBy(getVersion());
+    }
+}
+
+// Usage scenarios
+DSL dsl1 = DSL.forDialect("mysql", "8.0.30");    // ✓ Exact match
+DSL dsl2 = DSL.forDialect("mysql", "8.0.0+");    // ✓ 8.0.30 >= 8.0.0
+DSL dsl3 = DSL.forDialect("mysql", "[8.0,9.0)"); // ✓ 8.0.30 in range
+DSL dsl4 = DSL.forDialect("mysql", "9.0.0+");    // ✗ 8.0.30 < 9.0.0
+```
+
+### Version Comparison Rules
+
+Uses semantic versioning (MAJOR.MINOR.PATCH):
+- **Exact match:** Version must be identical
+- **Range match:** Version must fall within specified range
+- **Minimum/Maximum:** Inclusive `[` or exclusive `(` boundaries
+- **Shorthand `+`:** Equivalent to `[version,)` (minimum inclusive)
 
 ### Built-in Plugins
 
