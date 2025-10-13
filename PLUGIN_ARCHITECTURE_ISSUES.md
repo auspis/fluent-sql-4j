@@ -78,12 +78,13 @@ Implement a centralized registry that manages all SQL dialect plugins and provid
 
 ### Issue 3: Create StandardSQLDialectPlugin for SQL:2008
 
-**Title:** Implement built-in plugin for Standard SQL:2008 dialect
+**Title:** Implement built-in plugin for Standard SQL:2008 dialect in separate Maven module
 
 **Description:**
-Create the first built-in plugin for the standard SQL:2008 dialect, which is currently the default in the system.
+Create the first built-in plugin for the standard SQL:2008 dialect in a dedicated Maven module under `/dialect-plugins/standard`.
 
 **Acceptance Criteria:**
+- [ ] Create new Maven module `/dialect-plugins/standard`
 - [ ] Create `StandardSQLDialectPlugin` class in package `lan.tlab.r4j.sql.dsl.plugin.builtin`
 - [ ] Implement all `SqlDialectPlugin` interface methods
 - [ ] Return "sql2008" as dialect name
@@ -91,13 +92,14 @@ Create the first built-in plugin for the standard SQL:2008 dialect, which is cur
 - [ ] Delegate to `SqlRendererFactory.standardSql2008()` for renderer creation
 - [ ] Support aliases: "standard", "sql2008", "ansi"
 - [ ] Define supported features set (standard SQL operations)
+- [ ] Create META-INF/services configuration in module
 - [ ] Create unit tests verifying plugin behavior
 - [ ] Create integration tests using the plugin with DSL
 
 **Technical Notes:**
 - Reuse existing `SqlRendererFactory.standardSql2008()` method
 - Document supported features clearly
-- Ensure backward compatibility
+- Module should depend on `sql` core module
 
 **Dependencies:** Issues 1, 2
 
@@ -107,12 +109,13 @@ Create the first built-in plugin for the standard SQL:2008 dialect, which is cur
 
 ### Issue 4: Create MySQLDialectPlugin
 
-**Title:** Implement built-in plugin for MySQL dialect
+**Title:** Implement built-in plugin for MySQL dialect in separate Maven module
 
 **Description:**
-Create a plugin for MySQL that leverages the existing MySQL-specific renderer configuration.
+Create a plugin for MySQL in a dedicated Maven module under `/dialect-plugins/mysql`.
 
 **Acceptance Criteria:**
+- [ ] Create new Maven module `/dialect-plugins/mysql`
 - [ ] Create `MySQLDialectPlugin` class in package `lan.tlab.r4j.sql.dsl.plugin.builtin`
 - [ ] Implement all `SqlDialectPlugin` interface methods
 - [ ] Return "mysql" as dialect name
@@ -120,6 +123,7 @@ Create a plugin for MySQL that leverages the existing MySQL-specific renderer co
 - [ ] Delegate to `SqlRendererFactory.mysql()` for renderer creation
 - [ ] Support aliases: "mysql", "mariadb"
 - [ ] Define MySQL-specific features: "limit", "offset", "backtick-identifiers", "auto-increment"
+- [ ] Create META-INF/services configuration in module
 - [ ] Create unit tests verifying plugin behavior
 - [ ] Create integration tests with actual MySQL syntax validation
 
@@ -127,6 +131,7 @@ Create a plugin for MySQL that leverages the existing MySQL-specific renderer co
 - Reuse existing `SqlRendererFactory.mysql()` method
 - Document MySQL-specific features and version compatibility
 - Consider MariaDB compatibility
+- Module should depend on `sql` core module
 
 **Dependencies:** Issues 1, 2
 
@@ -136,12 +141,13 @@ Create a plugin for MySQL that leverages the existing MySQL-specific renderer co
 
 ### Issue 5: Create PostgreSQLDialectPlugin
 
-**Title:** Implement built-in plugin for PostgreSQL dialect
+**Title:** Implement built-in plugin for PostgreSQL dialect in separate Maven module
 
 **Description:**
-Create a plugin for PostgreSQL. Since there's no existing PostgreSQL renderer, this will require creating one or using the standard renderer with PostgreSQL-specific configurations.
+Create a plugin for PostgreSQL in a dedicated Maven module under `/dialect-plugins/postgresql`.
 
 **Acceptance Criteria:**
+- [ ] Create new Maven module `/dialect-plugins/postgresql`
 - [ ] Create `PostgreSQLDialectPlugin` class in package `lan.tlab.r4j.sql.dsl.plugin.builtin`
 - [ ] Implement all `SqlDialectPlugin` interface methods
 - [ ] Return "postgresql" as dialect name
@@ -149,6 +155,7 @@ Create a plugin for PostgreSQL. Since there's no existing PostgreSQL renderer, t
 - [ ] Create `SqlRendererFactory.postgresql()` method if needed
 - [ ] Support aliases: "postgresql", "postgres", "pg"
 - [ ] Define PostgreSQL-specific features
+- [ ] Create META-INF/services configuration in module
 - [ ] Create unit tests verifying plugin behavior
 - [ ] Create integration tests (may need Testcontainers with PostgreSQL)
 
@@ -156,6 +163,7 @@ Create a plugin for PostgreSQL. Since there's no existing PostgreSQL renderer, t
 - May need to create new renderer configuration in `SqlRendererFactory`
 - Research PostgreSQL-specific syntax differences (e.g., LIMIT/OFFSET, string concatenation, etc.)
 - Consider using standard renderer with minimal modifications
+- Module should depend on `sql` core module
 
 **Dependencies:** Issues 1, 2
 
@@ -165,12 +173,13 @@ Create a plugin for PostgreSQL. Since there's no existing PostgreSQL renderer, t
 
 ### Issue 6: Create SqlServerDialectPlugin
 
-**Title:** Implement built-in plugin for SQL Server dialect
+**Title:** Implement built-in plugin for SQL Server dialect in separate Maven module
 
 **Description:**
-Create a plugin for Microsoft SQL Server, leveraging the existing SQL Server renderer configuration.
+Create a plugin for Microsoft SQL Server in a dedicated Maven module under `/dialect-plugins/sqlserver`.
 
 **Acceptance Criteria:**
+- [ ] Create new Maven module `/dialect-plugins/sqlserver`
 - [ ] Create `SqlServerDialectPlugin` class in package `lan.tlab.r4j.sql.dsl.plugin.builtin`
 - [ ] Implement all `SqlDialectPlugin` interface methods
 - [ ] Return "sqlserver" as dialect name
@@ -178,12 +187,14 @@ Create a plugin for Microsoft SQL Server, leveraging the existing SQL Server ren
 - [ ] Delegate to `SqlRendererFactory.sqlServer()` for renderer creation
 - [ ] Support aliases: "sqlserver", "mssql", "tsql"
 - [ ] Define SQL Server-specific features
+- [ ] Create META-INF/services configuration in module
 - [ ] Create unit tests verifying plugin behavior
 - [ ] Create integration tests
 
 **Technical Notes:**
 - Reuse existing `SqlRendererFactory.sqlServer()` method
 - Document T-SQL specific features
+- Module should depend on `sql` core module
 
 **Dependencies:** Issues 1, 2
 
@@ -222,27 +233,37 @@ Create a plugin for Oracle Database. The existing Oracle renderer is incomplete 
 
 ### Issue 8: Create META-INF/services Configuration
 
-**Title:** Set up SPI configuration for auto-discovery of built-in plugins
+**Title:** Set up SPI configuration for auto-discovery of built-in plugins in each module
 
 **Description:**
-Create the ServiceLoader configuration file that enables automatic discovery of built-in dialect plugins.
+Create the ServiceLoader configuration files in each dialect plugin Maven module that enable automatic discovery of built-in dialect plugins.
 
 **Acceptance Criteria:**
-- [ ] Create directory `sql/src/main/resources/META-INF/services/`
-- [ ] Create file `lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin`
-- [ ] List all built-in plugin implementations in the file
+- [ ] Create META-INF/services configuration in `/dialect-plugins/standard` module
+- [ ] Create META-INF/services configuration in `/dialect-plugins/mysql` module
+- [ ] Create META-INF/services configuration in `/dialect-plugins/postgresql` module
+- [ ] Create META-INF/services configuration in `/dialect-plugins/sqlserver` module
+- [ ] Each file should be `lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin`
+- [ ] Each file lists only its own plugin implementation
 - [ ] Verify ServiceLoader can discover plugins at runtime
 - [ ] Create test to validate SPI configuration
 - [ ] Document SPI configuration format for external plugin developers
 
-**File Contents:**
+**File Contents (per module):**
+
+In `/dialect-plugins/standard/src/main/resources/META-INF/services/lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin`:
 
 ```
 lan.tlab.r4j.sql.dsl.plugin.builtin.StandardSQLDialectPlugin
-lan.tlab.r4j.sql.dsl.plugin.builtin.MySQLDialectPlugin
-lan.tlab.r4j.sql.dsl.plugin.builtin.PostgreSQLDialectPlugin
-lan.tlab.r4j.sql.dsl.plugin.builtin.SqlServerDialectPlugin
 ```
+
+In `/dialect-plugins/mysql/src/main/resources/META-INF/services/lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin`:
+
+```
+lan.tlab.r4j.sql.dsl.plugin.builtin.MySQLDialectPlugin
+```
+
+(Similar pattern for postgresql and sqlserver modules)
 
 **Technical Notes:**
 - Ensure file encoding is UTF-8
@@ -262,31 +283,26 @@ lan.tlab.r4j.sql.dsl.plugin.builtin.SqlServerDialectPlugin
 **Title:** Refactor DSL class to support plugin-based dialect selection
 
 **Description:**
-Refactor the main DSL class to support both the plugin-based architecture and maintain backward compatibility with the existing static method API.
+Refactor the main DSL class to support the plugin-based architecture with dynamic dialect selection via `forDialect()` method.
 
 **Acceptance Criteria:**
 - [ ] Add instance fields: `SqlRenderer sqlRenderer` and `String dialectName`
 - [ ] Add private constructor: `DSL(SqlRenderer sqlRenderer, String dialectName)`
 - [ ] Implement `forDialect(String dialectName)` factory method using registry
-- [ ] Implement `standard()` factory method
-- [ ] Implement `mysql()` factory method
-- [ ] Implement `postgresql()` factory method
-- [ ] Implement `sqlserver()` factory method
 - [ ] Add instance methods: `select()`, `selectAll()`, `createTable()`, `insertInto()`, `deleteFrom()`, `update()`
-- [ ] Keep existing static methods for backward compatibility (delegate to `standard()`)
 - [ ] Implement `getDialect()` method
 - [ ] Implement static `getSupportedDialects()` method
 - [ ] Create comprehensive unit tests
-- [ ] Update existing tests to ensure backward compatibility
+- [ ] Remove old static convenience methods
 
 **Technical Notes:**
-- Maintain backward compatibility: existing static methods must work unchanged
+- Only `forDialect()` method for instantiation
 - Instance methods should use the configured renderer
-- Static methods should delegate to `standard().methodName()`
+- Clean, simple API without convenience methods
 
 **Dependencies:** Issues 1-8
 
-**Estimated Effort:** Medium (4-5 hours)
+**Estimated Effort:** Medium (3-4 hours)
 
 ---
 
@@ -344,7 +360,7 @@ Create comprehensive documentation explaining the plugin architecture, how to us
 
 **Technical Notes:**
 - Use clear, runnable code examples
-- Explain both static (backward compatible) and instance-based usage
+- Explain instance-based usage with `forDialect()`
 - Provide complete external plugin example
 
 **Dependencies:** Issues 1-10
@@ -413,24 +429,23 @@ Create thorough integration tests that validate the entire plugin system working
 
 ---
 
-### Issue 14: Create Migration Tests
+### Issue 14: Create Multi-Dialect Integration Tests
 
-**Title:** Ensure backward compatibility with migration tests
+**Title:** Create integration tests for multi-dialect support
 
 **Description:**
-Create specific tests that verify existing code continues to work without modification after plugin architecture introduction.
+Create tests that verify the plugin system works correctly with multiple dialects simultaneously.
 
 **Acceptance Criteria:**
-- [ ] Collect real examples of current DSL usage from codebase
-- [ ] Create tests using old static API patterns
-- [ ] Verify all tests pass with new architecture
-- [ ] Test that SQL output is identical for same inputs
-- [ ] Document any behavioral changes (if any)
-- [ ] Create deprecation warnings for any APIs being phased out
+- [ ] Create tests for multiple dialect usage in same application
+- [ ] Test dialect-specific SQL generation
+- [ ] Verify plugin isolation (one dialect doesn't affect another)
+- [ ] Test dynamic dialect switching
+- [ ] Document multi-dialect usage patterns
 
 **Technical Notes:**
-- Focus on regression prevention
-- Use existing integration tests as baseline
+- Focus on multi-dialect scenarios
+- Use Testcontainers for real database testing
 
 **Dependencies:** Issues 9, 10
 
