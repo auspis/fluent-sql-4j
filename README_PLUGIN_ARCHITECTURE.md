@@ -62,23 +62,42 @@ Visual and conceptual overview of the architecture. Contains:
 
 ## 📊 Project Statistics
 
-- **Total Issues:** 18
-- **Total Estimated Effort:** 50-65 hours
-- **Minimum Viable Product:** 10 issues (Issues 1-10, 13)
-- **Complete Initial Release:** 14 issues (Issues 1-14)
-- **Enhanced Release:** All 18 issues
+### First Release (Standard SQL + MySQL)
+
+- **Total Issues:** 13
+- **Total Estimated Effort:** 42-51 hours
+- **Core Dialects:** Standard SQL:2008, MySQL/MariaDB
+- **Minimum Viable Product:** Issues 1-10, 13
+- **Complete First Release:** Issues 1-15 (excluding PostgreSQL/SQL Server)
+
+### Future Releases
+
+- **PostgreSQL Support:** Issues 5, 8 (update) - 4-5 hours
+- **SQL Server Support:** Issues 6, 8 (update) - 2-3 hours
+- **Oracle Support:** Issue 7 - 6-8 hours (optional)
+- **Advanced Features:** Issues 16-18 - 17-23 hours (optional)
 
 ## 🎯 Implementation Phases
 
-|  Phase  | Issues | Effort |                Description                 |
-|---------|--------|--------|--------------------------------------------|
-| Phase 1 | 1-2    | 4-6h   | Core infrastructure (interface, registry)  |
-| Phase 2 | 3-6, 8 | 10-13h | Built-in plugins (MySQL, PostgreSQL, etc.) |
-| Phase 3 | 9-10   | 6-8h   | DSL integration and refactoring            |
-| Phase 4 | 11-12  | 6-7h   | Documentation and examples                 |
-| Phase 5 | 13-14  | 9-12h  | Integration and migration tests            |
-| Phase 6 | 15     | 3-4h   | Performance optimization                   |
-| Phase 7 | 16-18  | 17-23h | Advanced features (optional)               |
+### First Release Phases (Standard SQL + MySQL)
+
+|  Phase  |  Issues  | Effort |                    Description                     |
+|---------|----------|--------|----------------------------------------------------|
+| Phase 1 | 1-2, 2.5 | 8-11h  | Core infrastructure (interface, registry, version) |
+| Phase 2 | 3-4, 8   | 5-7h   | Built-in plugins (Standard SQL, MySQL only)        |
+| Phase 3 | 9-10     | 6-8h   | DSL integration and refactoring                    |
+| Phase 4 | 11-12    | 6-7h   | Documentation and examples                         |
+| Phase 5 | 13-14    | 9-12h  | Integration and migration tests                    |
+| Phase 6 | 15       | 3-4h   | Performance optimization                           |
+
+### Future Release Phases
+
+|  Phase   | Issues | Effort |            Description            |
+|----------|--------|--------|-----------------------------------|
+| Phase 2+ | 5-6    | 6-8h   | PostgreSQL and SQL Server plugins |
+| Phase 7  | 16-18  | 17-23h | Advanced features (optional)      |
+| Phase 8  | 7      | 6-8h   | Oracle plugin (optional)          |
+| Phase 7  | 16-18  | 17-23h | Advanced features (optional)      |
 
 ## 🏗️ Core Components
 
