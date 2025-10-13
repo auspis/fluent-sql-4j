@@ -45,6 +45,26 @@ This document provides a concise summary of all 18 issues for quick reference an
 
 ---
 
+## Issue #2.5: Add Version Specification Support
+
+**Labels:** `enhancement`, `architecture`, `plugin-system`, `versioning`  
+**Milestone:** Plugin Architecture - Phase 1  
+**Priority:** High  
+**Effort:** Medium (4-5 hours)  
+**Dependencies:** Issues #1, #2
+
+**Summary:** Implement semantic version handling to allow applications to specify dialect version requirements. Create `VersionSpecification` utility class supporting Maven/Gradle-style version specifications: exact (`"8.0.1"`), minimum (`"8.0.0+"`), ranges (`"[8.0.0,9.0.0)"`). Add `supportsVersion()` to `SqlDialectPlugin` interface and `forDialect(String, String)` overload to DSL class.
+
+**Deliverables:**
+- VersionSpecification utility class
+- Version parsing and comparison logic
+- Updated SqlDialectPlugin interface
+- Updated SqlDialectRegistry with version support
+- Updated DSL class with version parameter
+- Comprehensive unit and integration tests
+
+---
+
 ## Issue #3: Create StandardSQLDialectPlugin
 
 **Labels:** `enhancement`, `plugin-system`, `dialect`  
@@ -386,51 +406,52 @@ lan.tlab.r4j.sql.dsl.plugin.builtin.SqlServerDialectPlugin
 |          Category           | Count | Total Effort |
 |-----------------------------|-------|--------------|
 | **Critical Priority**       | 3     | 9-11 hours   |
-| **High Priority**           | 8     | 29-38 hours  |
+| **High Priority**           | 9     | 33-43 hours  |
 | **Medium Priority**         | 3     | 9-11 hours   |
 | **Low Priority (Optional)** | 4     | 23-29 hours  |
-| **TOTAL**                   | 18    | 50-65 hours  |
+| **TOTAL**                   | 19    | 54-70 hours  |
 
 ## Phase Breakdown
 
-|       Phase       |  Issues  | Effort |   Status    |
-|-------------------|----------|--------|-------------|
-| Phase 1: Core     | #1-2     | 4-6h   | Not Started |
-| Phase 2: Plugins  | #3-6, #8 | 10-13h | Not Started |
-| Phase 3: DSL      | #9-10    | 6-8h   | Not Started |
-| Phase 4: Docs     | #11-12   | 6-7h   | Not Started |
-| Phase 5: Testing  | #13-14   | 9-12h  | Not Started |
-| Phase 6: Perf     | #15      | 3-4h   | Not Started |
-| Phase 7: Advanced | #16-18   | 17-23h | Optional    |
+|       Phase       |   Issues   | Effort |   Status    |
+|-------------------|------------|--------|-------------|
+| Phase 1: Core     | #1-2, #2.5 | 8-11h  | Not Started |
+| Phase 2: Plugins  | #3-6, #8   | 10-13h | Not Started |
+| Phase 3: DSL      | #9-10      | 6-8h   | Not Started |
+| Phase 4: Docs     | #11-12     | 6-7h   | Not Started |
+| Phase 5: Testing  | #13-14     | 9-12h  | Not Started |
+| Phase 6: Perf     | #15        | 3-4h   | Not Started |
+| Phase 7: Advanced | #16-18     | 17-23h | Optional    |
 
 ## Issue Dependencies Graph
 
 ```
 #1 (Plugin Interface)
  ├─→ #2 (Registry)
- │    ├─→ #3 (StandardSQL Plugin)
- │    ├─→ #4 (MySQL Plugin)
- │    ├─→ #5 (PostgreSQL Plugin)
- │    ├─→ #6 (SqlServer Plugin)
- │    └─→ #7 (Oracle Plugin - Optional)
- │         └─→ #8 (SPI Config)
- │              └─→ #9 (DSL Refactor)
- │                   ├─→ #10 (Builder Verification)
- │                   │    ├─→ #11 (Documentation)
- │                   │    │    └─→ #12 (Example Plugin)
- │                   │    │         └─→ #13 (Integration Tests)
- │                   │    │              ├─→ #14 (Migration Tests)
- │                   │    │              ├─→ #15 (Performance)
- │                   │    │              ├─→ #16 (Feature API)
- │                   │    │              ├─→ #17 (Configuration)
- │                   │    │              └─→ #18 (Multi-module)
+ │    ├─→ #2.5 (Version Support)
+ │    │    ├─→ #3 (StandardSQL Plugin)
+ │    │    ├─→ #4 (MySQL Plugin)
+ │    │    ├─→ #5 (PostgreSQL Plugin)
+ │    │    ├─→ #6 (SqlServer Plugin)
+ │    │    └─→ #7 (Oracle Plugin - Optional)
+ │    │         └─→ #8 (SPI Config)
+ │    │              └─→ #9 (DSL Refactor)
+ │    │                   ├─→ #10 (Builder Verification)
+ │    │                   │    ├─→ #11 (Documentation)
+ │    │                   │    │    └─→ #12 (Example Plugin)
+ │    │                   │    │         └─→ #13 (Integration Tests)
+ │    │                   │    │              ├─→ #14 (Migration Tests)
+ │    │                   │    │              ├─→ #15 (Performance)
+ │    │                   │    │              ├─→ #16 (Feature API)
+ │    │                   │    │              ├─→ #17 (Configuration)
+ │    │                   │    │              └─→ #18 (Multi-module)
 ```
 
 ## Recommended Implementation Order
 
 ### MVP (Minimum Viable Product)
 
-1. Issue #1 → Issue #2
+1. Issue #1 → Issue #2 → Issue #2.5
 2. Issues #3, #4, #5, #6 (can be parallel)
 3. Issue #8
 4. Issue #9 → Issue #10

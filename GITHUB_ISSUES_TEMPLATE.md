@@ -194,6 +194,131 @@ Medium (3-4 hours)
 
 ---
 
+## Issue #2.5: Add Version Specification Support
+
+**Labels:** enhancement, architecture, plugin-system, versioning  
+**Milestone:** Plugin Architecture - Phase 1  
+**Assignees:** (assign as needed)
+
+### Description
+
+Implement semantic version handling to allow applications to specify dialect version requirements. This enables compatibility checking and ensures the correct plugin version is selected.
+
+### Motivation
+
+Different database versions may have different SQL syntax or feature support. Applications need to be able to specify version constraints to ensure compatibility with their target database version.
+
+### Acceptance Criteria
+
+- [ ] Create `VersionSpecification` utility class in package `lan.tlab.r4j.sql.dsl.plugin.util`
+- [ ] Support version specification formats:
+  - Exact version: `"8.0.1"`
+  - Minimum version shorthand: `"8.0.0+"`
+  - Minimum version Maven-style: `"[8.0.0,)"`
+  - Maximum version: `"(,9.0.0)"`
+  - Version ranges: `"[8.0.0,9.0.0)"`, `"(8.0.0,8.5.0]"`
+- [ ] Implement `VersionSpecification.parse(String spec)` static method
+- [ ] Implement `boolean isSatisfiedBy(String version)` method
+- [ ] Add `boolean supportsVersion(String versionSpec)` method to `SqlDialectPlugin` interface
+- [ ] Update `SqlDialectRegistry` with `getRenderer(String dialect, String versionSpec)` method
+- [ ] Update `SqlDialectRegistry` with `isSupported(String dialect, String versionSpec)` method
+- [ ] Add `forDialect(String dialectName, String versionSpec)` overload to `DSL` class
+- [ ] Add `String dialectVersion` field to `DSL` class
+- [ ] Add `getDialectVersion()` method to `DSL` class
+- [ ] Implement semantic version comparison (MAJOR.MINOR.PATCH)
+- [ ] Create comprehensive unit tests for version parsing and matching
+- [ ] Create integration tests with various version specifications
+
+### Technical Notes
+
+- Follow Maven/Gradle version specification conventions
+- Use semantic versioning (semver) for comparisons
+- Handle inclusive `[` and exclusive `(` boundary notation
+- Throw `IllegalArgumentException` for invalid version specifications
+- Default behavior when no version specified: use latest available
+- VersionSpecification utility class must be final with private constructor
+- All parsing and comparison methods should be static
+- Consider using a well-tested library for version comparison if available
+
+### Example Implementation
+
+```java
+package lan.tlab.r4j.sql.dsl.plugin.util;
+
+/**
+ * Utility for parsing and matching semantic version specifications.
+ * Supports Maven/Gradle-style version ranges.
+ */
+public final class VersionSpecification {
+    private VersionSpecification() {
+        // Utility class
+    }
+    
+    /**
+     * Parses a version specification string.
+     * Supported formats:
+     * - Exact: "8.0.1"
+     * - Minimum: "8.0.0+", "[8.0.0,)"
+     * - Maximum: "(,9.0.0)"
+     * - Range: "[8.0.0,9.0.0)", "(8.0.0,8.5.0]"
+     */
+    public static VersionSpecification parse(String spec) {
+        // Implementation
+    }
+    
+    /**
+     * Checks if a version satisfies this specification.
+     */
+    public boolean isSatisfiedBy(String version) {
+        // Implementation
+    }
+}
+```
+
+### Usage Examples
+
+```java
+// Exact version
+DSL dsl = DSL.forDialect("mysql", "8.0.1");
+
+// Minimum version (8.0 or higher)
+DSL dsl = DSL.forDialect("mysql", "8.0.0+");
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,)");
+
+// Version range (8.x versions only)
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,9.0.0)");
+
+// Latest version (default)
+DSL dsl = DSL.forDialect("mysql");
+
+// Check version
+String version = dsl.getDialectVersion(); // e.g., "8.0.30"
+```
+
+### Test Scenarios
+
+1. Parse exact version specification
+2. Parse minimum version with `+` shorthand
+3. Parse minimum version with `[x,)` notation
+4. Parse version ranges with inclusive/exclusive boundaries
+5. Version comparison: 8.0.1 satisfies "8.0.0+"
+6. Version comparison: 8.0.1 satisfies "[8.0.0,9.0.0)"
+7. Version comparison: 8.0.1 does not satisfy "9.0.0+"
+8. Invalid version specification throws exception
+9. Plugin with version 8.0.30 matches various specifications
+10. Multiple plugins with different versions, select correct one
+
+### Dependencies
+
+- Issue #1 (SqlDialectPlugin interface)
+- Issue #2 (SqlDialectRegistry)
+
+### Estimated Effort
+
+Medium (4-5 hours)
+
+---
+
 ## Issue #3: Create StandardSQLDialectPlugin
 
 **Labels:** enhancement, plugin-system, dialect  
