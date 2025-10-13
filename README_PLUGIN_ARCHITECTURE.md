@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains comprehensive documentation for implementing a plugin-based architecture for SQL dialects in the r4j framework. The goal is to make the framework extensible, allowing the community to contribute new database dialect implementations while maintaining 100% backward compatibility with existing code.
+This directory contains comprehensive documentation for implementing a plugin-based architecture for SQL dialects in the r4j framework. The goal is to make the framework extensible, allowing the community to contribute new database dialect implementations with each dialect as a separate Maven module.
 
 ## 📚 Documentation Files
 
@@ -98,44 +98,40 @@ public interface SqlDialectPlugin {
 
 Central registry using Java ServiceLoader (SPI) for automatic plugin discovery.
 
-### Built-in Plugins
+### Built-in Plugins (Separate Maven Modules)
 
-- **StandardSQLDialectPlugin** - SQL:2008 standard
-- **MySQLDialectPlugin** - MySQL and MariaDB
-- **PostgreSQLDialectPlugin** - PostgreSQL
-- **SqlServerDialectPlugin** - Microsoft SQL Server
+- **StandardSQLDialectPlugin** - SQL:2008 standard (in `/dialect-plugins/standard`)
+- **MySQLDialectPlugin** - MySQL and MariaDB (in `/dialect-plugins/mysql`)
+- **PostgreSQLDialectPlugin** - PostgreSQL (in `/dialect-plugins/postgresql`)
+- **SqlServerDialectPlugin** - Microsoft SQL Server (in `/dialect-plugins/sqlserver`)
 
 ### DSL Class (Refactored)
 
-New instance-based API while maintaining all existing static methods:
+Clean API using dynamic dialect selection:
 
 ```java
-// New: dialect-specific
-DSL mysql = DSL.mysql();
-mysql.select("name").from("users").build();
-
-// Old: still works (backward compatible)
-DSL.select("name").from("users").build();
+// Dynamic dialect selection
+DSL dsl = DSL.forDialect("mysql");
+dsl.select("name").from("users").build();
 ```
 
 ## ✅ Key Features
 
 1. **🔌 Extensibility:** Community can create plugins for any database
 2. **🔍 Auto-Discovery:** ServiceLoader finds plugins automatically
-3. **📦 Modularity:** Each dialect can be a separate JAR
-4. **🔄 Backward Compatible:** Existing code works unchanged
-5. **🔒 Type Safety:** Compile-time checking via interface
-6. **🧪 Testability:** Easy to mock plugins
-7. **⚡ Performance:** Cached registry, no runtime overhead
+3. **📦 Modularity:** Each dialect is a separate Maven module
+4. **🔒 Type Safety:** Compile-time checking via interface
+5. **🧪 Testability:** Easy to mock plugins
+6. **⚡ Performance:** Cached registry, no runtime overhead
 
 ## 🎓 Usage Examples
 
-### Basic Usage (New API)
+### Basic Usage
 
 ```java
 // Create dialect-specific DSL
-DSL mysql = DSL.mysql();
-DSL postgres = DSL.postgresql();
+DSL mysql = DSL.forDialect("mysql");
+DSL postgres = DSL.forDialect("postgresql");
 
 // Use with fluent API
 String mysqlSql = mysql.select("name", "email")
@@ -240,16 +236,15 @@ r4j/
 ### MVP Success Criteria
 
 - ✅ Plugin system works with all built-in dialects
-- ✅ Backward compatibility: all existing tests pass unchanged
 - ✅ Auto-discovery via ServiceLoader works
-- ✅ Can use DSL.mysql(), DSL.postgresql(), etc.
+- ✅ Can use DSL.forDialect() for all dialects
 - ✅ Can create external plugin with example
+- ✅ Each dialect is in separate Maven module
 
 ### Complete Release Success Criteria
 
 - ✅ All MVP criteria
 - ✅ Comprehensive documentation created
-- ✅ Migration guide available
 - ✅ Example external plugin works
 - ✅ Integration tests pass
 - ✅ No performance regression
@@ -272,14 +267,13 @@ Use templates from [GITHUB_ISSUES_TEMPLATE.md](GITHUB_ISSUES_TEMPLATE.md) to cre
 
 Follow the recommended order:
 1. **Phase 1:** Core infrastructure (foundation)
-2. **Phase 2:** Built-in plugins (functionality)
+2. **Phase 2:** Built-in plugins in separate modules (functionality)
 3. **Phase 3:** DSL integration (user API)
 4. **Phase 4-5:** Documentation and testing
 5. **Phase 6-7:** Optimization and advanced features (optional)
 
 ### Step 5: Test Thoroughly
 
-- Run existing tests (should pass unchanged)
 - Create new tests for each feature
 - Use Testcontainers for integration tests
 - Verify backward compatibility
@@ -287,7 +281,6 @@ Follow the recommended order:
 ## ❓ Common Questions
 
 See [QUICK_REFERENCE.md](QUICK_REFERENCE.md) for answers to common questions including:
-- Do I need to modify existing code?
 - How do I create an external plugin?
 - Can I use multiple dialects in the same app?
 - What about performance?
@@ -300,7 +293,6 @@ When implementing features:
 2. **Format before commit** (`./mvnw spotless:apply` - mandatory!)
 3. **Test thoroughly** (unit + integration tests)
 4. **Document changes** (JavaDoc, README updates)
-5. **Maintain backward compatibility** (critical requirement)
 
 ## 📞 Support
 
@@ -317,7 +309,6 @@ Once implemented, this architecture will provide:
 - **For Users:**
   - Easy multi-database support
   - Clean, dialect-specific APIs
-  - Backward compatible (no code changes needed)
 - **For Contributors:**
   - Clear extension points
   - Well-defined interfaces
@@ -325,7 +316,7 @@ Once implemented, this architecture will provide:
   - Comprehensive examples
 - **For Maintainers:**
   - Modular, testable code
-  - Separate dialect concerns
+  - Separate dialect concerns (each in its own Maven module)
   - Easy to add new dialects
   - Community contributions enabled
 
@@ -340,9 +331,8 @@ Once implemented, this architecture will provide:
 ### Next: MVP Implementation
 
 - [ ] Implement core infrastructure
-- [ ] Create built-in plugins
-- [ ] Refactor DSL class
-- [ ] Verify backward compatibility
+- [ ] Create built-in plugins in separate Maven modules
+- [ ] Refactor DSL class with forDialect() support
 
 ### Future: Enhancement Phase
 
