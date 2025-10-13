@@ -269,10 +269,14 @@ Uses semantic versioning (MAJOR.MINOR.PATCH):
 
 ### Built-in Plugins
 
-- **StandardSQLDialectPlugin:** SQL:2008 standard
-- **MySQLDialectPlugin:** MySQL/MariaDB
-- **PostgreSQLDialectPlugin:** PostgreSQL
-- **SqlServerDialectPlugin:** Microsoft SQL Server
+**First Release (v1.0):**
+- **StandardSQLDialectPlugin:** SQL:2008 standard ✓
+- **MySQLDialectPlugin:** MySQL/MariaDB ✓
+
+**Future Releases:**
+- **PostgreSQLDialectPlugin:** PostgreSQL (planned)
+- **SqlServerDialectPlugin:** Microsoft SQL Server (planned)
+- **OracleDialectPlugin:** Oracle Database (optional)
 
 Each plugin:
 - Implements SqlDialectPlugin interface
