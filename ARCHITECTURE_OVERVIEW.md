@@ -6,8 +6,8 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                         User Application                         │
 │                                                                   │
-│  DSL.mysql().select("name").from("users").build()               │
-│  DSL.postgresql().select("name").from("users").build()          │
+│  DSL.forDialect("mysql").select("name").from("users").build()   │
+│  DSL.forDialect("postgresql").select("name").from("users")...   │
 │  DSL.forDialect("oracle").select("name").from("users").build()  │
 └───────────────────────────┬─────────────────────────────────────┘
                             │
@@ -19,17 +19,11 @@
 │  - dialectName: String                                           │
 │                                                                   │
 │  + forDialect(String): DSL                                       │
-│  + mysql(): DSL                                                  │
-│  + postgresql(): DSL                                             │
-│  + standard(): DSL                                               │
 │  + getSupportedDialects(): Set<String>                           │
 │                                                                   │
 │  Instance methods:                                               │
 │  + select(), selectAll(), createTable(),                         │
 │    insertInto(), deleteFrom(), update()                          │
-│                                                                   │
-│  Static methods (backward compatible):                           │
-│  + static select(), static createTable(), etc.                   │
 └───────────────────────────┬─────────────────────────────────────┘
                             │
                             │ uses
@@ -91,9 +85,6 @@
 ### DSL Class
 
 - **Purpose:** Main entry point for building SQL statements
-- **Modes:**
-  - Static methods (backward compatible)
-  - Instance methods (new, dialect-specific)
 - **Responsibilities:**
   - Provide fluent API for SQL construction
   - Manage SqlRenderer for current dialect
@@ -136,14 +127,11 @@ Each plugin:
 
 ## Data Flow
 
-### Usage Example 1: New API (Dialect-Specific)
+### Usage Example 1: Dynamic Dialect Selection
 
 ```
 User Code:
-  DSL.mysql().select("name").from("users").build()
-    │
-    ▼
-  DSL.mysql()  // static factory method
+  DSL.forDialect("mysql").select("name").from("users").build()
     │
     ▼
   DSL.forDialect("mysql")
@@ -179,26 +167,21 @@ User Code:
   Generates MySQL-specific SQL with backticks: SELECT `name` FROM `users`
 ```
 
-### Usage Example 2: Old API (Backward Compatible)
+### Usage Example 2: Multi-Database Support
 
 ```
 User Code:
-  DSL.select("name").from("users").build()
+  DSL mysqlDSL = DSL.forDialect("mysql");
+  DSL postgresDSL = DSL.forDialect("postgresql");
+  
+  mysqlDSL.select("name").from("users").build()
+  postgresDSL.select("name").from("users").build()
     │
     ▼
-  DSL.select("name")  // static method
+  Each DSL instance uses its configured renderer
     │
     ▼
-  standard().select("name")  // delegates to standard() factory
-    │
-    ▼
-  new DSL(standardRenderer, "sql2008")
-    │
-    ▼
-  dsl.select("name")  // instance method using standard renderer
-    │
-    ▼
-  Generates standard SQL: SELECT "name" FROM "users"
+  Generates dialect-specific SQL
 ```
 
 ## ServiceLoader (SPI) Configuration
@@ -276,78 +259,101 @@ DSL oracle = DSL.forDialect("oracle");
 ## Package Structure
 
 ```
-lan.tlab.r4j.sql
-├── dsl
-│   ├── DSL.java                          [Modified]
-│   ├── plugin                            [NEW]
-│   │   ├── SqlDialectPlugin.java         [NEW - Interface]
-│   │   ├── SqlDialectRegistry.java       [NEW - Registry]
-│   │   └── builtin                       [NEW]
-│   │       ├── StandardSQLDialectPlugin.java  [NEW]
-│   │       ├── MySQLDialectPlugin.java        [NEW]
-│   │       ├── PostgreSQLDialectPlugin.java   [NEW]
-│   │       └── SqlServerDialectPlugin.java    [NEW]
-│   ├── select
-│   │   └── SelectBuilder.java            [Unchanged]
-│   ├── insert
-│   │   └── InsertBuilder.java            [Unchanged]
-│   └── ...
-├── ast
-│   └── visitor
-│       └── sql
-│           ├── SqlRenderer.java          [Unchanged]
-│           └── factory
-│               └── SqlRendererFactory.java [Unchanged]
-└── ...
-
-resources
-└── META-INF
-    └── services                          [NEW]
-        └── lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin [NEW]
+r4j/
+├── sql                                       [Core module]
+│   └── src/main/java/lan/tlab/r4j/sql
+│       ├── dsl
+│       │   ├── DSL.java                     [Modified]
+│       │   ├── plugin                       [NEW]
+│       │   │   ├── SqlDialectPlugin.java    [NEW - Interface]
+│       │   │   └── SqlDialectRegistry.java  [NEW - Registry]
+│       │   ├── select
+│       │   │   └── SelectBuilder.java       [Unchanged]
+│       │   └── ...
+│       └── ast
+│           └── visitor
+│               └── sql
+│                   ├── SqlRenderer.java     [Unchanged]
+│                   └── factory
+│                       └── SqlRendererFactory.java [Unchanged]
+│
+├── dialect-plugins                          [NEW parent module]
+│   ├── mysql                                [NEW module]
+│   │   └── src/main/java/.../plugin/builtin
+│   │       └── MySQLDialectPlugin.java
+│   │   └── src/main/resources/META-INF/services
+│   │       └── lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin
+│   │
+│   ├── postgresql                           [NEW module]
+│   │   └── src/main/java/.../plugin/builtin
+│   │       └── PostgreSQLDialectPlugin.java
+│   │   └── src/main/resources/META-INF/services
+│   │       └── lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin
+│   │
+│   ├── sqlserver                            [NEW module]
+│   │   └── src/main/java/.../plugin/builtin
+│   │       └── SqlServerDialectPlugin.java
+│   │   └── src/main/resources/META-INF/services
+│   │       └── lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin
+│   │
+│   └── standard                             [NEW module]
+│       └── src/main/java/.../plugin/builtin
+│           └── StandardSQLDialectPlugin.java
+│       └── src/main/resources/META-INF/services
+│           └── lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin
+│
+└── test-integration                         [Existing module]
 ```
 
 ## Benefits
 
 1. **Extensibility:** Community can create plugins for any database
 2. **Auto-Discovery:** No manual registration code needed
-3. **Modularity:** Each dialect can be separate module/JAR
-4. **Backward Compatibility:** Existing code works unchanged
-5. **Type Safety:** Compile-time checking with defined interface
-6. **Testability:** Easy to mock plugins for testing
-7. **Performance:** Cached registry, no runtime overhead after initialization
-8. **Distribution:** Plugins can be distributed independently
+3. **Modularity:** Each dialect is a separate Maven module
+4. **Type Safety:** Compile-time checking with defined interface
+5. **Testability:** Easy to mock plugins for testing
+6. **Performance:** Cached registry, no runtime overhead after initialization
+7. **Distribution:** Plugins can be distributed independently
 
-## Migration Path
+## Usage Pattern
 
-### Phase 1: Current State
+### Basic Usage
 
 ```java
-// Only static API available
-DSL.select("name").from("users").build();
+// Instantiate DSL for specific dialect
+DSL dsl = DSL.forDialect("mysql");
+String sql = dsl.select("name").from("users").build();
 ```
 
-### Phase 2: Plugin Architecture Implemented
+### Multi-Database Support
 
 ```java
-// Both APIs available
-
-// Old way (still works, uses standard dialect)
-DSL.select("name").from("users").build();
-
-// New way (recommended for multi-dialect)
-DSL mysql = DSL.mysql();
-mysql.select("name").from("users").build();
+public class MultiDatabaseService {
+    private final DSL mysqlDSL = DSL.forDialect("mysql");
+    private final DSL postgresDSL = DSL.forDialect("postgresql");
+    
+    public String getUsersFromMySQL() {
+        return mysqlDSL.select("name", "email")
+                      .from("users")
+                      .where("active").eq(true)
+                      .build();
+    }
+    
+    public String getUsersFromPostgres() {
+        return postgresDSL.select("name", "email")
+                         .from("users") 
+                         .where("active").eq(true)
+                         .build();
+    }
+}
 ```
 
-### Phase 3: External Plugin Example
+### Dynamic Dialect Selection
 
 ```java
-// Community creates Oracle plugin
-// Add oracle-plugin.jar to classpath
-
-// Automatically available
-DSL oracle = DSL.forDialect("oracle");
-oracle.select("name").from("users").build();
+// Select dialect at runtime based on configuration
+String dialect = config.getDatabaseType();
+DSL dsl = DSL.forDialect(dialect);
 ```
 
 ## Thread Safety
@@ -410,7 +416,6 @@ If a plugin class cannot be loaded:
 
 - Test with real databases using Testcontainers
 - Test ServiceLoader discovery
-- Test backward compatibility
 - Test multi-dialect scenarios
 
 ### Performance Tests
@@ -425,7 +430,6 @@ If a plugin class cannot be loaded:
 ### User Documentation
 
 - README.md: Basic usage examples
-- Migration guide: Old API → New API
 - Dialect comparison: Feature matrix
 
 ### Developer Documentation
@@ -445,8 +449,8 @@ If a plugin class cannot be loaded:
 ### Phase 1 (MVP)
 
 - Core interface and registry
-- Built-in plugins for existing dialects
-- DSL refactoring with backward compatibility
+- Built-in plugins as separate Maven modules
+- DSL refactoring with forDialect() support
 - Basic documentation
 
 ### Phase 2 (Complete)
