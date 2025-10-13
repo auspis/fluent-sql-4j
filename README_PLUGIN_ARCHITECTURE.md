@@ -153,6 +153,25 @@ DSL dsl = DSL.forDialect(dialect);
 String sql = dsl.select("name").from("users").build();
 ```
 
+### Version-Specific Dialect Selection
+
+```java
+// Exact version
+DSL mysql80 = DSL.forDialect("mysql", "8.0.1");
+
+// Minimum version (8.0 or higher)
+DSL mysql8Plus = DSL.forDialect("mysql", "8.0.0+");
+
+// Version range (8.x versions only)
+DSL mysql8x = DSL.forDialect("mysql", "[8.0.0,9.0.0)");
+
+// Latest version (default behavior)
+DSL mysqlLatest = DSL.forDialect("mysql");
+
+// Check version in use
+String version = mysql80.getDialectVersion(); // Returns "8.0.1"
+```
+
 ### Query Supported Dialects
 
 ```java
