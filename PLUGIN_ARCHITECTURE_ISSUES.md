@@ -197,12 +197,14 @@ Create a plugin for MySQL in a dedicated Maven module under `/dialect-plugins/my
 
 ---
 
-### Issue 5: Create PostgreSQLDialectPlugin
+### Issue 5: Create PostgreSQLDialectPlugin (Future Release)
 
-**Title:** Implement built-in plugin for PostgreSQL dialect in separate Maven module
+**Title:** [FUTURE] Implement built-in plugin for PostgreSQL dialect in separate Maven module
 
 **Description:**
-Create a plugin for PostgreSQL in a dedicated Maven module under `/dialect-plugins/postgresql`.
+**This issue is planned for a future release.** Create a plugin for PostgreSQL in a dedicated Maven module under `/dialect-plugins/postgresql`.
+
+**Priority:** Low (Future Release)
 
 **Acceptance Criteria:**
 - [ ] Create new Maven module `/dialect-plugins/postgresql`
@@ -222,6 +224,7 @@ Create a plugin for PostgreSQL in a dedicated Maven module under `/dialect-plugi
 - Research PostgreSQL-specific syntax differences (e.g., LIMIT/OFFSET, string concatenation, etc.)
 - Consider using standard renderer with minimal modifications
 - Module should depend on `sql` core module
+- **Note:** This is not part of the first release which focuses on Standard SQL and MySQL only
 
 **Dependencies:** Issues 1, 2
 
@@ -229,12 +232,14 @@ Create a plugin for PostgreSQL in a dedicated Maven module under `/dialect-plugi
 
 ---
 
-### Issue 6: Create SqlServerDialectPlugin
+### Issue 6: Create SqlServerDialectPlugin (Future Release)
 
-**Title:** Implement built-in plugin for SQL Server dialect in separate Maven module
+**Title:** [FUTURE] Implement built-in plugin for SQL Server dialect in separate Maven module
 
 **Description:**
-Create a plugin for Microsoft SQL Server in a dedicated Maven module under `/dialect-plugins/sqlserver`.
+**This issue is planned for a future release.** Create a plugin for Microsoft SQL Server in a dedicated Maven module under `/dialect-plugins/sqlserver`.
+
+**Priority:** Low (Future Release)
 
 **Acceptance Criteria:**
 - [ ] Create new Maven module `/dialect-plugins/sqlserver`
@@ -253,6 +258,7 @@ Create a plugin for Microsoft SQL Server in a dedicated Maven module under `/dia
 - Reuse existing `SqlRendererFactory.sqlServer()` method
 - Document T-SQL specific features
 - Module should depend on `sql` core module
+- **Note:** This is not part of the first release which focuses on Standard SQL and MySQL only
 
 **Dependencies:** Issues 1, 2
 
@@ -291,16 +297,14 @@ Create a plugin for Oracle Database. The existing Oracle renderer is incomplete 
 
 ### Issue 8: Create META-INF/services Configuration
 
-**Title:** Set up SPI configuration for auto-discovery of built-in plugins in each module
+**Title:** Set up SPI configuration for auto-discovery of built-in plugins (Standard SQL + MySQL)
 
 **Description:**
-Create the ServiceLoader configuration files in each dialect plugin Maven module that enable automatic discovery of built-in dialect plugins.
+Create the ServiceLoader configuration files in each dialect plugin Maven module that enable automatic discovery of built-in dialect plugins. **First release includes only Standard SQL and MySQL.**
 
 **Acceptance Criteria:**
 - [ ] Create META-INF/services configuration in `/dialect-plugins/standard` module
 - [ ] Create META-INF/services configuration in `/dialect-plugins/mysql` module
-- [ ] Create META-INF/services configuration in `/dialect-plugins/postgresql` module
-- [ ] Create META-INF/services configuration in `/dialect-plugins/sqlserver` module
 - [ ] Each file should be `lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin`
 - [ ] Each file lists only its own plugin implementation
 - [ ] Verify ServiceLoader can discover plugins at runtime
@@ -321,7 +325,7 @@ In `/dialect-plugins/mysql/src/main/resources/META-INF/services/lan.tlab.r4j.sql
 lan.tlab.r4j.sql.dsl.plugin.builtin.MySQLDialectPlugin
 ```
 
-(Similar pattern for postgresql and sqlserver modules)
+**Note:** PostgreSQL and SQL Server modules will be added in future releases.
 
 **Technical Notes:**
 - Ensure file encoding is UTF-8

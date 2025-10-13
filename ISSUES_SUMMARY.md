@@ -99,15 +99,15 @@ This document provides a concise summary of all 18 issues for quick reference an
 
 ---
 
-## Issue #5: Create PostgreSQLDialectPlugin
+## Issue #5: Create PostgreSQLDialectPlugin (Optional - Future)
 
-**Labels:** `enhancement`, `plugin-system`, `dialect`, `postgresql`  
-**Milestone:** Plugin Architecture - Phase 2  
-**Priority:** High  
+**Labels:** `enhancement`, `plugin-system`, `dialect`, `postgresql`, `future`  
+**Milestone:** Plugin Architecture - Phase 3 (Future)  
+**Priority:** Low (Optional)  
 **Effort:** Medium (4-5 hours)  
 **Dependencies:** Issues #1, #2
 
-**Summary:** Create `PostgreSQLDialectPlugin` in package `lan.tlab.r4j.sql.dsl.plugin.builtin` for PostgreSQL. May need to create `SqlRendererFactory.postgresql()`. Supports aliases: "postgresql", "postgres", "pg".
+**Summary:** **[FUTURE RELEASE]** Create `PostgreSQLDialectPlugin` in package `lan.tlab.r4j.sql.dsl.plugin.builtin` for PostgreSQL. May need to create `SqlRendererFactory.postgresql()`. Supports aliases: "postgresql", "postgres", "pg".
 
 **Deliverables:**
 - Plugin implementation
@@ -117,15 +117,15 @@ This document provides a concise summary of all 18 issues for quick reference an
 
 ---
 
-## Issue #6: Create SqlServerDialectPlugin
+## Issue #6: Create SqlServerDialectPlugin (Optional - Future)
 
-**Labels:** `enhancement`, `plugin-system`, `dialect`, `sqlserver`  
-**Milestone:** Plugin Architecture - Phase 2  
-**Priority:** High  
+**Labels:** `enhancement`, `plugin-system`, `dialect`, `sqlserver`, `future`  
+**Milestone:** Plugin Architecture - Phase 3 (Future)  
+**Priority:** Low (Optional)  
 **Effort:** Small (2-3 hours)  
 **Dependencies:** Issues #1, #2
 
-**Summary:** Create `SqlServerDialectPlugin` in package `lan.tlab.r4j.sql.dsl.plugin.builtin` for Microsoft SQL Server. Features: square brackets, TOP clause, GETDATE(), LEN(). Supports aliases: "sqlserver", "mssql", "tsql".
+**Summary:** **[FUTURE RELEASE]** Create `SqlServerDialectPlugin` in package `lan.tlab.r4j.sql.dsl.plugin.builtin` for Microsoft SQL Server. Features: square brackets, TOP clause, GETDATE(), LEN(). Supports aliases: "sqlserver", "mssql", "tsql".
 
 **Deliverables:**
 - Plugin implementation
@@ -155,24 +155,31 @@ This document provides a concise summary of all 18 issues for quick reference an
 ## Issue #8: Create META-INF/services Configuration
 
 **Labels:** `enhancement`, `plugin-system`, `configuration`  
-**Milestone:** Plugin Architecture - Phase 3  
+**Milestone:** Plugin Architecture - Phase 2  
 **Priority:** High  
 **Effort:** Small (1 hour)  
-**Dependencies:** Issues #3, #4, #5, #6
+**Dependencies:** Issues #3, #4
 
-**Summary:** Create ServiceLoader configuration file at `sql/src/main/resources/META-INF/services/lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin` listing all built-in plugins.
+**Summary:** Create ServiceLoader configuration files in each dialect plugin module for Standard SQL and MySQL (first release). Future releases will add PostgreSQL and SQL Server.
 
-**File Contents:**
+**File Contents for First Release:**
+
+In `/dialect-plugins/standard/src/main/resources/META-INF/services/lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin`:
 
 ```
 lan.tlab.r4j.sql.dsl.plugin.builtin.StandardSQLDialectPlugin
-lan.tlab.r4j.sql.dsl.plugin.builtin.MySQLDialectPlugin
-lan.tlab.r4j.sql.dsl.plugin.builtin.PostgreSQLDialectPlugin
-lan.tlab.r4j.sql.dsl.plugin.builtin.SqlServerDialectPlugin
 ```
 
+In `/dialect-plugins/mysql/src/main/resources/META-INF/services/lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin`:
+
+```
+lan.tlab.r4j.sql.dsl.plugin.builtin.MySQLDialectPlugin
+```
+
+**Note:** PostgreSQL and SQL Server configurations will be added in future releases.
+
 **Deliverables:**
-- SPI configuration file
+- SPI configuration files for Standard SQL and MySQL modules
 - Test validating ServiceLoader discovery
 - Documentation for external plugin developers
 
@@ -403,25 +410,52 @@ lan.tlab.r4j.sql.dsl.plugin.builtin.SqlServerDialectPlugin
 
 ## Quick Statistics
 
+### First Release (Standard SQL + MySQL)
+
+|         Category          | Count | Total Effort |
+|---------------------------|-------|--------------|
+| **Critical Priority**     | 3     | 9-11 hours   |
+| **High Priority**         | 7     | 24-29 hours  |
+| **Medium Priority**       | 3     | 9-11 hours   |
+| **TOTAL (First Release)** | 13    | 42-51 hours  |
+
+### Future Releases
+
 |          Category           | Count | Total Effort |
 |-----------------------------|-------|--------------|
-| **Critical Priority**       | 3     | 9-11 hours   |
-| **High Priority**           | 9     | 33-43 hours  |
-| **Medium Priority**         | 3     | 9-11 hours   |
-| **Low Priority (Optional)** | 4     | 23-29 hours  |
-| **TOTAL**                   | 19    | 54-70 hours  |
+| **Low Priority (Optional)** | 6     | 32-44 hours  |
+| **PostgreSQL & SQL Server** | 2     | 6-8 hours    |
+| **Advanced Features**       | 4     | 23-29 hours  |
+| **TOTAL (Future)**          | 6     | 12-19 hours  |
+
+### Overall Project
+
+|       Category       | Count | Total Effort |
+|----------------------|-------|--------------|
+| **TOTAL ALL ISSUES** | 19    | 54-70 hours  |
 
 ## Phase Breakdown
 
-|       Phase       |   Issues   | Effort |   Status    |
-|-------------------|------------|--------|-------------|
-| Phase 1: Core     | #1-2, #2.5 | 8-11h  | Not Started |
-| Phase 2: Plugins  | #3-6, #8   | 10-13h | Not Started |
-| Phase 3: DSL      | #9-10      | 6-8h   | Not Started |
-| Phase 4: Docs     | #11-12     | 6-7h   | Not Started |
-| Phase 5: Testing  | #13-14     | 9-12h  | Not Started |
-| Phase 6: Perf     | #15        | 3-4h   | Not Started |
-| Phase 7: Advanced | #16-18     | 17-23h | Optional    |
+### First Release
+
+|      Phase       |    Issues     |   Effort   |   Status    |             Notes             |
+|------------------|---------------|------------|-------------|-------------------------------|
+| Phase 1: Core    | #1-2, #2.5    | 8-11h      | Not Started | Foundation                    |
+| Phase 2: Plugins | #3-4, #8      | 5-7h       | Not Started | **Standard SQL + MySQL only** |
+| Phase 3: DSL     | #9-10         | 6-8h       | Not Started | DSL refactor                  |
+| Phase 4: Docs    | #11-12        | 6-7h       | Not Started | Documentation                 |
+| Phase 5: Testing | #13-14        | 9-12h      | Not Started | Integration tests             |
+| Phase 6: Perf    | #15           | 3-4h       | Not Started | Optimization                  |
+| **SUBTOTAL**     | **13 issues** | **37-49h** |             | **MVP Release**               |
+
+### Future Releases
+
+|       Phase       |    Issues    |   Effort   |  Status  |          Notes          |
+|-------------------|--------------|------------|----------|-------------------------|
+| Phase 2+: Plugins | #5-6         | 6-8h       | Future   | PostgreSQL + SQL Server |
+| Phase 7: Advanced | #16-18       | 17-23h     | Optional | Advanced features       |
+| Phase 8: Oracle   | #7           | 6-8h       | Optional | Oracle plugin           |
+| **SUBTOTAL**      | **6 issues** | **29-39h** |          | **Future Work**         |
 
 ## Issue Dependencies Graph
 
@@ -429,12 +463,12 @@ lan.tlab.r4j.sql.dsl.plugin.builtin.SqlServerDialectPlugin
 #1 (Plugin Interface)
  ├─→ #2 (Registry)
  │    ├─→ #2.5 (Version Support)
- │    │    ├─→ #3 (StandardSQL Plugin)
- │    │    ├─→ #4 (MySQL Plugin)
- │    │    ├─→ #5 (PostgreSQL Plugin)
- │    │    ├─→ #6 (SqlServer Plugin)
- │    │    └─→ #7 (Oracle Plugin - Optional)
- │    │         └─→ #8 (SPI Config)
+ │    │    ├─→ #3 (StandardSQL Plugin) ✓ FIRST RELEASE
+ │    │    ├─→ #4 (MySQL Plugin) ✓ FIRST RELEASE
+ │    │    ├─→ #5 (PostgreSQL Plugin) ⏸ FUTURE
+ │    │    ├─→ #6 (SqlServer Plugin) ⏸ FUTURE
+ │    │    └─→ #7 (Oracle Plugin) ⏸ OPTIONAL
+ │    │         └─→ #8 (SPI Config) ✓ FIRST RELEASE (Standard + MySQL only)
  │    │              └─→ #9 (DSL Refactor)
  │    │                   ├─→ #10 (Builder Verification)
  │    │                   │    ├─→ #11 (Documentation)
@@ -442,32 +476,60 @@ lan.tlab.r4j.sql.dsl.plugin.builtin.SqlServerDialectPlugin
  │    │                   │    │         └─→ #13 (Integration Tests)
  │    │                   │    │              ├─→ #14 (Migration Tests)
  │    │                   │    │              ├─→ #15 (Performance)
- │    │                   │    │              ├─→ #16 (Feature API)
- │    │                   │    │              ├─→ #17 (Configuration)
- │    │                   │    │              └─→ #18 (Multi-module)
+ │    │                   │    │              ├─→ #16 (Feature API) ⏸ OPTIONAL
+ │    │                   │    │              ├─→ #17 (Configuration) ⏸ OPTIONAL
+ │    │                   │    │              └─→ #18 (Multi-module) ⏸ OPTIONAL
 ```
+
+**Legend:**
+- ✓ = First Release (Standard SQL + MySQL)
+- ⏸ = Future Release / Optional
 
 ## Recommended Implementation Order
 
-### MVP (Minimum Viable Product)
+### First Release (Standard SQL + MySQL)
 
-1. Issue #1 → Issue #2 → Issue #2.5
-2. Issues #3, #4, #5, #6 (can be parallel)
-3. Issue #8
-4. Issue #9 → Issue #10
-5. Issue #13
+**Phase 1: Foundation**
+1. Issue #1 (Plugin Interface)
+2. Issue #2 (Registry)
+3. Issue #2.5 (Version Support)
 
-### Complete Release
+**Phase 2: Core Plugins**
+4. Issue #3 (StandardSQL Plugin)
+5. Issue #4 (MySQL Plugin)
+6. Issue #8 (SPI Config for Standard + MySQL)
 
-1. All MVP issues
-2. Issue #11 → Issue #12
-3. Issue #14
+**Phase 3: DSL Integration**
+7. Issue #9 (DSL Refactor)
+8. Issue #10 (Builder Verification)
 
-### Enhanced Release (Optional)
+**Phase 4: Documentation**
+9. Issue #11 (Documentation)
+10. Issue #12 (Example Plugin)
 
-1. All Complete Release issues
-2. Issue #15
-3. Issues #16, #17, #18 (can be parallel)
+**Phase 5: Testing & Polish**
+11. Issue #13 (Integration Tests)
+12. Issue #14 (Migration Tests)
+13. Issue #15 (Performance)
+
+**Total: 13 issues, 42-51 hours**
+
+### Future Releases
+
+**PostgreSQL & SQL Server Support**
+1. Issue #5 (PostgreSQL Plugin)
+2. Issue #6 (SQL Server Plugin)
+3. Update Issue #8 (Add to SPI Config)
+
+**Advanced Features (Optional)**
+1. Issue #16 (Feature API)
+2. Issue #17 (Configuration)
+3. Issue #18 (Multi-module)
+
+**Oracle Support (Optional)**
+1. Issue #7 (Oracle Plugin)
+
+**Total: 6 additional issues, 12-19 hours**
 
 ---
 
