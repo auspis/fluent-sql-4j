@@ -157,6 +157,31 @@ dsl.select("name").from("users").build();
 // Or store DSL instance for reuse
 DSL mysql = DSL.forDialect("mysql");
 mysql.select("name").from("users").build();
+
+// With version specification
+DSL mysql80 = DSL.forDialect("mysql", "8.0.1");
+DSL mysql8Plus = DSL.forDialect("mysql", "8.0.0+");
+```
+
+### Q: How do I specify a dialect version?
+
+**A:** Use semantic version specifications:
+
+```java
+// Exact version
+DSL dsl = DSL.forDialect("mysql", "8.0.1");
+
+// Minimum version (shorthand)
+DSL dsl = DSL.forDialect("mysql", "8.0.0+");
+
+// Minimum version (Maven-style)
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,)");
+
+// Version range
+DSL dsl = DSL.forDialect("mysql", "[8.0.0,9.0.0)");
+
+// Latest (no version specified)
+DSL dsl = DSL.forDialect("mysql");
 ```
 
 ### Q: Can I have multiple dialects in the same application?
