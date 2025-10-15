@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.dsl.plugin;
+package lan.tlab.r4j.sql.plugin;
 
 import java.util.Collections;
 import java.util.ServiceLoader;

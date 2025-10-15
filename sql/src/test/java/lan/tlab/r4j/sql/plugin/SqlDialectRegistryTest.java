@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.dsl.plugin;
+package lan.tlab.r4j.sql.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,6 +17,15 @@ import org.junit.jupiter.api.Test;
 
 class SqlDialectRegistryTest {
 
+    private static final String TEST_DIALECT_1 = "test-dialect-1";
+    private static final String TEST_DIALECT_1_SHORT = "td1";
+    private static final String TEST_DIALECT_2 = "test-dialect-2";
+    private static final String V_1_0 = "1.0";
+    private static final String V_2_0 = "2.0";
+    private static final String FEATURE_1 = "feature-1";
+    private static final String FEATURE_2 = "feature-2";
+    private static final String FEATURE_3 = "feature-3";
+
     private SqlDialectPlugin mockPlugin1;
     private SqlDialectPlugin mockPlugin2;
     private SqlRenderer mockRenderer1;
@@ -27,30 +36,30 @@ class SqlDialectRegistryTest {
         // Create mock plugins
         mockPlugin1 = mock(SqlDialectPlugin.class);
         mockRenderer1 = mock(SqlRenderer.class);
-        when(mockPlugin1.getDialectName()).thenReturn("testdialect1");
-        when(mockPlugin1.getVersion()).thenReturn("1.0");
+        when(mockPlugin1.getDialectName()).thenReturn(TEST_DIALECT_1);
+        when(mockPlugin1.getVersion()).thenReturn(V_1_0);
         when(mockPlugin1.createRenderer()).thenReturn(mockRenderer1);
-        when(mockPlugin1.supports("testdialect1")).thenReturn(true);
-        when(mockPlugin1.supports("td1")).thenReturn(true);
-        when(mockPlugin1.getSupportedFeatures()).thenReturn(Set.of("feature1", "feature2"));
+        when(mockPlugin1.supports(TEST_DIALECT_1)).thenReturn(true);
+        when(mockPlugin1.supports(TEST_DIALECT_1_SHORT)).thenReturn(true);
+        when(mockPlugin1.getSupportedFeatures()).thenReturn(Set.of(FEATURE_1, FEATURE_2));
 
         mockPlugin2 = mock(SqlDialectPlugin.class);
         mockRenderer2 = mock(SqlRenderer.class);
-        when(mockPlugin2.getDialectName()).thenReturn("testdialect2");
-        when(mockPlugin2.getVersion()).thenReturn("2.0");
+        when(mockPlugin2.getDialectName()).thenReturn(TEST_DIALECT_2);
+        when(mockPlugin2.getVersion()).thenReturn(V_2_0);
         when(mockPlugin2.createRenderer()).thenReturn(mockRenderer2);
-        when(mockPlugin2.supports("testdialect2")).thenReturn(true);
-        when(mockPlugin2.getSupportedFeatures()).thenReturn(Set.of("feature3"));
+        when(mockPlugin2.supports(TEST_DIALECT_2)).thenReturn(true);
+        when(mockPlugin2.getSupportedFeatures()).thenReturn(Set.of(FEATURE_3));
     }
 
     @Test
     void registerAndRetrievePlugin() {
         SqlDialectRegistry.register(mockPlugin1);
 
-        assertThat(SqlDialectRegistry.isSupported("testdialect1")).isTrue();
-        assertThat(SqlDialectRegistry.getSupportedDialects()).contains("testdialect1");
+        assertThat(SqlDialectRegistry.isSupported(TEST_DIALECT_1)).isTrue();
+        assertThat(SqlDialectRegistry.getSupportedDialects()).contains(TEST_DIALECT_1);
 
-        SqlRenderer renderer = SqlDialectRegistry.getRenderer("testdialect1");
+        SqlRenderer renderer = SqlDialectRegistry.getRenderer(TEST_DIALECT_1);
         assertThat(renderer).isEqualTo(mockRenderer1);
     }
 
@@ -58,13 +67,13 @@ class SqlDialectRegistryTest {
     void caseInsensitiveDialectNameLookup() {
         SqlDialectRegistry.register(mockPlugin1);
 
-        assertThat(SqlDialectRegistry.isSupported("TESTDIALECT1")).isTrue();
-        assertThat(SqlDialectRegistry.isSupported("TestDialect1")).isTrue();
-        assertThat(SqlDialectRegistry.isSupported("testdialect1")).isTrue();
+        assertThat(SqlDialectRegistry.isSupported("TEST-DIALECT-1")).isTrue();
+        assertThat(SqlDialectRegistry.isSupported("Test-Dialect-1")).isTrue();
+        assertThat(SqlDialectRegistry.isSupported(TEST_DIALECT_1)).isTrue();
 
-        SqlRenderer renderer1 = SqlDialectRegistry.getRenderer("TESTDIALECT1");
-        SqlRenderer renderer2 = SqlDialectRegistry.getRenderer("TestDialect1");
-        SqlRenderer renderer3 = SqlDialectRegistry.getRenderer("testdialect1");
+        SqlRenderer renderer1 = SqlDialectRegistry.getRenderer("TEST-DIALECT-1");
+        SqlRenderer renderer2 = SqlDialectRegistry.getRenderer("Test-Dialect-1");
+        SqlRenderer renderer3 = SqlDialectRegistry.getRenderer(TEST_DIALECT_1);
 
         assertThat(renderer1).isEqualTo(mockRenderer1);
         assertThat(renderer2).isEqualTo(mockRenderer1);
@@ -76,8 +85,8 @@ class SqlDialectRegistryTest {
         SqlDialectRegistry.register(mockPlugin1);
 
         // Test alias support via supports() method
-        assertThat(SqlDialectRegistry.isSupported("td1")).isTrue();
-        SqlRenderer renderer = SqlDialectRegistry.getRenderer("td1");
+        assertThat(SqlDialectRegistry.isSupported(TEST_DIALECT_1_SHORT)).isTrue();
+        SqlRenderer renderer = SqlDialectRegistry.getRenderer(TEST_DIALECT_1_SHORT);
         assertThat(renderer).isEqualTo(mockRenderer1);
     }
 
@@ -86,13 +95,13 @@ class SqlDialectRegistryTest {
         SqlDialectRegistry.register(mockPlugin1);
         SqlDialectRegistry.register(mockPlugin2);
 
-        assertThat(SqlDialectRegistry.getSupportedDialects()).contains("testdialect1", "testdialect2");
+        assertThat(SqlDialectRegistry.getSupportedDialects()).contains(TEST_DIALECT_1, TEST_DIALECT_2);
 
-        assertThat(SqlDialectRegistry.isSupported("testdialect1")).isTrue();
-        assertThat(SqlDialectRegistry.isSupported("testdialect2")).isTrue();
+        assertThat(SqlDialectRegistry.isSupported(TEST_DIALECT_1)).isTrue();
+        assertThat(SqlDialectRegistry.isSupported(TEST_DIALECT_2)).isTrue();
 
-        SqlRenderer renderer1 = SqlDialectRegistry.getRenderer("testdialect1");
-        SqlRenderer renderer2 = SqlDialectRegistry.getRenderer("testdialect2");
+        SqlRenderer renderer1 = SqlDialectRegistry.getRenderer(TEST_DIALECT_1);
+        SqlRenderer renderer2 = SqlDialectRegistry.getRenderer(TEST_DIALECT_2);
 
         assertThat(renderer1).isEqualTo(mockRenderer1);
         assertThat(renderer2).isEqualTo(mockRenderer2);
@@ -105,16 +114,16 @@ class SqlDialectRegistryTest {
         // Create a second plugin with same dialect name
         SqlDialectPlugin replacementPlugin = mock(SqlDialectPlugin.class);
         SqlRenderer replacementRenderer = mock(SqlRenderer.class);
-        when(replacementPlugin.getDialectName()).thenReturn("testdialect1");
+        when(replacementPlugin.getDialectName()).thenReturn(TEST_DIALECT_1);
         when(replacementPlugin.getVersion()).thenReturn("1.1");
         when(replacementPlugin.createRenderer()).thenReturn(replacementRenderer);
-        when(replacementPlugin.supports("testdialect1")).thenReturn(true);
-        when(replacementPlugin.getSupportedFeatures()).thenReturn(Set.of("feature1"));
+        when(replacementPlugin.supports(TEST_DIALECT_1)).thenReturn(true);
+        when(replacementPlugin.getSupportedFeatures()).thenReturn(Set.of(FEATURE_1));
 
         SqlDialectRegistry.register(replacementPlugin);
 
         // The replacement should be active
-        SqlRenderer renderer = SqlDialectRegistry.getRenderer("testdialect1");
+        SqlRenderer renderer = SqlDialectRegistry.getRenderer(TEST_DIALECT_1);
         assertThat(renderer).isEqualTo(replacementRenderer);
     }
 
@@ -178,9 +187,9 @@ class SqlDialectRegistryTest {
         Set<String> dialects = SqlDialectRegistry.getSupportedDialects();
 
         // Should contain canonical name
-        assertThat(dialects).contains("testdialect1");
+        assertThat(dialects).contains(TEST_DIALECT_1);
         // Should not contain aliases
-        assertThat(dialects).doesNotContain("td1");
+        assertThat(dialects).doesNotContain(TEST_DIALECT_1_SHORT);
     }
 
     @Test
@@ -197,7 +206,7 @@ class SqlDialectRegistryTest {
                     SqlDialectPlugin plugin = mock(SqlDialectPlugin.class);
                     SqlRenderer renderer = mock(SqlRenderer.class);
                     when(plugin.getDialectName()).thenReturn("dialect" + index);
-                    when(plugin.getVersion()).thenReturn("1.0");
+                    when(plugin.getVersion()).thenReturn(V_1_0);
                     when(plugin.createRenderer()).thenReturn(renderer);
                     when(plugin.supports("dialect" + index)).thenReturn(true);
                     when(plugin.getSupportedFeatures()).thenReturn(Set.of("feature"));
@@ -234,7 +243,7 @@ class SqlDialectRegistryTest {
         for (int i = 0; i < threadCount; i++) {
             executor.submit(() -> {
                 try {
-                    SqlRenderer renderer = SqlDialectRegistry.getRenderer("testdialect1");
+                    SqlRenderer renderer = SqlDialectRegistry.getRenderer(TEST_DIALECT_1);
                     if (renderer != null) {
                         successCount.incrementAndGet();
                     }
@@ -271,7 +280,7 @@ class SqlDialectRegistryTest {
                         SqlDialectPlugin plugin = mock(SqlDialectPlugin.class);
                         SqlRenderer renderer = mock(SqlRenderer.class);
                         when(plugin.getDialectName()).thenReturn("concurrent" + index);
-                        when(plugin.getVersion()).thenReturn("1.0");
+                        when(plugin.getVersion()).thenReturn(V_1_0);
                         when(plugin.createRenderer()).thenReturn(renderer);
                         when(plugin.supports("concurrent" + index)).thenReturn(true);
                         when(plugin.getSupportedFeatures()).thenReturn(Set.of());
@@ -280,13 +289,13 @@ class SqlDialectRegistryTest {
                         registrationCount.incrementAndGet();
                     } else if (index % 3 == 1) {
                         // Retrieval operation
-                        SqlRenderer renderer = SqlDialectRegistry.getRenderer("testdialect1");
+                        SqlRenderer renderer = SqlDialectRegistry.getRenderer(TEST_DIALECT_1);
                         if (renderer != null) {
                             retrievalCount.incrementAndGet();
                         }
                     } else {
                         // Check operation
-                        if (SqlDialectRegistry.isSupported("testdialect1")) {
+                        if (SqlDialectRegistry.isSupported(TEST_DIALECT_1)) {
                             checkCount.incrementAndGet();
                         }
                     }
