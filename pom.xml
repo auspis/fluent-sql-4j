@@ -36,6 +36,7 @@
     <dep.junit-jupiter.version>6.0.0</dep.junit-jupiter.version>
     <dep.assertj-core.version>3.27.6</dep.assertj-core.version>
     <dep.mockito-core.version>5.20.0</dep.mockito-core.version>
+    <dep.byte-buddy.version>1.17.7</dep.byte-buddy.version>
   </properties>
 
   <dependencyManagement>
@@ -120,6 +121,12 @@
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>${dep.mockito-core.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy-agent</artifactId>
+        <version>${dep.byte-buddy.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -228,6 +235,39 @@
             <activeRecipes>
               <!--<org.openrewrite.java.migrate.UpgradeJavaVersion25</<!->-->
             </activeRecipes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.7.0</version>
+          <configuration>
+            <artifactItems>
+              <artifactItem>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${dep.byte-buddy.version}</version>
+                <outputDirectory>${project.build.directory}/agents</outputDirectory>
+                <destFileName>byte-buddy-agent-${dep.byte-buddy.version}.jar</destFileName>
+              </artifactItem>
+            </artifactItems>
+          </configuration>
+          <executions>
+            <execution>
+              <id>copy-byte-buddy-agent</id>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <phase>process-test-resources</phase>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven.surefire.plugin.version}</version>
+          <configuration>
+            <argLine>-javaagent:${project.build.directory}/agents/byte-buddy-agent-${dep.byte-buddy.version}.jar</argLine>
           </configuration>
         </plugin>
       </plugins>
