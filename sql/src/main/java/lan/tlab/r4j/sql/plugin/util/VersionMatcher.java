@@ -98,31 +98,4 @@ public final class VersionMatcher {
             return false;
         }
     }
-
-    /**
-     * Validates that a version range string is a valid NPM-style range.
-     * <p>
-     * <b>Examples:</b>
-     * <pre>{@code
-     * isValidRange("^14.0.0")           // true
-     * isValidRange("~5.7.0")            // true
-     * isValidRange(">=8.0.0 <9.0.0")    // true
-     * isValidRange("8.0.0")             // true (exact version is a valid range)
-     * isValidRange("invalid")           // false
-     * }</pre>
-     *
-     * @param versionRange the version range string to validate
-     * @return {@code true} if valid, {@code false} otherwise
-     */
-    public static boolean isValidRange(String versionRange) {
-        if (versionRange == null || versionRange.trim().isEmpty()) {
-            return false;
-        }
-        try {
-            Requirement.buildNPM(versionRange);
-            return true;
-        } catch (SemverException e) {
-            return false;
-        }
-    }
 }
