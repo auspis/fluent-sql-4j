@@ -1,112 +1,85 @@
 package lan.tlab.r4j.sql.plugin;
 
+import java.util.Objects;
+import java.util.function.Supplier;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
 
 /**
- * Interface for SQL dialect plugins.
+ * Immutable record representing a SQL dialect plugin.
  * <p>
- * Implementations provide SQL-dialect-specific rendering capabilities through the plugin architecture.
- * Each plugin represents a specific SQL dialect (e.g., MySQL, PostgreSQL, SQL Server) and provides
- * a configured {@link SqlRenderer} that generates SQL statements conforming to that dialect's syntax.
+ * This record provides automatic immutability, value semantics, and fail-fast validation
+ * through its compact constructor. All fields are validated at construction time,
+ * ensuring that invalid plugins cannot be created.
  * <p>
  * Plugins are discovered and registered automatically via Java's {@link java.util.ServiceLoader}
- * mechanism. To create a plugin, implement this interface and register it in
- * {@code META-INF/services/lan.tlab.r4j.sql.plugin.SqlDialectPlugin}.
+ * mechanism through {@link SqlDialectPluginProvider} implementations.
  * <p>
  * <b>Version Support:</b>
  * <p>
- * Plugins declare version support using Semantic Versioning (SemVer) notation through
- * {@link #getDialectVersion()}. The registry uses this information to match plugins to
- * requested database versions. Multiple plugins can be registered for the same dialect
- * with different version ranges.
+ * Plugins declare version support using Semantic Versioning (SemVer) notation.
+ * The registry uses this information to match plugins to requested database versions.
+ * Multiple plugins can be registered for the same dialect with different version ranges.
  * <p>
- * <b>Example implementation:</b>
+ * <b>Example usage:</b>
  * <pre>{@code
- * public class MySQL8DialectPlugin implements SqlDialectPlugin {
- *     @Override
- *     public String getDialectName() {
- *         return "mysql";
- *     }
- *
- *     @Override
- *     public String getDialectVersion() {
- *         return "^8.0.0";  // Supports all MySQL 8.x versions
- *     }
- *
- *     @Override
- *     public SqlRenderer createRenderer() {
- *         return SqlRendererFactory.mysql8();
- *     }
- * }
+ * var plugin = new SqlDialectPlugin(
+ *     "mysql",
+ *     "^8.0.0",  // Supports all MySQL 8.x versions
+ *     MySqlRenderer::new
+ * );
  * }</pre>
+ * <p>
+ * <b>Supported version formats:</b>
+ * <ul>
+ *   <li>Exact version: {@code "8.0.35"}</li>
+ *   <li>Caret range (compatible): {@code "^8.0.0"} (matches {@code >=8.0.0 <9.0.0})</li>
+ *   <li>Tilde range (patch): {@code "~5.7.42"} (matches {@code >=5.7.42 <5.8.0})</li>
+ *   <li>Explicit range: {@code ">=8.0.0 <9.0.0"}</li>
+ *   <li>Compound conditions: {@code ">=5.7.0 <8.0.0 || >=8.0.20"}</li>
+ * </ul>
  *
- * @see SqlRenderer
+ * @param dialectName the canonical name of the SQL dialect in lowercase (e.g., "mysql", "postgresql")
+ * @param dialectVersion the SemVer version range this plugin supports (e.g., "^8.0.0")
+ * @param rendererSupplier a supplier that creates new {@link SqlRenderer} instances
+ * @see SqlDialectPluginProvider
  * @see SqlDialectRegistry
+ * @see <a href="https://semver.org/">Semantic Versioning</a>
+ * @see <a href="https://github.com/npm/node-semver">NPM semver ranges</a>
  * @since 1.0
  */
-public interface SqlDialectPlugin {
+public record SqlDialectPlugin(String dialectName, String dialectVersion, Supplier<SqlRenderer> rendererSupplier) {
 
     /**
-     * Returns the canonical name of this SQL dialect.
+     * Compact constructor with validation.
      * <p>
-     * The dialect name should be in lowercase and uniquely identify the dialect.
-     * This is the primary identifier used for plugin registration and lookup.
-     * Each plugin must have a unique dialect name.
-     * <p>
-     * <b>Examples:</b>
-     * <ul>
-     *   <li>{@code "mysql"} - MySQL database</li>
-     *   <li>{@code "postgresql"} - PostgreSQL database</li>
-     *   <li>{@code "mariadb"} - MariaDB database</li>
-     *   <li>{@code "sqlserver"} - Microsoft SQL Server</li>
-     *   <li>{@code "sql2008"} - Standard SQL:2008</li>
-     * </ul>
+     * Validates that all parameters are non-null and that the dialect version
+     * is a valid SemVer range. This ensures that invalid plugins cannot be constructed.
      *
-     * @return the canonical dialect name in lowercase, never {@code null}
+     * @throws NullPointerException if any parameter is {@code null}
+     * @throws IllegalArgumentException if {@code dialectVersion} is not a valid SemVer range
      */
-    String getDialectName();
+    public SqlDialectPlugin {
+        Objects.requireNonNull(dialectName, "Dialect name must not be null");
+        Objects.requireNonNull(dialectVersion, "Dialect version must not be null");
+        Objects.requireNonNull(rendererSupplier, "Renderer supplier must not be null");
 
-    /**
-     * Returns the version range of the SQL dialect that this plugin supports.
-     * <p>
-     * The version string must follow Semantic Versioning (SemVer) notation and can express:
-     * <ul>
-     *   <li>Exact version: {@code "8.0.35"}</li>
-     *   <li>Caret range (compatible): {@code "^8.0.0"} (matches {@code >=8.0.0 <9.0.0})</li>
-     *   <li>Tilde range (patch): {@code "~5.7.42"} (matches {@code >=5.7.42 <5.8.0})</li>
-     *   <li>Explicit range: {@code ">=8.0.0 <9.0.0"}</li>
-     *   <li>Compound conditions: {@code ">=5.7.0 <8.0.0 || >=8.0.20"}</li>
-     * </ul>
-     * <p>
-     * The registry uses this information to select the appropriate plugin when a specific
-     * database version is requested. If multiple plugins match the requested version,
-     * the registry will use the first match and log a warning.
-     * <p>
-     * <b>Examples:</b>
-     * <ul>
-     *   <li>{@code "^8.0.0"} - MySQL 8.x (all 8.x versions)</li>
-     *   <li>{@code ">=5.7.0 <8.0.0"} - MySQL 5.7.x series</li>
-     *   <li>{@code "14.2"} - PostgreSQL 14.2 exactly</li>
-     *   <li>{@code "^14.0.0"} - PostgreSQL 14.x series</li>
-     * </ul>
-     *
-     * @return the SemVer version range string, never {@code null}
-     * @see <a href="https://semver.org/">Semantic Versioning</a>
-     * @see <a href="https://github.com/npm/node-semver">NPM semver ranges</a>
-     */
-    String getDialectVersion();
+        if (!SemVerUtil.isValidRange(dialectVersion)) {
+            throw new IllegalArgumentException("Invalid version range '" + dialectVersion + "' in plugin '"
+                    + dialectName + "'. Must be a valid SemVer range (e.g., '^8.0.0', '~5.7.0', '>=14.0.0 <15.0.0')");
+        }
+    }
 
     /**
      * Creates a new {@link SqlRenderer} configured for this SQL dialect.
      * <p>
      * The renderer is responsible for converting the abstract syntax tree (AST) representation
-     * of SQL statements into dialect-specific SQL text. Each invocation should return a new
+     * of SQL statements into dialect-specific SQL text. Each invocation returns a new
      * instance to ensure thread safety.
-     * <p>
-     * The returned renderer should be configured with all the necessary strategies and escape
-     * rules appropriate for the dialect and version that this plugin supports.
      *
      * @return a new, fully configured {@link SqlRenderer} instance, never {@code null}
      */
-    SqlRenderer createRenderer();
+    public SqlRenderer createRenderer() {
+        return rendererSupplier.get();
+    }
 }

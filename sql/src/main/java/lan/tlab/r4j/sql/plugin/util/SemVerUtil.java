@@ -15,9 +15,9 @@ import com.vdurmont.semver4j.SemverException;
  *
  * @see <a href="https://github.com/vdurmont/semver4j">semver4j library</a>
  */
-public final class VersionMatcher {
+public final class SemVerUtil {
 
-    private VersionMatcher() {
+    private SemVerUtil() {
         // Utility class - prevent instantiation
     }
 
