@@ -44,6 +44,7 @@ public final class SqlDialectRegistry {
      * @throws NullPointerException if {@code plugin.getDialectName()} returns {@code null}
      * @throws NullPointerException if {@code plugin.getDialectVersion()} returns {@code null}
      * @throws IllegalArgumentException if {@code plugin.getDialectVersion()} is not a valid SemVer range
+     * @throws IllegalArgumentException if {@code plugin.getDialectVersion()} is not a valid SemVer range
      */
     public static void register(SqlDialectPlugin plugin) {
         if (plugin == null) {
