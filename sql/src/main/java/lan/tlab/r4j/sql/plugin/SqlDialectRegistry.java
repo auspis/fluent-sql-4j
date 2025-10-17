@@ -1,88 +1,49 @@
 package lan.tlab.r4j.sql.plugin;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.plugin.util.VersionFormatException;
+import lan.tlab.r4j.sql.plugin.util.VersionMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Central registry for SQL dialect plugins.
- * <p>
- * This registry manages all SQL dialect plugins and provides thread-safe access to them.
- * Plugins are automatically discovered using Java's {@link ServiceLoader} mechanism (SPI)
- * at class initialization time. Additional plugins can be registered dynamically using
- * the {@link #register(SqlDialectPlugin)} method.
- * <p>
- * The registry provides a clean API for:
- * <ul>
- *   <li>Retrieving renderers for specific dialects</li>
- *   <li>Checking if a dialect is supported</li>
- *   <li>Listing all supported dialects</li>
- * </ul>
- * <p>
- * Dialect names are handled case-insensitively - they are normalized to lowercase
- * when stored and retrieved. This means "MySQL", "mysql", and "MYSQL" all refer
- * to the same dialect.
- * <p>
- * <b>Thread Safety:</b> This class is thread-safe. The internal storage uses
- * {@link ConcurrentHashMap} to ensure safe concurrent access.
- * <p>
- * <b>Example usage:</b>
- * <pre>{@code
- * // Check if a dialect is supported
- * if (SqlDialectRegistry.isSupported("mysql")) {
- *     SqlRenderer renderer = SqlDialectRegistry.getRenderer("mysql");
- *     // Use the renderer...
- * }
- *
- * // Get all supported dialects
- * Set<String> dialects = SqlDialectRegistry.getSupportedDialects();
- * System.out.println("Supported: " + dialects);
- *
- * // Register a custom plugin
- * SqlDialectPlugin customPlugin = new MyCustomDialectPlugin();
- * SqlDialectRegistry.register(customPlugin);
- * }</pre>
- *
- * @see SqlDialectPlugin
- * @see SqlRenderer
- * @since 1.0
- */
 public final class SqlDialectRegistry {
+
+    private static final Logger logger = LoggerFactory.getLogger(SqlDialectRegistry.class);
 
     /**
      * Thread-safe storage for registered plugins.
-     * Keys are dialect names in lowercase, values are the plugin instances.
+     * Keys are dialect names in lowercase, values are lists of plugins for that dialect.
+     * Multiple plugins can exist for the same dialect with different version ranges.
      */
-    private static final ConcurrentHashMap<String, SqlDialectPlugin> plugins = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, List<SqlDialectPlugin>> plugins = new ConcurrentHashMap<>();
 
     static {
-        // Auto-discovery of plugins via ServiceLoader
         ServiceLoader<SqlDialectPlugin> loader = ServiceLoader.load(SqlDialectPlugin.class);
         loader.forEach(SqlDialectRegistry::register);
     }
 
-    /**
-     * Private constructor to prevent instantiation.
-     * This is a utility class with only static methods.
-     */
-    private SqlDialectRegistry() {
-        // Utility class - prevent instantiation
-    }
+    private SqlDialectRegistry() {}
 
     /**
      * Registers a SQL dialect plugin.
      * <p>
      * The plugin is registered under its canonical dialect name (obtained via
-     * {@link SqlDialectPlugin#getDialectName()}). If a plugin is already registered
-     * for the same dialect, it will be replaced with the new plugin.
+     * {@link SqlDialectPlugin#getDialectName()}). Multiple plugins can be registered
+     * for the same dialect with different version ranges.
      * <p>
      * This method is thread-safe and can be called concurrently.
      *
      * @param plugin the plugin to register, must not be {@code null}
      * @throws NullPointerException if {@code plugin} is {@code null}
      * @throws NullPointerException if {@code plugin.getDialectName()} returns {@code null}
+     * @throws NullPointerException if {@code plugin.getDialectVersion()} returns {@code null}
      */
     public static void register(SqlDialectPlugin plugin) {
         if (plugin == null) {
@@ -92,16 +53,22 @@ public final class SqlDialectRegistry {
         if (dialectName == null) {
             throw new NullPointerException("Plugin dialect name must not be null");
         }
-        plugins.put(dialectName.toLowerCase(), plugin);
+        String dialectVersion = plugin.getDialectVersion();
+        if (dialectVersion == null) {
+            throw new NullPointerException("Plugin dialect version must not be null");
+        }
+
+        String normalizedDialect = dialectName.toLowerCase();
+        plugins.computeIfAbsent(normalizedDialect, k -> new ArrayList<>()).add(plugin);
     }
 
     /**
-     * Retrieves a {@link SqlRenderer} for the specified SQL dialect.
+     * Retrieves a {@link SqlRenderer} for the specified SQL dialect without version matching.
      * <p>
-     * The dialect name is matched case-insensitively. The registry first looks for
-     * a plugin registered under the exact dialect name, then checks all plugins
-     * to see if any support the requested dialect (via {@link SqlDialectPlugin#supports(String)}).
+     * This method returns the first available plugin for the given dialect, regardless of version.
+     * If you need version-specific rendering, use {@link #getRenderer(String, String)} instead.
      * <p>
+     * The dialect name is matched case-insensitively.
      * Each call returns a new renderer instance to ensure thread safety.
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
@@ -109,29 +76,102 @@ public final class SqlDialectRegistry {
      * @throws IllegalArgumentException if the dialect is not supported or if {@code dialect} is {@code null}
      */
     public static SqlRenderer getRenderer(String dialect) {
+        return getRenderer(dialect, null);
+    }
+
+    /**
+     * Retrieves a {@link SqlRenderer} for the specified SQL dialect and version.
+     * <p>
+     * The dialect name is matched case-insensitively. The registry finds all plugins
+     * registered for the given dialect and filters them by version compatibility using
+     * Semantic Versioning (SemVer) matching.
+     * <p>
+     * If multiple plugins match the requested version, the first match is used and a warning
+     * is logged. This typically indicates overlapping version ranges in plugin configuration.
+     * <p>
+     * Each call returns a new renderer instance to ensure thread safety.
+     * <p>
+     * <b>Example:</b>
+     * <pre>{@code
+     * // Get renderer for MySQL 8.0.35
+     * SqlRenderer renderer = SqlDialectRegistry.getRenderer("mysql", "8.0.35");
+     * }</pre>
+     *
+     * @param dialect the name of the SQL dialect, must not be {@code null}
+     * @param version the database version (SemVer format), may be {@code null} to match any version
+     * @return a new {@link SqlRenderer} instance configured for the dialect and version
+     * @throws IllegalArgumentException if the dialect is not supported, if no plugin matches the version,
+     *                                  if the version format is invalid, or if {@code dialect} is {@code null}
+     */
+    public static SqlRenderer getRenderer(String dialect, String version) {
         if (dialect == null) {
             throw new IllegalArgumentException("Dialect name must not be null");
         }
 
+        List<SqlDialectPlugin> matchingPlugins = findMatchingPlugins(dialect, version);
+
+        if (matchingPlugins.isEmpty()) {
+            String versionInfo = version != null ? " version '" + version + "'" : "";
+            throw new IllegalArgumentException("No plugin found for dialect '" + dialect + "'" + versionInfo
+                    + ". Supported dialects: " + getSupportedDialects());
+        }
+
+        if (matchingPlugins.size() > 1) {
+            String pluginInfo = matchingPlugins.stream()
+                    .map(p -> p.getDialectName() + ":" + p.getDialectVersion())
+                    .collect(Collectors.joining(", "));
+            logger.warn(
+                    "Multiple plugins match dialect '{}' version '{}': [{}]. Using first match: {}",
+                    dialect,
+                    version,
+                    pluginInfo,
+                    matchingPlugins.get(0).getDialectName() + ":"
+                            + matchingPlugins.get(0).getDialectVersion());
+        }
+
+        return matchingPlugins.get(0).createRenderer();
+    }
+
+    /**
+     * Finds all plugins matching the specified dialect and version.
+     *
+     * @param dialect the dialect name (case-insensitive)
+     * @param version the version to match (SemVer format), or null to match any version
+     * @return list of matching plugins, empty if none found
+     */
+    private static List<SqlDialectPlugin> findMatchingPlugins(String dialect, String version) {
         String normalizedDialect = dialect.toLowerCase();
+        List<SqlDialectPlugin> dialectPlugins = plugins.get(normalizedDialect);
 
-        // First, try direct lookup by dialect name
-        SqlDialectPlugin plugin = plugins.get(normalizedDialect);
-
-        // If not found, check if any plugin supports this dialect (for aliases)
-        if (plugin == null) {
-            plugin = plugins.values().stream()
-                    .filter(p -> p.supports(dialect))
-                    .findFirst()
-                    .orElse(null);
+        if (dialectPlugins == null || dialectPlugins.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        if (plugin == null) {
-            throw new IllegalArgumentException(
-                    "Unsupported SQL dialect: '" + dialect + "'. Supported dialects: " + getSupportedDialects());
+        // If no version specified, return all plugins for the dialect
+        if (version == null || version.trim().isEmpty()) {
+            return dialectPlugins;
         }
 
-        return plugin.createRenderer();
+        // Validate version format
+        if (!VersionMatcher.isValidVersion(version)) {
+            throw new IllegalArgumentException("Invalid version format: '" + version + "'");
+        }
+
+        // Filter plugins by version compatibility
+        return dialectPlugins.stream()
+                .filter(plugin -> {
+                    try {
+                        return VersionMatcher.matches(version, plugin.getDialectVersion());
+                    } catch (VersionFormatException e) {
+                        logger.warn(
+                                "Invalid version range '{}' in plugin {}, skipping",
+                                plugin.getDialectVersion(),
+                                plugin.getDialectName(),
+                                e);
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -153,8 +193,8 @@ public final class SqlDialectRegistry {
     /**
      * Checks if the specified SQL dialect is supported.
      * <p>
-     * This method checks both canonical dialect names and aliases. The check is
-     * case-insensitive.
+     * The check is case-insensitive and only verifies if at least one plugin
+     * is registered for the given dialect name.
      *
      * @param dialect the name of the SQL dialect to check, may be {@code null}
      * @return {@code true} if the dialect is supported, {@code false} otherwise
@@ -165,13 +205,17 @@ public final class SqlDialectRegistry {
         }
 
         String normalizedDialect = dialect.toLowerCase();
+        return plugins.containsKey(normalizedDialect);
+    }
 
-        // Check direct lookup first
-        if (plugins.containsKey(normalizedDialect)) {
-            return true;
-        }
-
-        // Check if any plugin supports this dialect (for aliases)
-        return plugins.values().stream().anyMatch(p -> p.supports(dialect));
+    /**
+     * Clears all registered plugins from the registry.
+     * <p>
+     * This method is primarily intended for testing purposes to ensure test isolation.
+     * <b>Warning:</b> This will remove all registered plugins and should not be used
+     * in production code.
+     */
+    static void clear() {
+        plugins.clear();
     }
 }
