@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.util.VersionFormatException;
 import lan.tlab.r4j.sql.plugin.util.VersionMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +43,7 @@ public final class SqlDialectRegistry {
      * @throws NullPointerException if {@code plugin} is {@code null}
      * @throws NullPointerException if {@code plugin.getDialectName()} returns {@code null}
      * @throws NullPointerException if {@code plugin.getDialectVersion()} returns {@code null}
+     * @throws IllegalArgumentException if {@code plugin.getDialectVersion()} is not a valid SemVer range
      */
     public static void register(SqlDialectPlugin plugin) {
         if (plugin == null) {
@@ -58,8 +58,14 @@ public final class SqlDialectRegistry {
             throw new NullPointerException("Plugin dialect version must not be null");
         }
 
-        String normalizedDialect = dialectName.toLowerCase();
-        plugins.computeIfAbsent(normalizedDialect, k -> new ArrayList<>()).add(plugin);
+        // Validate version range format at registration time (fail-fast)
+        if (!VersionMatcher.isValidRange(dialectVersion)) {
+            throw new IllegalArgumentException("Invalid version range '" + dialectVersion + "' in plugin '"
+                    + dialectName + "'. Must be a valid SemVer range (e.g., '^8.0.0', '~5.7.0', '>=14.0.0 <15.0.0')");
+        }
+
+        plugins.computeIfAbsent(getNormalizedDialect(dialectName), k -> new ArrayList<>())
+                .add(plugin);
     }
 
     /**
@@ -140,8 +146,7 @@ public final class SqlDialectRegistry {
      * @return list of matching plugins, empty if none found
      */
     private static List<SqlDialectPlugin> findMatchingPlugins(String dialect, String version) {
-        String normalizedDialect = dialect.toLowerCase();
-        List<SqlDialectPlugin> dialectPlugins = plugins.get(normalizedDialect);
+        List<SqlDialectPlugin> dialectPlugins = plugins.get(getNormalizedDialect(dialect));
 
         if (dialectPlugins == null || dialectPlugins.isEmpty()) {
             return Collections.emptyList();
@@ -158,19 +163,9 @@ public final class SqlDialectRegistry {
         }
 
         // Filter plugins by version compatibility
+        // Note: plugin version ranges are already validated at registration time
         return dialectPlugins.stream()
-                .filter(plugin -> {
-                    try {
-                        return VersionMatcher.matches(version, plugin.getDialectVersion());
-                    } catch (VersionFormatException e) {
-                        logger.warn(
-                                "Invalid version range '{}' in plugin {}, skipping",
-                                plugin.getDialectVersion(),
-                                plugin.getDialectName(),
-                                e);
-                        return false;
-                    }
-                })
+                .filter(plugin -> VersionMatcher.matches(version, plugin.getDialectVersion()))
                 .collect(Collectors.toList());
     }
 
@@ -204,8 +199,7 @@ public final class SqlDialectRegistry {
             return false;
         }
 
-        String normalizedDialect = dialect.toLowerCase();
-        return plugins.containsKey(normalizedDialect);
+        return plugins.containsKey(getNormalizedDialect(dialect));
     }
 
     /**
@@ -217,5 +211,10 @@ public final class SqlDialectRegistry {
      */
     static void clear() {
         plugins.clear();
+    }
+
+    private static String getNormalizedDialect(String dialect) {
+        String normalizedDialect = dialect.toLowerCase();
+        return normalizedDialect;
     }
 }
