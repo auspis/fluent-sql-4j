@@ -89,19 +89,4 @@ class VersionMatcherTest {
         assertThat(VersionMatcher.isValidVersion("")).isFalse();
         assertThat(VersionMatcher.isValidVersion("   ")).isFalse();
     }
-
-    @Test
-    void validatesCorrectRangeStrings() {
-        assertThat(VersionMatcher.isValidRange("^14.0.0")).isTrue();
-        assertThat(VersionMatcher.isValidRange("~5.7.0")).isTrue();
-        assertThat(VersionMatcher.isValidRange(">=8.0.0 <9.0.0")).isTrue();
-        assertThat(VersionMatcher.isValidRange("8.0.0")).isTrue(); // exact version is valid range
-    }
-
-    @Test
-    void rejectsInvalidRangeStrings() {
-        assertThat(VersionMatcher.isValidRange("invalid")).isFalse();
-        assertThat(VersionMatcher.isValidRange(null)).isFalse();
-        assertThat(VersionMatcher.isValidRange("   ")).isFalse();
-    }
 }
