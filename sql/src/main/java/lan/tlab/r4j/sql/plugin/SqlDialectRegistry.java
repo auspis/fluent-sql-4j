@@ -3,12 +3,13 @@ package lan.tlab.r4j.sql.plugin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.util.VersionMatcher;
+import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +25,8 @@ public final class SqlDialectRegistry {
     private static final ConcurrentHashMap<String, List<SqlDialectPlugin>> plugins = new ConcurrentHashMap<>();
 
     static {
-        ServiceLoader<SqlDialectPlugin> loader = ServiceLoader.load(SqlDialectPlugin.class);
-        loader.forEach(SqlDialectRegistry::register);
+        ServiceLoader<SqlDialectPluginProvider> loader = ServiceLoader.load(SqlDialectPluginProvider.class);
+        loader.forEach(provider -> register(provider.get()));
     }
 
     private SqlDialectRegistry() {}
@@ -33,39 +34,21 @@ public final class SqlDialectRegistry {
     /**
      * Registers a SQL dialect plugin.
      * <p>
-     * The plugin is registered under its canonical dialect name (obtained via
-     * {@link SqlDialectPlugin#getDialectName()}). Multiple plugins can be registered
+     * The plugin is registered under its canonical dialect name. Multiple plugins can be registered
      * for the same dialect with different version ranges.
+     * <p>
+     * Since {@link SqlDialectPlugin} is a validated record, all validation happens at plugin
+     * construction time. This method only needs to verify the plugin reference itself is not null.
      * <p>
      * This method is thread-safe and can be called concurrently.
      *
      * @param plugin the plugin to register, must not be {@code null}
      * @throws NullPointerException if {@code plugin} is {@code null}
-     * @throws NullPointerException if {@code plugin.getDialectName()} returns {@code null}
-     * @throws NullPointerException if {@code plugin.getDialectVersion()} returns {@code null}
-     * @throws IllegalArgumentException if {@code plugin.getDialectVersion()} is not a valid SemVer range
-     * @throws IllegalArgumentException if {@code plugin.getDialectVersion()} is not a valid SemVer range
      */
     public static void register(SqlDialectPlugin plugin) {
-        if (plugin == null) {
-            throw new NullPointerException("Plugin must not be null");
-        }
-        String dialectName = plugin.getDialectName();
-        if (dialectName == null) {
-            throw new NullPointerException("Plugin dialect name must not be null");
-        }
-        String dialectVersion = plugin.getDialectVersion();
-        if (dialectVersion == null) {
-            throw new NullPointerException("Plugin dialect version must not be null");
-        }
+        Objects.requireNonNull(plugin, "Plugin must not be null");
 
-        // Validate version range format at registration time (fail-fast)
-        if (!VersionMatcher.isValidRange(dialectVersion)) {
-            throw new IllegalArgumentException("Invalid version range '" + dialectVersion + "' in plugin '"
-                    + dialectName + "'. Must be a valid SemVer range (e.g., '^8.0.0', '~5.7.0', '>=14.0.0 <15.0.0')");
-        }
-
-        plugins.computeIfAbsent(getNormalizedDialect(dialectName), k -> new ArrayList<>())
+        plugins.computeIfAbsent(getNormalizedDialect(plugin.dialectName()), k -> new ArrayList<>())
                 .add(plugin);
     }
 
@@ -128,15 +111,15 @@ public final class SqlDialectRegistry {
 
         if (matchingPlugins.size() > 1) {
             String pluginInfo = matchingPlugins.stream()
-                    .map(p -> p.getDialectName() + ":" + p.getDialectVersion())
+                    .map(p -> p.dialectName() + ":" + p.dialectVersion())
                     .collect(Collectors.joining(", "));
             logger.warn(
                     "Multiple plugins match dialect '{}' version '{}': [{}]. Using first match: {}",
                     dialect,
                     version,
                     pluginInfo,
-                    matchingPlugins.get(0).getDialectName() + ":"
-                            + matchingPlugins.get(0).getDialectVersion());
+                    matchingPlugins.get(0).dialectName() + ":"
+                            + matchingPlugins.get(0).dialectVersion());
         }
 
         return matchingPlugins.get(0).createRenderer();
@@ -166,14 +149,14 @@ public final class SqlDialectRegistry {
         }
 
         // Validate version format (fail-fast)
-        if (!VersionMatcher.isValidVersion(version)) {
+        if (!SemVerUtil.isValidVersion(version)) {
             throw new IllegalArgumentException("Invalid version format: '" + version + "'");
         }
 
         // Filter plugins by version compatibility
         // Note: plugin version ranges are already validated at registration time
         return availablePlugins.stream()
-                .filter(plugin -> VersionMatcher.matches(version, plugin.getDialectVersion()))
+                .filter(plugin -> SemVerUtil.matches(version, plugin.dialectVersion()))
                 .collect(Collectors.toList());
     }
 
