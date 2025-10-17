@@ -87,4 +87,31 @@ class SqlDialectRegistryTest {
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("Plugin must not be null");
     }
+
+    @Test
+    void shouldThrowExceptionForInvalidVersionRange() {
+        SqlDialectPlugin plugin = mock(SqlDialectPlugin.class);
+        when(plugin.getDialectName()).thenReturn("oracle");
+        when(plugin.getDialectVersion()).thenReturn("invalid-range");
+
+        assertThatThrownBy(() -> SqlDialectRegistry.register(plugin))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid version range 'invalid-range'")
+                .hasMessageContaining("oracle");
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidUserVersionFormat() {
+        SqlDialectPlugin plugin = mock(SqlDialectPlugin.class);
+        SqlRenderer renderer = mock(SqlRenderer.class);
+        when(plugin.getDialectName()).thenReturn("postgres");
+        when(plugin.getDialectVersion()).thenReturn("^13.0.0");
+        when(plugin.createRenderer()).thenReturn(renderer);
+
+        SqlDialectRegistry.register(plugin);
+
+        assertThatThrownBy(() -> SqlDialectRegistry.getRenderer("postgres", "invalid-version"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Invalid version format: 'invalid-version'");
+    }
 }
