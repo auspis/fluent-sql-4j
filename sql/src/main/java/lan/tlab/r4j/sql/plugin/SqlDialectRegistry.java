@@ -2,54 +2,186 @@ package lan.tlab.r4j.sql.plugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.plugin.RegistryResult.Failure;
+import lan.tlab.r4j.sql.plugin.RegistryResult.Success;
 import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Immutable registry for SQL dialect plugins.
+ * <p>
+ * This registry follows functional programming principles:
+ * <ul>
+ *   <li><b>Immutability</b>: Once created, a registry instance cannot be modified</li>
+ *   <li><b>Pure functions</b>: Query methods have no side effects</li>
+ *   <li><b>No exceptions</b>: Operations return {@link RegistryResult} instead of throwing</li>
+ *   <li><b>Thread-safe by design</b>: Immutability eliminates concurrency issues</li>
+ * </ul>
+ * <p>
+ * <b>Creating a registry:</b>
+ * <pre>{@code
+ * // Load plugins via ServiceLoader
+ * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+ *
+ * // Create empty registry
+ * SqlDialectRegistry registry = SqlDialectRegistry.empty();
+ *
+ * // Create with specific plugins
+ * SqlDialectRegistry registry = SqlDialectRegistry.of(List.of(plugin1, plugin2));
+ * }</pre>
+ * <p>
+ * <b>Using the registry:</b>
+ * <pre>{@code
+ * RegistryResult<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
+ *
+ * switch (result) {
+ *     case Success<SqlRenderer>(SqlRenderer renderer) -> // use renderer
+ *     case Failure<SqlRenderer>(String message) -> // handle error
+ * }
+ *
+ * // Or use helper methods
+ * SqlRenderer renderer = registry.getRenderer("mysql", "8.0.35").orElseThrow();
+ * }</pre>
+ * <p>
+ * <b>Registering plugins:</b>
+ * <pre>{@code
+ * // Registration returns a NEW registry instance
+ * SqlDialectRegistry newRegistry = registry.register(customPlugin);
+ * }</pre>
+ *
+ * @see SqlDialectPlugin
+ * @see SqlDialectPluginProvider
+ * @see RegistryResult
+ * @since 1.0
+ */
 public final class SqlDialectRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlDialectRegistry.class);
 
     /**
-     * Thread-safe storage for registered plugins.
-     * Keys are dialect names in lowercase, values are lists of plugins for that dialect.
-     * Multiple plugins can exist for the same dialect with different version ranges.
+     * Immutable storage for registered plugins.
+     * Keys are dialect names in lowercase, values are immutable lists of plugins for that dialect.
      */
-    private static final ConcurrentHashMap<String, List<SqlDialectPlugin>> plugins = new ConcurrentHashMap<>();
-
-    static {
-        ServiceLoader<SqlDialectPluginProvider> loader = ServiceLoader.load(SqlDialectPluginProvider.class);
-        loader.forEach(provider -> register(provider.get()));
-    }
-
-    private SqlDialectRegistry() {}
+    private final Map<String, List<SqlDialectPlugin>> plugins;
 
     /**
-     * Registers a SQL dialect plugin.
+     * Private constructor. Use factory methods to create instances.
+     *
+     * @param plugins the plugins to include in this registry
+     */
+    private SqlDialectRegistry(Map<String, List<SqlDialectPlugin>> plugins) {
+        // Create defensive deep copy to ensure immutability
+        Map<String, List<SqlDialectPlugin>> copy = new HashMap<>();
+        plugins.forEach((key, value) -> copy.put(key, List.copyOf(value)));
+        this.plugins = Map.copyOf(copy);
+    }
+
+    /**
+     * Creates a registry with plugins discovered via {@link ServiceLoader}.
      * <p>
-     * The plugin is registered under its canonical dialect name. Multiple plugins can be registered
-     * for the same dialect with different version ranges.
+     * This is the recommended way to create a registry in production code.
+     * It automatically discovers and loads all {@link SqlDialectPluginProvider}
+     * implementations available on the classpath.
      * <p>
-     * Since {@link SqlDialectPlugin} is a validated record, all validation happens at plugin
-     * construction time. This method only needs to verify the plugin reference itself is not null.
+     * If no plugins are found, returns an empty registry.
+     *
+     * @return a new registry instance with all discovered plugins
+     */
+    public static SqlDialectRegistry createWithServiceLoader() {
+        Map<String, List<SqlDialectPlugin>> loadedPlugins = new HashMap<>();
+
+        ServiceLoader<SqlDialectPluginProvider> loader = ServiceLoader.load(SqlDialectPluginProvider.class);
+
+        for (SqlDialectPluginProvider provider : loader) {
+            SqlDialectPlugin plugin = provider.get();
+            loadedPlugins
+                    .computeIfAbsent(getNormalizedDialect(plugin.dialectName()), k -> new ArrayList<>())
+                    .add(plugin);
+
+            logger.debug("Loaded plugin: {} version {}", plugin.dialectName(), plugin.dialectVersion());
+        }
+
+        int totalPlugins = loadedPlugins.values().stream().mapToInt(List::size).sum();
+        logger.info("Loaded {} plugin(s) for {} dialect(s)", totalPlugins, loadedPlugins.size());
+
+        return new SqlDialectRegistry(loadedPlugins);
+    }
+
+    /**
+     * Creates an empty registry.
      * <p>
-     * This method is thread-safe and can be called concurrently.
+     * This is useful for testing or when you want to build a registry manually
+     * using {@link #register(SqlDialectPlugin)}.
+     *
+     * @return a new empty registry instance
+     */
+    public static SqlDialectRegistry empty() {
+        return new SqlDialectRegistry(Map.of());
+    }
+
+    /**
+     * Creates a registry with the specified plugins.
+     * <p>
+     * This is useful for testing when you want to create a registry with
+     * a specific set of plugins.
+     *
+     * @param pluginList the plugins to include in the registry
+     * @return a new registry instance containing the specified plugins
+     * @throws NullPointerException if {@code pluginList} is {@code null} or contains {@code null} elements
+     */
+    public static SqlDialectRegistry of(List<SqlDialectPlugin> pluginList) {
+        Objects.requireNonNull(pluginList, "Plugins list must not be null");
+
+        Map<String, List<SqlDialectPlugin>> pluginMap = pluginList.stream()
+                .peek(plugin -> Objects.requireNonNull(plugin, "Plugin list must not contain null elements"))
+                .collect(Collectors.groupingBy(
+                        plugin -> getNormalizedDialect(plugin.dialectName()), LinkedHashMap::new, Collectors.toList()));
+
+        return new SqlDialectRegistry(pluginMap);
+    }
+
+    /**
+     * Registers a SQL dialect plugin, returning a new registry instance.
+     * <p>
+     * This method does not modify the current registry. Instead, it returns
+     * a new registry instance that includes the specified plugin in addition
+     * to all plugins from this registry.
+     * <p>
+     * This immutable approach ensures thread safety and makes the registry
+     * behavior predictable and testable.
+     * <p>
+     * <b>Example:</b>
+     * <pre>{@code
+     * SqlDialectRegistry registry = SqlDialectRegistry.empty();
+     * SqlDialectRegistry newRegistry = registry.register(plugin1).register(plugin2);
+     * // registry is still empty, newRegistry contains both plugins
+     * }</pre>
      *
      * @param plugin the plugin to register, must not be {@code null}
+     * @return a new registry instance containing this plugin and all existing plugins
      * @throws NullPointerException if {@code plugin} is {@code null}
      */
-    public static void register(SqlDialectPlugin plugin) {
+    public SqlDialectRegistry register(SqlDialectPlugin plugin) {
         Objects.requireNonNull(plugin, "Plugin must not be null");
 
-        plugins.computeIfAbsent(getNormalizedDialect(plugin.dialectName()), k -> new ArrayList<>())
-                .add(plugin);
+        // Combine existing plugins with new plugin in a single immutable stream
+        List<SqlDialectPlugin> allPlugins = Stream.concat(
+                        this.plugins.values().stream().flatMap(List::stream), Stream.of(plugin))
+                .toList();
+
+        // Delegate to of() to create the new registry with consistent grouping logic
+        return of(allPlugins);
     }
 
     /**
@@ -59,13 +191,11 @@ public final class SqlDialectRegistry {
      * If you need version-specific rendering, use {@link #getRenderer(String, String)} instead.
      * <p>
      * The dialect name is matched case-insensitively.
-     * Each call returns a new renderer instance to ensure thread safety.
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
-     * @return a new {@link SqlRenderer} instance configured for the dialect
-     * @throws IllegalArgumentException if the dialect is not supported or if {@code dialect} is {@code null}
+     * @return a result containing the renderer, or a failure if the dialect is not supported
      */
-    public static SqlRenderer getRenderer(String dialect) {
+    public RegistryResult<SqlRenderer> getRenderer(String dialect) {
         return getRenderer(dialect, null);
     }
 
@@ -79,50 +209,43 @@ public final class SqlDialectRegistry {
      * If multiple plugins match the requested version, the first match is used and a warning
      * is logged. This typically indicates overlapping version ranges in plugin configuration.
      * <p>
-     * Each call returns a new renderer instance to ensure thread safety.
-     * <p>
      * <b>Example:</b>
      * <pre>{@code
-     * // Get renderer for MySQL 8.0.35
-     * SqlRenderer renderer = SqlDialectRegistry.getRenderer("mysql", "8.0.35");
+     * RegistryResult<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
+     *
+     * SqlRenderer renderer = result.orElseThrow(); // Convert to exception if needed
      * }</pre>
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @param version the database version (SemVer format), may be {@code null} to match any version
-     * @return a new {@link SqlRenderer} instance configured for the dialect and version
-     * @throws IllegalArgumentException if the dialect is not supported, if no plugin matches the version,
-     *                                  if the version format is invalid, or if {@code dialect} is {@code null}
+     * @return a result containing the renderer, or a failure if no matching plugin is found
      */
-    public static SqlRenderer getRenderer(String dialect, String version) {
+    public RegistryResult<SqlRenderer> getRenderer(String dialect, String version) {
         if (dialect == null) {
-            throw new IllegalArgumentException("Dialect name must not be null");
+            return new Failure<>("Dialect name must not be null");
         }
 
         List<SqlDialectPlugin> dialectPlugins =
                 plugins.getOrDefault(getNormalizedDialect(dialect), Collections.emptyList());
 
+        // Validate version format if provided
+        if (version != null && !version.trim().isEmpty() && !SemVerUtil.isValidVersion(version)) {
+            return new Failure<>("Invalid version format: '" + version + "'");
+        }
+
         List<SqlDialectPlugin> matchingPlugins = findMatchingPlugins(dialectPlugins, version);
 
         if (matchingPlugins.isEmpty()) {
             String versionInfo = version != null ? " version '" + version + "'" : "";
-            throw new IllegalArgumentException("No plugin found for dialect '" + dialect + "'" + versionInfo
+            return new Failure<>("No plugin found for dialect '" + dialect + "'" + versionInfo
                     + ". Supported dialects: " + getSupportedDialects());
         }
 
         if (matchingPlugins.size() > 1) {
-            String pluginInfo = matchingPlugins.stream()
-                    .map(p -> p.dialectName() + ":" + p.dialectVersion())
-                    .collect(Collectors.joining(", "));
-            logger.warn(
-                    "Multiple plugins match dialect '{}' version '{}': [{}]. Using first match: {}",
-                    dialect,
-                    version,
-                    pluginInfo,
-                    matchingPlugins.get(0).dialectName() + ":"
-                            + matchingPlugins.get(0).dialectVersion());
+            logMultipleMatches(dialect, version, matchingPlugins);
         }
 
-        return matchingPlugins.get(0).createRenderer();
+        return new Success<>(matchingPlugins.get(0).createRenderer());
     }
 
     /**
@@ -164,15 +287,12 @@ public final class SqlDialectRegistry {
      * Returns an immutable set of all supported SQL dialect names.
      * <p>
      * The returned set contains the canonical names of all registered dialects
-     * in lowercase. The set is a snapshot and will not reflect future registrations.
-     * <p>
-     * Note: This method returns only the canonical names. Dialects may support
-     * additional aliases that are not included in this set. Use {@link #isSupported(String)}
-     * to check if a specific dialect name (including aliases) is supported.
+     * in lowercase. The set is a snapshot and will not reflect changes to other
+     * registry instances.
      *
      * @return an immutable set of supported dialect names, never {@code null}
      */
-    public static Set<String> getSupportedDialects() {
+    public Set<String> getSupportedDialects() {
         return Collections.unmodifiableSet(plugins.keySet());
     }
 
@@ -185,7 +305,7 @@ public final class SqlDialectRegistry {
      * @param dialect the name of the SQL dialect to check, may be {@code null}
      * @return {@code true} if the dialect is supported, {@code false} otherwise
      */
-    public static boolean isSupported(String dialect) {
+    public boolean isSupported(String dialect) {
         if (dialect == null) {
             return false;
         }
@@ -194,18 +314,38 @@ public final class SqlDialectRegistry {
     }
 
     /**
-     * Clears all registered plugins from the registry.
-     * <p>
-     * This method is primarily intended for testing purposes to ensure test isolation.
-     * <b>Warning:</b> This will remove all registered plugins and should not be used
-     * in production code.
+     * Returns the total number of registered plugins across all dialects.
+     *
+     * @return the total number of plugins
      */
-    static void clear() {
-        plugins.clear();
+    public int size() {
+        return plugins.values().stream().mapToInt(List::size).sum();
+    }
+
+    /**
+     * Checks if this registry is empty (contains no plugins).
+     *
+     * @return {@code true} if no plugins are registered, {@code false} otherwise
+     */
+    public boolean isEmpty() {
+        return plugins.isEmpty();
     }
 
     private static String getNormalizedDialect(String dialect) {
-        String normalizedDialect = dialect.toLowerCase();
-        return normalizedDialect;
+        return dialect.toLowerCase();
+    }
+
+    private void logMultipleMatches(String dialect, String version, List<SqlDialectPlugin> matchingPlugins) {
+        String pluginInfo = matchingPlugins.stream()
+                .map(p -> p.dialectName() + ":" + p.dialectVersion())
+                .collect(Collectors.joining(", "));
+
+        logger.warn(
+                "Multiple plugins match dialect '{}' version '{}': [{}]. Using first match: {}",
+                dialect,
+                version,
+                pluginInfo,
+                matchingPlugins.get(0).dialectName() + ":"
+                        + matchingPlugins.get(0).dialectVersion());
     }
 }

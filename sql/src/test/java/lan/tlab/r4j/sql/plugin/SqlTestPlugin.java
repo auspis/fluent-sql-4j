@@ -9,6 +9,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public final class SqlTestPlugin {
 
     public static final String TEST_DIALECT = "test-dialect";
+    public static final String OTHER_DIALECT = "other-dialect";
     public static final String BASE_VERSION = "3.4.5";
 
     private SqlTestPlugin() {}
