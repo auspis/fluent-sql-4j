@@ -71,13 +71,17 @@ public record SqlDialectPlugin(String dialectName, String dialectVersion, Suppli
     }
 
     /**
-     * Creates a new {@link SqlRenderer} configured for this SQL dialect.
+     * Creates a {@link SqlRenderer} configured for this SQL dialect.
      * <p>
      * The renderer is responsible for converting the abstract syntax tree (AST) representation
-     * of SQL statements into dialect-specific SQL text. Each invocation returns a new
-     * instance to ensure thread safety.
+     * of SQL statements into dialect-specific SQL text.
+     * <p>
+     * <b>Thread Safety:</b> The thread safety of the returned renderer depends on the
+     * {@code rendererSupplier} implementation. It is recommended that the supplier creates
+     * a new instance on each invocation to ensure thread safety (e.g., using a constructor
+     * reference like {@code MySqlRenderer::new}).
      *
-     * @return a new, fully configured {@link SqlRenderer} instance, never {@code null}
+     * @return a fully configured {@link SqlRenderer} instance, never {@code null}
      */
     public SqlRenderer createRenderer() {
         return rendererSupplier.get();
