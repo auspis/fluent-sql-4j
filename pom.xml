@@ -278,14 +278,14 @@
             </execution>
           </executions>
         </plugin>
-        <plugin>
+        <!-- <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven.surefire.plugin.version}</version>
           <configuration>
             <argLine>-javaagent:${project.build.directory}/agents/byte-buddy-agent-${dep.byte-buddy.version}.jar</argLine>
           </configuration>
-        </plugin>
+        </plugin> -->
       </plugins>
     </pluginManagement>
     <plugins>
