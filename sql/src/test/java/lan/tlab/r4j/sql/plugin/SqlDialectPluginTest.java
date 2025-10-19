@@ -45,13 +45,44 @@ class SqlDialectPluginTest {
     }
 
     @Test
-    void shouldRejectInvalidVersionRange() {
+    void shouldRejectBlankVersionRange() {
         SqlRenderer renderer = mock(SqlRenderer.class);
 
-        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "invalid-version", () -> renderer))
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "", () -> renderer))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid version range 'invalid-version'")
+                .hasMessageContaining("Dialect version must not be blank")
                 .hasMessageContaining("mysql");
+
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "   ", () -> renderer))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Dialect version must not be blank")
+                .hasMessageContaining("mysql");
+    }
+
+    @Test
+    void shouldAllowNonSemVerVersion() {
+        SqlRenderer renderer = mock(SqlRenderer.class);
+
+        // Non-SemVer versions like "2008" should be allowed for exact matching
+        SqlDialectPlugin plugin = new SqlDialectPlugin("standardsql", "2008", () -> renderer);
+
+        assertThat(plugin.dialectName()).isEqualTo("standardsql");
+        assertThat(plugin.dialectVersion()).isEqualTo("2008");
+        assertThat(plugin.createRenderer()).isEqualTo(renderer);
+    }
+
+    @Test
+    void shouldAllowArbitraryVersionString() {
+        SqlRenderer renderer = mock(SqlRenderer.class);
+
+        // Arbitrary version strings should be allowed
+        SqlDialectPlugin plugin1 = new SqlDialectPlugin("customdb", "2011", () -> renderer);
+        SqlDialectPlugin plugin2 = new SqlDialectPlugin("customdb", "v1", () -> renderer);
+        SqlDialectPlugin plugin3 = new SqlDialectPlugin("customdb", "latest", () -> renderer);
+
+        assertThat(plugin1.dialectVersion()).isEqualTo("2011");
+        assertThat(plugin2.dialectVersion()).isEqualTo("v1");
+        assertThat(plugin3.dialectVersion()).isEqualTo("latest");
     }
 
     @Test
