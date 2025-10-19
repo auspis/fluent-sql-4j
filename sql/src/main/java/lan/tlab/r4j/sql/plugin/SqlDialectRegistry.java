@@ -270,7 +270,7 @@ public final class SqlDialectRegistry {
         // Note: plugin version ranges are already validated at registration time
         return availablePlugins.stream()
                 .filter(plugin -> SemVerUtil.matches(version, plugin.dialectVersion()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
