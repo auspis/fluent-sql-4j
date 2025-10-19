@@ -37,10 +37,15 @@ class SqlDialectRegistryTest {
     }
 
     @Test
-    void register_shouldThrowExceptionForInvalidVersionRange() {
-        assertThatThrownBy(() -> SqlTestPlugin.create("invalid-range", renderer))
+    void register_shouldThrowExceptionForBlankVersion() {
+        assertThatThrownBy(() -> SqlTestPlugin.create("", renderer))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid version range 'invalid-range'")
+                .hasMessageContaining("Dialect version must not be blank")
+                .hasMessageContaining(SqlTestPlugin.TEST_DIALECT);
+
+        assertThatThrownBy(() -> SqlTestPlugin.create("   ", renderer))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Dialect version must not be blank")
                 .hasMessageContaining(SqlTestPlugin.TEST_DIALECT);
     }
 
@@ -79,10 +84,89 @@ class SqlDialectRegistryTest {
     }
 
     @Test
-    void getRenderer_returnsFailureForInvalidUserVersionFormat() {
-        RegistryResult<SqlRenderer> result = registry.getRenderer(SqlTestPlugin.TEST_DIALECT, "invalid-version");
+    void getRenderer_supportsNonSemVerExactMatch() {
+        SqlRenderer nonSemVerRenderer = mock(SqlRenderer.class);
+        SqlDialectPlugin nonSemVerPlugin = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2008", nonSemVerRenderer);
+        SqlDialectRegistry registryWithNonSemVer = SqlDialectRegistry.of(List.of(nonSemVerPlugin));
+
+        // Exact match should work
+        RegistryResult<SqlRenderer> result = registryWithNonSemVer.getRenderer(SqlTestPlugin.TEST_DIALECT, "2008");
+        assertThat(result).isInstanceOf(Success.class);
+        assertThat(result.orElseThrow()).isEqualTo(nonSemVerRenderer);
+
+        // Non-matching version should fail
+        RegistryResult<SqlRenderer> result2 = registryWithNonSemVer.getRenderer(SqlTestPlugin.TEST_DIALECT, "2011");
+        assertThat(result2).isInstanceOf(Failure.class);
+    }
+
+    @Test
+    void getRenderer_supportsMultipleNonSemVerVersions() {
+        SqlRenderer renderer2008 = mock(SqlRenderer.class);
+        SqlRenderer renderer2011 = mock(SqlRenderer.class);
+        SqlRenderer renderer2016 = mock(SqlRenderer.class);
+
+        SqlDialectPlugin plugin2008 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2008", renderer2008);
+        SqlDialectPlugin plugin2011 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2011", renderer2011);
+        SqlDialectPlugin plugin2016 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2016", renderer2016);
+
+        SqlDialectRegistry registryWithMultipleVersions =
+                SqlDialectRegistry.of(List.of(plugin2008, plugin2011, plugin2016));
+
+        // Each version should match its corresponding plugin
+        assertThat(registryWithMultipleVersions
+                        .getRenderer(SqlTestPlugin.TEST_DIALECT, "2008")
+                        .orElseThrow())
+                .isEqualTo(renderer2008);
+        assertThat(registryWithMultipleVersions
+                        .getRenderer(SqlTestPlugin.TEST_DIALECT, "2011")
+                        .orElseThrow())
+                .isEqualTo(renderer2011);
+        assertThat(registryWithMultipleVersions
+                        .getRenderer(SqlTestPlugin.TEST_DIALECT, "2016")
+                        .orElseThrow())
+                .isEqualTo(renderer2016);
+
+        // Non-matching version should fail
+        RegistryResult<SqlRenderer> result =
+                registryWithMultipleVersions.getRenderer(SqlTestPlugin.TEST_DIALECT, "2019");
         assertThat(result).isInstanceOf(Failure.class);
-        assertThat(((Failure<SqlRenderer>) result).message()).contains("Invalid version format: 'invalid-version'");
+    }
+
+    @Test
+    void getRenderer_nonSemVerVersionsCaseSensitive() {
+        SqlRenderer rendererLower = mock(SqlRenderer.class);
+        SqlDialectPlugin pluginLower = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "v1", rendererLower);
+        SqlDialectRegistry registryWithVersion = SqlDialectRegistry.of(List.of(pluginLower));
+
+        // Exact case match should work
+        RegistryResult<SqlRenderer> result = registryWithVersion.getRenderer(SqlTestPlugin.TEST_DIALECT, "v1");
+        assertThat(result).isInstanceOf(Success.class);
+        assertThat(result.orElseThrow()).isEqualTo(rendererLower);
+
+        // Different case should not match
+        RegistryResult<SqlRenderer> result2 = registryWithVersion.getRenderer(SqlTestPlugin.TEST_DIALECT, "V1");
+        assertThat(result2).isInstanceOf(Failure.class);
+    }
+
+    @Test
+    void getRenderer_mixedSemVerAndNonSemVerPlugins() {
+        SqlRenderer semVerRenderer = mock(SqlRenderer.class);
+        SqlRenderer nonSemVerRenderer = mock(SqlRenderer.class);
+
+        SqlDialectPlugin semVerPlugin = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^8.0.0", semVerRenderer);
+        SqlDialectPlugin nonSemVerPlugin = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2008", nonSemVerRenderer);
+
+        SqlDialectRegistry mixedRegistry = SqlDialectRegistry.of(List.of(semVerPlugin, nonSemVerPlugin));
+
+        // SemVer version should match SemVer plugin
+        RegistryResult<SqlRenderer> semVerResult = mixedRegistry.getRenderer(SqlTestPlugin.TEST_DIALECT, "8.0.35");
+        assertThat(semVerResult).isInstanceOf(Success.class);
+        assertThat(semVerResult.orElseThrow()).isEqualTo(semVerRenderer);
+
+        // Non-SemVer version should match non-SemVer plugin
+        RegistryResult<SqlRenderer> nonSemVerResult = mixedRegistry.getRenderer(SqlTestPlugin.TEST_DIALECT, "2008");
+        assertThat(nonSemVerResult).isInstanceOf(Success.class);
+        assertThat(nonSemVerResult.orElseThrow()).isEqualTo(nonSemVerRenderer);
     }
 
     // Tests for pure function findMatchingPlugins
@@ -115,10 +199,42 @@ class SqlDialectRegistryTest {
     }
 
     @Test
-    void findMatchingPlugins_shouldThrowExceptionForInvalidVersionFormat() {
-        assertThatThrownBy(() -> SqlDialectRegistry.findMatchingPlugins(plugins, "invalid-version"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid version format: 'invalid-version'");
+    void findMatchingPlugins_shouldUseExactMatchForNonSemVer() {
+        SqlRenderer renderer2008 = mock(SqlRenderer.class);
+        SqlRenderer renderer2011 = mock(SqlRenderer.class);
+
+        SqlDialectPlugin plugin2008 = SqlTestPlugin.create("2008", renderer2008);
+        SqlDialectPlugin plugin2011 = SqlTestPlugin.create("2011", renderer2011);
+
+        List<SqlDialectPlugin> nonSemVerPlugins = List.of(plugin2008, plugin2011);
+
+        // Exact match should work
+        assertThat(SqlDialectRegistry.findMatchingPlugins(nonSemVerPlugins, "2008"))
+                .containsExactly(plugin2008);
+        assertThat(SqlDialectRegistry.findMatchingPlugins(nonSemVerPlugins, "2011"))
+                .containsExactly(plugin2011);
+
+        // Non-matching version should return empty
+        assertThat(SqlDialectRegistry.findMatchingPlugins(nonSemVerPlugins, "2016"))
+                .isEmpty();
+    }
+
+    @Test
+    void findMatchingPlugins_shouldHandleMixedSemVerAndNonSemVer() {
+        SqlRenderer semVerRenderer = mock(SqlRenderer.class);
+        SqlRenderer nonSemVerRenderer = mock(SqlRenderer.class);
+
+        SqlDialectPlugin semVerPlugin = SqlTestPlugin.create("^8.0.0", semVerRenderer);
+        SqlDialectPlugin nonSemVerPlugin = SqlTestPlugin.create("2008", nonSemVerRenderer);
+
+        List<SqlDialectPlugin> mixedPlugins = List.of(semVerPlugin, nonSemVerPlugin);
+
+        // SemVer version should match SemVer plugin only
+        assertThat(SqlDialectRegistry.findMatchingPlugins(mixedPlugins, "8.0.35"))
+                .containsExactly(semVerPlugin);
+
+        // Non-SemVer version should match non-SemVer plugin only
+        assertThat(SqlDialectRegistry.findMatchingPlugins(mixedPlugins, "2008")).containsExactly(nonSemVerPlugin);
     }
 
     @Test
@@ -231,5 +347,44 @@ class SqlDialectRegistryTest {
         assertThat(registry2.size()).isEqualTo(2);
         assertThat(registry2.getSupportedDialects())
                 .containsExactlyInAnyOrder(SqlTestPlugin.TEST_DIALECT, SqlTestPlugin.OTHER_DIALECT);
+    }
+
+    // Tests for matchesVersion static method
+
+    @Test
+    void matchesVersion_shouldMatchSemVerWithSemVerRange() {
+        // SemVer version with SemVer range
+        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "^8.0.0", true)).isTrue();
+        assertThat(SqlDialectRegistry.matchesVersion("8.5.0", "^8.0.0", true)).isTrue();
+        assertThat(SqlDialectRegistry.matchesVersion("9.0.0", "^8.0.0", true)).isFalse();
+    }
+
+    @Test
+    void matchesVersion_shouldMatchSemVerWithExactVersion() {
+        // SemVer exact match
+        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "8.0.35", true)).isTrue();
+        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "8.0.36", true)).isFalse();
+    }
+
+    @Test
+    void matchesVersion_shouldMatchNonSemVerWithExactString() {
+        // Non-SemVer version with exact string match
+        assertThat(SqlDialectRegistry.matchesVersion("2008", "2008", false)).isTrue();
+        assertThat(SqlDialectRegistry.matchesVersion("2008", "2011", false)).isFalse();
+        assertThat(SqlDialectRegistry.matchesVersion("v1", "v1", false)).isTrue();
+        assertThat(SqlDialectRegistry.matchesVersion("v1", "V1", false)).isFalse();
+    }
+
+    @Test
+    void matchesVersion_shouldHandleNonSemVerRequestWithSemVerPlugin() {
+        // Non-SemVer request version with SemVer plugin should use exact match
+        assertThat(SqlDialectRegistry.matchesVersion("2008", "^8.0.0", false)).isFalse();
+        assertThat(SqlDialectRegistry.matchesVersion("latest", "^8.0.0", false)).isFalse();
+    }
+
+    @Test
+    void matchesVersion_shouldHandleSemVerRequestWithNonSemVerPlugin() {
+        // SemVer request version with non-SemVer plugin - will try SemVer match and fail
+        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "2008", true)).isFalse();
     }
 }
