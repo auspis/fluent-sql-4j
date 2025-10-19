@@ -51,23 +51,15 @@ public final class SemVerUtil {
      * @param version the version to check (e.g., "14.0.0", "8.0.35")
      * @param versionRange the version range to match against (e.g., "^14.0.0", "~5.7.0")
      * @return {@code true} if the version satisfies the range, {@code false} otherwise
-     * @throws VersionFormatException if version or versionRange are not valid semantic versions
-     * @throws IllegalArgumentException if version or versionRange are {@code null}
+     * @throws IllegalArgumentException if version or versionRange are invalid (including {@code null})
      */
     public static boolean matches(String version, String versionRange) {
-        if (version == null) {
-            throw new IllegalArgumentException("Version must not be null");
-        }
-        if (versionRange == null) {
-            throw new IllegalArgumentException("Version range must not be null");
-        }
-
         try {
             Semver semver = new Semver(version);
             Requirement requirement = Requirement.buildNPM(versionRange);
             return requirement.isSatisfiedBy(semver);
-        } catch (SemverException e) {
-            throw new VersionFormatException(
+        } catch (SemverException | NullPointerException e) {
+            throw new IllegalArgumentException(
                     "Invalid version or range: version='" + version + "', range='" + versionRange + "'", e);
         }
     }
