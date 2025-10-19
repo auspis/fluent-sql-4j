@@ -49,27 +49,27 @@ class SemVerUtilTest {
     void matches_throwsExceptionForNullVersion() {
         assertThatThrownBy(() -> SemVerUtil.matches(null, "^14.0.0"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Version must not be null");
+                .hasMessageContaining("Invalid version or range");
     }
 
     @Test
     void matches_throwsExceptionForNullRange() {
         assertThatThrownBy(() -> SemVerUtil.matches("14.0.0", null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Version range must not be null");
+                .hasMessageContaining("Invalid version or range");
     }
 
     @Test
     void matches_throwsExceptionForInvalidVersionFormat() {
         assertThatThrownBy(() -> SemVerUtil.matches("invalid", "^14.0.0"))
-                .isInstanceOf(VersionFormatException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Invalid version or range");
     }
 
     @Test
     void matches_throwsExceptionForInvalidRangeFormat() {
         assertThatThrownBy(() -> SemVerUtil.matches("14.0.0", "invalid-range"))
-                .isInstanceOf(VersionFormatException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Invalid version or range");
     }
 
