@@ -3,7 +3,6 @@ package lan.tlab.r4j.sql.plugin;
 import java.util.Objects;
 import java.util.function.Supplier;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
 
 /**
  * Immutable record representing a SQL dialect plugin.
@@ -17,11 +16,12 @@ import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
  * <p>
  * <b>Version Support:</b>
  * <p>
- * Plugins declare version support using Semantic Versioning (SemVer) notation.
- * The registry uses this information to match plugins to requested database versions.
- * Multiple plugins can be registered for the same dialect with different version ranges.
+ * Plugins declare version support using either Semantic Versioning (SemVer) notation or
+ * exact version strings for non-SemVer versions. The registry uses this information to match
+ * plugins to requested database versions. Multiple plugins can be registered for the same
+ * dialect with different version ranges.
  * <p>
- * <b>Example usage:</b>
+ * <b>Example usage with SemVer:</b>
  * <pre>{@code
  * var plugin = new SqlDialectPlugin(
  *     "mysql",
@@ -30,17 +30,27 @@ import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
  * );
  * }</pre>
  * <p>
+ * <b>Example usage with non-SemVer (exact match):</b>
+ * <pre>{@code
+ * var plugin = new SqlDialectPlugin(
+ *     "standardsql",
+ *     "2008",  // Supports exactly SQL:2008 standard
+ *     StandardSqlRenderer::new
+ * );
+ * }</pre>
+ * <p>
  * <b>Supported version formats:</b>
  * <ul>
- *   <li>Exact version: {@code "8.0.35"}</li>
- *   <li>Caret range (compatible): {@code "^8.0.0"} (matches {@code >=8.0.0 <9.0.0})</li>
- *   <li>Tilde range (patch): {@code "~5.7.42"} (matches {@code >=5.7.42 <5.8.0})</li>
- *   <li>Explicit range: {@code ">=8.0.0 <9.0.0"}</li>
- *   <li>Compound conditions: {@code ">=5.7.0 <8.0.0 || >=8.0.20"}</li>
+ *   <li>SemVer exact version: {@code "8.0.35"}</li>
+ *   <li>SemVer caret range (compatible): {@code "^8.0.0"} (matches {@code >=8.0.0 <9.0.0})</li>
+ *   <li>SemVer tilde range (patch): {@code "~5.7.42"} (matches {@code >=5.7.42 <5.8.0})</li>
+ *   <li>SemVer explicit range: {@code ">=8.0.0 <9.0.0"}</li>
+ *   <li>SemVer compound conditions: {@code ">=5.7.0 <8.0.0 || >=8.0.20"}</li>
+ *   <li>Non-SemVer exact match: {@code "2008"}, {@code "2011"}, {@code "2016"}</li>
  * </ul>
  *
- * @param dialectName the canonical name of the SQL dialect in lowercase (e.g., "mysql", "postgresql")
- * @param dialectVersion the SemVer version range this plugin supports (e.g., "^8.0.0")
+ * @param dialectName the canonical name of the SQL dialect in lowercase (e.g., "mysql", "postgresql", "standardsql")
+ * @param dialectVersion the version this plugin supports - either a SemVer range (e.g., "^8.0.0") or exact version string (e.g., "2008")
  * @param rendererSupplier a supplier that creates new {@link SqlRenderer} instances
  * @see SqlDialectPluginProvider
  * @see SqlDialectRegistry
@@ -54,19 +64,20 @@ public record SqlDialectPlugin(String dialectName, String dialectVersion, Suppli
      * Compact constructor with validation.
      * <p>
      * Validates that all parameters are non-null and that the dialect version
-     * is a valid SemVer range. This ensures that invalid plugins cannot be constructed.
+     * is not empty. Version can be either a valid SemVer range or an exact version
+     * string for non-SemVer versions. The registry will determine the matching strategy
+     * based on whether the version is SemVer-compatible.
      *
      * @throws NullPointerException if any parameter is {@code null}
-     * @throws IllegalArgumentException if {@code dialectVersion} is not a valid SemVer range
+     * @throws IllegalArgumentException if {@code dialectVersion} is empty or blank
      */
     public SqlDialectPlugin {
         Objects.requireNonNull(dialectName, "Dialect name must not be null");
         Objects.requireNonNull(dialectVersion, "Dialect version must not be null");
         Objects.requireNonNull(rendererSupplier, "Renderer supplier must not be null");
 
-        if (!SemVerUtil.isValidRange(dialectVersion)) {
-            throw new IllegalArgumentException("Invalid version range '" + dialectVersion + "' in plugin '"
-                    + dialectName + "'. Must be a valid SemVer range (e.g., '^8.0.0', '~5.7.0', '>=14.0.0 <15.0.0')");
+        if (dialectVersion.isBlank()) {
+            throw new IllegalArgumentException("Dialect version must not be blank in plugin '" + dialectName + "'");
         }
     }
 
