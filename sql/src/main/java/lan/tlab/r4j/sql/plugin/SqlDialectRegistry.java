@@ -1,7 +1,6 @@
 package lan.tlab.r4j.sql.plugin;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,9 +79,8 @@ public final class SqlDialectRegistry {
      * @param plugins the plugins to include in this registry
      */
     private SqlDialectRegistry(Map<String, List<SqlDialectPlugin>> plugins) {
-        Map<String, List<SqlDialectPlugin>> copy = new HashMap<>();
-        plugins.forEach((key, value) -> copy.put(key, List.copyOf(value)));
-        this.plugins = Map.copyOf(copy);
+        this.plugins = plugins.entrySet().stream()
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> List.copyOf(entry.getValue())));
     }
 
     /**
