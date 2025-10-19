@@ -1,6 +1,5 @@
 package lan.tlab.r4j.sql.plugin;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -81,7 +80,6 @@ public final class SqlDialectRegistry {
      * @param plugins the plugins to include in this registry
      */
     private SqlDialectRegistry(Map<String, List<SqlDialectPlugin>> plugins) {
-        // Create defensive deep copy to ensure immutability
         Map<String, List<SqlDialectPlugin>> copy = new HashMap<>();
         plugins.forEach((key, value) -> copy.put(key, List.copyOf(value)));
         this.plugins = Map.copyOf(copy);
@@ -99,23 +97,22 @@ public final class SqlDialectRegistry {
      * @return a new registry instance with all discovered plugins
      */
     public static SqlDialectRegistry createWithServiceLoader() {
-        Map<String, List<SqlDialectPlugin>> loadedPlugins = new HashMap<>();
-
         ServiceLoader<SqlDialectPluginProvider> loader = ServiceLoader.load(SqlDialectPluginProvider.class);
 
-        for (SqlDialectPluginProvider provider : loader) {
-            SqlDialectPlugin plugin = provider.get();
-            loadedPlugins
-                    .computeIfAbsent(getNormalizedDialect(plugin.dialectName()), k -> new ArrayList<>())
-                    .add(plugin);
+        List<SqlDialectPlugin> plugins = loader.stream()
+                .map(ServiceLoader.Provider::get)
+                .map(SqlDialectPluginProvider::get)
+                .peek(plugin ->
+                        logger.debug("Loaded plugin: {} version {}", plugin.dialectName(), plugin.dialectVersion()))
+                .toList();
 
-            logger.debug("Loaded plugin: {} version {}", plugin.dialectName(), plugin.dialectVersion());
-        }
+        long distinctDialects = plugins.stream()
+                .map(p -> getNormalizedDialect(p.dialectName()))
+                .distinct()
+                .count();
+        logger.info("Loaded {} plugin(s) for {} dialect(s)", plugins.size(), distinctDialects);
 
-        int totalPlugins = loadedPlugins.values().stream().mapToInt(List::size).sum();
-        logger.info("Loaded {} plugin(s) for {} dialect(s)", totalPlugins, loadedPlugins.size());
-
-        return new SqlDialectRegistry(loadedPlugins);
+        return of(plugins);
     }
 
     /**
@@ -175,12 +172,10 @@ public final class SqlDialectRegistry {
     public SqlDialectRegistry register(SqlDialectPlugin plugin) {
         Objects.requireNonNull(plugin, "Plugin must not be null");
 
-        // Combine existing plugins with new plugin in a single immutable stream
         List<SqlDialectPlugin> allPlugins = Stream.concat(
                         this.plugins.values().stream().flatMap(List::stream), Stream.of(plugin))
                 .toList();
 
-        // Delegate to of() to create the new registry with consistent grouping logic
         return of(allPlugins);
     }
 
@@ -228,7 +223,6 @@ public final class SqlDialectRegistry {
         List<SqlDialectPlugin> dialectPlugins =
                 plugins.getOrDefault(getNormalizedDialect(dialect), Collections.emptyList());
 
-        // Validate version format if provided
         if (version != null && !version.trim().isEmpty() && !SemVerUtil.isValidVersion(version)) {
             return new Failure<>("Invalid version format: '" + version + "'");
         }
@@ -266,12 +260,10 @@ public final class SqlDialectRegistry {
             return Collections.emptyList();
         }
 
-        // If no version specified, return all available plugins
         if (version == null || version.trim().isEmpty()) {
             return availablePlugins;
         }
 
-        // Validate version format (fail-fast)
         if (!SemVerUtil.isValidVersion(version)) {
             throw new IllegalArgumentException("Invalid version format: '" + version + "'");
         }
