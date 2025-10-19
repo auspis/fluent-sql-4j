@@ -196,21 +196,29 @@ public final class SqlDialectRegistry {
      * Retrieves a {@link SqlRenderer} for the specified SQL dialect and version.
      * <p>
      * The dialect name is matched case-insensitively. The registry finds all plugins
-     * registered for the given dialect and filters them by version compatibility using
-     * Semantic Versioning (SemVer) matching.
+     * registered for the given dialect and filters them by version compatibility.
+     * <p>
+     * Version matching strategy:
+     * <ul>
+     *   <li>If the requested version is SemVer-compatible, uses SemVer range matching</li>
+     *   <li>If the requested version is not SemVer-compatible, uses exact string matching</li>
+     * </ul>
      * <p>
      * If multiple plugins match the requested version, the first match is used and a warning
      * is logged. This typically indicates overlapping version ranges in plugin configuration.
      * <p>
-     * <b>Example:</b>
+     * <b>Example with SemVer:</b>
      * <pre>{@code
      * RegistryResult<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
-     *
-     * SqlRenderer renderer = result.orElseThrow(); // Convert to exception if needed
+     * }</pre>
+     * <p>
+     * <b>Example with non-SemVer:</b>
+     * <pre>{@code
+     * RegistryResult<SqlRenderer> result = registry.getRenderer("standardsql", "2008");
      * }</pre>
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
-     * @param version the database version (SemVer format), may be {@code null} to match any version
+     * @param version the database version, may be {@code null} to match any version
      * @return a result containing the renderer, or a failure if no matching plugin is found
      */
     public RegistryResult<SqlRenderer> getRenderer(String dialect, String version) {
@@ -220,10 +228,6 @@ public final class SqlDialectRegistry {
 
         List<SqlDialectPlugin> dialectPlugins =
                 plugins.getOrDefault(getNormalizedDialect(dialect), Collections.emptyList());
-
-        if (version != null && !version.trim().isEmpty() && !SemVerUtil.isValidVersion(version)) {
-            return new Failure<>("Invalid version format: '" + version + "'");
-        }
 
         List<SqlDialectPlugin> matchingPlugins = findMatchingPlugins(dialectPlugins, version);
 
@@ -246,12 +250,18 @@ public final class SqlDialectRegistry {
      * This is a pure function: the result depends only on input parameters,
      * with no access to mutable state. This makes it highly testable and composable.
      * <p>
+     * Matching strategy:
+     * <ul>
+     *   <li>If version is null or empty, returns all available plugins</li>
+     *   <li>If version is SemVer-compatible, uses SemVer range matching</li>
+     *   <li>If version is not SemVer-compatible, uses exact string matching (case-sensitive)</li>
+     * </ul>
+     * <p>
      * Package-private for testing purposes.
      *
      * @param availablePlugins the list of plugins to filter
-     * @param version the version to match (SemVer format), or null to match any version
+     * @param version the version to match, or null to match any version
      * @return list of matching plugins, empty if none found
-     * @throws IllegalArgumentException if the version format is invalid
      */
     static List<SqlDialectPlugin> findMatchingPlugins(List<SqlDialectPlugin> availablePlugins, String version) {
         if (availablePlugins.isEmpty()) {
@@ -262,15 +272,42 @@ public final class SqlDialectRegistry {
             return availablePlugins;
         }
 
-        if (!SemVerUtil.isValidVersion(version)) {
-            throw new IllegalArgumentException("Invalid version format: '" + version + "'");
-        }
+        boolean isSemVer = SemVerUtil.isValidVersion(version);
 
-        // Filter plugins by version compatibility
-        // Note: plugin version ranges are already validated at registration time
         return availablePlugins.stream()
-                .filter(plugin -> SemVerUtil.matches(version, plugin.dialectVersion()))
+                .filter(plugin -> matchesVersion(version, plugin.dialectVersion(), isSemVer))
                 .toList();
+    }
+
+    /**
+     * Determines if a requested version matches a plugin's version specification.
+     * <p>
+     * Uses different matching strategies based on whether the requested version is SemVer-compatible:
+     * <ul>
+     *   <li>For SemVer versions: uses SemVer range matching (e.g., "8.0.35" matches "^8.0.0")</li>
+     *   <li>For non-SemVer versions: uses exact string matching (e.g., "2008" matches "2008")</li>
+     * </ul>
+     * <p>
+     * Package-private for testing purposes.
+     *
+     * @param requestedVersion the version requested by the user
+     * @param pluginVersion the version specification from the plugin
+     * @param isSemVer whether the requested version is SemVer-compatible
+     * @return {@code true} if the versions match, {@code false} otherwise
+     */
+    static boolean matchesVersion(String requestedVersion, String pluginVersion, boolean isSemVer) {
+        if (isSemVer && SemVerUtil.isValidRange(pluginVersion)) {
+            // Both are SemVer-compatible: use SemVer matching
+            try {
+                return SemVerUtil.matches(requestedVersion, pluginVersion);
+            } catch (IllegalArgumentException e) {
+                // SemVer matching failed, fall through to exact match
+                return false;
+            }
+        } else {
+            // Non-SemVer version: use exact string matching
+            return requestedVersion.equals(pluginVersion);
+        }
     }
 
     /**
