@@ -91,8 +91,8 @@ class StandardSQLDialectPluginIntegrationTest {
         RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
         SqlRenderer renderer = result.orElseThrow();
 
-        // Verify renderer works with real queries
-        String sql = DSL.select("name", "email").from("users").build();
+        // Verify renderer works with real queries using the DSL
+        String sql = DSL.select(renderer, "name", "email").from("users").build();
         // DSL adds table references and quotes by default
         assertThat(sql).contains("name");
         assertThat(sql).contains("email");
@@ -100,7 +100,7 @@ class StandardSQLDialectPluginIntegrationTest {
 
         // Execute the query to verify it works with H2
         List<List<Object>> rows = ResultSetUtil.list(
-                DSL.select("name", "email").from("users").buildPreparedStatement(connection),
+                DSL.select(renderer, "name", "email").from("users").buildPreparedStatement(connection),
                 r -> List.of(r.getString("name"), r.getString("email")));
 
         assertThat(rows)
@@ -115,8 +115,8 @@ class StandardSQLDialectPluginIntegrationTest {
         SqlRenderer renderer =
                 registry.getRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
 
-        // Verify it generates standard SQL:2008 syntax for pagination
-        String paginationSql = DSL.select("name")
+        // Verify it generates standard SQL:2008 syntax for pagination using the DSL
+        String paginationSql = DSL.select(renderer, "name")
                 .from("users")
                 .orderBy("name")
                 .offset(5)
@@ -125,6 +125,43 @@ class StandardSQLDialectPluginIntegrationTest {
 
         assertThat(paginationSql).contains("OFFSET 5 ROWS");
         assertThat(paginationSql).contains("FETCH NEXT 3 ROWS ONLY");
+    }
+
+    @Test
+    void shouldUseRendererForDifferentDSLOperations() throws SQLException {
+        // Get renderer from registry
+        SqlRenderer renderer = registry.getRenderer("StandardSQL", "2008").orElseThrow();
+
+        // Test SELECT with WHERE using the custom renderer
+        String selectSql = DSL.select(renderer, "name", "age")
+                .from("users")
+                .where("age")
+                .gt(25)
+                .build();
+        assertThat(selectSql).contains("WHERE");
+        assertThat(selectSql).isNotEmpty();
+
+        // Test UPDATE using the custom renderer
+        String updateSql = DSL.update(renderer, "users")
+                .set("age", 31)
+                .where("name")
+                .eq("John Doe")
+                .build();
+        assertThat(updateSql).contains("UPDATE");
+        assertThat(updateSql).contains("SET");
+
+        // Test DELETE using the custom renderer
+        String deleteSql = DSL.deleteFrom(renderer, "users").where("age").lt(18).build();
+        assertThat(deleteSql).contains("DELETE");
+        assertThat(deleteSql).contains("FROM");
+
+        // Test INSERT using the custom renderer
+        String insertSql = DSL.insertInto(renderer, "users")
+                .set("name", "Test")
+                .set("age", 25)
+                .build();
+        assertThat(insertSql).contains("INSERT");
+        assertThat(insertSql).contains("INTO");
     }
 
     @Test
