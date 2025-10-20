@@ -1,5 +1,7 @@
 package lan.tlab.r4j.integration.sql.plugin.builtin;
 
+import static lan.tlab.r4j.sql.plugin.builtin.StandardSQLDialectPlugin.DIALECT_NAME;
+import static lan.tlab.r4j.sql.plugin.builtin.StandardSQLDialectPlugin.DIALECT_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -47,15 +49,15 @@ class StandardSQLDialectPluginIntegrationTest {
     }
 
     @Test
-    void shouldBeRegisteredInRegistry() {
-        assertThat(registry.isSupported("StandardSQL")).isTrue();
+    void registration() {
+        assertThat(registry.isSupported(DIALECT_NAME)).isTrue();
         assertThat(registry.isSupported("standardsql")).isTrue(); // case-insensitive
         assertThat(registry.isSupported("STANDARDSQL")).isTrue();
     }
 
     @Test
-    void shouldBeDiscoverableViaServiceLoader() {
-        RegistryResult<SqlRenderer> result = registry.getRenderer("StandardSQL", "2008");
+    void getRenderer() {
+        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
         SqlRenderer renderer = result.orElseThrow();
@@ -63,23 +65,21 @@ class StandardSQLDialectPluginIntegrationTest {
     }
 
     @Test
-    void shouldMatchExactVersion() {
-        // Should match exact version "2008"
-        RegistryResult<SqlRenderer> exactMatch = registry.getRenderer("StandardSQL", "2008");
+    void versionMatching() {
+        RegistryResult<SqlRenderer> exactMatch = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(exactMatch).isInstanceOf(RegistryResult.Success.class);
 
-        // Should not match other versions (non-SemVer uses exact matching)
-        RegistryResult<SqlRenderer> wrongVersion = registry.getRenderer("StandardSQL", "2011");
+        RegistryResult<SqlRenderer> wrongVersion = registry.getRenderer(DIALECT_NAME, "2011");
         assertThat(wrongVersion).isInstanceOf(RegistryResult.Failure.class);
 
-        RegistryResult<SqlRenderer> wrongVersion2 = registry.getRenderer("StandardSQL", "2016");
+        RegistryResult<SqlRenderer> wrongVersion2 = registry.getRenderer(DIALECT_NAME, "2016");
         assertThat(wrongVersion2).isInstanceOf(RegistryResult.Failure.class);
     }
 
     @Test
-    void shouldReturnRendererWithoutVersion() {
+    void getRendererWithoutVersion() {
         // When version is not specified, should return available plugin
-        RegistryResult<SqlRenderer> result = registry.getRenderer("StandardSQL");
+        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME);
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
@@ -88,7 +88,7 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldProduceWorkingRenderer() throws SQLException {
         // Get renderer from registry
-        RegistryResult<SqlRenderer> result = registry.getRenderer("StandardSQL", "2008");
+        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
         SqlRenderer renderer = result.orElseThrow();
 
         // Verify renderer works with real queries
@@ -112,7 +112,8 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldGenerateStandardSQLSyntax() {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer("StandardSQL", "2008").orElseThrow();
+        SqlRenderer renderer =
+                registry.getRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
 
         // Verify it generates standard SQL:2008 syntax for pagination
         String paginationSql = DSL.select("name")
@@ -140,15 +141,15 @@ class StandardSQLDialectPluginIntegrationTest {
     void shouldWorkWithRegistryManualRegistration() {
         // Create a new empty registry and manually register the plugin
         SqlDialectRegistry emptyRegistry = SqlDialectRegistry.empty();
-        assertThat(emptyRegistry.isSupported("StandardSQL")).isFalse();
+        assertThat(emptyRegistry.isSupported(DIALECT_NAME)).isFalse();
 
         // Register the plugin
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
         SqlDialectRegistry newRegistry = emptyRegistry.register(plugin);
 
         // Verify it's now available
-        assertThat(newRegistry.isSupported("StandardSQL")).isTrue();
-        RegistryResult<SqlRenderer> result = newRegistry.getRenderer("StandardSQL", "2008");
+        assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
+        RegistryResult<SqlRenderer> result = newRegistry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
     }
 }
