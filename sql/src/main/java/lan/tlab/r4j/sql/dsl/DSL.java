@@ -17,27 +17,55 @@ public class DSL {
         return new CreateTableBuilder(SQL_RENDERER, tableName);
     }
 
+    public static CreateTableBuilder createTable(SqlRenderer renderer, String tableName) {
+        return new CreateTableBuilder(renderer, tableName);
+    }
+
     public static SelectProjectionBuilder select() {
         return new SelectProjectionBuilder(SQL_RENDERER);
+    }
+
+    public static SelectProjectionBuilder select(SqlRenderer renderer) {
+        return new SelectProjectionBuilder(renderer);
     }
 
     public static SelectBuilder select(String... columns) {
         return new SelectBuilder(SQL_RENDERER, columns);
     }
 
+    public static SelectBuilder select(SqlRenderer renderer, String... columns) {
+        return new SelectBuilder(renderer, columns);
+    }
+
     public static SelectBuilder selectAll() {
         return new SelectBuilder(SQL_RENDERER, "*");
+    }
+
+    public static SelectBuilder selectAll(SqlRenderer renderer) {
+        return new SelectBuilder(renderer, "*");
     }
 
     public static InsertBuilder insertInto(String tableName) {
         return new InsertBuilder(SQL_RENDERER, tableName);
     }
 
+    public static InsertBuilder insertInto(SqlRenderer renderer, String tableName) {
+        return new InsertBuilder(renderer, tableName);
+    }
+
     public static DeleteBuilder deleteFrom(String tableName) {
         return new DeleteBuilder(SQL_RENDERER, tableName);
     }
 
+    public static DeleteBuilder deleteFrom(SqlRenderer renderer, String tableName) {
+        return new DeleteBuilder(renderer, tableName);
+    }
+
     public static UpdateBuilder update(String tableName) {
         return new UpdateBuilder(SQL_RENDERER, tableName);
+    }
+
+    public static UpdateBuilder update(SqlRenderer renderer, String tableName) {
+        return new UpdateBuilder(renderer, tableName);
     }
 }
