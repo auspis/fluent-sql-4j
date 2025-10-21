@@ -1,0 +1,193 @@
+package lan.tlab.r4j.sql.plugin.builtin;
+
+import static lan.tlab.r4j.sql.plugin.builtin.StandardSQLDialectPlugin.DIALECT_NAME;
+import static lan.tlab.r4j.sql.plugin.builtin.StandardSQLDialectPlugin.DIALECT_VERSION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
+import lan.tlab.r4j.sql.plugin.RegistryResult;
+import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.sql.plugin.SqlDialectRegistry;
+import lan.tlab.r4j.sql.util.TestDatabaseUtil;
+import lan.tlab.r4j.sql.util.annotation.E2ETest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * End-to-end tests for StandardSQLDialectPlugin with SqlDialectRegistry.
+ * <p>
+ * These tests verify that the plugin integrates correctly with the registry,
+ * is discoverable via ServiceLoader, and produces functional SQL renderers
+ * that work with real database operations.
+ */
+@E2ETest
+class StandardSQLDialectPluginE2E {
+
+    private SqlDialectRegistry registry;
+    private Connection connection;
+
+    @BeforeEach
+    void setUp() throws SQLException {
+        // Create registry with ServiceLoader to test plugin discovery
+        registry = SqlDialectRegistry.createWithServiceLoader();
+
+        // Set up database for renderer functionality tests
+        connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersTable(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
+    }
+
+    @AfterEach
+    void tearDown() throws SQLException {
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void registration() {
+        assertThat(registry.isSupported(DIALECT_NAME)).isTrue();
+        assertThat(registry.isSupported("standardsql")).isTrue(); // case-insensitive
+        assertThat(registry.isSupported("STANDARDSQL")).isTrue();
+    }
+
+    @Test
+    void getRenderer() {
+        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+
+        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        SqlRenderer renderer = result.orElseThrow();
+        assertThat(renderer).isNotNull();
+    }
+
+    @Test
+    void versionMatching() {
+        RegistryResult<SqlRenderer> exactMatch = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        assertThat(exactMatch).isInstanceOf(RegistryResult.Success.class);
+
+        RegistryResult<SqlRenderer> wrongVersion = registry.getRenderer(DIALECT_NAME, "2011");
+        assertThat(wrongVersion).isInstanceOf(RegistryResult.Failure.class);
+
+        RegistryResult<SqlRenderer> wrongVersion2 = registry.getRenderer(DIALECT_NAME, "2016");
+        assertThat(wrongVersion2).isInstanceOf(RegistryResult.Failure.class);
+    }
+
+    @Test
+    void getRendererWithoutVersion() {
+        // When version is not specified, should return available plugin
+        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME);
+
+        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result.orElseThrow()).isNotNull();
+    }
+
+    @Test
+    void shouldProduceWorkingRenderer() throws SQLException {
+        // Get renderer from registry
+        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        SqlRenderer renderer = result.orElseThrow();
+
+        // Verify renderer works with real queries using the DSL
+        String sql = DSL.select(renderer, "name", "email").from("users").build();
+        // DSL adds table references and quotes by default
+        assertThat(sql).contains("name");
+        assertThat(sql).contains("email");
+        assertThat(sql).contains("users");
+
+        // Execute the query to verify it works with H2
+        List<List<Object>> rows = ResultSetUtil.list(
+                DSL.select(renderer, "name", "email").from("users").buildPreparedStatement(connection),
+                r -> List.of(r.getString("name"), r.getString("email")));
+
+        assertThat(rows)
+                .hasSize(10)
+                .extracting(r -> (String) r.get(0), r -> (String) r.get(1))
+                .contains(tuple("John Doe", "john@example.com"), tuple("Jane Smith", "jane@example.com"));
+    }
+
+    @Test
+    void shouldGenerateStandardSQLSyntax() {
+        // Get renderer from registry
+        SqlRenderer renderer =
+                registry.getRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+
+        // Verify it generates standard SQL:2008 syntax for pagination using the DSL
+        String paginationSql = DSL.select(renderer, "name")
+                .from("users")
+                .orderBy("name")
+                .offset(5)
+                .fetch(3)
+                .build();
+
+        assertThat(paginationSql).contains("OFFSET 5 ROWS");
+        assertThat(paginationSql).contains("FETCH NEXT 3 ROWS ONLY");
+    }
+
+    @Test
+    void shouldUseRendererForDifferentDSLOperations() throws SQLException {
+        // Get renderer from registry
+        SqlRenderer renderer = registry.getRenderer("StandardSQL", "2008").orElseThrow();
+
+        // Test SELECT with WHERE using the custom renderer
+        String selectSql = DSL.select(renderer, "name", "age")
+                .from("users")
+                .where("age")
+                .gt(25)
+                .build();
+        assertThat(selectSql).contains("WHERE");
+        assertThat(selectSql).isNotEmpty();
+
+        // Test UPDATE using the custom renderer
+        String updateSql = DSL.update(renderer, "users")
+                .set("age", 31)
+                .where("name")
+                .eq("John Doe")
+                .build();
+        assertThat(updateSql).contains("UPDATE");
+        assertThat(updateSql).contains("SET");
+
+        // Test DELETE using the custom renderer
+        String deleteSql = DSL.deleteFrom(renderer, "users").where("age").lt(18).build();
+        assertThat(deleteSql).contains("DELETE");
+        assertThat(deleteSql).contains("FROM");
+
+        // Test INSERT using the custom renderer
+        String insertSql = DSL.insertInto(renderer, "users")
+                .set("name", "Test")
+                .set("age", 25)
+                .build();
+        assertThat(insertSql).contains("INSERT");
+        assertThat(insertSql).contains("INTO");
+    }
+
+    @Test
+    void shouldBeIntegratedWithMultiplePlugins() {
+        // Verify StandardSQL plugin coexists with other plugins (if any)
+        assertThat(registry.isEmpty()).isFalse();
+        assertThat(registry.size()).isGreaterThanOrEqualTo(1);
+
+        // Verify we can get StandardSQL specifically
+        assertThat(registry.getSupportedDialects()).contains("standardsql");
+    }
+
+    @Test
+    void shouldWorkWithRegistryManualRegistration() {
+        // Create a new empty registry and manually register the plugin
+        SqlDialectRegistry emptyRegistry = SqlDialectRegistry.empty();
+        assertThat(emptyRegistry.isSupported(DIALECT_NAME)).isFalse();
+
+        // Register the plugin
+        SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
+        SqlDialectRegistry newRegistry = emptyRegistry.register(plugin);
+
+        // Verify it's now available
+        assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
+        RegistryResult<SqlRenderer> result = newRegistry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+    }
+}
