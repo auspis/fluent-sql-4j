@@ -16,7 +16,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.util.LiteralUtil;
@@ -88,8 +88,8 @@ public class InsertBuilder {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         InsertStatement stmt = getCurrentStatement();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = stmt.accept(visitor, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = stmt.accept(renderer, new AstContext());
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {

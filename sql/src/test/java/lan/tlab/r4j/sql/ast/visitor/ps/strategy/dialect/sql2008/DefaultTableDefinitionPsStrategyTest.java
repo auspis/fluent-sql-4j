@@ -5,7 +5,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 class DefaultTableDefinitionPsStrategyTest {
 
     private final DefaultTableDefinitionPsStrategy strategy = new DefaultTableDefinitionPsStrategy();
-    private final PreparedStatementVisitor visitor =
-            PreparedStatementVisitor.builder().build();
+    private final PreparedStatementRenderer renderer =
+            PreparedStatementRenderer.builder().build();
     private final AstContext context = new AstContext();
 
     @Test
@@ -29,7 +29,7 @@ class DefaultTableDefinitionPsStrategyTest {
                 .build();
 
         // When
-        PsDto result = strategy.handle(tableDefinition, visitor, context);
+        PsDto result = strategy.handle(tableDefinition, renderer, context);
 
         // Then
         Assertions.assertThat(result.sql()).isEqualTo("\"users\" (\"id\" INTEGER)");
@@ -52,7 +52,7 @@ class DefaultTableDefinitionPsStrategyTest {
                 .build();
 
         // When
-        PsDto result = strategy.handle(tableDefinition, visitor, context);
+        PsDto result = strategy.handle(tableDefinition, renderer, context);
 
         // Then
         Assertions.assertThat(result.sql()).isEqualTo("\"users\" (\"id\" INTEGER, \"name\" VARCHAR)");

@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.DateArithmetic;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class DefaultDateArithmeticPsStrategyTest {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = Interval.of(Literal.of(30), Interval.IntervalUnit.DAY);
         var dateArithmetic = DateArithmetic.add(ColumnReference.of("orders", "created_date"), interval);
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dateArithmetic, visitor, ctx);
@@ -32,7 +32,7 @@ class DefaultDateArithmeticPsStrategyTest {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = Interval.of(Literal.of(7), Interval.IntervalUnit.DAY);
         var dateArithmetic = DateArithmetic.subtract(ColumnReference.of("events", "event_date"), interval);
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dateArithmetic, visitor, ctx);
@@ -46,7 +46,7 @@ class DefaultDateArithmeticPsStrategyTest {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = Interval.of(Literal.of(3), Interval.IntervalUnit.MONTH);
         var dateArithmetic = DateArithmetic.add(ColumnReference.of("subscriptions", "start_date"), interval);
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dateArithmetic, visitor, ctx);
@@ -60,7 +60,7 @@ class DefaultDateArithmeticPsStrategyTest {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = Interval.of(Literal.of(1), Interval.IntervalUnit.YEAR);
         var dateArithmetic = DateArithmetic.subtract(ColumnReference.of("employees", "hire_date"), interval);
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dateArithmetic, visitor, ctx);

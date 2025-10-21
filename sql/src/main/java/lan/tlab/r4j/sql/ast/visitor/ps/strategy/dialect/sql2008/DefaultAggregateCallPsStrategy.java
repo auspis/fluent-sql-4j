@@ -12,19 +12,19 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.AggregateCallPsStrategy;
 
 public class DefaultAggregateCallPsStrategy implements AggregateCallPsStrategy {
     @Override
-    public PsDto handle(AggregateCall aggregateCall, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(AggregateCall aggregateCall, Visitor<PsDto> renderer, AstContext ctx) {
         return switch (aggregateCall) {
             case AggregateCallImpl e -> {
                 String functionName = e.getOperator().name();
                 PsDto argResult =
-                        e.getExpression() == null ? null : e.getExpression().accept(visitor, ctx);
+                        e.getExpression() == null ? null : e.getExpression().accept(renderer, ctx);
                 String argumentSql = argResult == null ? "*" : argResult.sql();
                 List<Object> params = argResult == null ? List.of() : argResult.parameters();
                 String sql = functionName + "(" + argumentSql + ")";
                 yield new PsDto(sql, params);
             }
             case CountDistinct e -> {
-                PsDto argResult = e.getExpression().accept(visitor, ctx);
+                PsDto argResult = e.getExpression().accept(renderer, ctx);
                 String sql = "COUNT(DISTINCT " + argResult.sql() + ")";
                 yield new PsDto(sql, argResult.parameters());
             }

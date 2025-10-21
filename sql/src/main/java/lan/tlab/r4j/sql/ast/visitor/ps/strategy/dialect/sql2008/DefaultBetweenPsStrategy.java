@@ -10,10 +10,10 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.BetweenPsStrategy;
 
 public class DefaultBetweenPsStrategy implements BetweenPsStrategy {
     @Override
-    public PsDto handle(Between between, Visitor<PsDto> visitor, AstContext ctx) {
-        PsDto testDto = between.getTestExpression().accept(visitor, ctx);
-        PsDto startDto = between.getStartExpression().accept(visitor, ctx);
-        PsDto endDto = between.getEndExpression().accept(visitor, ctx);
+    public PsDto handle(Between between, Visitor<PsDto> renderer, AstContext ctx) {
+        PsDto testDto = between.getTestExpression().accept(renderer, ctx);
+        PsDto startDto = between.getStartExpression().accept(renderer, ctx);
+        PsDto endDto = between.getEndExpression().accept(renderer, ctx);
 
         String sql = testDto.sql() + " BETWEEN " + startDto.sql() + " AND " + endDto.sql();
 

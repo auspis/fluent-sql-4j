@@ -3,14 +3,14 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.FetchPsStrategy;
 
 public class DefaultPaginationPsStrategy implements FetchPsStrategy {
 
     @Override
-    public PsDto handle(Fetch pagination, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(Fetch pagination, PreparedStatementRenderer renderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder();
 
         // SQL 2008 standard uses OFFSET ... ROWS FETCH NEXT ... ROWS ONLY

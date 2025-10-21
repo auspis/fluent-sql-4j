@@ -9,8 +9,8 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InsertSourcePsStrategy;
 
 public class DefaultInsertSourcePsStrategy implements InsertSourcePsStrategy {
     @Override
-    public PsDto handle(InsertSource item, Visitor<PsDto> visitor, AstContext ctx) {
-        PsDto psDto = item.getSetExpression().accept(visitor, new AstContext(Scope.UNION));
+    public PsDto handle(InsertSource item, Visitor<PsDto> renderer, AstContext ctx) {
+        PsDto psDto = item.getSetExpression().accept(renderer, new AstContext(Scope.UNION));
         return new PsDto(psDto.sql(), psDto.parameters());
     }
 }

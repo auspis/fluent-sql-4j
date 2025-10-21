@@ -13,21 +13,21 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class PreparedStatementVisitorTest {
+class PreparedStatementRendererTest {
 
     private Connection connection;
-    private PreparedStatementVisitor visitor;
+    private PreparedStatementRenderer renderer;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
-        visitor = new PreparedStatementVisitor();
+        renderer = new PreparedStatementRenderer();
 
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
@@ -49,9 +49,9 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John Doe"))))
                 .build();
 
-        // Generate SQL and parameters using PreparedStatementVisitor
+        // Generate SQL and parameters using PreparedStatementRenderer
         AstContext context = new AstContext();
-        PsDto result = selectStmt.accept(visitor, context);
+        PsDto result = selectStmt.accept(renderer, context);
 
         // Verify generated SQL and parameters
         assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\" WHERE \"name\" = ?");

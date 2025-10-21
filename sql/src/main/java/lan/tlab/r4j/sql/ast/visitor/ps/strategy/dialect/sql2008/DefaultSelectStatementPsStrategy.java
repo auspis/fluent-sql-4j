@@ -10,16 +10,16 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 
 public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrategy {
     @Override
-    public PsDto handle(SelectStatement stmt, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(SelectStatement stmt, Visitor<PsDto> renderer, AstContext ctx) {
         // SELECT ...
-        PsDto selectResult = stmt.getSelect().accept(visitor, ctx);
+        PsDto selectResult = stmt.getSelect().accept(renderer, ctx);
         // FROM ...
-        PsDto fromResult = stmt.getFrom().accept(visitor, ctx);
+        PsDto fromResult = stmt.getFrom().accept(renderer, ctx);
         // WHERE ... (optional)
         PsDto whereResult = null;
         String whereClause = "";
         if (stmt.getWhere() != null && stmt.getWhere().getCondition() != null) {
-            whereResult = stmt.getWhere().accept(visitor, ctx);
+            whereResult = stmt.getWhere().accept(renderer, ctx);
             String whereSql = whereResult.sql();
             if (!whereSql.isBlank()) {
                 // If the whereSql already starts with WHERE, don't prepend it
@@ -35,14 +35,14 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         String groupByClause = "";
         if (stmt.getGroupBy() != null
                 && !stmt.getGroupBy().getGroupingExpressions().isEmpty()) {
-            groupByResult = stmt.getGroupBy().accept(visitor, ctx);
+            groupByResult = stmt.getGroupBy().accept(renderer, ctx);
             groupByClause = " GROUP BY " + groupByResult.sql();
         }
         // HAVING ... (optional, after GROUP BY)
         PsDto havingResult = null;
         String havingClause = "";
         if (stmt.getHaving() != null && stmt.getHaving().getCondition() != null) {
-            havingResult = stmt.getHaving().accept(visitor, ctx);
+            havingResult = stmt.getHaving().accept(renderer, ctx);
             if (!havingResult.sql().isBlank()) {
                 havingClause = " HAVING " + havingResult.sql();
             }
@@ -51,14 +51,14 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         PsDto orderByResult = null;
         String orderByClause = "";
         if (stmt.getOrderBy() != null && !stmt.getOrderBy().getSortings().isEmpty()) {
-            orderByResult = stmt.getOrderBy().accept(visitor, ctx);
+            orderByResult = stmt.getOrderBy().accept(renderer, ctx);
             orderByClause = " ORDER BY " + orderByResult.sql();
         }
         // PAGINATION - delegate to proper pagination strategy
         PsDto paginationResult = null;
         String paginationClause = "";
         if (stmt.getFetch() != null && stmt.getFetch().isActive()) {
-            paginationResult = stmt.getFetch().accept(visitor, ctx);
+            paginationResult = stmt.getFetch().accept(renderer, ctx);
             paginationClause = paginationResult.sql();
         }
         String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause

@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ComparisonPsStrategy;
 
 public class DefaultComparisonPsStrategy implements ComparisonPsStrategy {
     @Override
-    public PsDto handle(Comparison cmp, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(Comparison cmp, Visitor<PsDto> renderer, AstContext ctx) {
         String operator;
         switch (cmp.getOperator()) {
             case EQUALS -> operator = "=";
@@ -25,12 +25,12 @@ public class DefaultComparisonPsStrategy implements ComparisonPsStrategy {
         List<Object> params = new ArrayList<>();
 
         // Handle LHS (Left Hand Side)
-        PsDto lhsResult = cmp.getLhs().accept(visitor, ctx.copy());
+        PsDto lhsResult = cmp.getLhs().accept(renderer, ctx.copy());
         String lhs = lhsResult.sql();
         params.addAll(lhsResult.parameters());
 
         // Handle RHS (Right Hand Side)
-        PsDto rhsResult = cmp.getRhs().accept(visitor, ctx);
+        PsDto rhsResult = cmp.getRhs().accept(renderer, ctx);
         String rhsSql = rhsResult.sql();
         params.addAll(rhsResult.parameters());
 

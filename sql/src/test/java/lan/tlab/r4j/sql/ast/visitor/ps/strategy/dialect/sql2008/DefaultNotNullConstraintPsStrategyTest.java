@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NotNullConstraintPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test;
 class DefaultNotNullConstraintPsStrategyTest {
 
     private final NotNullConstraintPsStrategy strategy = new DefaultNotNullConstraintPsStrategy();
-    private final PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
 
     @Test
     void notNullConstraint() {
         NotNullConstraintDefinition constraint = new NotNullConstraintDefinition();
 
-        PsDto result = strategy.handle(constraint, visitor, ctx);
+        PsDto result = strategy.handle(constraint, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -30,8 +30,8 @@ class DefaultNotNullConstraintPsStrategyTest {
         NotNullConstraintDefinition constraint1 = new NotNullConstraintDefinition();
         NotNullConstraintDefinition constraint2 = new NotNullConstraintDefinition();
 
-        PsDto result1 = strategy.handle(constraint1, visitor, ctx);
-        PsDto result2 = strategy.handle(constraint2, visitor, ctx);
+        PsDto result1 = strategy.handle(constraint1, renderer, ctx);
+        PsDto result2 = strategy.handle(constraint2, renderer, ctx);
 
         assertThat(result1.sql()).isEqualTo("NOT NULL");
         assertThat(result1.parameters()).isEmpty();
@@ -46,8 +46,8 @@ class DefaultNotNullConstraintPsStrategyTest {
         AstContext ctx1 = new AstContext();
         AstContext ctx2 = new AstContext();
 
-        PsDto result1 = strategy.handle(constraint, visitor, ctx1);
-        PsDto result2 = strategy.handle(constraint, visitor, ctx2);
+        PsDto result1 = strategy.handle(constraint, renderer, ctx1);
+        PsDto result2 = strategy.handle(constraint, renderer, ctx2);
 
         assertThat(result1.sql()).isEqualTo("NOT NULL");
         assertThat(result1.parameters()).isEmpty();
