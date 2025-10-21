@@ -1,1 +1,2 @@
 lan.tlab.r4j.sql.plugin.builtin.StandardSQLDialectPluginProvider
+lan.tlab.r4j.sql.plugin.builtin.MySQLDialectPluginProvider
