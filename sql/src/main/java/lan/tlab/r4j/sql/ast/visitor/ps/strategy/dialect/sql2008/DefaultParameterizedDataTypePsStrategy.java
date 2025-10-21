@@ -3,17 +3,17 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 
 public class DefaultParameterizedDataTypePsStrategy implements ParameterizedDataTypePsStrategy {
 
     @Override
-    public PsDto handle(ParameterizedDataType type, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(ParameterizedDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
         // Handle parameters by processing each one
         var parameterResults = type.getParameters().stream()
-                .map(param -> param.accept(visitor, ctx))
+                .map(param -> param.accept(renderer, ctx))
                 .collect(Collectors.toList());
 
         // Combine all parameters

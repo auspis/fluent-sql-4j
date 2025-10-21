@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;
 
 public class DefaultIntersectExpressionPsStrategy implements IntersectExpressionPsStrategy {
 
     @Override
-    public PsDto handle(IntersectExpression expression, PreparedStatementVisitor visitor, AstContext ctx) {
-        PsDto leftDto = expression.getLeftSetExpression().accept(visitor, ctx);
-        PsDto rightDto = expression.getRightSetExpression().accept(visitor, ctx);
+    public PsDto handle(IntersectExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
+        PsDto leftDto = expression.getLeftSetExpression().accept(renderer, ctx);
+        PsDto rightDto = expression.getRightSetExpression().accept(renderer, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",

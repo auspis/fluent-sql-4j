@@ -8,8 +8,8 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IsNullPsStrategy;
 
 public class DefaultIsNullPsStrategy implements IsNullPsStrategy {
     @Override
-    public PsDto handle(IsNull isNull, Visitor<PsDto> visitor, AstContext ctx) {
-        PsDto inner = isNull.getExpression().accept(visitor, ctx);
+    public PsDto handle(IsNull isNull, Visitor<PsDto> renderer, AstContext ctx) {
+        PsDto inner = isNull.getExpression().accept(renderer, ctx);
         return new PsDto(inner.sql() + " IS NULL", inner.parameters());
     }
 }

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
@@ -12,8 +12,8 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 public class DefaultReferencesItemPsStrategy implements ReferencesItemPsStrategy {
 
     @Override
-    public PsDto handle(ReferencesItem item, PreparedStatementVisitor visitor, AstContext ctx) {
-        EscapeStrategy escapeStrategy = visitor.getEscapeStrategy();
+    public PsDto handle(ReferencesItem item, PreparedStatementRenderer renderer, AstContext ctx) {
+        EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
 
         String sql = String.format(
                 "REFERENCES %s (%s)",

@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class DefaultLengthPsStrategyTest {
     void handlesLengthWithLiteralString() {
         var strategy = new DefaultLengthPsStrategy();
         var length = new Length(Literal.of("Hello World"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(length, visitor, ctx);
@@ -30,7 +30,7 @@ class DefaultLengthPsStrategyTest {
     void handlesLengthWithColumnReference() {
         var strategy = new DefaultLengthPsStrategy();
         var length = new Length(ColumnReference.of("users", "email"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(length, visitor, ctx);
@@ -43,7 +43,7 @@ class DefaultLengthPsStrategyTest {
     void handlesLengthWithColumnOnly() {
         var strategy = new DefaultLengthPsStrategy();
         var length = new Length(ColumnReference.of("products", "description"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(length, visitor, ctx);
@@ -56,7 +56,7 @@ class DefaultLengthPsStrategyTest {
     void handlesLengthWithTableAlias() {
         var strategy = new DefaultLengthPsStrategy();
         var length = new Length(ColumnReference.of("p", "product_name"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(length, visitor, ctx);
