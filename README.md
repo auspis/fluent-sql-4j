@@ -1,5 +1,37 @@
 # r4j - Repo4J
 
+## Table of contents
+
+- [Quick Start](#quick-start)
+- [DSL Features](#dsl-features)
+  - [CREATE TABLE](#create-table)
+  - [SELECT Queries](#select-queries)
+    - [Basic SELECT](#basic-select)
+    - [WHERE Clause](#where-clause)
+    - [JOIN Operations](#join-operations)
+    - [GROUP BY](#group-by)
+    - [HAVING Clause](#having-clause)
+    - [Subqueries](#subqueries)
+    - [ORDER BY and Pagination](#order-by-and-pagination)
+    - [Aggregate Functions](#aggregate-functions)
+  - [INSERT Statements](#insert-statements)
+  - [UPDATE Statements](#update-statements)
+  - [DELETE Statements](#delete-statements)
+- [Project structure](#project-structure)
+- [Running Tests](#running-tests)
+  - [Test Categories](#test-categories)
+  - [Basic Commands](#basic-commands)
+  - [Selective Test Execution](#selective-test-execution)
+  - [Development Workflow](#development-workflow)
+  - [CI/CD Pipeline](#cicd-pipeline)
+  - [Writing Tests](#writing-tests)
+  - [Test Annotations](#test-annotations)
+- [Install GIT hook](#install-git-hook)
+- [Manually format code](#manually-format-code)
+- [Check updates](#check-updates)
+  - [Dependencies](#dependencies)
+  - [Plugins](#plugins)
+
 A Java library for building SQL statements using a fluent DSL (Domain-Specific Language).
 
 ## Quick Start
@@ -421,8 +453,149 @@ PreparedStatement ps = DSL.deleteFrom("users")
 ## Project structure
 
 The project is split into Maven modules:
-- `sql`: contains the SQL AST, DSL and unit tests
-- `test-integration`: contains integration tests (fast H2 tests and slow E2E tests with Testcontainers)
+
+- `sql`: contains the SQL AST, DSL, unit tests, integration tests, and E2E tests
+- `test-integration`: contains legacy integration tests (to be migrated)
+- `spike`: experimental code and prototypes
+
+## Running Tests
+
+This project uses a structured approach to test execution with three distinct test categories:
+
+### Test Categories
+
+1. **Unit Tests** - Fast, isolated tests with no external dependencies
+   - Run by Maven Surefire during `test` phase
+   - Excluded tags: `integration`, `e2e`
+   - Located in all modules under `src/test/java`
+2. **Integration Tests** - Tests with external dependencies (databases, containers)
+   - Run by Maven Failsafe during `verify` phase
+   - Tagged with `@IntegrationTest` (includes `@Tag("integration")`)
+   - Test against H2 in-memory database for fast feedback
+3. **End-to-End (E2E) Tests** - Full system tests with real databases via Testcontainers
+   - Run by Maven Failsafe during `verify` phase
+   - Tagged with `@E2ETest` (includes `@Tag("e2e")`)
+   - Test against real database engines (MySQL, PostgreSQL, etc.)
+
+### Basic Commands
+
+```bash
+# Run only unit tests (fast, no containers)
+./mvnw test
+
+# Run unit tests for specific module
+./mvnw test -pl sql
+
+# Run all tests (unit + integration + e2e)
+./mvnw verify
+
+# Run all tests for specific module
+./mvnw verify -pl sql
+```
+
+### Selective Test Execution
+
+```bash
+# Run only integration tests
+./mvnw verify -Dgroups=integration
+
+# Run only e2e tests
+./mvnw verify -Dgroups=e2e
+
+# Run only integration tests in sql module
+./mvnw verify -pl sql -Dgroups=integration
+
+# Run only e2e tests in sql module
+./mvnw verify -pl sql -Dgroups=e2e
+
+# Run both integration and e2e (skip unit tests)
+./mvnw verify -Dgroups=integration,e2e
+```
+
+### Development Workflow
+
+```bash
+# Fast feedback loop (unit tests only)
+./mvnw clean test
+
+# Pre-commit check (unit + integration + e2e)
+./mvnw clean verify
+
+# Quick integration check (no slow E2E tests)
+./mvnw verify -pl sql -Dgroups=integration
+
+# Full e2e validation with real databases
+./mvnw verify -pl sql -Dgroups=e2e
+```
+
+### CI/CD Pipeline
+
+The GitHub Actions pipeline executes tests in stages:
+
+1. **Fast Feedback** - Unit tests only (`mvn test`)
+2. **Integration** - Integration tests with H2 (`mvn verify -Dgroups=integration`)
+3. **E2E Validation** - E2E tests with Testcontainers (`mvn verify -Dgroups=e2e`)
+
+This staged approach provides:
+
+- **Quick feedback** for developers (unit tests complete in seconds)
+- **Medium feedback** for integration issues (H2 tests complete in under a minute)
+- **Complete validation** for production readiness (E2E tests complete in a few minutes)
+
+### Writing Tests
+
+#### Unit Test
+
+```java
+@Test
+void shouldDoSomething() {
+    // Fast, isolated test with no external dependencies
+    assertThat(result).isEqualTo(expected);
+}
+```
+
+#### Integration Test
+
+```java
+@IntegrationTest  // includes @Tag("integration")
+class MyIntegrationTest {
+    
+    @Test
+    void shouldIntegrateWithDatabase() {
+        // Test with H2 in-memory database
+        Connection conn = TestDatabaseUtil.createH2Connection();
+        // ... test code
+    }
+}
+```
+
+#### E2E Test
+
+```java
+@E2ETest  // includes @Tag("e2e")
+@Testcontainers
+class MyE2E {
+    
+    @Container
+    private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0");
+    
+    @Test
+    void shouldWorkEndToEnd() {
+        // Full system test with real MySQL database
+        Connection conn = DriverManager.getConnection(mysql.getJdbcUrl(), ...);
+        // ... test code
+    }
+}
+```
+
+### Test Annotations
+
+Custom test annotations are located in `lan.tlab.r4j.sql.util.annotation`:
+
+- `@IntegrationTest` - Marks integration tests (tagged with `integration`)
+- `@E2ETest` - Marks end-to-end tests (tagged with `e2e`)
+
+Both annotations include JUnit tags for Maven filtering. Apply them at the **class level** only.
 
 ## Install GIT hook
 
@@ -438,71 +611,15 @@ To reduce conflicts, a hook is provided to automatically format code with Spotle
 ./mvnw spotless:apply
 ```
 
-## Run tests
+## Check updates
 
-### To run fast tests (unit tests + H2 integration tests)
-
-```bash
-./mvnw test
-```
-
-### To run all tests (unit + H2 integration + E2E tests)
-
-```bash
-./mvnw verify
-```
-
-## Test naming convention
-
-- **Unit tests**: `*Test.java` suffix (e.g. `MyFeatureTest.java`)
-- **Integration tests (H2)**: `*Test.java` suffix (e.g. `PreparedStatementVisitorTest.java`)
-- **End-to-end tests (Testcontainers)**: `*E2E.java` suffix (e.g. `StandardSqlRendererMySqlE2E.java`)
-
-This naming convention allows for:
-- Fast feedback during development: `./mvnw test` runs unit and H2 integration tests
-- Complete validation: `./mvnw verify` runs all tests including E2E tests
-
-## How to run specific test types
-
-### To run only H2 integration tests
-
-```bash
-./mvnw test -pl test-integration -am
-```
-
-### To run only E2E tests
-
-```bash
-./mvnw verify -Dtest=skip -Dit.test="*E2E" -pl test-integration -am
-```
-
-### To run all integration tests (H2 + E2E)
-
-```bash
-./mvnw verify -pl test-integration -am
-```
-
-### Technical details
-
-- Running `./mvnw test` will execute:
-  - **Unit tests** in the `sql` module
-  - **H2 integration tests** in the `test-integration` module (fast, in-memory database)
-- Running `./mvnw verify` will additionally execute:
-  - **E2E tests** with Testcontainers in the `test-integration` module (slower, real databases)
-- The `test-integration` module depends on `sql` and contains all the necessary dependencies for testing (JUnit, Testcontainers, H2, etc).
-- **H2 integration tests** are named with the `*Test.java` suffix and run with Surefire.
-- **E2E tests** are named with the `*E2E.java` suffix and run with Failsafe.
-- This ensures optimal development workflow: fast feedback with `test`, complete validation with `verify`.
-
-## check updates
-
-### dependencies
+### Dependencies
 
 ```bash
 data/scripts/dependency-updates-show.sh
 ```
 
-### plugins
+### Plugins
 
 ```bash
 data/scripts/plugin-updates-show.sh
