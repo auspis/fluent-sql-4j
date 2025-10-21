@@ -1,12 +1,12 @@
-package lan.tlab.r4j.sql.plugin.builtin;
+package lan.tlab.r4j.sql.plugin.builtin.mysql;
 
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
 
 /**
- * Service provider for the Standard SQL:2008 dialect plugin.
+ * Service provider for the MySQL dialect plugin.
  * <p>
- * This provider enables automatic discovery of the {@link StandardSQLDialectPlugin}
+ * This provider enables automatic discovery of the {@link MySQLDialectPlugin}
  * through Java's {@link java.util.ServiceLoader} mechanism. It is registered in
  * {@code META-INF/services/lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider}.
  * <p>
@@ -24,7 +24,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
  * is automatically discovered when creating a registry with ServiceLoader:
  * <pre>{@code
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * // StandardSQLDialectPlugin is now registered and available
+ * // MySQLDialectPlugin is now registered and available
  * }</pre>
  * <p>
  * <b>Thread Safety:</b>
@@ -32,23 +32,23 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
  * This provider is stateless and thread-safe. The ServiceLoader framework may create
  * multiple instances, but since the provider is stateless, this has no adverse effects.
  *
- * @see StandardSQLDialectPlugin
+ * @see MySQLDialectPlugin
  * @see SqlDialectPluginProvider
  * @see java.util.ServiceLoader
  * @since 1.0
  */
-public final class StandardSQLDialectPluginProvider implements SqlDialectPluginProvider {
+public final class MySQLDialectPluginProvider implements SqlDialectPluginProvider {
 
     /**
-     * Returns the Standard SQL:2008 dialect plugin instance.
+     * Returns the MySQL dialect plugin instance.
      * <p>
      * This method is called by the {@link java.util.ServiceLoader} framework during
-     * plugin discovery. It returns the singleton instance of the StandardSQLDialectPlugin.
+     * plugin discovery. It returns the singleton instance of the MySQLDialectPlugin.
      *
-     * @return the Standard SQL:2008 dialect plugin, never {@code null}
+     * @return the MySQL dialect plugin, never {@code null}
      */
     @Override
     public SqlDialectPlugin get() {
-        return StandardSQLDialectPlugin.instance();
+        return MySQLDialectPlugin.instance();
     }
 }
