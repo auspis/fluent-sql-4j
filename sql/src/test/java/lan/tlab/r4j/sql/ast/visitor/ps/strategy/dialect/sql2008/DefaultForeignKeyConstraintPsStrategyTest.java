@@ -6,7 +6,7 @@ import java.util.List;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ForeignKeyConstraintPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class DefaultForeignKeyConstraintPsStrategyTest {
 
     private final ForeignKeyConstraintPsStrategy strategy = new DefaultForeignKeyConstraintPsStrategy();
-    private final PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
 
     @Test
@@ -22,7 +22,7 @@ class DefaultForeignKeyConstraintPsStrategyTest {
         ReferencesItem references = new ReferencesItem("users", "id");
         ForeignKeyConstraintDefinition constraint = new ForeignKeyConstraintDefinition(List.of("user_id"), references);
 
-        PsDto result = strategy.handle(constraint, visitor, ctx);
+        PsDto result = strategy.handle(constraint, renderer, ctx);
 
         assertThat(result.sql()).contains("FOREIGN KEY");
         assertThat(result.sql()).contains("user_id");
@@ -37,7 +37,7 @@ class DefaultForeignKeyConstraintPsStrategyTest {
         ForeignKeyConstraintDefinition constraint =
                 new ForeignKeyConstraintDefinition(List.of("country_id", "city_id"), references);
 
-        PsDto result = strategy.handle(constraint, visitor, ctx);
+        PsDto result = strategy.handle(constraint, renderer, ctx);
 
         assertThat(result.sql()).contains("FOREIGN KEY");
         assertThat(result.sql()).contains("country_id");
@@ -56,8 +56,8 @@ class DefaultForeignKeyConstraintPsStrategyTest {
         ForeignKeyConstraintDefinition constraint2 =
                 new ForeignKeyConstraintDefinition(List.of("user_id"), references2);
 
-        PsDto result1 = strategy.handle(constraint1, visitor, ctx);
-        PsDto result2 = strategy.handle(constraint2, visitor, ctx);
+        PsDto result1 = strategy.handle(constraint1, renderer, ctx);
+        PsDto result2 = strategy.handle(constraint2, renderer, ctx);
 
         assertThat(result1.sql()).isEqualTo(result2.sql());
         assertThat(result1.parameters()).isEqualTo(result2.parameters());

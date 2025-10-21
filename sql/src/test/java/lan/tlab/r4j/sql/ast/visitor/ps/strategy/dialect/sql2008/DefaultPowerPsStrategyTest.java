@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Power;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class DefaultPowerPsStrategyTest {
     void handlesPowerWithTwoLiterals() {
         var strategy = new DefaultPowerPsStrategy();
         var power = new Power(Literal.of(2), Literal.of(8));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(power, visitor, ctx);
@@ -30,7 +30,7 @@ class DefaultPowerPsStrategyTest {
     void handlesPowerWithColumnAndLiteral() {
         var strategy = new DefaultPowerPsStrategy();
         var power = new Power(ColumnReference.of("calculations", "base"), Literal.of(3));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(power, visitor, ctx);
@@ -43,7 +43,7 @@ class DefaultPowerPsStrategyTest {
     void handlesPowerWithTwoColumns() {
         var strategy = new DefaultPowerPsStrategy();
         var power = new Power(ColumnReference.of("math", "base"), ColumnReference.of("math", "exponent"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(power, visitor, ctx);
@@ -56,7 +56,7 @@ class DefaultPowerPsStrategyTest {
     void handlesPowerWithLiteralAndColumn() {
         var strategy = new DefaultPowerPsStrategy();
         var power = new Power(Literal.of(10), ColumnReference.of("settings", "log_level"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(power, visitor, ctx);

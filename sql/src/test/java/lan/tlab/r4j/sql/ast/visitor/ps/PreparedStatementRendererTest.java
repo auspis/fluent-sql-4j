@@ -61,7 +61,7 @@ import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import org.junit.jupiter.api.Test;
 
-class PreparedStatementVisitorTest {
+class PreparedStatementRendererTest {
 
     static class User {
         public int id;
@@ -94,8 +94,8 @@ class PreparedStatementVisitorTest {
     void testInsertStatement() {
         User user = new User(1, "John", "john@example.com");
         InsertStatement insertStatement = buildInsertStatementFromUser(user);
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(insertStatement, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(insertStatement, new AstContext());
         assertThat(result.sql()).isEqualTo("INSERT INTO \"User\" (\"id\", \"name\", \"email\") VALUES (?, ?, ?)");
         assertThat(result.parameters()).containsExactly(1, "John", "john@example.com");
     }
@@ -106,8 +106,8 @@ class PreparedStatementVisitorTest {
         var defaultValues = new lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues();
         InsertStatement insertStatement =
                 InsertStatement.builder().table(table).data(defaultValues).build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(insertStatement, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(insertStatement, new AstContext());
         assertThat(result.sql()).isEqualTo("INSERT INTO \"User\" DEFAULT VALUES");
         assertThat(result.parameters()).isEmpty();
     }
@@ -121,8 +121,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"User\" WHERE \"id\" = ?");
         assertThat(result.parameters()).containsExactly(1);
     }
@@ -132,8 +132,8 @@ class PreparedStatementVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .from(From.of(new TableIdentifier("users")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -146,8 +146,8 @@ class PreparedStatementVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("u", "name"))))
                 .from(From.fromTable("users", "u"))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"users\" AS u");
         assertThat(result.parameters()).isEmpty();
     }
@@ -159,8 +159,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ?");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -172,8 +172,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.lt(ColumnReference.of("User", "id"), Literal.of(5))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" < ?");
         assertThat(result.parameters()).containsExactly(5);
     }
@@ -185,8 +185,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gte(ColumnReference.of("User", "id"), Literal.of(7))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" >= ?");
         assertThat(result.parameters()).containsExactly(7);
     }
@@ -198,8 +198,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.lte(ColumnReference.of("User", "id"), Literal.of(3))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" <= ?");
         assertThat(result.parameters()).containsExactly(3);
     }
@@ -211,8 +211,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.ne(ColumnReference.of("User", "id"), Literal.of(99))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" <> ?");
         assertThat(result.parameters()).containsExactly(99);
     }
@@ -226,8 +226,8 @@ class PreparedStatementVisitorTest {
                         Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
                         Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20)))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"id\" > ?) AND (\"id\" < ?)");
         assertThat(result.parameters()).containsExactly(10, 20);
     }
@@ -241,8 +241,8 @@ class PreparedStatementVisitorTest {
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob")))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"name\" = ?) OR (\"name\" = ?)");
         assertThat(result.parameters()).containsExactly("Alice", "Bob");
     }
@@ -258,8 +258,8 @@ class PreparedStatementVisitorTest {
                                 Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
                                 Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\" FROM \"User\" WHERE (\"name\" = ?) OR ((\"id\" > ?) AND (\"id\" < ?))");
         assertThat(result.parameters()).containsExactly("Alice", 10, 20);
@@ -272,8 +272,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new Not(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT (\"name\" = ?)");
         assertThat(result.parameters()).containsExactly("Alice");
     }
@@ -285,8 +285,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new IsNull(ColumnReference.of("User", "email"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" WHERE \"email\" IS NULL");
         assertThat(result.parameters()).isEmpty();
     }
@@ -298,8 +298,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(new IsNotNull(ColumnReference.of("User", "email"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"email\" FROM \"User\" WHERE \"email\" IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
     }
@@ -313,8 +313,8 @@ class PreparedStatementVisitorTest {
                         Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10)),
                         Comparison.lt(ColumnReference.of("User", "id"), Literal.of(20))))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT ((\"id\" > ?) AND (\"id\" < ?))");
         assertThat(result.parameters()).containsExactly(10, 20);
     }
@@ -328,8 +328,8 @@ class PreparedStatementVisitorTest {
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice")),
                         Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Bob"))))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE NOT ((\"name\" = ?) OR (\"name\" = ?))");
         assertThat(result.parameters()).containsExactly("Alice", "Bob");
     }
@@ -340,8 +340,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -352,8 +352,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -364,8 +364,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -376,8 +376,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.min(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MIN(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -388,8 +388,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MAX(\"id\") FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -401,8 +401,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -414,8 +414,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -427,8 +427,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -440,8 +440,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MIN(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -453,8 +453,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MAX(\"id\") FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -467,8 +467,8 @@ class PreparedStatementVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("User", "name"), new Alias("userName"))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" AS \"userId\", \"name\" AS \"userName\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -481,8 +481,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "name"), Literal.of("Alice"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" AS \"userId\" FROM \"User\" WHERE \"name\" = ?");
         assertThat(result.parameters()).containsExactly("Alice");
     }
@@ -494,8 +494,8 @@ class PreparedStatementVisitorTest {
                         AggregateCall.count(ColumnReference.of("User", "id")), new Alias("totalUsers"))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT COUNT(\"id\") AS \"totalUsers\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -508,8 +508,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT SUM(\"id\") AS \"sumId\" FROM \"User\" GROUP BY \"email\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -524,8 +524,8 @@ class PreparedStatementVisitorTest {
                                 AggregateCall.max(ColumnReference.of("User", "id")), new Alias("maxId"))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT AVG(\"id\") AS \"avgId\", MAX(\"id\") AS \"maxId\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -537,8 +537,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC");
         assertThat(result.parameters()).isEmpty();
     }
@@ -550,8 +550,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" DESC");
         assertThat(result.parameters()).isEmpty();
     }
@@ -563,8 +563,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.by(ColumnReference.of("User", "id"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -580,8 +580,8 @@ class PreparedStatementVisitorTest {
                         Sorting.asc(ColumnReference.of("User", "id")),
                         Sorting.desc(ColumnReference.of("User", "name"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\", \"name\" FROM \"User\" ORDER BY \"id\" ASC, \"name\" DESC");
         assertThat(result.parameters()).isEmpty();
     }
@@ -594,8 +594,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "id"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? ORDER BY \"id\" DESC");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -607,8 +607,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(10).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" FETCH NEXT 10 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
@@ -620,8 +620,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(10).offset(10).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
@@ -634,8 +634,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
                 .fetch(Fetch.builder().rows(5).offset(5).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\" FROM \"User\" WHERE \"id\" > ? OFFSET 5 ROWS FETCH NEXT 5 ROWS ONLY");
         assertThat(result.parameters()).containsExactly(100);
@@ -649,8 +649,8 @@ class PreparedStatementVisitorTest {
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
                 .fetch(Fetch.builder().rows(3).offset(3).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\" FROM \"User\" ORDER BY \"id\" ASC OFFSET 3 ROWS FETCH NEXT 3 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
@@ -664,8 +664,8 @@ class PreparedStatementVisitorTest {
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
                 .fetch(Fetch.builder().rows(2).offset(4).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"email\" FROM \"User\" GROUP BY \"email\" OFFSET 4 ROWS FETCH NEXT 2 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
@@ -686,8 +686,8 @@ class PreparedStatementVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
                 .from(From.of(join))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(stmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\"");
         assertThat(result.parameters()).isEmpty();
@@ -709,8 +709,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(join))
                 .where(Where.of(Comparison.gt(ColumnReference.of("t1", "id"), Literal.of(10))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(stmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\" FROM \"t1\" LEFT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" WHERE \"id\" > ?");
@@ -733,8 +733,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(join))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("t2", "name"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(stmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\" FROM \"t1\" RIGHT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" ORDER BY \"name\" ASC");
@@ -757,8 +757,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(join))
                 .groupBy(GroupBy.of(ColumnReference.of("t1", "id")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(stmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\" FROM \"t1\" FULL JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" GROUP BY \"id\"");
@@ -778,8 +778,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(join))
                 .fetch(Fetch.builder().rows(5).offset(0).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(stmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" CROSS JOIN \"t2\" FETCH NEXT 5 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
@@ -807,8 +807,8 @@ class PreparedStatementVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("t3", "value"))))
                 .from(From.of(join2))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(stmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(stmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\", \"name\", \"value\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" LEFT JOIN \"t3\" ON \"t2\".\"id\" = \"t3\".\"t2_id\"");
@@ -824,8 +824,8 @@ class PreparedStatementVisitorTest {
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(1))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") > ?");
         assertThat(result.parameters()).containsExactly(1);
@@ -842,8 +842,8 @@ class PreparedStatementVisitorTest {
                                 Comparison.gt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10)),
                                 Comparison.lt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(100)))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\" HAVING (SUM(\"id\") > ?) AND (SUM(\"id\") < ?)");
@@ -861,8 +861,8 @@ class PreparedStatementVisitorTest {
                                 Comparison.lt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(5)),
                                 Comparison.gt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(50)))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT AVG(\"id\") FROM \"User\" GROUP BY \"email\" HAVING (AVG(\"id\") < ?) OR (AVG(\"id\") > ?)");
@@ -879,8 +879,8 @@ class PreparedStatementVisitorTest {
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         Comparison.gte(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(2))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT COUNT(\"id\") AS \"total\" FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") >= ?");
@@ -896,8 +896,8 @@ class PreparedStatementVisitorTest {
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         Comparison.ne(AggregateCall.max(ColumnReference.of("User", "id")), Literal.of(0))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT MAX(\"id\") FROM \"User\" GROUP BY \"email\", \"name\" HAVING MAX(\"id\") <> ?");
         assertThat(result.parameters()).containsExactly(0);
@@ -915,8 +915,8 @@ class PreparedStatementVisitorTest {
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "email"))))
                 .fetch(Fetch.builder().rows(5).offset(0).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT MIN(\"id\") FROM \"User\" WHERE \"id\" > ? GROUP BY \"email\" HAVING MIN(\"id\") < ? ORDER BY \"email\" DESC FETCH NEXT 5 ROWS ONLY");
@@ -932,8 +932,8 @@ class PreparedStatementVisitorTest {
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         new IsNull(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT MAX(\"email\") FROM \"User\" GROUP BY \"name\" HAVING MAX(\"email\") IS NULL");
         assertThat(result.parameters()).isEmpty();
@@ -948,8 +948,8 @@ class PreparedStatementVisitorTest {
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         new IsNotNull(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT MAX(\"email\") FROM \"User\" GROUP BY \"name\" HAVING MAX(\"email\") IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -965,8 +965,8 @@ class PreparedStatementVisitorTest {
                         new lan.tlab.r4j.sql.ast.predicate.Between(
                                 AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10), Literal.of(100))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT SUM(\"id\") FROM \"User\" GROUP BY \"email\" HAVING SUM(\"id\") BETWEEN ? AND ?");
         assertThat(result.parameters()).containsExactly(10, 100);
@@ -982,8 +982,8 @@ class PreparedStatementVisitorTest {
                         AggregateCall.count(ColumnReference.of("User", "id")),
                         List.of(Literal.of(1), Literal.of(2), Literal.of(3)))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING COUNT(\"id\") IN (?, ?, ?)");
         assertThat(result.parameters()).containsExactly(1, 2, 3);
@@ -1000,8 +1000,8 @@ class PreparedStatementVisitorTest {
                                 Comparison.lt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(5)),
                                 Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(50))))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT COUNT(\"id\") FROM \"User\" GROUP BY \"email\" HAVING NOT ((COUNT(\"id\") < ?) OR (COUNT(\"id\") > ?))");
@@ -1015,8 +1015,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(10).offset(0).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" FETCH NEXT 10 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1028,8 +1028,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("User")))
                 .fetch(Fetch.builder().rows(25).offset(225).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\" OFFSET 225 ROWS FETCH NEXT 25 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1048,8 +1048,8 @@ class PreparedStatementVisitorTest {
                         Sorting.desc(ColumnReference.of("User", "id"))))
                 .fetch(Fetch.builder().rows(15).offset(30).build())
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "SELECT \"id\" FROM \"User\" WHERE (\"id\" > ?) AND (\"name\" LIKE ?) ORDER BY \"name\" ASC, \"id\" DESC OFFSET 30 ROWS FETCH NEXT 15 ROWS ONLY");
@@ -1069,8 +1069,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(2))))
                 .build();
         UnionExpression union = UnionExpression.union(select1, select2);
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(union, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(union, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         "((SELECT \"id\" FROM \"User\" WHERE \"id\" = ?) UNION (SELECT \"id\" FROM \"User\" WHERE \"id\" = ?))");
@@ -1092,8 +1092,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(fromSubquery))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo("SELECT \"id\" FROM (SELECT \"id\" FROM \"User\" WHERE \"id\" > ?) AS \"sub\"");
@@ -1108,8 +1108,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(new NullPredicate()))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"User\"");
         assertThat(result.parameters()).isEmpty();
@@ -1123,13 +1123,13 @@ class PreparedStatementVisitorTest {
         Where where = Where.builder().condition(whereExpr).build();
         DeleteStatement stmt =
                 DeleteStatement.builder().table(table).where(where).build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto ps = visitor.visit(stmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto ps = renderer.visit(stmt, new AstContext());
         assertThat(ps.sql()).isEqualTo("DELETE FROM users WHERE \"id\" = ?");
         assertThat(ps.parameters()).containsExactly(42);
         // Delete senza where
         DeleteStatement stmtNoWhere = DeleteStatement.builder().table(table).build();
-        PsDto psNoWhere = visitor.visit(stmtNoWhere, new AstContext());
+        PsDto psNoWhere = renderer.visit(stmtNoWhere, new AstContext());
         assertThat(psNoWhere.sql()).isEqualTo("DELETE FROM users");
         assertThat(psNoWhere.parameters()).isEmpty();
     }
@@ -1141,8 +1141,8 @@ class PreparedStatementVisitorTest {
                         ArithmeticExpression.addition(ColumnReference.of("Product", "price"), Literal.of(10)))))
                 .from(From.of(new TableIdentifier("Product")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (\"price\" + ?) FROM \"Product\"");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -1154,8 +1154,8 @@ class PreparedStatementVisitorTest {
                         ArithmeticExpression.subtraction(Literal.of(100), ColumnReference.of("Product", "discount")))))
                 .from(From.of(new TableIdentifier("Product")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (? - \"discount\") FROM \"Product\"");
         assertThat(result.parameters()).containsExactly(100);
     }
@@ -1167,8 +1167,8 @@ class PreparedStatementVisitorTest {
                         ColumnReference.of("Order", "quantity"), ColumnReference.of("Product", "price")))))
                 .from(From.of(new TableIdentifier("Order")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (\"quantity\" * \"price\") FROM \"Order\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1180,8 +1180,8 @@ class PreparedStatementVisitorTest {
                         ArithmeticExpression.division(ColumnReference.of("Customer", "score"), Literal.of(2)))))
                 .from(From.of(new TableIdentifier("Customer")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (\"score\" / ?) FROM \"Customer\"");
         assertThat(result.parameters()).containsExactly(2);
     }
@@ -1193,8 +1193,8 @@ class PreparedStatementVisitorTest {
                         ArithmeticExpression.modulo(ColumnReference.of("User", "id"), Literal.of(10)))))
                 .from(From.of(new TableIdentifier("User")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (\"id\" % ?) FROM \"User\"");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -1206,8 +1206,8 @@ class PreparedStatementVisitorTest {
                         ArithmeticExpression.negation(ColumnReference.of("Customer", "score")))))
                 .from(From.of(new TableIdentifier("Customer")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (-\"score\") FROM \"Customer\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1218,8 +1218,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ArithmeticExpression.negation(Literal.of(100)))))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT (-?) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly(100);
     }
@@ -1230,8 +1230,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(Cast.of(Literal.of("hello"), "VARCHAR(50)"))))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CAST(? AS VARCHAR(50)) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly("hello");
     }
@@ -1242,8 +1242,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(Cast.of(ColumnReference.of("users", "age"), "INT"))))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CAST(\"age\" AS INT) FROM \"Test\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1254,8 +1254,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(Cast.of(Literal.of(123), "DATE"))))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CAST(? AS DATE) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly(123);
     }
@@ -1267,8 +1267,8 @@ class PreparedStatementVisitorTest {
                         new ScalarExpressionProjection(Concat.concat(Literal.of("Hello"), Literal.of("World")))))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CONCAT(?, ?) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly("Hello", "World");
     }
@@ -1280,8 +1280,8 @@ class PreparedStatementVisitorTest {
                         Concat.concat(Literal.of("Name: "), ColumnReference.of("users", "name")))))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CONCAT(?, \"name\") FROM \"Test\"");
         assertThat(result.parameters()).containsExactly("Name: ");
     }
@@ -1293,8 +1293,8 @@ class PreparedStatementVisitorTest {
                         Concat.concatWithSeparator(" - ", Literal.of("First"), Literal.of("Second")))))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CONCAT_WS(?, ?, ?) FROM \"Test\"");
         assertThat(result.parameters()).containsExactly(" - ", "First", "Second");
     }
@@ -1305,8 +1305,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(new CurrentDate())))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CURRENT_DATE FROM \"Test\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1318,8 +1318,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("orders")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("orders", "created_date"), new CurrentDate())))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"created_date\" FROM \"orders\" WHERE \"created_date\" = CURRENT_DATE");
         assertThat(result.parameters()).isEmpty();
@@ -1331,8 +1331,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(new CurrentDateTime())))
                 .from(From.of(new TableIdentifier("Test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CURRENT_TIMESTAMP FROM \"Test\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1344,8 +1344,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("events")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("events", "timestamp"), new CurrentDateTime())))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql())
                 .isEqualTo("SELECT \"timestamp\" FROM \"events\" WHERE \"timestamp\" = CURRENT_TIMESTAMP");
         assertThat(result.parameters()).isEmpty();
@@ -1359,8 +1359,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
                 .from(From.of(new TableIdentifier("orders")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT DATEADD(INTERVAL ? DAY, \"created_date\") FROM \"orders\"");
         assertThat(result.parameters()).containsExactly(30);
     }
@@ -1373,8 +1373,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(dateSub)))
                 .from(From.of(new TableIdentifier("events")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT DATESUB(INTERVAL ? DAY, \"event_date\") FROM \"events\"");
         assertThat(result.parameters()).containsExactly(7);
     }
@@ -1387,8 +1387,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
                 .from(From.of(new TableIdentifier("subscriptions")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT DATEADD(INTERVAL ? MONTH, \"start_date\") FROM \"subscriptions\"");
         assertThat(result.parameters()).containsExactly(1);
     }
@@ -1400,8 +1400,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(extractYear)))
                 .from(From.of(new TableIdentifier("orders")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT EXTRACT(YEAR FROM \"created_date\") FROM \"orders\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1413,8 +1413,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(extractMonth)))
                 .from(From.of(new TableIdentifier("events")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT EXTRACT(MONTH FROM \"event_date\") FROM \"events\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1427,8 +1427,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("logs")))
                 .where(Where.of(Comparison.eq(extractDay, Literal.of(25))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"logs\" WHERE EXTRACT(DAY FROM \"timestamp\") = ?");
         assertThat(result.parameters()).containsExactly(25);
     }
@@ -1440,8 +1440,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(leftFunction)))
                 .from(From.of(new TableIdentifier("users")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT LEFT(\"full_name\", ?) FROM \"users\"");
         assertThat(result.parameters()).containsExactly(5);
     }
@@ -1453,8 +1453,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(leftFunction)))
                 .from(From.of(new TableIdentifier("test")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT LEFT(?, ?) FROM \"test\"");
         assertThat(result.parameters()).containsExactly("Hello World", 3);
     }
@@ -1466,8 +1466,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(leftFunction)))
                 .from(From.of(new TableIdentifier("products")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT LEFT(\"code\", ?) FROM \"products\"");
         assertThat(result.parameters()).containsExactly(2);
     }
@@ -1480,8 +1480,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("products")))
                 .where(Where.of(Comparison.eq(leftFunction, Literal.of("AB"))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"products\" WHERE LEFT(\"code\", ?) = ?");
         assertThat(result.parameters()).containsExactly(2, "AB");
     }
@@ -1493,8 +1493,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(lengthFunction)))
                 .from(From.of(new TableIdentifier("users")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT LENGTH(\"email\") FROM \"users\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1506,8 +1506,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(lengthFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT LENGTH(?) FROM \"dummy\"");
         assertThat(result.parameters()).containsExactly("Test String");
     }
@@ -1520,8 +1520,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("users")))
                 .where(Where.of(Comparison.gt(lengthFunction, Literal.of(8))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"users\" WHERE LENGTH(\"username\") > ?");
         assertThat(result.parameters()).containsExactly(8);
     }
@@ -1533,8 +1533,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(charLengthFunction)))
                 .from(From.of(new TableIdentifier("users")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CHAR_LENGTH(\"email\") FROM \"users\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1546,8 +1546,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(charLengthFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CHAR_LENGTH(?) FROM \"dummy\"");
         assertThat(result.parameters()).containsExactly("Test String");
     }
@@ -1560,8 +1560,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("products")))
                 .where(Where.of(Comparison.eq(charLengthFunction, Literal.of(10))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"products\" WHERE CHAR_LENGTH(\"code\") = ?");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -1573,8 +1573,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(characterLengthFunction)))
                 .from(From.of(new TableIdentifier("users")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CHARACTER_LENGTH(\"full_name\") FROM \"users\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1586,8 +1586,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(characterLengthFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT CHARACTER_LENGTH(?) FROM \"dummy\"");
         assertThat(result.parameters()).containsExactly("Test String");
     }
@@ -1600,8 +1600,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("comments")))
                 .where(Where.of(Comparison.lt(characterLengthFunction, Literal.of(280))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"comments\" WHERE CHARACTER_LENGTH(\"content\") < ?");
         assertThat(result.parameters()).containsExactly(280);
     }
@@ -1613,8 +1613,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(dataLengthFunction)))
                 .from(From.of(new TableIdentifier("files")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT DATALENGTH(\"content\") FROM \"files\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1626,8 +1626,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(dataLengthFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT DATALENGTH(?) FROM \"dummy\"");
         assertThat(result.parameters()).containsExactly("Hello World");
     }
@@ -1640,8 +1640,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("files")))
                 .where(Where.of(Comparison.gt(dataLengthFunction, Literal.of(1024))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"files\" WHERE DATALENGTH(\"binary_data\") > ?");
         assertThat(result.parameters()).containsExactly(1024);
     }
@@ -1653,8 +1653,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(modFunction)))
                 .from(From.of(new TableIdentifier("orders")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MOD(\"total\", ?) FROM \"orders\"");
         assertThat(result.parameters()).containsExactly(100);
     }
@@ -1666,8 +1666,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(modFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT MOD(?, ?) FROM \"dummy\"");
         assertThat(result.parameters()).containsExactly(17, 5);
     }
@@ -1680,8 +1680,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("numbers")))
                 .where(Where.of(Comparison.eq(modFunction, Literal.of(0))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"numbers\" WHERE MOD(\"value\", ?) = ?");
         assertThat(result.parameters()).containsExactly(3, 0);
     }
@@ -1693,8 +1693,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(nullExpression)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT NULL FROM \"dummy\"");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1707,8 +1707,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("users")))
                 .where(Where.of(Comparison.eq(ColumnReference.of("users", "status"), nullExpression)))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"users\" WHERE \"status\" = NULL");
         assertThat(result.parameters()).isEmpty();
     }
@@ -1720,8 +1720,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(powerFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT POWER(?, ?) FROM \"dummy\"");
         assertThat(result.parameters()).containsExactly(2, 8);
     }
@@ -1733,8 +1733,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(powerFunction)))
                 .from(From.of(new TableIdentifier("math")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT POWER(\"base\", ?) FROM \"math\"");
         assertThat(result.parameters()).containsExactly(3);
     }
@@ -1747,8 +1747,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("calculations")))
                 .where(Where.of(Comparison.gt(powerFunction, Literal.of(100))))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"calculations\" WHERE POWER(\"value\", ?) > ?");
         assertThat(result.parameters()).containsExactly(2, 100);
     }
@@ -1760,8 +1760,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT REPLACE(?, ?, ?) FROM \"dummy\"");
         assertThat(result.parameters()).containsExactly("Hello World", "World", "Universe");
     }
@@ -1774,8 +1774,8 @@ class PreparedStatementVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
                 .from(From.of(new TableIdentifier("users")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT REPLACE(\"email\", ?, ?) FROM \"users\"");
         assertThat(result.parameters()).containsExactly("@old.com", "@new.com");
     }
@@ -1788,8 +1788,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("content")))
                 .where(Where.of(new Like(replaceFunction, "%new%")))
                 .build();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"content\" WHERE REPLACE(\"text\", ?, ?) LIKE ?");
         assertThat(result.parameters()).containsExactly("old", "new", "%new%");
     }
@@ -1803,8 +1803,8 @@ class PreparedStatementVisitorTest {
                         ColumnDefinitionBuilder.varchar("name").build()))
                 .build());
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(createTable, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(createTable, new AstContext());
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("users");
@@ -1823,8 +1823,8 @@ class PreparedStatementVisitorTest {
                 .constraint(new ConstraintDefinition.UniqueConstraintDefinition("email"))
                 .build());
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(createTable, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(createTable, new AstContext());
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("UNIQUE");
@@ -1843,8 +1843,8 @@ class PreparedStatementVisitorTest {
                 .constraint(new ConstraintDefinition.ForeignKeyConstraintDefinition(List.of("user_id"), references))
                 .build());
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(createTable, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(createTable, new AstContext());
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("FOREIGN KEY");
@@ -1865,8 +1865,8 @@ class PreparedStatementVisitorTest {
                 .constraint(new ConstraintDefinition.CheckConstraintDefinition(ageCheck))
                 .build());
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(createTable, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(createTable, new AstContext());
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("CHECK");
@@ -1878,9 +1878,9 @@ class PreparedStatementVisitorTest {
     void defaultConstraintIntegration() {
         ConstraintDefinition.DefaultConstraintDefinition constraint =
                 new ConstraintDefinition.DefaultConstraintDefinition(Literal.of("active"));
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
 
-        PsDto result = visitor.visit(constraint, new AstContext());
+        PsDto result = renderer.visit(constraint, new AstContext());
 
         assertThat(result.sql()).isEqualTo("DEFAULT 'active'");
         assertThat(result.parameters()).isEmpty();
@@ -1897,8 +1897,8 @@ class PreparedStatementVisitorTest {
         ScalarSubquery subquery =
                 ScalarSubquery.builder().tableExpression(innerSelect).build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(subquery, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(subquery, new AstContext());
 
         assertThat(result.sql()).startsWith("(");
         assertThat(result.sql()).endsWith(")");
@@ -1916,8 +1916,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("products")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT ROUND(\"price\", ?) AS \"rounded_price\" FROM \"products\"");
         assertThat(result.parameters()).containsExactly(2);
@@ -1932,8 +1932,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.gt(roundFunction, Literal.of(100))))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"orders\" WHERE ROUND(\"total\") > ?");
         assertThat(result.parameters()).containsExactly(100);
@@ -1947,8 +1947,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("settings")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT ROUND(?, \"precision\") AS \"pi_rounded\" FROM \"settings\"");
         assertThat(result.parameters()).containsExactly(3.14159);
@@ -1962,8 +1962,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("users")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT SUBSTRING(\"name\", ?, ?) AS \"short_name\" FROM \"users\"");
         assertThat(result.parameters()).containsExactly(1, 10);
@@ -1978,8 +1978,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(new Like(substringFunction, "%search%")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"posts\" WHERE SUBSTRING(\"content\", ?, ?) LIKE ?");
         assertThat(result.parameters()).containsExactly(1, 50, "%search%");
@@ -1993,8 +1993,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("dual")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT SUBSTRING(?, ?) AS \"greeting\" FROM \"dual\"");
         assertThat(result.parameters()).containsExactly("Hello World", 7);
@@ -2008,8 +2008,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("users")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT TRIM(\"name\") AS \"clean_name\" FROM \"users\"");
         assertThat(result.parameters()).isEmpty();
@@ -2024,8 +2024,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.eq(trimFunction, Literal.of("ABC123"))))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"products\" WHERE TRIM(BOTH \"code\") = ?");
         assertThat(result.parameters()).containsExactly("ABC123");
@@ -2039,8 +2039,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("dual")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT TRIM(LEADING ? FROM ?) AS \"cleaned\" FROM \"dual\"");
         assertThat(result.parameters()).containsExactly("*", "***data***");
@@ -2054,8 +2054,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("transactions")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT ABS(\"amount\") AS \"abs_amount\" FROM \"transactions\"");
         assertThat(result.parameters()).isEmpty();
@@ -2070,8 +2070,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.gt(ColumnReference.of("data", "value"), sqrtFunction)))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"data\" WHERE \"value\" > SQRT(?)");
         assertThat(result.parameters()).containsExactly(16);
@@ -2088,8 +2088,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("orders")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo("SELECT CEIL(\"total\") AS \"rounded_up\", FLOOR(?) AS \"rounded_down\" FROM \"orders\"");
@@ -2104,8 +2104,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("users")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT UPPER(\"name\") AS \"upper_name\" FROM \"users\"");
         assertThat(result.parameters()).isEmpty();
@@ -2120,8 +2120,8 @@ class PreparedStatementVisitorTest {
                 .where(Where.of(Comparison.eq(UnaryString.lower(ColumnReference.of("users", "role")), lowerFunction)))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql()).isEqualTo("SELECT \"id\" FROM \"users\" WHERE LOWER(\"role\") = LOWER(?)");
         assertThat(result.parameters()).containsExactly("ADMIN");
@@ -2138,8 +2138,8 @@ class PreparedStatementVisitorTest {
                 .from(From.of(new TableIdentifier("products")))
                 .build();
 
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = visitor.visit(selectStmt, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = renderer.visit(selectStmt, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo(

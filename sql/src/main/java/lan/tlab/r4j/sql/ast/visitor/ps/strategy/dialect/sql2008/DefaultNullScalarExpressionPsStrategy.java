@@ -9,7 +9,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullScalarExpressionPsStrategy;
 
 public class DefaultNullScalarExpressionPsStrategy implements NullScalarExpressionPsStrategy {
     @Override
-    public PsDto handle(NullScalarExpression nullScalarExpression, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(NullScalarExpression nullScalarExpression, Visitor<PsDto> renderer, AstContext ctx) {
         return new PsDto("NULL", List.of());
     }
 }

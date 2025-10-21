@@ -9,22 +9,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
 class DefaultTrimPsStrategyTest {
 
     private final DefaultTrimPsStrategy strategy = new DefaultTrimPsStrategy();
-    private final PreparedStatementVisitor visitor =
-            PreparedStatementVisitor.builder().build();
+    private final PreparedStatementRenderer renderer =
+            PreparedStatementRenderer.builder().build();
     private final AstContext ctx = new AstContext();
 
     @Test
     void simpleTrimWithLiteral() {
         var trimCall = trim(Literal.of("  hello  "));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(?)");
         assertThat(result.parameters()).containsExactly("  hello  ");
@@ -34,7 +34,7 @@ class DefaultTrimPsStrategyTest {
     void trimWithColumn() {
         var trimCall = trim(ColumnReference.of("users", "name"));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(\"name\")");
         assertThat(result.parameters()).isEmpty();
@@ -44,7 +44,7 @@ class DefaultTrimPsStrategyTest {
     void trimBothWithLiteral() {
         var trimCall = trimBoth(Literal.of("  test  "));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(BOTH ?)");
         assertThat(result.parameters()).containsExactly("  test  ");
@@ -54,7 +54,7 @@ class DefaultTrimPsStrategyTest {
     void trimLeadingWithColumn() {
         var trimCall = trimLeading(ColumnReference.of("users", "description"));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(LEADING \"description\")");
         assertThat(result.parameters()).isEmpty();
@@ -64,7 +64,7 @@ class DefaultTrimPsStrategyTest {
     void trimTrailingWithLiteral() {
         var trimCall = trimTrailing(Literal.of("  data  "));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(TRAILING ?)");
         assertThat(result.parameters()).containsExactly("  data  ");
@@ -74,7 +74,7 @@ class DefaultTrimPsStrategyTest {
     void trimWithCharactersToRemoveAndLiteral() {
         var trimCall = trim(Literal.of("*"), Literal.of("*hello*"));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(? FROM ?)");
         assertThat(result.parameters()).containsExactly("*", "*hello*");
@@ -84,7 +84,7 @@ class DefaultTrimPsStrategyTest {
     void trimBothWithCharactersToRemoveAndColumn() {
         var trimCall = trimBoth(Literal.of(" "), ColumnReference.of("users", "title"));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(BOTH ? FROM \"title\")");
         assertThat(result.parameters()).containsExactly(" ");
@@ -94,7 +94,7 @@ class DefaultTrimPsStrategyTest {
     void trimLeadingWithCharactersToRemoveMixed() {
         var trimCall = trimLeading(ColumnReference.of("config", "prefix"), Literal.of("prefix_data"));
 
-        PsDto result = strategy.handle(trimCall, visitor, ctx);
+        PsDto result = strategy.handle(trimCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("TRIM(LEADING \"prefix\" FROM ?)");
         assertThat(result.parameters()).containsExactly("prefix_data");

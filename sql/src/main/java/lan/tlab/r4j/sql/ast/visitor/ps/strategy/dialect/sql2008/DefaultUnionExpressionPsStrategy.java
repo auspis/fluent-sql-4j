@@ -5,16 +5,16 @@ import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression.UnionType;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 
 public class DefaultUnionExpressionPsStrategy implements UnionExpressionPsStrategy {
     @Override
-    public PsDto handle(UnionExpression expression, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(UnionExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
 
-        PsDto leftPart = expression.getLeft().accept(visitor, ctx);
-        PsDto rightPart = expression.getRight().accept(visitor, ctx);
+        PsDto leftPart = expression.getLeft().accept(renderer, ctx);
+        PsDto rightPart = expression.getRight().accept(renderer, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",

@@ -5,15 +5,15 @@ import java.util.List;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 
 public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrategy {
     @Override
-    public PsDto handle(UpdateStatement stmt, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(UpdateStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
         // TableIdentifier name
-        PsDto tableDto = stmt.getTable().accept(visitor, ctx); // Usa il visitor su qualunque TableExpression
+        PsDto tableDto = stmt.getTable().accept(renderer, ctx); // Usa il visitor su qualunque TableExpression
         String tableName = tableDto.sql();
 
         List<UpdateItem> setItems = stmt.getSet();
@@ -21,9 +21,9 @@ public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrate
         List<Object> params = new ArrayList<>();
         for (UpdateItem item : setItems) {
             // Colonna
-            PsDto colDto = item.getColumn().accept(visitor, ctx);
+            PsDto colDto = item.getColumn().accept(renderer, ctx);
             // Valore
-            PsDto valDto = item.getValue().accept(visitor, ctx);
+            PsDto valDto = item.getValue().accept(renderer, ctx);
             setClauses.add(colDto.sql() + " = " + valDto.sql());
             params.addAll(valDto.parameters());
         }
@@ -33,7 +33,7 @@ public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrate
         String whereSql = "";
         List<Object> whereParams = new ArrayList<>();
         if (stmt.getWhere() != null) {
-            PsDto whereDto = stmt.getWhere().accept(visitor, ctx);
+            PsDto whereDto = stmt.getWhere().accept(renderer, ctx);
             if (whereDto.sql() != null && !whereDto.sql().isBlank()) {
                 whereSql = " WHERE " + whereDto.sql();
                 whereParams.addAll(whereDto.parameters());
