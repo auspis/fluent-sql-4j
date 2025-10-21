@@ -18,7 +18,7 @@ import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
@@ -144,8 +144,8 @@ public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         UpdateStatement stmt = getCurrentStatement();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = stmt.accept(visitor, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = stmt.accept(renderer, new AstContext());
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {

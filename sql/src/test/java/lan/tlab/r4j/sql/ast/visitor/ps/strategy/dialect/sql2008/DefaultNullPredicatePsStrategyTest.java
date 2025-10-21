@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import org.junit.jupiter.api.Test;
 
 class DefaultNullPredicatePsStrategyTest {
@@ -14,7 +14,7 @@ class DefaultNullPredicatePsStrategyTest {
         var expression = new NullPredicate();
 
         var strategy = new DefaultNullPredicatePsStrategy();
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var result = strategy.handle(expression, visitor, new AstContext());
 
         assertThat(result.sql()).isEqualTo("NULL");

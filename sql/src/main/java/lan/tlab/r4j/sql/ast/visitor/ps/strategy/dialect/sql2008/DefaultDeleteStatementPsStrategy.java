@@ -12,7 +12,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
 
 public class DefaultDeleteStatementPsStrategy implements DeleteStatementPsStrategy {
     @Override
-    public PsDto handle(DeleteStatement stmt, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(DeleteStatement stmt, Visitor<PsDto> renderer, AstContext ctx) {
         TableExpression table = stmt.getTable();
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
@@ -23,7 +23,7 @@ public class DefaultDeleteStatementPsStrategy implements DeleteStatementPsStrate
         if (where != null
                 && where.getCondition() != null
                 && !(where.getCondition() instanceof lan.tlab.r4j.sql.ast.predicate.NullPredicate)) {
-            PsDto whereDto = where.accept(visitor, ctx);
+            PsDto whereDto = where.accept(renderer, ctx);
             sql.append(" WHERE ").append(whereDto.sql());
             params.addAll(whereDto.parameters());
         }

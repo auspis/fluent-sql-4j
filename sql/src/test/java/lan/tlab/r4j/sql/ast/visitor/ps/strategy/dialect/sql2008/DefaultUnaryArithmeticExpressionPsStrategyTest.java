@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression.UnaryArithmet
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 class DefaultUnaryArithmeticExpressionPsStrategyTest {
 
     private DefaultUnaryArithmeticExpressionPsStrategy strategy;
-    private PreparedStatementVisitor visitor;
+    private PreparedStatementRenderer visitor;
 
     @BeforeEach
     void setUp() {
         strategy = new DefaultUnaryArithmeticExpressionPsStrategy();
-        visitor = new PreparedStatementVisitor();
+        visitor = new PreparedStatementRenderer();
     }
 
     @Test

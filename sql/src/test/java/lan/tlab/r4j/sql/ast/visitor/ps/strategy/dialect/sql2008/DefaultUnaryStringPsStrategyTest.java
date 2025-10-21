@@ -7,22 +7,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
 class DefaultUnaryStringPsStrategyTest {
 
     private final DefaultUnaryStringPsStrategy strategy = new DefaultUnaryStringPsStrategy();
-    private final PreparedStatementVisitor visitor =
-            PreparedStatementVisitor.builder().build();
+    private final PreparedStatementRenderer renderer =
+            PreparedStatementRenderer.builder().build();
     private final AstContext ctx = new AstContext();
 
     @Test
     void lowerWithLiteral() {
         var lowerCall = lower(Literal.of("HELLO WORLD"));
 
-        PsDto result = strategy.handle(lowerCall, visitor, ctx);
+        PsDto result = strategy.handle(lowerCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("LOWER(?)");
         assertThat(result.parameters()).containsExactly("HELLO WORLD");
@@ -32,7 +32,7 @@ class DefaultUnaryStringPsStrategyTest {
     void lowerWithColumn() {
         var lowerCall = lower(ColumnReference.of("users", "name"));
 
-        PsDto result = strategy.handle(lowerCall, visitor, ctx);
+        PsDto result = strategy.handle(lowerCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("LOWER(\"name\")");
         assertThat(result.parameters()).isEmpty();
@@ -42,7 +42,7 @@ class DefaultUnaryStringPsStrategyTest {
     void upperWithLiteral() {
         var upperCall = upper(Literal.of("hello world"));
 
-        PsDto result = strategy.handle(upperCall, visitor, ctx);
+        PsDto result = strategy.handle(upperCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("UPPER(?)");
         assertThat(result.parameters()).containsExactly("hello world");
@@ -52,7 +52,7 @@ class DefaultUnaryStringPsStrategyTest {
     void upperWithColumn() {
         var upperCall = upper(ColumnReference.of("products", "description"));
 
-        PsDto result = strategy.handle(upperCall, visitor, ctx);
+        PsDto result = strategy.handle(upperCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("UPPER(\"description\")");
         assertThat(result.parameters()).isEmpty();
@@ -62,7 +62,7 @@ class DefaultUnaryStringPsStrategyTest {
     void lowerWithEmptyString() {
         var lowerCall = lower(Literal.of(""));
 
-        PsDto result = strategy.handle(lowerCall, visitor, ctx);
+        PsDto result = strategy.handle(lowerCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("LOWER(?)");
         assertThat(result.parameters()).containsExactly("");
@@ -72,7 +72,7 @@ class DefaultUnaryStringPsStrategyTest {
     void upperWithSpecialCharacters() {
         var upperCall = upper(Literal.of("test@email.com"));
 
-        PsDto result = strategy.handle(upperCall, visitor, ctx);
+        PsDto result = strategy.handle(upperCall, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("UPPER(?)");
         assertThat(result.parameters()).containsExactly("test@email.com");

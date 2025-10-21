@@ -10,11 +10,11 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.GroupByClausePsStrategy;
 
 public class DefaultGroupByClausePsStrategy implements GroupByClausePsStrategy {
     @Override
-    public PsDto handle(GroupBy clause, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(GroupBy clause, Visitor<PsDto> renderer, AstContext ctx) {
         List<String> exprSqls = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var expr : clause.getGroupingExpressions()) {
-            PsDto res = expr.accept(visitor, ctx);
+            PsDto res = expr.accept(renderer, ctx);
             exprSqls.add(res.sql());
             params.addAll(res.parameters());
         }

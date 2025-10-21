@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,9 +29,9 @@ class DefaultUnionExpressionPsStrategyTest {
                         lan.tlab.r4j.sql.ast.predicate.Comparison.eq(ColumnReference.of("User", "id"), Literal.of(2))))
                 .build();
         UnionExpression union = UnionExpression.union(select1, select2);
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         DefaultUnionExpressionPsStrategy strategy = new DefaultUnionExpressionPsStrategy();
-        PsDto result = strategy.handle(union, visitor, new AstContext());
+        PsDto result = strategy.handle(union, renderer, new AstContext());
         Assertions.assertThat(result.sql())
                 .isEqualTo(
                         "((SELECT \"id\" FROM \"User\" WHERE \"id\" = ?) UNION (SELECT \"id\" FROM \"User\" WHERE \"id\" = ?))");

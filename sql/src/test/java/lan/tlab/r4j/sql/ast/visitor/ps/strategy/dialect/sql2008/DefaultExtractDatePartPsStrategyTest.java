@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class DefaultExtractDatePartPsStrategyTest {
     void handlesExtractYearFromColumn() {
         var strategy = new DefaultExtractDatePartPsStrategy();
         var extractYear = ExtractDatePart.year(ColumnReference.of("orders", "created_date"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(extractYear, visitor, ctx);
@@ -30,7 +30,7 @@ class DefaultExtractDatePartPsStrategyTest {
     void handlesExtractMonthFromLiteral() {
         var strategy = new DefaultExtractDatePartPsStrategy();
         var extractMonth = ExtractDatePart.month(Literal.of("2023-12-25"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(extractMonth, visitor, ctx);
@@ -43,7 +43,7 @@ class DefaultExtractDatePartPsStrategyTest {
     void handlesExtractDayFromColumn() {
         var strategy = new DefaultExtractDatePartPsStrategy();
         var extractDay = ExtractDatePart.day(ColumnReference.of("events", "event_date"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(extractDay, visitor, ctx);
@@ -56,7 +56,7 @@ class DefaultExtractDatePartPsStrategyTest {
     void handlesExtractWithComplexDateExpression() {
         var strategy = new DefaultExtractDatePartPsStrategy();
         var extractYear = ExtractDatePart.year(Literal.of("2023-06-15"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(extractYear, visitor, ctx);

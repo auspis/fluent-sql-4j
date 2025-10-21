@@ -10,9 +10,9 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.BinaryArithmeticExpressionPsStra
 
 public class DefaultBinaryArithmeticExpressionPsStrategy implements BinaryArithmeticExpressionPsStrategy {
     @Override
-    public PsDto handle(BinaryArithmeticExpression expression, Visitor<PsDto> visitor, AstContext ctx) {
-        PsDto lhsResult = expression.getLhs().accept(visitor, ctx);
-        PsDto rhsResult = expression.getRhs().accept(visitor, ctx);
+    public PsDto handle(BinaryArithmeticExpression expression, Visitor<PsDto> renderer, AstContext ctx) {
+        PsDto lhsResult = expression.getLhs().accept(renderer, ctx);
+        PsDto rhsResult = expression.getRhs().accept(renderer, ctx);
 
         String sql = String.format("(%s %s %s)", lhsResult.sql(), expression.getOperator(), rhsResult.sql());
 

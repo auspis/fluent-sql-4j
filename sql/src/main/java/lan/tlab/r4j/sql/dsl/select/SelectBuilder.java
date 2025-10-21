@@ -31,7 +31,7 @@ import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.HavingConditionBuilder;
@@ -403,8 +403,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         SelectStatement stmt = getCurrentStatement();
-        PreparedStatementVisitor visitor = new PreparedStatementVisitor();
-        PsDto result = stmt.accept(visitor, new AstContext());
+        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+        PsDto result = stmt.accept(renderer, new AstContext());
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {

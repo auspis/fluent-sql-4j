@@ -6,7 +6,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Between;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 class DefaultBetweenPsStrategyTest {
 
     private DefaultBetweenPsStrategy strategy;
-    private PreparedStatementVisitor visitor;
+    private PreparedStatementRenderer renderer;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new DefaultBetweenPsStrategy();
-        visitor = new PreparedStatementVisitor();
+        renderer = new PreparedStatementRenderer();
         ctx = new AstContext();
     }
 
@@ -28,7 +28,7 @@ class DefaultBetweenPsStrategyTest {
     void betweenWithLiterals() {
         Between between = new Between(ColumnReference.of("User", "age"), Literal.of(18), Literal.of(65));
 
-        PsDto result = strategy.handle(between, visitor, ctx);
+        PsDto result = strategy.handle(between, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("\"age\" BETWEEN ? AND ?");
         assertThat(result.parameters()).containsExactly(18, 65);
@@ -38,7 +38,7 @@ class DefaultBetweenPsStrategyTest {
     void betweenWithStrings() {
         Between between = new Between(ColumnReference.of("User", "name"), Literal.of("Alice"), Literal.of("John"));
 
-        PsDto result = strategy.handle(between, visitor, ctx);
+        PsDto result = strategy.handle(between, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("\"name\" BETWEEN ? AND ?");
         assertThat(result.parameters()).containsExactly("Alice", "John");
@@ -51,7 +51,7 @@ class DefaultBetweenPsStrategyTest {
                 ColumnReference.of("Discount", "min_amount"),
                 ColumnReference.of("Discount", "max_amount"));
 
-        PsDto result = strategy.handle(between, visitor, ctx);
+        PsDto result = strategy.handle(between, renderer, ctx);
 
         assertThat(result.sql()).isEqualTo("\"total\" BETWEEN \"min_amount\" AND \"max_amount\"");
         assertThat(result.parameters()).isEmpty();

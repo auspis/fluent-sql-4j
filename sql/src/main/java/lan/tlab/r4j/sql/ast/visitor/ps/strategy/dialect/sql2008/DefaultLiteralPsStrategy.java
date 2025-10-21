@@ -9,7 +9,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LiteralPsStrategy;
 
 public class DefaultLiteralPsStrategy implements LiteralPsStrategy {
     @Override
-    public PsDto handle(Literal<?> literal, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(Literal<?> literal, Visitor<PsDto> renderer, AstContext ctx) {
         return new PsDto("?", List.of(literal.getValue()));
     }
 }
