@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -14,7 +14,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 public class DefaultColumnDefinitionPsStrategy implements ColumnDefinitionPsStrategy {
 
     @Override
-    public PsDto handle(ColumnDefinition columnDefinition, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(ColumnDefinition columnDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
         if (columnDefinition.equals(ColumnDefinition.nullObject())) {
             return new PsDto("", List.of());
         }
@@ -23,7 +23,7 @@ public class DefaultColumnDefinitionPsStrategy implements ColumnDefinitionPsStra
         List<Object> parameters = new ArrayList<>();
 
         // Handle column name - use escape strategy from visitor
-        String columnName = visitor.getEscapeStrategy().apply(columnDefinition.getName());
+        String columnName = renderer.getEscapeStrategy().apply(columnDefinition.getName());
         builder.append(columnName);
 
         // Handle data type using SQL renderer since data types are static DDL elements
@@ -34,7 +34,7 @@ public class DefaultColumnDefinitionPsStrategy implements ColumnDefinitionPsStra
         List<PsDto> constraintDtos = Stream.of(
                         columnDefinition.getNotNullConstraint(), columnDefinition.getDefaultConstraint())
                 .filter(c -> c != null)
-                .map(c -> c.accept(visitor, ctx))
+                .map(c -> c.accept(renderer, ctx))
                 .collect(Collectors.toList());
 
         if (!constraintDtos.isEmpty()) {

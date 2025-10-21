@@ -239,7 +239,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class PreparedStatementVisitor implements Visitor<PsDto> {
+public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Getter
     @Default
     private final EscapeStrategy escapeStrategy = EscapeStrategy.standard();

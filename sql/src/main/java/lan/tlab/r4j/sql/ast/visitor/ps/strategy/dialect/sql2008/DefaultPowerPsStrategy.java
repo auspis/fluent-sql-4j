@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Power;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.PowerPsStrategy;
 
 public class DefaultPowerPsStrategy implements PowerPsStrategy {
 
     @Override
-    public PsDto handle(Power power, PreparedStatementVisitor visitor, AstContext ctx) {
-        PsDto baseResult = power.getBase().accept(visitor, ctx);
-        PsDto exponentResult = power.getExponent().accept(visitor, ctx);
+    public PsDto handle(Power power, PreparedStatementRenderer renderer, AstContext ctx) {
+        PsDto baseResult = power.getBase().accept(renderer, ctx);
+        PsDto exponentResult = power.getExponent().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(baseResult.parameters());

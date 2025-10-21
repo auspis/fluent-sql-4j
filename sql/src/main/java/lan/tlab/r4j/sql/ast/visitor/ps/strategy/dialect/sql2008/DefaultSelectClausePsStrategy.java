@@ -12,7 +12,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.SelectClausePsStrategy;
 
 public class DefaultSelectClausePsStrategy implements SelectClausePsStrategy {
     @Override
-    public PsDto handle(Select select, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(Select select, Visitor<PsDto> renderer, AstContext ctx) {
         List<Projection> projections = select.getProjections();
         if (projections.isEmpty()) {
             return new PsDto("*", List.of());
@@ -21,7 +21,7 @@ public class DefaultSelectClausePsStrategy implements SelectClausePsStrategy {
         List<Object> allParameters = new ArrayList<>();
         String sql = projections.stream()
                 .map(p -> {
-                    PsDto result = p.accept(visitor, ctx);
+                    PsDto result = p.accept(renderer, ctx);
                     allParameters.addAll(result.parameters());
                     return result.sql();
                 })

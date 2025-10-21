@@ -11,7 +11,7 @@ import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -20,12 +20,12 @@ import org.junit.jupiter.api.Test;
 class DefaultInsertSourcePsStrategyTest {
 
     private DefaultInsertSourcePsStrategy strategy;
-    private PreparedStatementVisitor visitor;
+    private PreparedStatementRenderer visitor;
 
     @BeforeEach
     void setUp() {
         strategy = new DefaultInsertSourcePsStrategy();
-        visitor = new PreparedStatementVisitor();
+        visitor = new PreparedStatementRenderer();
     }
 
     @Test

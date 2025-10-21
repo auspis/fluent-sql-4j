@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class DefaultCharLengthPsStrategyTest {
     void handlesCharLengthWithLiteralString() {
         var strategy = new DefaultCharLengthPsStrategy();
         var charLength = new CharLength(Literal.of("Hello World"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(charLength, visitor, ctx);
@@ -30,7 +30,7 @@ class DefaultCharLengthPsStrategyTest {
     void handlesCharLengthWithColumnReference() {
         var strategy = new DefaultCharLengthPsStrategy();
         var charLength = new CharLength(ColumnReference.of("users", "email"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(charLength, visitor, ctx);
@@ -43,7 +43,7 @@ class DefaultCharLengthPsStrategyTest {
     void handlesCharLengthWithTableColumn() {
         var strategy = new DefaultCharLengthPsStrategy();
         var charLength = new CharLength(ColumnReference.of("products", "description"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(charLength, visitor, ctx);
@@ -56,7 +56,7 @@ class DefaultCharLengthPsStrategyTest {
     void handlesCharLengthWithAliasedColumn() {
         var strategy = new DefaultCharLengthPsStrategy();
         var charLength = new CharLength(ColumnReference.of("u", "username"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(charLength, visitor, ctx);

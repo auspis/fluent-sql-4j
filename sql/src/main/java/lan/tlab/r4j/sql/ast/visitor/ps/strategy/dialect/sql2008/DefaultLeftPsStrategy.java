@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LeftPsStrategy;
 
 public class DefaultLeftPsStrategy implements LeftPsStrategy {
 
     @Override
-    public PsDto handle(Left left, PreparedStatementVisitor visitor, AstContext ctx) {
-        var expressionResult = left.getExpression().accept(visitor, ctx);
-        var lengthResult = left.getLength().accept(visitor, ctx);
+    public PsDto handle(Left left, PreparedStatementRenderer renderer, AstContext ctx) {
+        var expressionResult = left.getExpression().accept(renderer, ctx);
+        var lengthResult = left.getLength().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(expressionResult.parameters());

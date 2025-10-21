@@ -9,7 +9,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 
 public class DefaultDefaultValuesPsStrategy implements DefaultValuesPsStrategy {
     @Override
-    public PsDto handle(DefaultValues defaultValues, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(DefaultValues defaultValues, Visitor<PsDto> renderer, AstContext ctx) {
         // For SQL DEFAULT VALUES
         return new PsDto("DEFAULT VALUES", List.of());
     }

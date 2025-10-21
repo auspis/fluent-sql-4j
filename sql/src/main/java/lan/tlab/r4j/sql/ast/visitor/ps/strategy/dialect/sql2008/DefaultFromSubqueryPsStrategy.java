@@ -9,14 +9,14 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.FromSubqueryPsStrategy;
 public class DefaultFromSubqueryPsStrategy implements FromSubqueryPsStrategy {
 
     @Override
-    public PsDto handle(FromSubquery fromSubquery, Visitor<PsDto> visitor, AstContext ctx) {
-        PsDto subqueryResult = fromSubquery.getSubquery().accept(visitor, ctx);
+    public PsDto handle(FromSubquery fromSubquery, Visitor<PsDto> renderer, AstContext ctx) {
+        PsDto subqueryResult = fromSubquery.getSubquery().accept(renderer, ctx);
 
         String sql = "(" + subqueryResult.sql() + ")";
 
         // Add alias if present (not empty name)
         if (!fromSubquery.getAs().getName().isEmpty()) {
-            PsDto aliasResult = fromSubquery.getAs().accept(visitor, ctx);
+            PsDto aliasResult = fromSubquery.getAs().accept(renderer, ctx);
             sql += " AS " + aliasResult.sql();
         }
 

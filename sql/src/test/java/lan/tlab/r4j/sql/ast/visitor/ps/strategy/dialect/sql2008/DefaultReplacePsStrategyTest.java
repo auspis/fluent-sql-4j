@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class DefaultReplacePsStrategyTest {
     void handlesReplaceWithAllLiterals() {
         var strategy = new DefaultReplacePsStrategy();
         var replace = Replace.of(Literal.of("Hello World"), Literal.of("World"), Literal.of("Universe"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(replace, visitor, ctx);
@@ -30,7 +30,7 @@ class DefaultReplacePsStrategyTest {
     void handlesReplaceWithColumnAndLiterals() {
         var strategy = new DefaultReplacePsStrategy();
         var replace = Replace.of(ColumnReference.of("users", "email"), Literal.of("@old.com"), Literal.of("@new.com"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(replace, visitor, ctx);
@@ -46,7 +46,7 @@ class DefaultReplacePsStrategyTest {
                 ColumnReference.of("content", "text"),
                 ColumnReference.of("content", "old_pattern"),
                 ColumnReference.of("content", "new_pattern"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(replace, visitor, ctx);
@@ -60,7 +60,7 @@ class DefaultReplacePsStrategyTest {
         var strategy = new DefaultReplacePsStrategy();
         var replace = Replace.of(
                 Literal.of("Test string"), ColumnReference.of("patterns", "search"), Literal.of("replacement"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(replace, visitor, ctx);

@@ -10,10 +10,10 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.OnJoinPsStrategy;
 
 public class DefaultOnJoinPsStrategy implements OnJoinPsStrategy {
     @Override
-    public PsDto handle(OnJoin join, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(OnJoin join, Visitor<PsDto> renderer, AstContext ctx) {
         // Visit left and right sources
-        PsDto leftResult = join.getLeft().accept(visitor, ctx);
-        PsDto rightResult = join.getRight().accept(visitor, ctx);
+        PsDto leftResult = join.getLeft().accept(renderer, ctx);
+        PsDto rightResult = join.getRight().accept(renderer, ctx);
         String joinType;
         switch (join.getType()) {
             case INNER -> joinType = "INNER JOIN";
@@ -32,7 +32,7 @@ public class DefaultOnJoinPsStrategy implements OnJoinPsStrategy {
         if (join.getType() != OnJoin.JoinType.CROSS) {
             if (join.getOnCondition() != null) {
                 // Passa il contesto con scope JOIN_ON
-                PsDto onResult = join.getOnCondition().accept(visitor, new AstContext(AstContext.Scope.JOIN_ON));
+                PsDto onResult = join.getOnCondition().accept(renderer, new AstContext(AstContext.Scope.JOIN_ON));
                 sql.append(" ON ").append(onResult.sql());
                 params.addAll(onResult.parameters());
             }
