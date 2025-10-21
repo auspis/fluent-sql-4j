@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.plugin.builtin;
+package lan.tlab.r4j.sql.plugin.builtin.standardsql2008;
 
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;

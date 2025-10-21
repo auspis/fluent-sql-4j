@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.plugin.builtin;
+package lan.tlab.r4j.sql.plugin.builtin.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
