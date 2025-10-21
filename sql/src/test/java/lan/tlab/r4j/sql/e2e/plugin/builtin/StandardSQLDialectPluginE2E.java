@@ -1,7 +1,7 @@
-package lan.tlab.r4j.sql.plugin.builtin;
+package lan.tlab.r4j.sql.e2e.plugin.builtin;
 
-import static lan.tlab.r4j.sql.plugin.builtin.StandardSQLDialectPlugin.DIALECT_NAME;
-import static lan.tlab.r4j.sql.plugin.builtin.StandardSQLDialectPlugin.DIALECT_VERSION;
+import static lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin.DIALECT_NAME;
+import static lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin.DIALECT_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -14,6 +14,7 @@ import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
 import lan.tlab.r4j.sql.plugin.RegistryResult;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectRegistry;
+import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
 import lan.tlab.r4j.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.util.annotation.E2ETest;
 import org.junit.jupiter.api.AfterEach;
