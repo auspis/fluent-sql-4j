@@ -11,6 +11,8 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRender
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LegthRenderStrategy;
 
+// TODO: move the factory methods to plugins: each plugin should provide its own renderer
+//       and separate the SqlRendererAcceptanceTest too.
 public class SqlRendererFactory {
 
     public static SqlRenderer standardSql2008() {
