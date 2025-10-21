@@ -1,6 +1,6 @@
-package lan.tlab.r4j.sql.plugin.builtin;
+package lan.tlab.r4j.sql.e2e.plugin.builtin;
 
-import static lan.tlab.r4j.sql.plugin.builtin.MySQLDialectPlugin.DIALECT_NAME;
+import static lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin.DIALECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
@@ -21,6 +21,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.plugin.RegistryResult;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectRegistry;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
 import lan.tlab.r4j.sql.util.annotation.E2ETest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
