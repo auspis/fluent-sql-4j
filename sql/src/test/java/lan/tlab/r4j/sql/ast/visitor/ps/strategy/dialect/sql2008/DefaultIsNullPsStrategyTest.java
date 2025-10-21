@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.r4j.sql.ast.predicate.IsNull;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
 class DefaultIsNullPsStrategyTest {
 
     private DefaultIsNullPsStrategy strategy;
-    private PreparedStatementVisitor visitor;
+    private PreparedStatementRenderer visitor;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new DefaultIsNullPsStrategy();
-        visitor = new PreparedStatementVisitor();
+        visitor = new PreparedStatementRenderer();
         ctx = new AstContext();
     }
 

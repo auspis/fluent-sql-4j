@@ -11,7 +11,7 @@ import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +23,9 @@ class DefaultUpdateStatementPsStrategyTest {
                 .set(List.of(UpdateItem.of("name", Literal.of("Mario")), UpdateItem.of("age", Literal.of(42))))
                 .where(Where.of(Comparison.eq(ColumnReference.of("", "id"), Literal.of(1))))
                 .build();
-        PreparedStatementVisitor visitor = PreparedStatementVisitor.builder().build();
+        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultUpdateStatementPsStrategy strategy = new DefaultUpdateStatementPsStrategy();
-        PsDto result = strategy.handle(stmt, visitor, new AstContext());
+        PsDto result = strategy.handle(stmt, renderer, new AstContext());
         assertThat(result.sql()).isEqualTo("UPDATE \"person\" SET \"name\" = ?, \"age\" = ? WHERE \"id\" = ?");
         assertThat(result.parameters()).containsExactly("Mario", 42, 1);
     }

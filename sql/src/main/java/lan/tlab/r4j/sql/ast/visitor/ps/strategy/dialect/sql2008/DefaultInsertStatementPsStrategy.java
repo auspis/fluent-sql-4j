@@ -17,7 +17,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 
 public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrategy {
     @Override
-    public PsDto handle(InsertStatement stmt, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(InsertStatement stmt, Visitor<PsDto> renderer, AstContext ctx) {
         // TableIdentifier name
         TableIdentifier table = (TableIdentifier) stmt.getTable();
         String tableName = table.getName();
@@ -26,7 +26,7 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
 
         if (data instanceof DefaultValues defaultValues) {
             // Handle DEFAULT VALUES case
-            PsDto dataResult = defaultValues.accept(visitor, ctx);
+            PsDto dataResult = defaultValues.accept(renderer, ctx);
             String sql = "INSERT INTO \"" + tableName + "\" " + dataResult.sql();
             return new PsDto(sql, dataResult.parameters());
         } else if (data instanceof InsertValues values) {

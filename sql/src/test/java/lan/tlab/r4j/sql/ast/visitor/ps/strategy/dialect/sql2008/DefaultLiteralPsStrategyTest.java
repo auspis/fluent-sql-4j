@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
 class DefaultLiteralPsStrategyTest {
 
     private DefaultLiteralPsStrategy strategy;
-    private PreparedStatementVisitor visitor;
+    private PreparedStatementRenderer visitor;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new DefaultLiteralPsStrategy();
-        visitor = new PreparedStatementVisitor();
+        visitor = new PreparedStatementRenderer();
         ctx = new AstContext();
     }
 

@@ -10,11 +10,11 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.OrderByClausePsStrategy;
 
 public class DefaultOrderByClausePsStrategy implements OrderByClausePsStrategy {
     @Override
-    public PsDto handle(OrderBy clause, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(OrderBy clause, Visitor<PsDto> renderer, AstContext ctx) {
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var sorting : clause.getSortings()) {
-            PsDto res = sorting.accept(visitor, ctx);
+            PsDto res = sorting.accept(renderer, ctx);
             sqlParts.add(res.sql());
             params.addAll(res.parameters());
         }

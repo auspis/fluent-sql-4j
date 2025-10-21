@@ -16,7 +16,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
@@ -46,8 +46,8 @@ public class SpikeObjectToJdbcMain {
             // 3. Insert a user
             User user = new User(1, "John", "john@example.com");
             InsertStatement insertStatement = InsertStatementBuilderFromObject.fromObject("User", user);
-            PreparedStatementVisitor preparedVisitor = new PreparedStatementVisitor();
-            PsDto preparedResult = preparedVisitor.visit(insertStatement, new AstContext());
+            PreparedStatementRenderer preparedRenderer = new PreparedStatementRenderer();
+            PsDto preparedResult = preparedRenderer.visit(insertStatement, new AstContext());
             String insertSql = preparedResult.sql();
             System.out.println("SQL insert: " + insertSql);
             try (var ps = conn.prepareStatement(insertSql)) {
@@ -81,8 +81,8 @@ public class SpikeObjectToJdbcMain {
                     .from(From.of(new TableIdentifier("User")))
                     .where(Where.of(Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
                     .build();
-            PreparedStatementVisitor selectVisitor = new PreparedStatementVisitor();
-            PsDto selectResult = selectVisitor.visit(selectStmt, new AstContext());
+            PreparedStatementRenderer selectRenderer = new PreparedStatementRenderer();
+            PsDto selectResult = selectRenderer.visit(selectStmt, new AstContext());
             String selectSql = selectResult.sql();
             System.out.println("SQL select: " + selectSql);
             System.out.println("Parameters: " + selectResult.parameters());

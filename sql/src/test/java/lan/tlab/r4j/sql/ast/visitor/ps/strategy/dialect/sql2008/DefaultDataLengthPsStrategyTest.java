@@ -7,7 +7,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.DataLength;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class DefaultDataLengthPsStrategyTest {
     void handlesDataLengthWithLiteralString() {
         var strategy = new DefaultDataLengthPsStrategy();
         var dataLength = new DataLength(Literal.of("Hello World"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dataLength, visitor, ctx);
@@ -30,7 +30,7 @@ class DefaultDataLengthPsStrategyTest {
     void handlesDataLengthWithColumnReference() {
         var strategy = new DefaultDataLengthPsStrategy();
         var dataLength = new DataLength(ColumnReference.of("files", "content"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dataLength, visitor, ctx);
@@ -43,7 +43,7 @@ class DefaultDataLengthPsStrategyTest {
     void handlesDataLengthWithBinaryColumn() {
         var strategy = new DefaultDataLengthPsStrategy();
         var dataLength = new DataLength(ColumnReference.of("documents", "binary_data"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dataLength, visitor, ctx);
@@ -56,7 +56,7 @@ class DefaultDataLengthPsStrategyTest {
     void handlesDataLengthWithAliasedColumn() {
         var strategy = new DefaultDataLengthPsStrategy();
         var dataLength = new DataLength(ColumnReference.of("d", "blob_field"));
-        var visitor = new PreparedStatementVisitor();
+        var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
         PsDto result = strategy.handle(dataLength, visitor, ctx);

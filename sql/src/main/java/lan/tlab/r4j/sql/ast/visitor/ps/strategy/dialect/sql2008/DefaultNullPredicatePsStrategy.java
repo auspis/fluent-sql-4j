@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullPredicatePsStrategy;
 public class DefaultNullPredicatePsStrategy implements NullPredicatePsStrategy {
 
     @Override
-    public PsDto handle(NullPredicate expression, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(NullPredicate expression, Visitor<PsDto> renderer, AstContext ctx) {
         return new PsDto("NULL", List.of());
     }
 }

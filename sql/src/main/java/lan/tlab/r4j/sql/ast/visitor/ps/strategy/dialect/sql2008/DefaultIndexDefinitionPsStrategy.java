@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementVisitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IndexDefinitionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -14,7 +14,7 @@ public class DefaultIndexDefinitionPsStrategy implements IndexDefinitionPsStrate
     private final SqlRenderer sqlRenderer = SqlRendererFactory.standardSql2008();
 
     @Override
-    public PsDto handle(IndexDefinition index, PreparedStatementVisitor visitor, AstContext ctx) {
+    public PsDto handle(IndexDefinition index, PreparedStatementRenderer renderer, AstContext ctx) {
         // Index definitions are static DDL elements without parameters
         String sql = index.accept(sqlRenderer, ctx);
         return new PsDto(sql, List.of());

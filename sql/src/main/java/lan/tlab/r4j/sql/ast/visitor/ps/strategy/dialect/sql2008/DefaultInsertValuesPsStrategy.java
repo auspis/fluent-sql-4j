@@ -11,7 +11,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InsertValuesPsStrategy;
 
 public class DefaultInsertValuesPsStrategy implements InsertValuesPsStrategy {
     @Override
-    public PsDto handle(InsertValues insertValues, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(InsertValues insertValues, Visitor<PsDto> renderer, AstContext ctx) {
         List<String> placeholders = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var expr : insertValues.getValueExpressions()) {

@@ -11,11 +11,11 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.WhereClausePsStrategy;
 
 public class DefaultWhereClausePsStrategy implements WhereClausePsStrategy {
     @Override
-    public PsDto handle(Where where, Visitor<PsDto> visitor, AstContext ctx) {
+    public PsDto handle(Where where, Visitor<PsDto> renderer, AstContext ctx) {
         Predicate cond = where.getCondition();
         if (cond instanceof NullPredicate) {
             return new PsDto("", List.of());
         }
-        return cond.accept(visitor, ctx);
+        return cond.accept(renderer, ctx);
     }
 }
