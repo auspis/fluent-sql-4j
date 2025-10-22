@@ -25,7 +25,7 @@ package lan.tlab.r4j.sql.plugin;
  * }</pre>
  *
  * @see SqlDialectPlugin
- * @see SqlDialectRegistry
+ * @see SqlDialectPluginRegistry
  * @see java.util.ServiceLoader
  * @since 1.0
  */

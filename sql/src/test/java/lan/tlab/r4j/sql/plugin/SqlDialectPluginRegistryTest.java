@@ -12,13 +12,13 @@ import lan.tlab.r4j.sql.plugin.RegistryResult.Success;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class SqlDialectRegistryTest {
+class SqlDialectPluginRegistryTest {
 
     private SqlRenderer renderer;
     private SqlDialectPlugin plugin_3_0_0;
     private SqlDialectPlugin plugin_1_7_0;
     private List<SqlDialectPlugin> plugins;
-    private SqlDialectRegistry registry;
+    private SqlDialectPluginRegistry registry;
 
     @BeforeEach
     void setUp() {
@@ -26,7 +26,7 @@ class SqlDialectRegistryTest {
         plugin_3_0_0 = SqlTestPlugin.create(renderer);
         plugin_1_7_0 = SqlTestPlugin.create("^1.7.0", renderer);
         plugins = List.of(plugin_3_0_0, plugin_1_7_0);
-        registry = SqlDialectRegistry.of(plugins);
+        registry = SqlDialectPluginRegistry.of(plugins);
     }
 
     @Test
@@ -87,7 +87,7 @@ class SqlDialectRegistryTest {
     void getRenderer_supportsNonSemVerExactMatch() {
         SqlRenderer nonSemVerRenderer = mock(SqlRenderer.class);
         SqlDialectPlugin nonSemVerPlugin = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2008", nonSemVerRenderer);
-        SqlDialectRegistry registryWithNonSemVer = SqlDialectRegistry.of(List.of(nonSemVerPlugin));
+        SqlDialectPluginRegistry registryWithNonSemVer = SqlDialectPluginRegistry.of(List.of(nonSemVerPlugin));
 
         // Exact match should work
         RegistryResult<SqlRenderer> result = registryWithNonSemVer.getRenderer(SqlTestPlugin.TEST_DIALECT, "2008");
@@ -109,8 +109,8 @@ class SqlDialectRegistryTest {
         SqlDialectPlugin plugin2011 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2011", renderer2011);
         SqlDialectPlugin plugin2016 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2016", renderer2016);
 
-        SqlDialectRegistry registryWithMultipleVersions =
-                SqlDialectRegistry.of(List.of(plugin2008, plugin2011, plugin2016));
+        SqlDialectPluginRegistry registryWithMultipleVersions =
+                SqlDialectPluginRegistry.of(List.of(plugin2008, plugin2011, plugin2016));
 
         // Each version should match its corresponding plugin
         assertThat(registryWithMultipleVersions
@@ -136,7 +136,7 @@ class SqlDialectRegistryTest {
     void getRenderer_nonSemVerVersionsCaseSensitive() {
         SqlRenderer rendererLower = mock(SqlRenderer.class);
         SqlDialectPlugin pluginLower = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "v1", rendererLower);
-        SqlDialectRegistry registryWithVersion = SqlDialectRegistry.of(List.of(pluginLower));
+        SqlDialectPluginRegistry registryWithVersion = SqlDialectPluginRegistry.of(List.of(pluginLower));
 
         // Exact case match should work
         RegistryResult<SqlRenderer> result = registryWithVersion.getRenderer(SqlTestPlugin.TEST_DIALECT, "v1");
@@ -156,7 +156,7 @@ class SqlDialectRegistryTest {
         SqlDialectPlugin semVerPlugin = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^8.0.0", semVerRenderer);
         SqlDialectPlugin nonSemVerPlugin = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "2008", nonSemVerRenderer);
 
-        SqlDialectRegistry mixedRegistry = SqlDialectRegistry.of(List.of(semVerPlugin, nonSemVerPlugin));
+        SqlDialectPluginRegistry mixedRegistry = SqlDialectPluginRegistry.of(List.of(semVerPlugin, nonSemVerPlugin));
 
         // SemVer version should match SemVer plugin
         RegistryResult<SqlRenderer> semVerResult = mixedRegistry.getRenderer(SqlTestPlugin.TEST_DIALECT, "8.0.35");
@@ -173,29 +173,30 @@ class SqlDialectRegistryTest {
 
     @Test
     void findMatchingPlugins_shouldReturnEmptyListForEmptyInput() {
-        assertThat(SqlDialectRegistry.findMatchingPlugins(Collections.emptyList(), SqlTestPlugin.BASE_VERSION))
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(Collections.emptyList(), SqlTestPlugin.BASE_VERSION))
                 .isEmpty();
     }
 
     @Test
     void findMatchingPlugins_shouldReturnAllPluginsWhenVersionIsNull() {
-        assertThat(SqlDialectRegistry.findMatchingPlugins(plugins, null)).containsExactlyElementsOf(plugins);
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(plugins, null)).containsExactlyElementsOf(plugins);
     }
 
     @Test
     void findMatchingPlugins_shouldReturnAllPluginsWhenVersionIsEmpty() {
-        assertThat(SqlDialectRegistry.findMatchingPlugins(plugins, "   ")).containsExactlyElementsOf(plugins);
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(plugins, "   ")).containsExactlyElementsOf(plugins);
     }
 
     @Test
     void findMatchingPlugins_shouldFilterByVersion() {
-        assertThat(SqlDialectRegistry.findMatchingPlugins(plugins, SqlTestPlugin.BASE_VERSION))
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(plugins, SqlTestPlugin.BASE_VERSION))
                 .containsExactly(plugin_3_0_0);
     }
 
     @Test
     void findMatchingPlugins_shouldReturnEmptyWhenNoVersionMatches() {
-        assertThat(SqlDialectRegistry.findMatchingPlugins(plugins, "9.0.0")).isEmpty();
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(plugins, "9.0.0"))
+                .isEmpty();
     }
 
     @Test
@@ -209,13 +210,13 @@ class SqlDialectRegistryTest {
         List<SqlDialectPlugin> nonSemVerPlugins = List.of(plugin2008, plugin2011);
 
         // Exact match should work
-        assertThat(SqlDialectRegistry.findMatchingPlugins(nonSemVerPlugins, "2008"))
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(nonSemVerPlugins, "2008"))
                 .containsExactly(plugin2008);
-        assertThat(SqlDialectRegistry.findMatchingPlugins(nonSemVerPlugins, "2011"))
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(nonSemVerPlugins, "2011"))
                 .containsExactly(plugin2011);
 
         // Non-matching version should return empty
-        assertThat(SqlDialectRegistry.findMatchingPlugins(nonSemVerPlugins, "2016"))
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(nonSemVerPlugins, "2016"))
                 .isEmpty();
     }
 
@@ -230,17 +231,18 @@ class SqlDialectRegistryTest {
         List<SqlDialectPlugin> mixedPlugins = List.of(semVerPlugin, nonSemVerPlugin);
 
         // SemVer version should match SemVer plugin only
-        assertThat(SqlDialectRegistry.findMatchingPlugins(mixedPlugins, "8.0.35"))
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(mixedPlugins, "8.0.35"))
                 .containsExactly(semVerPlugin);
 
         // Non-SemVer version should match non-SemVer plugin only
-        assertThat(SqlDialectRegistry.findMatchingPlugins(mixedPlugins, "2008")).containsExactly(nonSemVerPlugin);
+        assertThat(SqlDialectPluginRegistry.findMatchingPlugins(mixedPlugins, "2008"))
+                .containsExactly(nonSemVerPlugin);
     }
 
     @Test
     void findMatchingPlugins_shouldBeIdempotent() {
-        List<SqlDialectPlugin> result1 = SqlDialectRegistry.findMatchingPlugins(plugins, "3.5.0");
-        List<SqlDialectPlugin> result2 = SqlDialectRegistry.findMatchingPlugins(plugins, "3.5.0");
+        List<SqlDialectPlugin> result1 = SqlDialectPluginRegistry.findMatchingPlugins(plugins, "3.5.0");
+        List<SqlDialectPlugin> result2 = SqlDialectPluginRegistry.findMatchingPlugins(plugins, "3.5.0");
 
         assertThat(result1).isEqualTo(result2);
     }
@@ -249,11 +251,11 @@ class SqlDialectRegistryTest {
 
     @Test
     void register_returnsNewInstanceWithoutModifyingOriginal() {
-        SqlDialectRegistry original = SqlDialectRegistry.empty();
+        SqlDialectPluginRegistry original = SqlDialectPluginRegistry.empty();
         SqlRenderer newRenderer = mock(SqlRenderer.class);
         SqlDialectPlugin newPlugin = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^8.0.0", newRenderer);
 
-        SqlDialectRegistry withPlugin = original.register(newPlugin);
+        SqlDialectPluginRegistry withPlugin = original.register(newPlugin);
 
         assertThat(original.isEmpty()).isTrue();
         assertThat(original.size()).isZero();
@@ -271,8 +273,10 @@ class SqlDialectRegistryTest {
         SqlDialectPlugin plugin2 = SqlTestPlugin.create(SqlTestPlugin.OTHER_DIALECT, "^14.0.0", renderer2);
         SqlDialectPlugin plugin3 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^5.7.0", renderer3);
 
-        SqlDialectRegistry chained =
-                SqlDialectRegistry.empty().register(plugin1).register(plugin2).register(plugin3);
+        SqlDialectPluginRegistry chained = SqlDialectPluginRegistry.empty()
+                .register(plugin1)
+                .register(plugin2)
+                .register(plugin3);
 
         assertThat(chained.size()).isEqualTo(3);
         assertThat(chained.getSupportedDialects())
@@ -287,10 +291,10 @@ class SqlDialectRegistryTest {
         SqlDialectPlugin plugin1 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^8.0.0", renderer1);
         SqlDialectPlugin plugin2 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^5.7.0", renderer2);
 
-        SqlDialectRegistry withOne = SqlDialectRegistry.empty().register(plugin1);
+        SqlDialectPluginRegistry withOne = SqlDialectPluginRegistry.empty().register(plugin1);
         assertThat(withOne.size()).isEqualTo(1);
 
-        SqlDialectRegistry withTwo = withOne.register(plugin2);
+        SqlDialectPluginRegistry withTwo = withOne.register(plugin2);
         assertThat(withTwo.size()).isEqualTo(2);
         assertThat(withTwo.getSupportedDialects()).containsExactly(SqlTestPlugin.TEST_DIALECT);
     }
@@ -303,10 +307,10 @@ class SqlDialectRegistryTest {
         SqlDialectPlugin plugin1 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^8.0.0", renderer1);
         SqlDialectPlugin plugin2 = SqlTestPlugin.create(SqlTestPlugin.OTHER_DIALECT, "^14.0.0", renderer2);
 
-        SqlDialectRegistry withFirst = SqlDialectRegistry.empty().register(plugin1);
+        SqlDialectPluginRegistry withFirst = SqlDialectPluginRegistry.empty().register(plugin1);
         assertThat(withFirst.getSupportedDialects()).containsExactly(SqlTestPlugin.TEST_DIALECT);
 
-        SqlDialectRegistry withBoth = withFirst.register(plugin2);
+        SqlDialectPluginRegistry withBoth = withFirst.register(plugin2);
         assertThat(withBoth.getSupportedDialects())
                 .containsExactlyInAnyOrder(SqlTestPlugin.TEST_DIALECT, SqlTestPlugin.OTHER_DIALECT);
     }
@@ -321,8 +325,10 @@ class SqlDialectRegistryTest {
         SqlDialectPlugin plugin2 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^5.7.0", renderer2);
         SqlDialectPlugin plugin3 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^5.6.0", renderer3);
 
-        SqlDialectRegistry ordered =
-                SqlDialectRegistry.empty().register(plugin1).register(plugin2).register(plugin3);
+        SqlDialectPluginRegistry ordered = SqlDialectPluginRegistry.empty()
+                .register(plugin1)
+                .register(plugin2)
+                .register(plugin3);
 
         RegistryResult<SqlRenderer> result = ordered.getRenderer(SqlTestPlugin.TEST_DIALECT, "8.0.35");
 
@@ -338,8 +344,8 @@ class SqlDialectRegistryTest {
         SqlDialectPlugin plugin1 = SqlTestPlugin.create(SqlTestPlugin.TEST_DIALECT, "^8.0.0", renderer1);
         SqlDialectPlugin plugin2 = SqlTestPlugin.create(SqlTestPlugin.OTHER_DIALECT, "^14.0.0", renderer2);
 
-        SqlDialectRegistry registry1 = SqlDialectRegistry.empty().register(plugin1);
-        SqlDialectRegistry registry2 = registry1.register(plugin2);
+        SqlDialectPluginRegistry registry1 = SqlDialectPluginRegistry.empty().register(plugin1);
+        SqlDialectPluginRegistry registry2 = registry1.register(plugin2);
 
         assertThat(registry1.size()).isEqualTo(1);
         assertThat(registry1.getSupportedDialects()).containsExactly(SqlTestPlugin.TEST_DIALECT);
@@ -354,37 +360,47 @@ class SqlDialectRegistryTest {
     @Test
     void matchesVersion_shouldMatchSemVerWithSemVerRange() {
         // SemVer version with SemVer range
-        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "^8.0.0", true)).isTrue();
-        assertThat(SqlDialectRegistry.matchesVersion("8.5.0", "^8.0.0", true)).isTrue();
-        assertThat(SqlDialectRegistry.matchesVersion("9.0.0", "^8.0.0", true)).isFalse();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("8.0.35", "^8.0.0", true))
+                .isTrue();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("8.5.0", "^8.0.0", true))
+                .isTrue();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("9.0.0", "^8.0.0", true))
+                .isFalse();
     }
 
     @Test
     void matchesVersion_shouldMatchSemVerWithExactVersion() {
         // SemVer exact match
-        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "8.0.35", true)).isTrue();
-        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "8.0.36", true)).isFalse();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("8.0.35", "8.0.35", true))
+                .isTrue();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("8.0.35", "8.0.36", true))
+                .isFalse();
     }
 
     @Test
     void matchesVersion_shouldMatchNonSemVerWithExactString() {
         // Non-SemVer version with exact string match
-        assertThat(SqlDialectRegistry.matchesVersion("2008", "2008", false)).isTrue();
-        assertThat(SqlDialectRegistry.matchesVersion("2008", "2011", false)).isFalse();
-        assertThat(SqlDialectRegistry.matchesVersion("v1", "v1", false)).isTrue();
-        assertThat(SqlDialectRegistry.matchesVersion("v1", "V1", false)).isFalse();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("2008", "2008", false))
+                .isTrue();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("2008", "2011", false))
+                .isFalse();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("v1", "v1", false)).isTrue();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("v1", "V1", false)).isFalse();
     }
 
     @Test
     void matchesVersion_shouldHandleNonSemVerRequestWithSemVerPlugin() {
         // Non-SemVer request version with SemVer plugin should use exact match
-        assertThat(SqlDialectRegistry.matchesVersion("2008", "^8.0.0", false)).isFalse();
-        assertThat(SqlDialectRegistry.matchesVersion("latest", "^8.0.0", false)).isFalse();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("2008", "^8.0.0", false))
+                .isFalse();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("latest", "^8.0.0", false))
+                .isFalse();
     }
 
     @Test
     void matchesVersion_shouldHandleSemVerRequestWithNonSemVerPlugin() {
         // SemVer request version with non-SemVer plugin - will try SemVer match and fail
-        assertThat(SqlDialectRegistry.matchesVersion("8.0.35", "2008", true)).isFalse();
+        assertThat(SqlDialectPluginRegistry.matchesVersion("8.0.35", "2008", true))
+                .isFalse();
     }
 }
