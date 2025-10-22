@@ -1,6 +1,15 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql;
 
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.fetch.FetchRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateTimeRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DataLengthRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 
 /**
@@ -49,11 +58,11 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * RegistryResult<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
+ * RegistryResult<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
- * SqlRenderer renderer = plugin.createRenderer();
+ * DialectRenderer renderer = plugin.createRenderer();
  * }</pre>
  * <p>
  * <b>Version Matching:</b>
@@ -95,7 +104,6 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
  *
  * @see SqlDialectPlugin
  * @see MySQLDialectPluginProvider
- * @see SqlRendererFactory#mysql()
  * @see <a href="https://dev.mysql.com/doc/">MySQL Documentation</a>
  * @see <a href="https://dev.mysql.com/doc/refman/8.0/en/">MySQL 8.0 Reference Manual</a>
  * @since 1.0
@@ -124,7 +132,7 @@ public final class MySQLDialectPlugin {
     public static final String DIALECT_VERSION = "^8.0.0";
 
     private static final SqlDialectPlugin INSTANCE =
-            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, SqlRendererFactory::mysql);
+            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, MySQLDialectPlugin::createMySqlRenderer);
 
     /**
      * Private constructor to prevent instantiation.
@@ -137,6 +145,40 @@ public final class MySQLDialectPlugin {
     }
 
     /**
+     * Creates the MySQL-specific renderers.
+     * <p>
+     * This method creates both the {@link SqlRenderer} and {@link PreparedStatementRenderer}
+     * configured specifically for MySQL syntax, including:
+     * <ul>
+     *   <li>Backtick identifier escaping</li>
+     *   <li>LIMIT/OFFSET pagination syntax</li>
+     *   <li>CURDATE() for current date</li>
+     *   <li>NOW() for current timestamp</li>
+     *   <li>DATE_ADD/DATE_SUB for date arithmetic</li>
+     *   <li>CONCAT() for string concatenation</li>
+     *   <li>LENGTH() for data length</li>
+     * </ul>
+     *
+     * @return a new {@link DialectRenderer} instance configured for MySQL, never {@code null}
+     */
+    private static DialectRenderer createMySqlRenderer() {
+        SqlRenderer sqlRenderer = SqlRenderer.builder()
+                .escapeStrategy(EscapeStrategy.mysql())
+                .paginationStrategy(FetchRenderStrategy.mysql())
+                .currentDateStrategy(CurrentDateRenderStrategy.mysql())
+                .currentDateTimeStrategy(CurrentDateTimeRenderStrategy.mysql())
+                .dateArithmeticStrategy(DateArithmeticRenderStrategy.mysql())
+                .concatStrategy(ConcatRenderStrategy.mysql())
+                .dataLengthStrategy(DataLengthRenderStrategy.mysql())
+                .build();
+
+        PreparedStatementRenderer psRenderer =
+                PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
+
+        return new DialectRenderer(sqlRenderer, psRenderer);
+    }
+
+    /**
      * Returns the singleton instance of the MySQL dialect plugin.
      * <p>
      * This method is thread-safe and always returns the same instance. The plugin
@@ -145,7 +187,7 @@ public final class MySQLDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-     * SqlRenderer renderer = plugin.createRenderer();
+     * DialectRenderer renderer = plugin.createRenderer();
      * }</pre>
      *
      * @return the singleton MySQL dialect plugin instance, never {@code null}

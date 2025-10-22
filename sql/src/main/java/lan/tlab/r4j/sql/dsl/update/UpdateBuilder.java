@@ -17,10 +17,8 @@ import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.dsl.SupportsWhere;
 import lan.tlab.r4j.sql.dsl.WhereConditionBuilder;
@@ -28,12 +26,12 @@ import lan.tlab.r4j.sql.dsl.util.LiteralUtil;
 
 public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
     private UpdateStatement.UpdateStatementBuilder statementBuilder = UpdateStatement.builder();
-    private final SqlRenderer sqlRenderer;
+    private final DialectRenderer renderer;
     private TableIdentifier table;
     private final List<UpdateItem> setItems = new ArrayList<>();
 
-    public UpdateBuilder(SqlRenderer sqlRenderer, String tableName) {
-        this.sqlRenderer = sqlRenderer;
+    public UpdateBuilder(DialectRenderer renderer, String tableName) {
+        this.renderer = renderer;
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
@@ -138,14 +136,13 @@ public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
     public String build() {
         validateState();
         UpdateStatement updateStatement = getCurrentStatement();
-        return updateStatement.accept(sqlRenderer, new AstContext());
+        return renderer.renderSql(updateStatement);
     }
 
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
-        UpdateStatement stmt = getCurrentStatement();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = stmt.accept(renderer, new AstContext());
+        UpdateStatement statement = getCurrentStatement();
+        PsDto result = renderer.renderPreparedStatement(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {
