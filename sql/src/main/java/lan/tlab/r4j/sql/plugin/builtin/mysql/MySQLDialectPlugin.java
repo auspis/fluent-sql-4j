@@ -105,7 +105,7 @@ public final class MySQLDialectPlugin {
     /**
      * The canonical name for the MySQL dialect.
      * <p>
-     * This name is used for plugin registration and lookup in the {@link lan.tlab.r4j.sql.plugin.SqlDialectRegistry}.
+     * This name is used for plugin registration and lookup in the {@link lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry}.
      * The registry performs case-insensitive matching, so "MySQL", "mysql", and "MYSQL"
      * will all match this dialect.
      */
