@@ -9,7 +9,6 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class DefaultColumnDefinitionPsStrategy implements ColumnDefinitionPsStrategy {
 
@@ -26,8 +25,9 @@ public class DefaultColumnDefinitionPsStrategy implements ColumnDefinitionPsStra
         String columnName = renderer.getEscapeStrategy().apply(columnDefinition.getName());
         builder.append(columnName);
 
-        // Handle data type using SQL renderer since data types are static DDL elements
-        String typeString = columnDefinition.getType().accept(SqlRendererFactory.standardSql2008(), ctx);
+        // Handle data type using the SQL renderer from the PreparedStatementRenderer
+        // This ensures we use the same dialect configuration
+        String typeString = columnDefinition.getType().accept(renderer.getSqlRenderer(), ctx);
         builder.append(" ").append(typeString);
 
         // Handle constraints (NOT NULL, DEFAULT) - these may have parameters

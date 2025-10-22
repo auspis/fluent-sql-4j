@@ -6,17 +6,14 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UniqueConstraintPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class DefaultUniqueConstraintPsStrategy implements UniqueConstraintPsStrategy {
-
-    private final SqlRenderer sqlRenderer = SqlRendererFactory.standardSql2008();
 
     @Override
     public PsDto handle(UniqueConstraintDefinition constraint, PreparedStatementRenderer renderer, AstContext ctx) {
         // Unique constraints are static DDL elements without parameters
-        String sql = constraint.accept(sqlRenderer, ctx);
+        // Use the SQL renderer from the PreparedStatementRenderer to ensure dialect consistency
+        String sql = constraint.accept(renderer.getSqlRenderer(), ctx);
         return new PsDto(sql, List.of());
     }
 }
