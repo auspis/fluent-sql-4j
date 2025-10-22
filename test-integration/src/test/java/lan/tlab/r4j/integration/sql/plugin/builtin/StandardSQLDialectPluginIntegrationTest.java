@@ -14,7 +14,7 @@ import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
 import lan.tlab.r4j.sql.plugin.RegistryResult;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectRegistry;
+import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,13 +29,13 @@ import org.junit.jupiter.api.Test;
  */
 class StandardSQLDialectPluginIntegrationTest {
 
-    private SqlDialectRegistry registry;
+    private SqlDialectPluginRegistry registry;
     private Connection connection;
 
     @BeforeEach
     void setUp() throws SQLException {
         // Create registry with ServiceLoader to test plugin discovery
-        registry = SqlDialectRegistry.createWithServiceLoader();
+        registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Set up database for renderer functionality tests
         connection = TestDatabaseUtil.createH2Connection();
@@ -177,12 +177,12 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldWorkWithRegistryManualRegistration() {
         // Create a new empty registry and manually register the plugin
-        SqlDialectRegistry emptyRegistry = SqlDialectRegistry.empty();
+        SqlDialectPluginRegistry emptyRegistry = SqlDialectPluginRegistry.empty();
         assertThat(emptyRegistry.isSupported(DIALECT_NAME)).isFalse();
 
         // Register the plugin
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-        SqlDialectRegistry newRegistry = emptyRegistry.register(plugin);
+        SqlDialectPluginRegistry newRegistry = emptyRegistry.register(plugin);
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();

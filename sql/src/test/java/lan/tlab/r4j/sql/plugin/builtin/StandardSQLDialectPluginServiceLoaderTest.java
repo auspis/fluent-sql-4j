@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.plugin.RegistryResult;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
-import lan.tlab.r4j.sql.plugin.SqlDialectRegistry;
+import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginServiceLoaderTest {
@@ -36,7 +36,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
 
     @Test
     void shouldBeRegisteredInRegistry() {
-        SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+        SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         assertThat(registry.isSupported("StandardSQL")).isTrue();
         assertThat(registry.isSupported("standardsql")).isTrue(); // case-insensitive
@@ -44,7 +44,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
 
     @Test
     void shouldProvideRendererViaRegistry() {
-        SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+        SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         RegistryResult<SqlRenderer> result = registry.getRenderer("StandardSQL", "2008");
 
@@ -54,7 +54,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
 
     @Test
     void shouldProvideRendererViaRegistryCaseInsensitive() {
-        SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+        SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Test various case combinations
         RegistryResult<SqlRenderer> result1 = registry.getRenderer("standardsql", "2008");
@@ -68,7 +68,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
 
     @Test
     void shouldUseExactVersionMatching() {
-        SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+        SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Exact match should work
         RegistryResult<SqlRenderer> exactMatch = registry.getRenderer("StandardSQL", "2008");
@@ -81,7 +81,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
 
     @Test
     void shouldProvideRendererWithoutVersion() {
-        SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+        SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // When version is not specified, should return the first available plugin
         RegistryResult<SqlRenderer> result = registry.getRenderer("StandardSQL");
