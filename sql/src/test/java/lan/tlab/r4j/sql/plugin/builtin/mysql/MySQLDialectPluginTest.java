@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ class MySQLDialectPluginTest {
     @Test
     void shouldCreateValidRenderer() {
         SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-        SqlRenderer renderer = plugin.createRenderer();
+        DialectRenderer renderer = plugin.createRenderer();
 
         assertThat(renderer).isNotNull();
     }
@@ -44,8 +44,8 @@ class MySQLDialectPluginTest {
     void shouldCreateNewRendererOnEachCall() {
         SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
 
-        SqlRenderer renderer1 = plugin.createRenderer();
-        SqlRenderer renderer2 = plugin.createRenderer();
+        DialectRenderer renderer1 = plugin.createRenderer();
+        DialectRenderer renderer2 = plugin.createRenderer();
 
         // Verify that each call creates a new instance
         assertThat(renderer1).isNotSameAs(renderer2);
@@ -66,7 +66,7 @@ class MySQLDialectPluginTest {
     @Test
     void shouldCreateRendererCompatibleWithMySQL() {
         SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-        SqlRenderer renderer = plugin.createRenderer();
+        DialectRenderer renderer = plugin.createRenderer();
 
         // Verify renderer is configured for MySQL
         assertThat(renderer).isNotNull();
