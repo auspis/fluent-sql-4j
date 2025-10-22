@@ -31,7 +31,7 @@ import java.util.function.Function;
  * }</pre>
  *
  * @param <T> the type of the successful result
- * @see SqlDialectRegistry
+ * @see SqlDialectPluginRegistry
  * @since 1.0
  */
 public sealed interface RegistryResult<T> {

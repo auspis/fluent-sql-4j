@@ -53,7 +53,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
  * @param dialectVersion the version this plugin supports - either a SemVer range (e.g., "^8.0.0") or exact version string (e.g., "2008")
  * @param rendererSupplier a supplier that creates new {@link SqlRenderer} instances
  * @see SqlDialectPluginProvider
- * @see SqlDialectRegistry
+ * @see SqlDialectPluginRegistry
  * @see <a href="https://semver.org/">Semantic Versioning</a>
  * @see <a href="https://github.com/npm/node-semver">NPM semver ranges</a>
  * @since 1.0
