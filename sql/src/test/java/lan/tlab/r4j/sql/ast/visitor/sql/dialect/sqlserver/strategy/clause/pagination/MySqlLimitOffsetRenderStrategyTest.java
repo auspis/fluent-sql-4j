@@ -6,7 +6,7 @@ import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.dialect.mysql.strategy.clause.pagination.MySqlLimitOffsetRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class MySqlLimitOffsetRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new MySqlLimitOffsetRenderStrategy();
-        sqlRenderer = SqlRendererFactory.mysql();
+        sqlRenderer = TestDialectRendererFactory.mysql();
     }
 
     @Test

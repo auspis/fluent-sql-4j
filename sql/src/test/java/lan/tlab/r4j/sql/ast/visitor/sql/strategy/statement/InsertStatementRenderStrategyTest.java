@@ -19,7 +19,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,7 @@ class InsertStatementRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new InsertStatementRenderStrategy();
-        renderer = SqlRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql2008();
     }
 
     @Test

@@ -6,7 +6,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class IsNotNullRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new IsNotNullRenderStrategy();
-        sqlRenderer = SqlRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql2008();
     }
 
     @Test
