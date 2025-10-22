@@ -30,10 +30,8 @@ import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.HavingConditionBuilder;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.dsl.SupportsWhere;
@@ -43,12 +41,12 @@ import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
 // TODO: Add support for SELECT AggregateCalls, subqueries, and other SQL features as needed.
 public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
-    private final SqlRenderer sqlRenderer;
+    private final DialectRenderer renderer;
     private FromSource currentFromSource;
     private TableIdentifier baseTable;
 
-    public SelectBuilder(SqlRenderer sqlRenderer, String... columns) {
-        this.sqlRenderer = sqlRenderer;
+    public SelectBuilder(DialectRenderer renderer, String... columns) {
+        this.renderer = renderer;
         if (columns != null && columns.length > 0) {
             statementBuilder = statementBuilder.select(Select.of(java.util.Arrays.stream(columns)
                     .map(column -> new ScalarExpressionProjection(ColumnReference.of("", column)))
@@ -56,8 +54,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         }
     }
 
-    public SelectBuilder(SqlRenderer sqlRenderer, Select select) {
-        this.sqlRenderer = sqlRenderer;
+    public SelectBuilder(DialectRenderer renderer, Select select) {
+        this.renderer = renderer;
         if (select != null) {
             statementBuilder = statementBuilder.select(select);
         }
@@ -397,14 +395,13 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     public String build() {
         validateState();
         SelectStatement selectStatement = getCurrentStatement();
-        return selectStatement.accept(sqlRenderer, new AstContext());
+        return renderer.renderSql(selectStatement);
     }
 
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
-        SelectStatement stmt = getCurrentStatement();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = stmt.accept(renderer, new AstContext());
+        SelectStatement statement = getCurrentStatement();
+        PsDto result = renderer.renderPreparedStatement(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {
