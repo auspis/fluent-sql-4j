@@ -8,15 +8,15 @@ import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 
 public class SelectProjectionBuilder {
-    private final SqlRenderer sqlRenderer;
+    private final DialectRenderer renderer;
     private final List<Projection> projections;
     private Projection pendingProjection;
 
-    public SelectProjectionBuilder(SqlRenderer sqlRenderer) {
-        this.sqlRenderer = sqlRenderer;
+    public SelectProjectionBuilder(DialectRenderer renderer) {
+        this.renderer = renderer;
         this.projections = new ArrayList<>();
         this.pendingProjection = null;
     }
@@ -121,7 +121,7 @@ public class SelectProjectionBuilder {
         }
 
         Select select = Select.of(projections.toArray(new Projection[0]));
-        SelectBuilder selectBuilder = new SelectBuilder(sqlRenderer, select);
+        SelectBuilder selectBuilder = new SelectBuilder(renderer, select);
         return selectBuilder.from(tableName);
     }
 

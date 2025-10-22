@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.plugin;
 
 import java.util.Objects;
 import java.util.function.Supplier;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 
 /**
  * Immutable record representing a SQL dialect plugin.
@@ -26,7 +26,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
  * var plugin = new SqlDialectPlugin(
  *     "mysql",
  *     "^8.0.0",  // Supports all MySQL 8.x versions
- *     MySqlRenderer::new
+ *     () -> createMySqlDialectRenderer()
  * );
  * }</pre>
  * <p>
@@ -35,7 +35,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
  * var plugin = new SqlDialectPlugin(
  *     "standardsql",
  *     "2008",  // Supports exactly SQL:2008 standard
- *     StandardSqlRenderer::new
+ *     () -> createStandardSqlDialectRenderer()
  * );
  * }</pre>
  * <p>
@@ -51,14 +51,15 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
  *
  * @param dialectName the canonical name of the SQL dialect in lowercase (e.g., "mysql", "postgresql", "standardsql")
  * @param dialectVersion the version this plugin supports - either a SemVer range (e.g., "^8.0.0") or exact version string (e.g., "2008")
- * @param rendererSupplier a supplier that creates new {@link SqlRenderer} instances
+ * @param rendererSupplier a supplier that creates new {@link DialectRenderer} instances
  * @see SqlDialectPluginProvider
  * @see SqlDialectPluginRegistry
+ * @see DialectRenderer
  * @see <a href="https://semver.org/">Semantic Versioning</a>
  * @see <a href="https://github.com/npm/node-semver">NPM semver ranges</a>
  * @since 1.0
  */
-public record SqlDialectPlugin(String dialectName, String dialectVersion, Supplier<SqlRenderer> rendererSupplier) {
+public record SqlDialectPlugin(String dialectName, String dialectVersion, Supplier<DialectRenderer> rendererSupplier) {
 
     /**
      * Compact constructor with validation.
@@ -82,19 +83,19 @@ public record SqlDialectPlugin(String dialectName, String dialectVersion, Suppli
     }
 
     /**
-     * Creates a {@link SqlRenderer} configured for this SQL dialect.
+     * Creates a {@link DialectRenderer} configured for this SQL dialect.
      * <p>
-     * The renderer is responsible for converting the abstract syntax tree (AST) representation
-     * of SQL statements into dialect-specific SQL text.
+     * The renderer encapsulates both SQL and PreparedStatement rendering,
+     * ensuring consistency between SQL generation and prepared statement creation.
      * <p>
      * <b>Thread Safety:</b> The thread safety of the returned renderer depends on the
      * {@code rendererSupplier} implementation. It is recommended that the supplier creates
-     * a new instance on each invocation to ensure thread safety (e.g., using a constructor
-     * reference like {@code MySqlRenderer::new}).
+     * a new instance on each invocation to ensure thread safety (e.g., using a method
+     * reference like {@code this::createMySqlDialectRenderer}).
      *
-     * @return a fully configured {@link SqlRenderer} instance, never {@code null}
+     * @return a fully configured {@link DialectRenderer} instance, never {@code null}
      */
-    public SqlRenderer createRenderer() {
+    public DialectRenderer createRenderer() {
         return rendererSupplier.get();
     }
 }
