@@ -6,16 +6,15 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CreateTableStatementPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 
 public class DefaultCreateTableStatementPsStrategy implements CreateTableStatementPsStrategy {
 
     @Override
     public PsDto handle(CreateTableStatement createTableStatement, PreparedStatementRenderer renderer, AstContext ctx) {
-        // For CREATE TABLE statements, we use the SQL renderer since DDL statements typically don't have parameters
+        // For CREATE TABLE statements, we use the SQL renderer from the PreparedStatementRenderer
+        // This ensures we use the same dialect configuration
         String sql = String.format(
-                "CREATE TABLE %s",
-                createTableStatement.getTableDefinition().accept(SqlRendererFactory.standardSql2008(), ctx));
+                "CREATE TABLE %s", createTableStatement.getTableDefinition().accept(renderer.getSqlRenderer(), ctx));
 
         return new PsDto(sql, Collections.emptyList());
     }
