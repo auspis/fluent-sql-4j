@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import org.junit.jupiter.api.Test;
 
 class SqlDialectPluginTest {
 
     @Test
     void shouldCreateValidPlugin() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
         SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> renderer);
 
         assertThat(plugin.dialectName()).isEqualTo("mysql");
@@ -21,7 +21,7 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldRejectNullDialectName() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
 
         assertThatThrownBy(() -> new SqlDialectPlugin(null, "^8.0.0", () -> renderer))
                 .isInstanceOf(NullPointerException.class)
@@ -30,7 +30,7 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldRejectNullDialectVersion() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
 
         assertThatThrownBy(() -> new SqlDialectPlugin("mysql", null, () -> renderer))
                 .isInstanceOf(NullPointerException.class)
@@ -46,7 +46,7 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldRejectBlankVersionRange() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
 
         assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "", () -> renderer))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -61,7 +61,7 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldAllowNonSemVerVersion() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
 
         // Non-SemVer versions like "2008" should be allowed for exact matching
         SqlDialectPlugin plugin = new SqlDialectPlugin("standardsql", "2008", () -> renderer);
@@ -73,7 +73,7 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldAllowArbitraryVersionString() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
 
         // Arbitrary version strings should be allowed
         SqlDialectPlugin plugin1 = new SqlDialectPlugin("customdb", "2011", () -> renderer);
@@ -87,8 +87,8 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldHaveValueSemantics() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
-        java.util.function.Supplier<SqlRenderer> factory = () -> renderer;
+        DialectRenderer renderer = mock(DialectRenderer.class);
+        java.util.function.Supplier<DialectRenderer> factory = () -> renderer;
 
         SqlDialectPlugin plugin1 = new SqlDialectPlugin("mysql", "^8.0.0", factory);
         SqlDialectPlugin plugin2 = new SqlDialectPlugin("mysql", "^8.0.0", factory);
@@ -100,7 +100,7 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldBeImmutable() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
         SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> renderer);
 
         // All fields are final by record definition
@@ -113,8 +113,8 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldCreateNewRendererOnEachCall() {
-        SqlRenderer renderer1 = mock(SqlRenderer.class);
-        SqlRenderer renderer2 = mock(SqlRenderer.class);
+        DialectRenderer renderer1 = mock(DialectRenderer.class);
+        DialectRenderer renderer2 = mock(DialectRenderer.class);
 
         int[] callCount = {0};
         SqlDialectPlugin plugin =
@@ -127,7 +127,7 @@ class SqlDialectPluginTest {
     @Test
     void shouldSupportMethodReferences() {
         // Record works well with functional programming
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
 
         SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> renderer);
 
@@ -137,7 +137,7 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldHaveToString() {
-        SqlRenderer renderer = mock(SqlRenderer.class);
+        DialectRenderer renderer = mock(DialectRenderer.class);
         SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> renderer);
 
         String toString = plugin.toString();

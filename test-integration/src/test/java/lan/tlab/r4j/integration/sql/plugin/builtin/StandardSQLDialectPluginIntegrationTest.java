@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
 import lan.tlab.r4j.sql.plugin.RegistryResult;
@@ -57,29 +57,29 @@ class StandardSQLDialectPluginIntegrationTest {
 
     @Test
     void getRenderer() {
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
-        SqlRenderer renderer = result.orElseThrow();
+        DialectRenderer renderer = result.orElseThrow();
         assertThat(renderer).isNotNull();
     }
 
     @Test
     void versionMatching() {
-        RegistryResult<SqlRenderer> exactMatch = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        RegistryResult<DialectRenderer> exactMatch = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(exactMatch).isInstanceOf(RegistryResult.Success.class);
 
-        RegistryResult<SqlRenderer> wrongVersion = registry.getRenderer(DIALECT_NAME, "2011");
+        RegistryResult<DialectRenderer> wrongVersion = registry.getDialectRenderer(DIALECT_NAME, "2011");
         assertThat(wrongVersion).isInstanceOf(RegistryResult.Failure.class);
 
-        RegistryResult<SqlRenderer> wrongVersion2 = registry.getRenderer(DIALECT_NAME, "2016");
+        RegistryResult<DialectRenderer> wrongVersion2 = registry.getDialectRenderer(DIALECT_NAME, "2016");
         assertThat(wrongVersion2).isInstanceOf(RegistryResult.Failure.class);
     }
 
     @Test
     void getRendererWithoutVersion() {
         // When version is not specified, should return available plugin
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME);
+        RegistryResult<DialectRenderer> result = registry.getRenderer(DIALECT_NAME);
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
@@ -88,8 +88,8 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldProduceWorkingRenderer() throws SQLException {
         // Get renderer from registry
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
-        SqlRenderer renderer = result.orElseThrow();
+        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
+        DialectRenderer renderer = result.orElseThrow();
 
         // Verify renderer works with real queries using the DSL
         String sql = DSL.select(renderer, "name", "email").from("users").build();
@@ -112,8 +112,8 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldGenerateStandardSQLSyntax() {
         // Get renderer from registry
-        SqlRenderer renderer =
-                registry.getRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
 
         // Verify it generates standard SQL:2008 syntax for pagination using the DSL
         String paginationSql = DSL.select(renderer, "name")
@@ -130,7 +130,8 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldUseRendererForDifferentDSLOperations() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer("StandardSQL", "2008").orElseThrow();
+        DialectRenderer renderer =
+                registry.getDialectRenderer("StandardSQL", "2008").orElseThrow();
 
         // Test SELECT with WHERE using the custom renderer
         String selectSql = DSL.select(renderer, "name", "age")
@@ -186,7 +187,7 @@ class StandardSQLDialectPluginIntegrationTest {
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
-        RegistryResult<SqlRenderer> result = newRegistry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        RegistryResult<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
     }
 }
