@@ -36,7 +36,7 @@ class MySQLDialectPluginIntegrationTest {
     @Container
     @SuppressWarnings("resource")
     private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
-            .withDatabaseName("testdb")
+            .withDatabaseName("test-db")
             .withUsername("test")
             .withPassword("test");
 
