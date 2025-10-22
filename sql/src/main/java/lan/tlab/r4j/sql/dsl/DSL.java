@@ -27,7 +27,7 @@ public class DSL {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
         return registry.getDialectRenderer(
                         StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
-                .orElse(StandardSQLDialectPlugin.instance().createRenderer());
+                .orElseThrow();
     }
 
     public static CreateTableBuilder createTable(String tableName) {
