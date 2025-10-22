@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class OrderByRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new OrderByRenderStrategy();
-        sqlRenderer = SqlRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql2008();
     }
 
     @Test
