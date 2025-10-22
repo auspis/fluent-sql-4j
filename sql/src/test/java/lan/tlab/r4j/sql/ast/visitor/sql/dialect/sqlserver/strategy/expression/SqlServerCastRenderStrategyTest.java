@@ -7,8 +7,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CastRenderStrategy;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class SqlServerCastRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = CastRenderStrategy.sqlServer();
-        sqlRenderer = SqlRendererFactory.sqlServer();
+        sqlRenderer = TestDialectRendererFactory.sqlServer();
     }
 
     @Test
