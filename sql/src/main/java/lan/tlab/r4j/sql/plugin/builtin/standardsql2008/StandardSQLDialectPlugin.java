@@ -1,6 +1,8 @@
 package lan.tlab.r4j.sql.plugin.builtin.standardsql2008;
 
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 
 /**
@@ -34,11 +36,11 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * RegistryResult<SqlRenderer> result = registry.getRenderer("standardsql", "2008");
+ * RegistryResult<DialectRenderer> result = registry.getRenderer("standardsql", "2008");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
- * SqlRenderer renderer = plugin.createRenderer();
+ * DialectRenderer renderer = plugin.createRenderer();
  * }</pre>
  * <p>
  * <b>Version Matching:</b>
@@ -54,7 +56,6 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
  *
  * @see SqlDialectPlugin
  * @see StandardSQLDialectPluginProvider
- * @see SqlRendererFactory#standardSql2008()
  * @see <a href="https://en.wikipedia.org/wiki/SQL:2008">SQL:2008 Standard</a>
  * @since 1.0
  */
@@ -77,8 +78,8 @@ public final class StandardSQLDialectPlugin {
      */
     public static final String DIALECT_VERSION = "2008";
 
-    private static final SqlDialectPlugin INSTANCE =
-            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, SqlRendererFactory::standardSql2008);
+    private static final SqlDialectPlugin INSTANCE = new SqlDialectPlugin(
+            DIALECT_NAME, DIALECT_VERSION, StandardSQLDialectPlugin::createStandardSql2008Renderer);
 
     /**
      * Private constructor to prevent instantiation.
@@ -91,6 +92,23 @@ public final class StandardSQLDialectPlugin {
     }
 
     /**
+     * Creates a {@link DialectRenderer} for Standard SQL:2008.
+     * <p>
+     * This method creates both SQL and PreparedStatement renderers configured
+     * for the SQL:2008 standard, ensuring consistency between the two.
+     *
+     * @return a new DialectRenderer instance
+     */
+    private static DialectRenderer createStandardSql2008Renderer() {
+        SqlRenderer sqlRenderer = SqlRenderer.builder().build();
+
+        PreparedStatementRenderer psRenderer =
+                PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
+
+        return new DialectRenderer(sqlRenderer, psRenderer);
+    }
+
+    /**
      * Returns the singleton instance of the Standard SQL:2008 dialect plugin.
      * <p>
      * This method is thread-safe and always returns the same instance. The plugin
@@ -99,7 +117,7 @@ public final class StandardSQLDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-     * SqlRenderer renderer = plugin.createRenderer();
+     * DialectRenderer renderer = plugin.createRenderer();
      * }</pre>
      *
      * @return the singleton Standard SQL:2008 dialect plugin instance, never {@code null}
