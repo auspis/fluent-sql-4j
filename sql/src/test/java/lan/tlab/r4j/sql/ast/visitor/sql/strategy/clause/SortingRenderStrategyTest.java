@@ -6,7 +6,7 @@ import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class SortingRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new SortingRenderStrategy();
-        sqlRenderer = SqlRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql2008();
     }
 
     @Test

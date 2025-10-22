@@ -10,8 +10,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.In
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval.IntervalUnit;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class DateArithmeticStandardSql2008RenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = DateArithmeticRenderStrategy.standardSql2008();
-        renderer = SqlRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql2008();
     }
 
     @Test

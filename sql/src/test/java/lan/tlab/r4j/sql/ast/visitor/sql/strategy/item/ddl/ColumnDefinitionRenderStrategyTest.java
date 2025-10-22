@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNul
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class ColumnDefinitionRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new ColumnDefinitionRenderStrategy();
-        renderer = SqlRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql2008();
     }
 
     @Test

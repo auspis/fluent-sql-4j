@@ -7,13 +7,13 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.Test;
 
 class ComparisonRenderStrategyTest {
 
     private final ComparisonRenderStrategy strategy = new ComparisonRenderStrategy();
-    private final SqlRenderer standardSql2008 = SqlRendererFactory.standardSql2008();
+    private final SqlRenderer standardSql2008 = TestDialectRendererFactory.standardSql2008();
 
     @Test
     void eq() {
