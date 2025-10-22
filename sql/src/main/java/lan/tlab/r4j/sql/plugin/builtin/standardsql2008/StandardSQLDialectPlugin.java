@@ -63,7 +63,7 @@ public final class StandardSQLDialectPlugin {
     /**
      * The canonical name for the Standard SQL dialect.
      * <p>
-     * This name is used for plugin registration and lookup in the {@link lan.tlab.r4j.sql.plugin.SqlDialectRegistry}.
+     * This name is used for plugin registration and lookup in the {@link lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry}.
      * The registry performs case-insensitive matching, so "StandardSQL", "standardsql", and "STANDARDSQL"
      * will all match this dialect.
      */
