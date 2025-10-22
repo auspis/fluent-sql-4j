@@ -13,17 +13,16 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 
 public class CreateTableBuilder {
 
     private TableDefinition.TableDefinitionBuilder definitionBuilder;
-    private final SqlRenderer sqlRenderer;
+    private final DialectRenderer renderer;
     private List<ColumnDefinition> columns = new ArrayList<>();
 
-    public CreateTableBuilder(SqlRenderer sqlRenderer, String tableName) {
-        this.sqlRenderer = sqlRenderer;
+    public CreateTableBuilder(DialectRenderer renderer, String tableName) {
+        this.renderer = renderer;
         this.definitionBuilder = TableDefinition.builder().name(tableName);
     }
 
@@ -165,6 +164,6 @@ public class CreateTableBuilder {
             finalBuilder = finalBuilder.columns(columns);
         }
         CreateTableStatement statement = new CreateTableStatement(finalBuilder.build());
-        return statement.accept(sqlRenderer, new AstContext());
+        return renderer.renderSql(statement);
     }
 }

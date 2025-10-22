@@ -16,8 +16,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.plugin.RegistryResult;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
@@ -120,37 +119,37 @@ class MySQLDialectPluginE2E {
 
     @Test
     void getRenderer() {
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, "8.0.35");
+        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
-        SqlRenderer renderer = result.orElseThrow();
+        DialectRenderer renderer = result.orElseThrow();
         assertThat(renderer).isNotNull();
     }
 
     @Test
     void versionMatching() {
         // Should match MySQL 8.x versions (using ^8.0.0 range)
-        RegistryResult<SqlRenderer> version800 = registry.getRenderer(DIALECT_NAME, "8.0.0");
+        RegistryResult<DialectRenderer> version800 = registry.getDialectRenderer(DIALECT_NAME, "8.0.0");
         assertThat(version800).isInstanceOf(RegistryResult.Success.class);
 
-        RegistryResult<SqlRenderer> version8035 = registry.getRenderer(DIALECT_NAME, "8.0.35");
+        RegistryResult<DialectRenderer> version8035 = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
         assertThat(version8035).isInstanceOf(RegistryResult.Success.class);
 
-        RegistryResult<SqlRenderer> version810 = registry.getRenderer(DIALECT_NAME, "8.1.0");
+        RegistryResult<DialectRenderer> version810 = registry.getDialectRenderer(DIALECT_NAME, "8.1.0");
         assertThat(version810).isInstanceOf(RegistryResult.Success.class);
 
         // Should NOT match MySQL 5.7 or 9.0
-        RegistryResult<SqlRenderer> version57 = registry.getRenderer(DIALECT_NAME, "5.7.42");
+        RegistryResult<DialectRenderer> version57 = registry.getDialectRenderer(DIALECT_NAME, "5.7.42");
         assertThat(version57).isInstanceOf(RegistryResult.Failure.class);
 
-        RegistryResult<SqlRenderer> version90 = registry.getRenderer(DIALECT_NAME, "9.0.0");
+        RegistryResult<DialectRenderer> version90 = registry.getDialectRenderer(DIALECT_NAME, "9.0.0");
         assertThat(version90).isInstanceOf(RegistryResult.Failure.class);
     }
 
     @Test
     void getRendererWithoutVersion() {
         // When version is not specified, should return available plugin
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME);
+        RegistryResult<DialectRenderer> result = registry.getRenderer(DIALECT_NAME);
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
@@ -159,8 +158,8 @@ class MySQLDialectPluginE2E {
     @Test
     void shouldProduceWorkingRenderer() throws SQLException {
         // Get renderer from registry
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, "8.0.35");
-        SqlRenderer renderer = result.orElseThrow();
+        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
+        DialectRenderer renderer = result.orElseThrow();
 
         // Verify renderer works by generating MySQL-specific SQL
         assertThat(renderer).isNotNull();
@@ -173,7 +172,7 @@ class MySQLDialectPluginE2E {
                 .from(From.fromTable("users"))
                 .build();
 
-        String sql = statement.accept(renderer, new AstContext());
+        String sql = renderer.renderSql(statement);
 
         // Should use MySQL backticks
         assertThat(sql).contains("`users`");
@@ -196,7 +195,8 @@ class MySQLDialectPluginE2E {
     @Test
     void shouldGenerateMySQLSyntaxWithBackticks() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
 
         // Use AST to verify MySQL syntax with backticks
         var statement = SelectStatement.builder()
@@ -204,7 +204,7 @@ class MySQLDialectPluginE2E {
                 .from(From.fromTable("users"))
                 .build();
 
-        String sql = statement.accept(renderer, new AstContext());
+        String sql = renderer.renderSql(statement);
 
         // MySQL uses backticks for identifier escaping
         assertThat(sql).contains("`");
@@ -216,7 +216,8 @@ class MySQLDialectPluginE2E {
     @Test
     void shouldGenerateMySQLPaginationSyntax() {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
 
         // Use AST to verify MySQL LIMIT/OFFSET syntax
         var statement = SelectStatement.builder()
@@ -226,7 +227,7 @@ class MySQLDialectPluginE2E {
                 .fetch(Fetch.builder().rows(3).offset(5).build())
                 .build();
 
-        String sql = statement.accept(renderer, new AstContext());
+        String sql = renderer.renderSql(statement);
 
         // MySQL uses LIMIT n OFFSET m syntax
         assertThat(sql).contains("LIMIT 3 OFFSET 5");
@@ -238,7 +239,8 @@ class MySQLDialectPluginE2E {
     @Test
     void shouldUseRendererForDifferentStatementTypes() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer("MySQL", "8.0.35").orElseThrow();
+        DialectRenderer renderer =
+                registry.getDialectRenderer("MySQL", "8.0.35").orElseThrow();
 
         // Test SELECT with WHERE using the AST
         var selectStatement = SelectStatement.builder()
@@ -250,7 +252,7 @@ class MySQLDialectPluginE2E {
                         Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25))))
                 .build();
 
-        String selectSql = selectStatement.accept(renderer, new AstContext());
+        String selectSql = renderer.renderSql(selectStatement);
         assertThat(selectSql).contains("WHERE");
         assertThat(selectSql).contains("`users`");
         assertThat(selectSql).contains("`name`");
@@ -292,14 +294,15 @@ class MySQLDialectPluginE2E {
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
-        RegistryResult<SqlRenderer> result = newRegistry.getRenderer(DIALECT_NAME, "8.0.35");
+        RegistryResult<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, "8.0.35");
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
     }
 
     @Test
     void shouldExecuteMySQLSpecificQueries() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
 
         // Create a query using the AST
         var statement = SelectStatement.builder()
@@ -313,7 +316,7 @@ class MySQLDialectPluginE2E {
                 .fetch(Fetch.builder().rows(5).offset(0).build())
                 .build();
 
-        String sql = statement.accept(renderer, new AstContext());
+        String sql = renderer.renderSql(statement);
 
         // Execute and verify results
         try (var ps = connection.prepareStatement(sql);

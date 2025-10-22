@@ -10,21 +10,19 @@ import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.dsl.SupportsWhere;
 import lan.tlab.r4j.sql.dsl.WhereConditionBuilder;
 
 public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
     private DeleteStatement.DeleteStatementBuilder statementBuilder = DeleteStatement.builder();
-    private final SqlRenderer sqlRenderer;
+    private final DialectRenderer renderer;
     private TableIdentifier table;
 
-    public DeleteBuilder(SqlRenderer sqlRenderer, String tableName) {
-        this.sqlRenderer = sqlRenderer;
+    public DeleteBuilder(DialectRenderer renderer, String tableName) {
+        this.renderer = renderer;
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
@@ -88,13 +86,12 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
 
     public String build() {
         DeleteStatement deleteStatement = getCurrentStatement();
-        return deleteStatement.accept(sqlRenderer, new AstContext());
+        return renderer.renderSql(deleteStatement);
     }
 
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
-        DeleteStatement stmt = getCurrentStatement();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = stmt.accept(renderer, new AstContext());
+        DeleteStatement statement = getCurrentStatement();
+        PsDto result = renderer.renderPreparedStatement(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {
