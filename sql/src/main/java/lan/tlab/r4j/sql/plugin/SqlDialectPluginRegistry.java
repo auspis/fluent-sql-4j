@@ -9,6 +9,8 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.plugin.RegistryResult.Failure;
 import lan.tlab.r4j.sql.plugin.RegistryResult.Success;
@@ -178,22 +180,25 @@ public final class SqlDialectPluginRegistry {
     }
 
     /**
-     * Retrieves a {@link SqlRenderer} for the specified SQL dialect without version matching.
+     * Retrieves a {@link DialectRenderer} for the specified SQL dialect without version matching.
      * <p>
      * This method returns the first available plugin for the given dialect, regardless of version.
-     * If you need version-specific rendering, use {@link #getRenderer(String, String)} instead.
+     * If you need version-specific rendering, use {@link #getDialectRenderer(String, String)} instead.
      * <p>
      * The dialect name is matched case-insensitively.
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @return a result containing the renderer, or a failure if the dialect is not supported
      */
-    public RegistryResult<SqlRenderer> getRenderer(String dialect) {
-        return getRenderer(dialect, null);
+    public RegistryResult<DialectRenderer> getRenderer(String dialect) {
+        return getDialectRenderer(dialect, null);
     }
 
     /**
-     * Retrieves a {@link SqlRenderer} for the specified SQL dialect and version.
+     * Retrieves a {@link DialectRenderer} for the specified SQL dialect and version.
+     * <p>
+     * The renderer encapsulates both SQL and PreparedStatement rendering,
+     * ensuring consistency between SQL generation and prepared statement creation.
      * <p>
      * The dialect name is matched case-insensitively. The registry finds all plugins
      * registered for the given dialect and filters them by version compatibility.
@@ -209,19 +214,19 @@ public final class SqlDialectPluginRegistry {
      * <p>
      * <b>Example with SemVer:</b>
      * <pre>{@code
-     * RegistryResult<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
+     * RegistryResult<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
      * }</pre>
      * <p>
      * <b>Example with non-SemVer:</b>
      * <pre>{@code
-     * RegistryResult<SqlRenderer> result = registry.getRenderer("standardsql", "2008");
+     * RegistryResult<DialectRenderer> result = registry.getRenderer("standardsql", "2008");
      * }</pre>
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @param version the database version, may be {@code null} to match any version
      * @return a result containing the renderer, or a failure if no matching plugin is found
      */
-    public RegistryResult<SqlRenderer> getRenderer(String dialect, String version) {
+    public RegistryResult<DialectRenderer> getDialectRenderer(String dialect, String version) {
         if (dialect == null) {
             return new Failure<>("Dialect name must not be null");
         }
@@ -242,6 +247,32 @@ public final class SqlDialectPluginRegistry {
         }
 
         return new Success<>(matchingPlugins.get(0).createRenderer());
+    }
+
+    /**
+     * Gets a {@link SqlRenderer} for the specified dialect and version.
+     * <p>
+     * This is a convenience method that extracts the SQL renderer from the dialect renderer.
+     *
+     * @param dialect the dialect name
+     * @param version the version to match
+     * @return a {@link RegistryResult} containing either the SQL renderer or an error message
+     */
+    public RegistryResult<SqlRenderer> getSqlRenderer(String dialect, String version) {
+        return getDialectRenderer(dialect, version).map(DialectRenderer::sqlRenderer);
+    }
+
+    /**
+     * Gets a {@link PreparedStatementRenderer} for the specified dialect and version.
+     * <p>
+     * This is a convenience method that extracts the PS renderer from the dialect renderer.
+     *
+     * @param dialect the dialect name
+     * @param version the version to match
+     * @return a {@link RegistryResult} containing either the PS renderer or an error message
+     */
+    public RegistryResult<PreparedStatementRenderer> getPsRenderer(String dialect, String version) {
+        return getDialectRenderer(dialect, version).map(DialectRenderer::psRenderer);
     }
 
     /**
