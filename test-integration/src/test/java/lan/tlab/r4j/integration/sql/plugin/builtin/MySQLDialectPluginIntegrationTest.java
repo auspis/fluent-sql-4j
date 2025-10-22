@@ -113,7 +113,7 @@ class MySQLDialectPluginIntegrationTest {
 
     @Test
     void getRenderer() {
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, "8.0.35");
+        RegistryResult<SqlRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
         SqlRenderer renderer = result.orElseThrow();
@@ -123,20 +123,20 @@ class MySQLDialectPluginIntegrationTest {
     @Test
     void versionMatching() {
         // Should match MySQL 8.x versions (using ^8.0.0 range)
-        RegistryResult<SqlRenderer> version800 = registry.getRenderer(DIALECT_NAME, "8.0.0");
+        RegistryResult<SqlRenderer> version800 = registry.getDialectRenderer(DIALECT_NAME, "8.0.0");
         assertThat(version800).isInstanceOf(RegistryResult.Success.class);
 
-        RegistryResult<SqlRenderer> version8035 = registry.getRenderer(DIALECT_NAME, "8.0.35");
+        RegistryResult<SqlRenderer> version8035 = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
         assertThat(version8035).isInstanceOf(RegistryResult.Success.class);
 
-        RegistryResult<SqlRenderer> version810 = registry.getRenderer(DIALECT_NAME, "8.1.0");
+        RegistryResult<SqlRenderer> version810 = registry.getDialectRenderer(DIALECT_NAME, "8.1.0");
         assertThat(version810).isInstanceOf(RegistryResult.Success.class);
 
         // Should NOT match MySQL 5.7 or 9.0
-        RegistryResult<SqlRenderer> version57 = registry.getRenderer(DIALECT_NAME, "5.7.42");
+        RegistryResult<SqlRenderer> version57 = registry.getDialectRenderer(DIALECT_NAME, "5.7.42");
         assertThat(version57).isInstanceOf(RegistryResult.Failure.class);
 
-        RegistryResult<SqlRenderer> version90 = registry.getRenderer(DIALECT_NAME, "9.0.0");
+        RegistryResult<SqlRenderer> version90 = registry.getDialectRenderer(DIALECT_NAME, "9.0.0");
         assertThat(version90).isInstanceOf(RegistryResult.Failure.class);
     }
 
@@ -152,7 +152,7 @@ class MySQLDialectPluginIntegrationTest {
     @Test
     void shouldProduceWorkingRenderer() throws SQLException {
         // Get renderer from registry
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, "8.0.35");
+        RegistryResult<SqlRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
         SqlRenderer renderer = result.orElseThrow();
 
         // Verify renderer works by generating MySQL-specific SQL
@@ -189,7 +189,8 @@ class MySQLDialectPluginIntegrationTest {
     @Test
     void shouldGenerateMySQLSyntaxWithBackticks() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+        SqlRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
 
         // Use AST to verify MySQL syntax with backticks
         var statement = SelectStatement.builder()
@@ -209,7 +210,8 @@ class MySQLDialectPluginIntegrationTest {
     @Test
     void shouldGenerateMySQLPaginationSyntax() {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+        SqlRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
 
         // Use AST to verify MySQL LIMIT/OFFSET syntax
         var statement = SelectStatement.builder()
@@ -235,7 +237,7 @@ class MySQLDialectPluginIntegrationTest {
     @Test
     void shouldUseRendererForDifferentStatementTypes() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer("MySQL", "8.0.35").orElseThrow();
+        SqlRenderer renderer = registry.getDialectRenderer("MySQL", "8.0.35").orElseThrow();
 
         // Test SELECT with WHERE using the AST
         var selectStatement = SelectStatement.builder()
@@ -291,14 +293,15 @@ class MySQLDialectPluginIntegrationTest {
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
-        RegistryResult<SqlRenderer> result = newRegistry.getRenderer(DIALECT_NAME, "8.0.35");
+        RegistryResult<SqlRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, "8.0.35");
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
     }
 
     @Test
     void shouldExecuteMySQLSpecificQueries() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+        SqlRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
 
         // Create a query using the AST
         var statement = SelectStatement.builder()
