@@ -20,7 +20,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.plugin.RegistryResult;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectRegistry;
+import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
 import lan.tlab.r4j.sql.util.annotation.E2ETest;
 import org.junit.jupiter.api.AfterEach;
@@ -48,13 +48,13 @@ class MySQLDialectPluginE2E {
             .withUsername("test")
             .withPassword("test");
 
-    private SqlDialectRegistry registry;
+    private SqlDialectPluginRegistry registry;
     private Connection connection;
 
     @BeforeEach
     void setUp() throws SQLException {
         // Create registry with ServiceLoader to test plugin discovery
-        registry = SqlDialectRegistry.createWithServiceLoader();
+        registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Set up MySQL database for renderer functionality tests
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
@@ -283,12 +283,12 @@ class MySQLDialectPluginE2E {
     @Test
     void shouldWorkWithRegistryManualRegistration() {
         // Create a new empty registry and manually register the plugin
-        SqlDialectRegistry emptyRegistry = SqlDialectRegistry.empty();
+        SqlDialectPluginRegistry emptyRegistry = SqlDialectPluginRegistry.empty();
         assertThat(emptyRegistry.isSupported(DIALECT_NAME)).isFalse();
 
         // Register the plugin
         SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-        SqlDialectRegistry newRegistry = emptyRegistry.register(plugin);
+        SqlDialectPluginRegistry newRegistry = emptyRegistry.register(plugin);
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();

@@ -63,9 +63,9 @@ import org.slf4j.LoggerFactory;
  * @see RegistryResult
  * @since 1.0
  */
-public final class SqlDialectRegistry {
+public final class SqlDialectPluginRegistry {
 
-    private static final Logger logger = LoggerFactory.getLogger(SqlDialectRegistry.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlDialectPluginRegistry.class);
 
     /**
      * Immutable storage for registered plugins.
@@ -78,7 +78,7 @@ public final class SqlDialectRegistry {
      *
      * @param plugins the plugins to include in this registry
      */
-    private SqlDialectRegistry(Map<String, List<SqlDialectPlugin>> plugins) {
+    private SqlDialectPluginRegistry(Map<String, List<SqlDialectPlugin>> plugins) {
         this.plugins = plugins.entrySet().stream()
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, entry -> List.copyOf(entry.getValue())));
     }
@@ -94,7 +94,7 @@ public final class SqlDialectRegistry {
      *
      * @return a new registry instance with all discovered plugins
      */
-    public static SqlDialectRegistry createWithServiceLoader() {
+    public static SqlDialectPluginRegistry createWithServiceLoader() {
         ServiceLoader<SqlDialectPluginProvider> loader = ServiceLoader.load(SqlDialectPluginProvider.class);
 
         List<SqlDialectPlugin> plugins = loader.stream()
@@ -121,8 +121,8 @@ public final class SqlDialectRegistry {
      *
      * @return a new empty registry instance
      */
-    public static SqlDialectRegistry empty() {
-        return new SqlDialectRegistry(Map.of());
+    public static SqlDialectPluginRegistry empty() {
+        return new SqlDialectPluginRegistry(Map.of());
     }
 
     /**
@@ -135,7 +135,7 @@ public final class SqlDialectRegistry {
      * @return a new registry instance containing the specified plugins
      * @throws NullPointerException if {@code pluginList} is {@code null} or contains {@code null} elements
      */
-    public static SqlDialectRegistry of(List<SqlDialectPlugin> pluginList) {
+    public static SqlDialectPluginRegistry of(List<SqlDialectPlugin> pluginList) {
         Objects.requireNonNull(pluginList, "Plugins list must not be null");
 
         Map<String, List<SqlDialectPlugin>> pluginMap = pluginList.stream()
@@ -143,7 +143,7 @@ public final class SqlDialectRegistry {
                 .collect(Collectors.groupingBy(
                         plugin -> getNormalizedDialect(plugin.dialectName()), LinkedHashMap::new, Collectors.toList()));
 
-        return new SqlDialectRegistry(pluginMap);
+        return new SqlDialectPluginRegistry(pluginMap);
     }
 
     /**
@@ -167,7 +167,7 @@ public final class SqlDialectRegistry {
      * @return a new registry instance containing this plugin and all existing plugins
      * @throws NullPointerException if {@code plugin} is {@code null}
      */
-    public SqlDialectRegistry register(SqlDialectPlugin plugin) {
+    public SqlDialectPluginRegistry register(SqlDialectPlugin plugin) {
         Objects.requireNonNull(plugin, "Plugin must not be null");
 
         List<SqlDialectPlugin> allPlugins = Stream.concat(
