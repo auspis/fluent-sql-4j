@@ -228,6 +228,8 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUniqueCon
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUpdateItemPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUpdateStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultWhereClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.factory.SqlRendererFactory;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -243,6 +245,10 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Getter
     @Default
     private final EscapeStrategy escapeStrategy = EscapeStrategy.standard();
+
+    @Getter
+    @Default
+    private final SqlRenderer sqlRenderer = SqlRendererFactory.standardSql2008();
 
     @Default
     private final SelectClausePsStrategy selectClauseStrategy = new DefaultSelectClausePsStrategy();
