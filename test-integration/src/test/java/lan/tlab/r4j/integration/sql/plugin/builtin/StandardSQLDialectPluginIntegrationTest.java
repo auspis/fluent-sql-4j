@@ -57,7 +57,7 @@ class StandardSQLDialectPluginIntegrationTest {
 
     @Test
     void getRenderer() {
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        RegistryResult<SqlRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
         SqlRenderer renderer = result.orElseThrow();
@@ -66,13 +66,13 @@ class StandardSQLDialectPluginIntegrationTest {
 
     @Test
     void versionMatching() {
-        RegistryResult<SqlRenderer> exactMatch = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        RegistryResult<SqlRenderer> exactMatch = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(exactMatch).isInstanceOf(RegistryResult.Success.class);
 
-        RegistryResult<SqlRenderer> wrongVersion = registry.getRenderer(DIALECT_NAME, "2011");
+        RegistryResult<SqlRenderer> wrongVersion = registry.getDialectRenderer(DIALECT_NAME, "2011");
         assertThat(wrongVersion).isInstanceOf(RegistryResult.Failure.class);
 
-        RegistryResult<SqlRenderer> wrongVersion2 = registry.getRenderer(DIALECT_NAME, "2016");
+        RegistryResult<SqlRenderer> wrongVersion2 = registry.getDialectRenderer(DIALECT_NAME, "2016");
         assertThat(wrongVersion2).isInstanceOf(RegistryResult.Failure.class);
     }
 
@@ -88,7 +88,7 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldProduceWorkingRenderer() throws SQLException {
         // Get renderer from registry
-        RegistryResult<SqlRenderer> result = registry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        RegistryResult<SqlRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         SqlRenderer renderer = result.orElseThrow();
 
         // Verify renderer works with real queries using the DSL
@@ -113,7 +113,7 @@ class StandardSQLDialectPluginIntegrationTest {
     void shouldGenerateStandardSQLSyntax() {
         // Get renderer from registry
         SqlRenderer renderer =
-                registry.getRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+                registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
 
         // Verify it generates standard SQL:2008 syntax for pagination using the DSL
         String paginationSql = DSL.select(renderer, "name")
@@ -130,7 +130,8 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldUseRendererForDifferentDSLOperations() throws SQLException {
         // Get renderer from registry
-        SqlRenderer renderer = registry.getRenderer("StandardSQL", "2008").orElseThrow();
+        SqlRenderer renderer =
+                registry.getDialectRenderer("StandardSQL", "2008").orElseThrow();
 
         // Test SELECT with WHERE using the custom renderer
         String selectSql = DSL.select(renderer, "name", "age")
@@ -186,7 +187,7 @@ class StandardSQLDialectPluginIntegrationTest {
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
-        RegistryResult<SqlRenderer> result = newRegistry.getRenderer(DIALECT_NAME, DIALECT_VERSION);
+        RegistryResult<SqlRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(result).isInstanceOf(RegistryResult.Success.class);
     }
 }

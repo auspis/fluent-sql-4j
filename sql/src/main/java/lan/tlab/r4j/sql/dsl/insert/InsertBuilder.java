@@ -15,23 +15,21 @@ import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.util.LiteralUtil;
 
 public class InsertBuilder {
-    private final SqlRenderer sqlRenderer;
+    private final DialectRenderer renderer;
     private TableIdentifier table;
     private final List<ColumnReference> columns = new ArrayList<>();
     private InsertData data = new DefaultValues();
 
-    public InsertBuilder(SqlRenderer sqlRenderer, String tableName) {
+    public InsertBuilder(DialectRenderer renderer, String tableName) {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
-        this.sqlRenderer = sqlRenderer;
+        this.renderer = renderer;
         this.table = new TableIdentifier(tableName);
     }
 
@@ -82,14 +80,13 @@ public class InsertBuilder {
     public String build() {
         validateState();
         InsertStatement statement = getCurrentStatement();
-        return statement.accept(sqlRenderer, new AstContext());
+        return renderer.renderSql(statement);
     }
 
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
-        InsertStatement stmt = getCurrentStatement();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = stmt.accept(renderer, new AstContext());
+        InsertStatement statement = getCurrentStatement();
+        PsDto result = renderer.renderPreparedStatement(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {
