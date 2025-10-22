@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.plugin.builtin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class StandardSQLDialectPluginTest {
     @Test
     void shouldCreateValidRenderer() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-        SqlRenderer renderer = plugin.createRenderer();
+        DialectRenderer renderer = plugin.createRenderer();
 
         assertThat(renderer).isNotNull();
     }
@@ -45,8 +45,8 @@ class StandardSQLDialectPluginTest {
     void shouldCreateNewRendererOnEachCall() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
 
-        SqlRenderer renderer1 = plugin.createRenderer();
-        SqlRenderer renderer2 = plugin.createRenderer();
+        DialectRenderer renderer1 = plugin.createRenderer();
+        DialectRenderer renderer2 = plugin.createRenderer();
 
         // Verify that each call creates a new instance
         assertThat(renderer1).isNotSameAs(renderer2);
@@ -67,7 +67,7 @@ class StandardSQLDialectPluginTest {
     @Test
     void shouldCreateRendererCompatibleWithStandardSql2008() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-        SqlRenderer renderer = plugin.createRenderer();
+        DialectRenderer renderer = plugin.createRenderer();
 
         // Verify renderer is configured for standard SQL:2008
         assertThat(renderer).isNotNull();
