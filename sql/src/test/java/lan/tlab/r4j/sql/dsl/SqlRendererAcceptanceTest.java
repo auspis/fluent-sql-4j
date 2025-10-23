@@ -175,13 +175,16 @@ class SqlRendererAcceptanceTest {
     }
 
     @Test
-    void dslStaticMethodsUseDefaultRenderer() {
-        // These should use the default StandardSql2008 renderer
-        String selectSql = DSL.select("name").from("users").build();
-        String insertSql = DSL.insertInto("users").set("name", "John").build();
+    void dslInstanceMethodsUseConfiguredRenderer() {
+        // Create a DSL instance with StandardSQL renderer
+        DSL dsl = TestDialectRendererFactory.dslStandardSql2008();
+
+        // These should use the configured StandardSql2008 renderer
+        String selectSql = dsl.select("name").from("users").build();
+        String insertSql = dsl.insertInto("users").set("name", "John").build();
         String updateSql =
-                DSL.update("users").set("name", "John").where("id").eq(1).build();
-        String deleteSql = DSL.deleteFrom("users").where("id").eq(1).build();
+                dsl.update("users").set("name", "John").where("id").eq(1).build();
+        String deleteSql = dsl.deleteFrom("users").where("id").eq(1).build();
 
         // All should use double quotes (StandardSql2008)
         assertThat(selectSql).contains("\"users\"").contains("\"name\"");
