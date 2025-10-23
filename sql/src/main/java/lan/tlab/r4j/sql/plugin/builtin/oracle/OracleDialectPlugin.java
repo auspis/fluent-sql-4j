@@ -36,7 +36,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * RegistryResult<DialectRenderer> result = registry.getRenderer("oracle", "19.0.0");
+ * Result<DialectRenderer> result = registry.getRenderer("oracle", "19.0.0");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = OracleDialectPlugin.instance();
