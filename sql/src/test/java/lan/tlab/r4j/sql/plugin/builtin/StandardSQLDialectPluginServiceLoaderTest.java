@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.ServiceLoader;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.plugin.RegistryResult;
+import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
@@ -46,9 +46,9 @@ class StandardSQLDialectPluginServiceLoaderTest {
     void shouldProvideRendererViaRegistry() {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
-        RegistryResult<DialectRenderer> result = registry.getDialectRenderer("StandardSQL", "2008");
+        Result<DialectRenderer> result = registry.getDialectRenderer("StandardSQL", "2008");
 
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
     }
 
@@ -57,13 +57,13 @@ class StandardSQLDialectPluginServiceLoaderTest {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Test various case combinations
-        RegistryResult<DialectRenderer> result1 = registry.getDialectRenderer("standardsql", "2008");
-        RegistryResult<DialectRenderer> result2 = registry.getDialectRenderer("STANDARDSQL", "2008");
-        RegistryResult<DialectRenderer> result3 = registry.getDialectRenderer("StandardSQL", "2008");
+        Result<DialectRenderer> result1 = registry.getDialectRenderer("standardsql", "2008");
+        Result<DialectRenderer> result2 = registry.getDialectRenderer("STANDARDSQL", "2008");
+        Result<DialectRenderer> result3 = registry.getDialectRenderer("StandardSQL", "2008");
 
-        assertThat(result1).isInstanceOf(RegistryResult.Success.class);
-        assertThat(result2).isInstanceOf(RegistryResult.Success.class);
-        assertThat(result3).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result1).isInstanceOf(Result.Success.class);
+        assertThat(result2).isInstanceOf(Result.Success.class);
+        assertThat(result3).isInstanceOf(Result.Success.class);
     }
 
     @Test
@@ -71,12 +71,12 @@ class StandardSQLDialectPluginServiceLoaderTest {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Exact match should work
-        RegistryResult<DialectRenderer> exactMatch = registry.getDialectRenderer("StandardSQL", "2008");
-        assertThat(exactMatch).isInstanceOf(RegistryResult.Success.class);
+        Result<DialectRenderer> exactMatch = registry.getDialectRenderer("StandardSQL", "2008");
+        assertThat(exactMatch).isInstanceOf(Result.Success.class);
 
         // Different version should fail (non-SemVer uses exact matching)
-        RegistryResult<DialectRenderer> differentVersion = registry.getDialectRenderer("StandardSQL", "2011");
-        assertThat(differentVersion).isInstanceOf(RegistryResult.Failure.class);
+        Result<DialectRenderer> differentVersion = registry.getDialectRenderer("StandardSQL", "2011");
+        assertThat(differentVersion).isInstanceOf(Result.Failure.class);
     }
 
     @Test
@@ -84,9 +84,9 @@ class StandardSQLDialectPluginServiceLoaderTest {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // When version is not specified, should return the first available plugin
-        RegistryResult<DialectRenderer> result = registry.getRenderer("StandardSQL");
+        Result<DialectRenderer> result = registry.getRenderer("StandardSQL");
 
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
     }
 }

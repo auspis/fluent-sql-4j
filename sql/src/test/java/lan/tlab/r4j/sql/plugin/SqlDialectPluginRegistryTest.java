@@ -7,8 +7,9 @@ import static org.mockito.Mockito.mock;
 import java.util.Collections;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.plugin.RegistryResult.Failure;
-import lan.tlab.r4j.sql.plugin.RegistryResult.Success;
+import lan.tlab.r4j.sql.functional.Result;
+import lan.tlab.r4j.sql.functional.Result.Failure;
+import lan.tlab.r4j.sql.functional.Result.Success;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,33 +53,33 @@ class SqlDialectPluginRegistryTest {
     @Test
     void getRenderer_returnsSuccessWhenDialectSupported() {
         assertThat(registry.isSupported(SqlTestPlugin.TEST_DIALECT)).isTrue();
-        RegistryResult<DialectRenderer> result = registry.getRenderer(SqlTestPlugin.TEST_DIALECT);
+        Result<DialectRenderer> result = registry.getRenderer(SqlTestPlugin.TEST_DIALECT);
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isEqualTo(renderer);
     }
 
     @Test
     void getRenderer_shouldMatchVersionWithinRange() {
-        RegistryResult<DialectRenderer> result1 =
+        Result<DialectRenderer> result1 =
                 registry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, SqlTestPlugin.BASE_VERSION);
         assertThat(result1).isInstanceOf(Success.class);
         assertThat(result1.orElseThrow()).isEqualTo(renderer);
 
-        RegistryResult<DialectRenderer> result2 = registry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "3.5.0");
+        Result<DialectRenderer> result2 = registry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "3.5.0");
         assertThat(result2).isInstanceOf(Success.class);
         assertThat(result2.orElseThrow()).isEqualTo(renderer);
     }
 
     @Test
     void getRenderer_returnsFailureForVersionOutsideRange() {
-        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2.7.0");
+        Result<DialectRenderer> result = registry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2.7.0");
         assertThat(result).isInstanceOf(Failure.class);
         assertThat(((Failure<DialectRenderer>) result).message()).contains("No plugin found");
     }
 
     @Test
     void getRenderer_returnsFailureForNullDialect() {
-        RegistryResult<DialectRenderer> result = registry.getRenderer(null);
+        Result<DialectRenderer> result = registry.getRenderer(null);
         assertThat(result).isInstanceOf(Failure.class);
         assertThat(((Failure<DialectRenderer>) result).message()).contains("Dialect name must not be null");
     }
@@ -90,14 +91,12 @@ class SqlDialectPluginRegistryTest {
         SqlDialectPluginRegistry registryWithNonSemVer = SqlDialectPluginRegistry.of(List.of(nonSemVerPlugin));
 
         // Exact match should work
-        RegistryResult<DialectRenderer> result =
-                registryWithNonSemVer.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2008");
+        Result<DialectRenderer> result = registryWithNonSemVer.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2008");
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isEqualTo(nonSemVerRenderer);
 
         // Non-matching version should fail
-        RegistryResult<DialectRenderer> result2 =
-                registryWithNonSemVer.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2011");
+        Result<DialectRenderer> result2 = registryWithNonSemVer.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2011");
         assertThat(result2).isInstanceOf(Failure.class);
     }
 
@@ -129,7 +128,7 @@ class SqlDialectPluginRegistryTest {
                 .isEqualTo(renderer2016);
 
         // Non-matching version should fail
-        RegistryResult<DialectRenderer> result =
+        Result<DialectRenderer> result =
                 registryWithMultipleVersions.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2019");
         assertThat(result).isInstanceOf(Failure.class);
     }
@@ -141,14 +140,12 @@ class SqlDialectPluginRegistryTest {
         SqlDialectPluginRegistry registryWithVersion = SqlDialectPluginRegistry.of(List.of(pluginLower));
 
         // Exact case match should work
-        RegistryResult<DialectRenderer> result =
-                registryWithVersion.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "v1");
+        Result<DialectRenderer> result = registryWithVersion.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "v1");
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isEqualTo(rendererLower);
 
         // Different case should not match
-        RegistryResult<DialectRenderer> result2 =
-                registryWithVersion.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "V1");
+        Result<DialectRenderer> result2 = registryWithVersion.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "V1");
         assertThat(result2).isInstanceOf(Failure.class);
     }
 
@@ -163,14 +160,12 @@ class SqlDialectPluginRegistryTest {
         SqlDialectPluginRegistry mixedRegistry = SqlDialectPluginRegistry.of(List.of(semVerPlugin, nonSemVerPlugin));
 
         // SemVer version should match SemVer plugin
-        RegistryResult<DialectRenderer> semVerResult =
-                mixedRegistry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "8.0.35");
+        Result<DialectRenderer> semVerResult = mixedRegistry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "8.0.35");
         assertThat(semVerResult).isInstanceOf(Success.class);
         assertThat(semVerResult.orElseThrow()).isEqualTo(semVerRenderer);
 
         // Non-SemVer version should match non-SemVer plugin
-        RegistryResult<DialectRenderer> nonSemVerResult =
-                mixedRegistry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2008");
+        Result<DialectRenderer> nonSemVerResult = mixedRegistry.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "2008");
         assertThat(nonSemVerResult).isInstanceOf(Success.class);
         assertThat(nonSemVerResult.orElseThrow()).isEqualTo(nonSemVerRenderer);
     }
@@ -336,7 +331,7 @@ class SqlDialectPluginRegistryTest {
                 .register(plugin2)
                 .register(plugin3);
 
-        RegistryResult<DialectRenderer> result = ordered.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "8.0.35");
+        Result<DialectRenderer> result = ordered.getDialectRenderer(SqlTestPlugin.TEST_DIALECT, "8.0.35");
 
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isSameAs(renderer1);
