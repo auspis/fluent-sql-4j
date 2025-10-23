@@ -17,7 +17,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.plugin.RegistryResult;
+import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
@@ -119,9 +119,9 @@ class MySQLDialectPluginE2E {
 
     @Test
     void getRenderer() {
-        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
+        Result<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
 
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result).isInstanceOf(Result.Success.class);
         DialectRenderer renderer = result.orElseThrow();
         assertThat(renderer).isNotNull();
     }
@@ -129,36 +129,36 @@ class MySQLDialectPluginE2E {
     @Test
     void versionMatching() {
         // Should match MySQL 8.x versions (using ^8.0.0 range)
-        RegistryResult<DialectRenderer> version800 = registry.getDialectRenderer(DIALECT_NAME, "8.0.0");
-        assertThat(version800).isInstanceOf(RegistryResult.Success.class);
+        Result<DialectRenderer> version800 = registry.getDialectRenderer(DIALECT_NAME, "8.0.0");
+        assertThat(version800).isInstanceOf(Result.Success.class);
 
-        RegistryResult<DialectRenderer> version8035 = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
-        assertThat(version8035).isInstanceOf(RegistryResult.Success.class);
+        Result<DialectRenderer> version8035 = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
+        assertThat(version8035).isInstanceOf(Result.Success.class);
 
-        RegistryResult<DialectRenderer> version810 = registry.getDialectRenderer(DIALECT_NAME, "8.1.0");
-        assertThat(version810).isInstanceOf(RegistryResult.Success.class);
+        Result<DialectRenderer> version810 = registry.getDialectRenderer(DIALECT_NAME, "8.1.0");
+        assertThat(version810).isInstanceOf(Result.Success.class);
 
         // Should NOT match MySQL 5.7 or 9.0
-        RegistryResult<DialectRenderer> version57 = registry.getDialectRenderer(DIALECT_NAME, "5.7.42");
-        assertThat(version57).isInstanceOf(RegistryResult.Failure.class);
+        Result<DialectRenderer> version57 = registry.getDialectRenderer(DIALECT_NAME, "5.7.42");
+        assertThat(version57).isInstanceOf(Result.Failure.class);
 
-        RegistryResult<DialectRenderer> version90 = registry.getDialectRenderer(DIALECT_NAME, "9.0.0");
-        assertThat(version90).isInstanceOf(RegistryResult.Failure.class);
+        Result<DialectRenderer> version90 = registry.getDialectRenderer(DIALECT_NAME, "9.0.0");
+        assertThat(version90).isInstanceOf(Result.Failure.class);
     }
 
     @Test
     void getRendererWithoutVersion() {
         // When version is not specified, should return available plugin
-        RegistryResult<DialectRenderer> result = registry.getRenderer(DIALECT_NAME);
+        Result<DialectRenderer> result = registry.getRenderer(DIALECT_NAME);
 
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
     }
 
     @Test
     void shouldProduceWorkingRenderer() throws SQLException {
         // Get renderer from registry
-        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
+        Result<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, "8.0.35");
         DialectRenderer renderer = result.orElseThrow();
 
         // Verify renderer works by generating MySQL-specific SQL
@@ -294,8 +294,8 @@ class MySQLDialectPluginE2E {
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
-        RegistryResult<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, "8.0.35");
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        Result<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, "8.0.35");
+        assertThat(result).isInstanceOf(Result.Success.class);
     }
 
     @Test
