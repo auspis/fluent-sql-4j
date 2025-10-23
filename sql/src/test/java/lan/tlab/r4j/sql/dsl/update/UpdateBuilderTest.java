@@ -1,6 +1,5 @@
 package lan.tlab.r4j.sql.dsl.update;
 
-import static lan.tlab.r4j.sql.dsl.DSL.update;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -12,19 +11,29 @@ import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UpdateBuilderTest {
 
+    private lan.tlab.r4j.sql.dsl.DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void singleSet() {
-        String result = update("users").set("name", "John").where("id").eq(1).build();
+        String result =
+                dsl.update("users").set("name", "John").where("id").eq(1).build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"name\" = 'John' WHERE \"users\".\"id\" = 1");
     }
 
     @Test
     void multipleSets() {
-        String result = update("users")
+        String result = dsl.update("users")
                 .set("name", "John")
                 .set("age", 30)
                 .where("id")
@@ -35,19 +44,19 @@ class UpdateBuilderTest {
 
     @Test
     void noWhere() {
-        String result = update("users").set("status", "active").build();
+        String result = dsl.update("users").set("status", "active").build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"status\" = 'active'");
     }
 
     @Test
     void whereWithNumber() {
-        String result = update("users").set("age", 25).where("id").eq(42).build();
+        String result = dsl.update("users").set("age", 25).where("id").eq(42).build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"age\" = 25 WHERE \"users\".\"id\" = 42");
     }
 
     @Test
     void and() {
-        String result = update("users")
+        String result = dsl.update("users")
                 .set("status", "inactive")
                 .where("age")
                 .lt(18)
@@ -62,7 +71,7 @@ class UpdateBuilderTest {
 
     @Test
     void or() {
-        String result = update("users")
+        String result = dsl.update("users")
                 .set("status", "deleted")
                 .where("status")
                 .eq("banned")
@@ -77,7 +86,7 @@ class UpdateBuilderTest {
 
     @Test
     void andOr() {
-        String result = update("users")
+        String result = dsl.update("users")
                 .set("status", "inactive")
                 .where("age")
                 .lt(18)
@@ -94,7 +103,7 @@ class UpdateBuilderTest {
 
     @Test
     void isNull() {
-        String result = update("users")
+        String result = dsl.update("users")
                 .set("deleted_at", (String) null)
                 .where("status")
                 .isNull()
@@ -105,7 +114,7 @@ class UpdateBuilderTest {
 
     @Test
     void like() {
-        String result = update("users")
+        String result = dsl.update("users")
                 .set("status", "verified")
                 .where("email")
                 .like("%@example.com")
@@ -118,7 +127,7 @@ class UpdateBuilderTest {
 
     @Test
     void allComparisonOperators() {
-        String result = update("products")
+        String result = dsl.update("products")
                 .set("discount", 20)
                 .where("price")
                 .gt(100)
@@ -139,21 +148,21 @@ class UpdateBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> update(""))
+        assertThatThrownBy(() -> dsl.update(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> update("users").set("", "value"))
+        assertThatThrownBy(() -> dsl.update("users").set("", "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void buildWithoutSetThrowsException() {
-        assertThatThrownBy(() -> update("users").where("id").eq(1).build())
+        assertThatThrownBy(() -> dsl.update("users").where("id").eq(1).build())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("At least one SET clause must be specified");
     }

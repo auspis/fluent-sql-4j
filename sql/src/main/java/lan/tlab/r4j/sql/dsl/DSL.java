@@ -7,82 +7,139 @@ import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectProjectionBuilder;
 import lan.tlab.r4j.sql.dsl.table.CreateTableBuilder;
 import lan.tlab.r4j.sql.dsl.update.UpdateBuilder;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
 
 public class DSL {
 
-    static final DialectRenderer DIALECT_RENDERER = getDefaultRenderer();
+    private final DialectRenderer renderer;
 
     /**
-     * Gets the default dialect renderer for the DSL.
+     * Creates a DSL instance configured for a specific SQL dialect.
      * <p>
-     * This method retrieves the Standard SQL:2008 dialect renderer from the
-     * plugin registry. If the registry lookup fails, it creates a renderer
-     * directly from the plugin.
+     * This constructor is used by {@link DSLRegistry} to create dialect-specific
+     * DSL instances. It can also be used directly when you have a {@link DialectRenderer}
+     * and want to create a DSL instance without going through the registry.
+     * <p>
+     * <b>Example usage via DSLRegistry (recommended):</b>
+     * <pre>{@code
+     * DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+     * DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+     * String sql = dsl.select("name").from("users").build();
+     * }</pre>
+     * <p>
+     * <b>Example direct usage:</b>
+     * <pre>{@code
+     * DialectRenderer renderer = ...; // obtain from SqlDialectPluginRegistry
+     * DSL dsl = new DSL(renderer);
+     * String sql = dsl.select("name").from("users").build();
+     * }</pre>
      *
-     * @return the default Standard SQL:2008 dialect renderer, never {@code null}
+     * @param renderer the dialect renderer to use for this DSL instance
+     * @throws NullPointerException if {@code renderer} is {@code null}
+     * @see DSLRegistry
      */
-    private static DialectRenderer getDefaultRenderer() {
-        SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
-        return registry.getDialectRenderer(
-                        StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
-                .orElseThrow();
+    public DSL(DialectRenderer renderer) {
+        this.renderer = java.util.Objects.requireNonNull(renderer, "DialectRenderer must not be null");
     }
 
-    public static CreateTableBuilder createTable(String tableName) {
-        return new CreateTableBuilder(DIALECT_RENDERER, tableName);
-    }
+    // Static methods that accept a DialectRenderer (for backward compatibility and explicit control)
 
     public static CreateTableBuilder createTable(DialectRenderer renderer, String tableName) {
         return new CreateTableBuilder(renderer, tableName);
-    }
-
-    public static SelectProjectionBuilder select() {
-        return new SelectProjectionBuilder(DIALECT_RENDERER);
     }
 
     public static SelectProjectionBuilder select(DialectRenderer renderer) {
         return new SelectProjectionBuilder(renderer);
     }
 
-    public static SelectBuilder select(String... columns) {
-        return new SelectBuilder(DIALECT_RENDERER, columns);
-    }
-
     public static SelectBuilder select(DialectRenderer renderer, String... columns) {
         return new SelectBuilder(renderer, columns);
-    }
-
-    public static SelectBuilder selectAll() {
-        return new SelectBuilder(DIALECT_RENDERER, "*");
     }
 
     public static SelectBuilder selectAll(DialectRenderer renderer) {
         return new SelectBuilder(renderer, "*");
     }
 
-    public static InsertBuilder insertInto(String tableName) {
-        return new InsertBuilder(DIALECT_RENDERER, tableName);
-    }
-
     public static InsertBuilder insertInto(DialectRenderer renderer, String tableName) {
         return new InsertBuilder(renderer, tableName);
-    }
-
-    public static DeleteBuilder deleteFrom(String tableName) {
-        return new DeleteBuilder(DIALECT_RENDERER, tableName);
     }
 
     public static DeleteBuilder deleteFrom(DialectRenderer renderer, String tableName) {
         return new DeleteBuilder(renderer, tableName);
     }
 
-    public static UpdateBuilder update(String tableName) {
-        return new UpdateBuilder(DIALECT_RENDERER, tableName);
-    }
-
     public static UpdateBuilder update(DialectRenderer renderer, String tableName) {
         return new UpdateBuilder(renderer, tableName);
+    }
+
+    // Instance methods using the configured renderer (new instance-based API)
+
+    /**
+     * Creates a CREATE TABLE builder using this DSL instance's configured renderer.
+     *
+     * @param tableName the name of the table to create
+     * @return a new CreateTableBuilder instance
+     */
+    public CreateTableBuilder createTable(String tableName) {
+        return createTable(renderer, tableName);
+    }
+
+    /**
+     * Creates a SELECT builder with no columns specified, using this DSL instance's configured renderer.
+     * <p>
+     * Use this method when you want to build the projection dynamically.
+     *
+     * @return a new SelectProjectionBuilder instance
+     */
+    public SelectProjectionBuilder select() {
+        return select(renderer);
+    }
+
+    /**
+     * Creates a SELECT builder with the specified columns, using this DSL instance's configured renderer.
+     *
+     * @param columns the columns to select
+     * @return a new SelectBuilder instance
+     */
+    public SelectBuilder select(String... columns) {
+        return select(renderer, columns);
+    }
+
+    /**
+     * Creates a SELECT * builder using this DSL instance's configured renderer.
+     *
+     * @return a new SelectBuilder instance configured to select all columns
+     */
+    public SelectBuilder selectAll() {
+        return selectAll(renderer);
+    }
+
+    /**
+     * Creates an INSERT INTO builder using this DSL instance's configured renderer.
+     *
+     * @param tableName the name of the table to insert into
+     * @return a new InsertBuilder instance
+     */
+    public InsertBuilder insertInto(String tableName) {
+        return insertInto(renderer, tableName);
+    }
+
+    /**
+     * Creates a DELETE FROM builder using this DSL instance's configured renderer.
+     *
+     * @param tableName the name of the table to delete from
+     * @return a new DeleteBuilder instance
+     */
+    public DeleteBuilder deleteFrom(String tableName) {
+        return deleteFrom(renderer, tableName);
+    }
+
+    /**
+     * Creates an UPDATE builder using this DSL instance's configured renderer.
+     *
+     * @param tableName the name of the table to update
+     * @return a new UpdateBuilder instance
+     */
+    public UpdateBuilder update(String tableName) {
+        return update(renderer, tableName);
     }
 }

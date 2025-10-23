@@ -1,6 +1,5 @@
 package lan.tlab.r4j.sql.dsl.delete;
 
-import static lan.tlab.r4j.sql.dsl.DSL.deleteFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -12,31 +11,40 @@ import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class DeleteBuilderTest {
 
+    private lan.tlab.r4j.sql.dsl.DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void ok() {
-        String result = deleteFrom("users").where("status").eq("inactive").build();
+        String result = dsl.deleteFrom("users").where("status").eq("inactive").build();
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"status\" = 'inactive'");
     }
 
     @Test
     void noWhere() {
-        String result = deleteFrom("users").build();
+        String result = dsl.deleteFrom("users").build();
         assertThat(result).isEqualTo("DELETE FROM \"users\"");
     }
 
     @Test
     void whereWithNumber() {
-        String result = deleteFrom("users").where("id").eq(42).build();
+        String result = dsl.deleteFrom("users").where("id").eq(42).build();
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"id\" = 42");
     }
 
     @Test
     void and() {
-        String result = deleteFrom("users")
+        String result = dsl.deleteFrom("users")
                 .where("status")
                 .eq("inactive")
                 .and("age")
@@ -50,7 +58,7 @@ class DeleteBuilderTest {
 
     @Test
     void or() {
-        String result = deleteFrom("users")
+        String result = dsl.deleteFrom("users")
                 .where("status")
                 .eq("deleted")
                 .or("status")
@@ -64,7 +72,7 @@ class DeleteBuilderTest {
 
     @Test
     void andOr() {
-        String result = deleteFrom("users")
+        String result = dsl.deleteFrom("users")
                 .where("status")
                 .eq("inactive")
                 .and("age")
@@ -80,21 +88,22 @@ class DeleteBuilderTest {
 
     @Test
     void isNull() {
-        String result = deleteFrom("users").where("deleted_at").isNotNull().build();
+        String result = dsl.deleteFrom("users").where("deleted_at").isNotNull().build();
 
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"deleted_at\" IS NOT NULL");
     }
 
     @Test
     void like() {
-        String result = deleteFrom("users").where("email").like("%@temp.com").build();
+        String result =
+                dsl.deleteFrom("users").where("email").like("%@temp.com").build();
 
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"email\" LIKE '%@temp.com'");
     }
 
     @Test
     void allComparisonOperators() {
-        String result = deleteFrom("products")
+        String result = dsl.deleteFrom("products")
                 .where("price")
                 .gt(100)
                 .and("discount")
@@ -114,14 +123,14 @@ class DeleteBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> deleteFrom(""))
+        assertThatThrownBy(() -> dsl.deleteFrom(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> deleteFrom("users").where(""))
+        assertThatThrownBy(() -> dsl.deleteFrom("users").where(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
