@@ -1,16 +1,24 @@
 package lan.tlab.r4j.sql.dsl.insert;
 
-import static lan.tlab.r4j.sql.dsl.DSL.insertInto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class InsertBuilderTest {
 
+    private lan.tlab.r4j.sql.dsl.DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void insertWithDefaultValues() {
-        String sql = insertInto("users").defaultValues().build();
+        String sql = dsl.insertInto("users").defaultValues().build();
 
         assertThat(sql).isEqualTo("""
             INSERT INTO "users" DEFAULT VALUES\
@@ -19,7 +27,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithSingleColumnAndValue() {
-        String sql = insertInto("users").set("name", "John").build();
+        String sql = dsl.insertInto("users").set("name", "John").build();
 
         assertThat(sql)
                 .isEqualTo("""
@@ -29,7 +37,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithMultipleColumnsAndValues() {
-        String sql = insertInto("users")
+        String sql = dsl.insertInto("users")
                 .set("id", 1)
                 .set("name", "John")
                 .set("email", "john@example.com")
@@ -44,7 +52,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithNullValue() {
-        String sql = insertInto("users")
+        String sql = dsl.insertInto("users")
                 .set("name", "John")
                 .set("email", (String) null)
                 .build();
@@ -58,7 +66,8 @@ class InsertBuilderTest {
 
     @Test
     void insertWithBooleanValue() {
-        String sql = insertInto("users").set("name", "John").set("active", true).build();
+        String sql =
+                dsl.insertInto("users").set("name", "John").set("active", true).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -69,7 +78,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithNumericValues() {
-        String sql = insertInto("products")
+        String sql = dsl.insertInto("products")
                 .set("id", 1)
                 .set("price", 19.99)
                 .set("quantity", 100)
@@ -84,35 +93,35 @@ class InsertBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> insertInto(""))
+        assertThatThrownBy(() -> dsl.insertInto(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidNullTableName() {
-        assertThatThrownBy(() -> insertInto(null))
+        assertThatThrownBy(() -> dsl.insertInto(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidEmptyColumnName() {
-        assertThatThrownBy(() -> insertInto("users").set("", "value"))
+        assertThatThrownBy(() -> dsl.insertInto("users").set("", "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void invalidNullColumnName() {
-        assertThatThrownBy(() -> insertInto("users").set(null, "value"))
+        assertThatThrownBy(() -> dsl.insertInto("users").set(null, "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void insertWithMixedDataTypes() {
-        String sql = insertInto("mixed_table")
+        String sql = dsl.insertInto("mixed_table")
                 .set("text_col", "test")
                 .set("int_col", 42)
                 .set("bool_col", false)

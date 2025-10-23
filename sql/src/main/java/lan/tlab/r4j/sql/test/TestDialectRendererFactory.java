@@ -137,4 +137,18 @@ public final class TestDialectRendererFactory {
         return REGISTRY.getDialectRenderer(OracleDialectPlugin.DIALECT_NAME, OracleDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }
+
+    /**
+     * Creates a {@link lan.tlab.r4j.sql.dsl.DSL} instance configured for Standard SQL:2008.
+     * <p>
+     * This method provides a convenient way for tests to obtain a DSL instance
+     * using the default Standard SQL:2008 dialect without going through DSLRegistry.
+     *
+     * @return DSL instance configured for Standard SQL:2008
+     * @throws IllegalArgumentException if the StandardSQL plugin is not available
+     * @since 1.1
+     */
+    public static lan.tlab.r4j.sql.dsl.DSL dslStandardSql2008() {
+        return new lan.tlab.r4j.sql.dsl.DSL(dialectRendererStandardSql2008());
+    }
 }
