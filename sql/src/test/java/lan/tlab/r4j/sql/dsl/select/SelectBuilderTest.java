@@ -1,6 +1,5 @@
 package lan.tlab.r4j.sql.dsl.select;
 
-import static lan.tlab.r4j.sql.dsl.DSL.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -13,13 +12,22 @@ import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderTest {
 
+    private DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void ok() {
-        String result = select("name", "email").from("users").build();
+        String result = dsl.select("name", "email").from("users").build();
         assertThat(result)
                 .isEqualTo("""
             SELECT "users"."name", "users"."email" FROM "users"\
@@ -28,7 +36,7 @@ class SelectBuilderTest {
 
     @Test
     void star() {
-        String result = select("*").from("products").build();
+        String result = dsl.select("*").from("products").build();
         assertThat(result).isEqualTo("""
             SELECT * FROM "products"\
             """);
@@ -36,7 +44,7 @@ class SelectBuilderTest {
 
     @Test
     void fromWithAlias() {
-        String result = select("name", "email")
+        String result = dsl.select("name", "email")
                 .from("users")
                 .as("u")
                 .where("name")
@@ -52,7 +60,7 @@ class SelectBuilderTest {
 
     @Test
     void where() {
-        String result = select("*").from("users").where("age").gt(18).build();
+        String result = dsl.select("*").from("users").where("age").gt(18).build();
         assertThat(result).isEqualTo("""
             SELECT * FROM "users" WHERE "users"."age" > 18\
             """);
@@ -60,7 +68,7 @@ class SelectBuilderTest {
 
     @Test
     void and() {
-        String result = select("name", "email")
+        String result = dsl.select("name", "email")
                 .from("users")
                 .where("age")
                 .gt(18)
@@ -79,7 +87,7 @@ class SelectBuilderTest {
 
     @Test
     void or() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .where("role")
                 .eq("admin")
@@ -96,7 +104,7 @@ class SelectBuilderTest {
 
     @Test
     void andOr() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .where("status")
                 .eq("active")
@@ -115,7 +123,7 @@ class SelectBuilderTest {
 
     @Test
     void orderBy() {
-        String sql = select("name", "age").from("users").orderBy("name").build();
+        String sql = dsl.select("name", "age").from("users").orderBy("name").build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -126,7 +134,7 @@ class SelectBuilderTest {
 
     @Test
     void orderByDesc() {
-        String sql = select("*").from("products").orderByDesc("created_at").build();
+        String sql = dsl.select("*").from("products").orderByDesc("created_at").build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -137,7 +145,7 @@ class SelectBuilderTest {
 
     @Test
     void fetch() {
-        String sql = select("*").from("users").fetch(10).build();
+        String sql = dsl.select("*").from("users").fetch(10).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -148,7 +156,7 @@ class SelectBuilderTest {
 
     @Test
     void fetchWithOffset() {
-        String sql = select("*").from("users").fetch(10).offset(20).build();
+        String sql = dsl.select("*").from("users").fetch(10).offset(20).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -159,7 +167,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetBeforeFetch() {
-        String sql = select("*").from("users").offset(15).fetch(5).build();
+        String sql = dsl.select("*").from("users").offset(15).fetch(5).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -170,7 +178,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetZero() {
-        String sql = select("*").from("users").fetch(5).offset(0).build();
+        String sql = dsl.select("*").from("users").fetch(5).offset(0).build();
 
         assertThat(sql)
                 .isEqualTo("""
@@ -180,7 +188,8 @@ class SelectBuilderTest {
 
     @Test
     void offsetOverridesOnMultipleCalls() {
-        String sql = select("*").from("users").offset(10).offset(20).fetch(5).build();
+        String sql =
+                dsl.select("*").from("users").offset(10).offset(20).fetch(5).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -191,7 +200,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetPreservedAcrossFetchChanges() {
-        String sql = select("*").from("users").fetch(10).offset(25).fetch(8).build();
+        String sql = dsl.select("*").from("users").fetch(10).offset(25).fetch(8).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -202,7 +211,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetPrecisionMaintained() {
-        String sql = select("*").from("users").offset(23).fetch(10).build();
+        String sql = dsl.select("*").from("users").offset(23).fetch(10).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -213,7 +222,7 @@ class SelectBuilderTest {
 
     @Test
     void fullSelectQuery() {
-        String sql = select("name", "email", "age")
+        String sql = dsl.select("name", "email", "age")
                 .from("users")
                 .where("status")
                 .eq("active")
@@ -237,7 +246,7 @@ class SelectBuilderTest {
 
     @Test
     void isNull() {
-        String sql = select("*").from("users").where("deleted_at").isNull().build();
+        String sql = dsl.select("*").from("users").where("deleted_at").isNull().build();
 
         assertThat(sql)
                 .isEqualTo("""
@@ -247,7 +256,7 @@ class SelectBuilderTest {
 
     @Test
     void isNotNull() {
-        String sql = select("*").from("users").where("email").isNotNull().build();
+        String sql = dsl.select("*").from("users").where("email").isNotNull().build();
 
         assertThat(sql)
                 .isEqualTo("""
@@ -257,7 +266,7 @@ class SelectBuilderTest {
 
     @Test
     void like() {
-        String sql = select("*").from("users").where("name").like("%john%").build();
+        String sql = dsl.select("*").from("users").where("name").like("%john%").build();
 
         assertThat(sql)
                 .isEqualTo("""
@@ -267,7 +276,7 @@ class SelectBuilderTest {
 
     @Test
     void allComparisonOperators() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("products")
                 .where("price")
                 .gt(100)
@@ -290,42 +299,42 @@ class SelectBuilderTest {
 
     @Test
     void fromNotSpecified() {
-        assertThatThrownBy(() -> select("*").build())
+        assertThatThrownBy(() -> dsl.select("*").build())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified");
     }
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> select("*").from(""))
+        assertThatThrownBy(() -> dsl.select("*").from(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("TableIdentifier name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> select("*").from("users").where(""))
+        assertThatThrownBy(() -> dsl.select("*").from("users").where(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void invalidAlias() {
-        assertThatThrownBy(() -> select("*").from("users").as(""))
+        assertThatThrownBy(() -> dsl.select("*").from("users").as(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty");
     }
 
     @Test
     void invalidFetch() {
-        assertThatThrownBy(() -> select("*").from("users").fetch(-1))
+        assertThatThrownBy(() -> dsl.select("*").from("users").fetch(-1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Fetch rows must be positive, got: -1");
     }
 
     @Test
     void invalidOffset() {
-        assertThatThrownBy(() -> select("*").from("users").offset(-5))
+        assertThatThrownBy(() -> dsl.select("*").from("users").offset(-5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Offset must be non-negative, got: -5");
     }
@@ -402,9 +411,10 @@ class SelectBuilderTest {
 
     @Test
     void fromSubquery() {
-        SelectBuilder subquery = select("id", "name").from("users").where("age").gt(18);
+        SelectBuilder subquery =
+                dsl.select("id", "name").from("users").where("age").gt(18);
 
-        String sql = select("*").from(subquery, "u").build();
+        String sql = dsl.select("*").from(subquery, "u").build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -416,9 +426,9 @@ class SelectBuilderTest {
     @Test
     void fromSubqueryWithWhere() {
         SelectBuilder subquery =
-                select("id", "total").from("orders").where("status").eq("completed");
+                dsl.select("id", "total").from("orders").where("status").eq("completed");
 
-        String sql = select("*").from(subquery, "o").where("total").gt(100).build();
+        String sql = dsl.select("*").from(subquery, "o").where("total").gt(100).build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -429,9 +439,10 @@ class SelectBuilderTest {
 
     @Test
     void whereWithScalarSubquery() {
-        SelectBuilder subquery = select("*").from("users").where("age").gt(50);
+        SelectBuilder subquery = dsl.select("*").from("users").where("age").gt(50);
 
-        String sql = select("name").from("employees").where("age").gt(subquery).build();
+        String sql =
+                dsl.select("name").from("employees").where("age").gt(subquery).build();
 
         assertThat(sql)
                 .contains("WHERE \"employees\".\"age\" > (SELECT * FROM \"users\" WHERE \"users\".\"age\" > 50)");
@@ -439,41 +450,48 @@ class SelectBuilderTest {
 
     @Test
     void whereWithScalarSubqueryEquals() {
-        SelectBuilder maxAgeSubquery = select("*").from("users");
+        SelectBuilder maxAgeSubquery = dsl.select("*").from("users");
 
-        String sql =
-                select("*").from("employees").where("age").eq(maxAgeSubquery).build();
+        String sql = dsl.select("*")
+                .from("employees")
+                .where("age")
+                .eq(maxAgeSubquery)
+                .build();
 
         assertThat(sql).contains("WHERE \"employees\".\"age\" = (SELECT * FROM \"users\")");
     }
 
     @Test
     void fromSubqueryNullSubquery() {
-        assertThatThrownBy(() -> select("*").from((SelectBuilder) null, "alias"))
+        assertThatThrownBy(() -> dsl.select("*").from((SelectBuilder) null, "alias"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Subquery cannot be null");
     }
 
     @Test
     void fromSubqueryNullAlias() {
-        SelectBuilder subquery = select("*").from("users");
-        assertThatThrownBy(() -> select("*").from(subquery, null))
+        SelectBuilder subquery = dsl.select("*").from("users");
+        assertThatThrownBy(() -> dsl.select("*").from(subquery, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty for subquery");
     }
 
     @Test
     void fromSubqueryEmptyAlias() {
-        SelectBuilder subquery = select("*").from("users");
-        assertThatThrownBy(() -> select("*").from(subquery, ""))
+        SelectBuilder subquery = dsl.select("*").from("users");
+        assertThatThrownBy(() -> dsl.select("*").from(subquery, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty for subquery");
     }
 
     @Test
     void havingWithSingleCondition() {
-        String sql =
-                select("*").from("users").groupBy("age").having("age").gt(18).build();
+        String sql = dsl.select("*")
+                .from("users")
+                .groupBy("age")
+                .having("age")
+                .gt(18)
+                .build();
 
         assertThat(sql)
                 .isEqualTo(
@@ -484,7 +502,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithAndCondition() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .groupBy("age")
                 .having("age")
@@ -502,7 +520,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithOrCondition() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .groupBy("status")
                 .having("status")
@@ -520,7 +538,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithComplexConditions() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .groupBy("customer_id")
                 .having("customer_id")
@@ -540,7 +558,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithWhereAndOrderBy() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("products")
                 .where("category")
                 .eq("electronics")
@@ -559,14 +577,14 @@ class SelectBuilderTest {
 
     @Test
     void invalidHavingColumn() {
-        assertThatThrownBy(() -> select("*").from("users").groupBy("age").having(""))
+        assertThatThrownBy(() -> dsl.select("*").from("users").groupBy("age").having(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void countStar() {
-        String result = DSL.select().countStar().from("users").build();
+        String result = dsl.select().countStar().from("users").build();
         assertThat(result).isEqualTo("""
             SELECT COUNT(*) FROM "users"\
             """);
@@ -574,7 +592,7 @@ class SelectBuilderTest {
 
     @Test
     void countStarWithAlias() {
-        String result = DSL.select().countStar().as("total").from("users").build();
+        String result = dsl.select().countStar().as("total").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT COUNT(*) AS total FROM "users"\
             """);
@@ -582,7 +600,7 @@ class SelectBuilderTest {
 
     @Test
     void sum() {
-        String result = DSL.select().sum("amount").from("orders").build();
+        String result = dsl.select().sum("amount").from("orders").build();
         assertThat(result).isEqualTo("""
             SELECT SUM("orders"."amount") FROM "orders"\
             """);
@@ -591,7 +609,7 @@ class SelectBuilderTest {
     @Test
     void sumWithAlias() {
         String result =
-                DSL.select().sum("amount").as("total_amount").from("orders").build();
+                dsl.select().sum("amount").as("total_amount").from("orders").build();
         assertThat(result)
                 .isEqualTo(
                         """
@@ -601,7 +619,7 @@ class SelectBuilderTest {
 
     @Test
     void avg() {
-        String result = DSL.select().avg("score").from("students").build();
+        String result = dsl.select().avg("score").from("students").build();
         assertThat(result).isEqualTo("""
             SELECT AVG("students"."score") FROM "students"\
             """);
@@ -610,7 +628,7 @@ class SelectBuilderTest {
     @Test
     void avgWithAlias() {
         String result =
-                DSL.select().avg("score").as("avg_score").from("students").build();
+                dsl.select().avg("score").as("avg_score").from("students").build();
         assertThat(result)
                 .isEqualTo(
                         """
@@ -620,7 +638,7 @@ class SelectBuilderTest {
 
     @Test
     void count() {
-        String result = DSL.select().count("id").from("users").build();
+        String result = dsl.select().count("id").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT COUNT("users"."id") FROM "users"\
             """);
@@ -628,7 +646,7 @@ class SelectBuilderTest {
 
     @Test
     void countWithAlias() {
-        String result = DSL.select().count("id").as("user_count").from("users").build();
+        String result = dsl.select().count("id").as("user_count").from("users").build();
         assertThat(result)
                 .isEqualTo("""
             SELECT COUNT("users"."id") AS user_count FROM "users"\
@@ -637,7 +655,7 @@ class SelectBuilderTest {
 
     @Test
     void countDistinct() {
-        String result = DSL.select().countDistinct("email").from("users").build();
+        String result = dsl.select().countDistinct("email").from("users").build();
         assertThat(result)
                 .isEqualTo("""
             SELECT COUNT(DISTINCT "users"."email") FROM "users"\
@@ -646,7 +664,7 @@ class SelectBuilderTest {
 
     @Test
     void countDistinctWithAlias() {
-        String result = DSL.select()
+        String result = dsl.select()
                 .countDistinct("email")
                 .as("unique_emails")
                 .from("users")
@@ -660,7 +678,7 @@ class SelectBuilderTest {
 
     @Test
     void max() {
-        String result = DSL.select().max("price").from("products").build();
+        String result = dsl.select().max("price").from("products").build();
         assertThat(result).isEqualTo("""
             SELECT MAX("products"."price") FROM "products"\
             """);
@@ -669,7 +687,7 @@ class SelectBuilderTest {
     @Test
     void maxWithAlias() {
         String result =
-                DSL.select().max("price").as("max_price").from("products").build();
+                dsl.select().max("price").as("max_price").from("products").build();
         assertThat(result)
                 .isEqualTo(
                         """
@@ -679,7 +697,7 @@ class SelectBuilderTest {
 
     @Test
     void min() {
-        String result = DSL.select().min("price").from("products").build();
+        String result = dsl.select().min("price").from("products").build();
         assertThat(result).isEqualTo("""
             SELECT MIN("products"."price") FROM "products"\
             """);
@@ -688,7 +706,7 @@ class SelectBuilderTest {
     @Test
     void minWithAlias() {
         String result =
-                DSL.select().min("price").as("min_price").from("products").build();
+                dsl.select().min("price").as("min_price").from("products").build();
         assertThat(result)
                 .isEqualTo(
                         """
@@ -699,7 +717,7 @@ class SelectBuilderTest {
     @Test
     void sumWithGroupBy() {
         String result =
-                DSL.select().sum("amount").from("orders").groupBy("customer_id").build();
+                dsl.select().sum("amount").from("orders").groupBy("customer_id").build();
         assertThat(result)
                 .isEqualTo(
                         """
@@ -710,7 +728,7 @@ class SelectBuilderTest {
     @Test
     void countWithWhere() {
         String result =
-                DSL.select().countStar().from("users").where("active").eq(true).build();
+                dsl.select().countStar().from("users").where("active").eq(true).build();
         assertThat(result)
                 .isEqualTo("""
             SELECT COUNT(*) FROM "users" WHERE "users"."active" = true\
@@ -719,7 +737,7 @@ class SelectBuilderTest {
 
     @Test
     void avgWithGroupByAndHaving() {
-        String result = DSL.select()
+        String result = dsl.select()
                 .avg("salary")
                 .from("employees")
                 .groupBy("department")
@@ -735,7 +753,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithoutAliases() {
-        String result = DSL.select().sum("score").max("createdAt").from("users").build();
+        String result = dsl.select().sum("score").max("createdAt").from("users").build();
         assertThat(result)
                 .isEqualTo(
                         """
@@ -745,7 +763,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithAliases() {
-        String result = DSL.select()
+        String result = dsl.select()
                 .sum("score")
                 .as("total_score")
                 .max("createdAt")
@@ -761,7 +779,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithOneAlias() {
-        String result = DSL.select()
+        String result = dsl.select()
                 .sum("score")
                 .max("createdAt")
                 .as("latest")
@@ -776,7 +794,7 @@ class SelectBuilderTest {
 
     @Test
     void column() {
-        String result = DSL.select().column("name").from("users").build();
+        String result = dsl.select().column("name").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT "users"."name" FROM "users"\
             """);
@@ -785,7 +803,7 @@ class SelectBuilderTest {
     @Test
     void columnWithAlias() {
         String result =
-                DSL.select().column("name").as("user_name").from("users").build();
+                dsl.select().column("name").as("user_name").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT "users"."name" AS user_name FROM "users"\
             """);
@@ -794,7 +812,7 @@ class SelectBuilderTest {
     @Test
     void multipleColumns() {
         String result =
-                DSL.select().column("name").column("email").from("users").build();
+                dsl.select().column("name").column("email").from("users").build();
         assertThat(result)
                 .isEqualTo("""
             SELECT "users"."name", "users"."email" FROM "users"\
@@ -803,7 +821,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumnsWithAliases() {
-        String result = DSL.select()
+        String result = dsl.select()
                 .column("name")
                 .as("user_name")
                 .column("email")
@@ -819,7 +837,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumnsWithOneAlias() {
-        String result = DSL.select()
+        String result = dsl.select()
                 .column("name")
                 .column("email")
                 .as("user_email")
@@ -834,7 +852,7 @@ class SelectBuilderTest {
 
     @Test
     void tableQualifiedColumn() {
-        String result = DSL.select().column("users", "name").from("users").build();
+        String result = dsl.select().column("users", "name").from("users").build();
         assertThat(result).isEqualTo("""
             SELECT "users"."name" FROM "users"\
             """);
@@ -842,7 +860,7 @@ class SelectBuilderTest {
 
     @Test
     void mixedColumnsAndAggregates() {
-        String result = DSL.select()
+        String result = dsl.select()
                 .column("name")
                 .sum("score")
                 .as("total_score")
