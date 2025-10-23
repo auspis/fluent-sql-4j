@@ -1,17 +1,25 @@
 package lan.tlab.r4j.sql.dsl.insert;
 
-import static lan.tlab.r4j.sql.dsl.DSL.insertInto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class InsertBuilderSetMethodTest {
 
+    private lan.tlab.r4j.sql.dsl.DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void insertWithSetMethodSingleColumn() {
-        String sql = insertInto("users").set("name", "John").build();
+        String sql = dsl.insertInto("users").set("name", "John").build();
 
         assertThat(sql)
                 .isEqualTo("""
@@ -21,7 +29,7 @@ class InsertBuilderSetMethodTest {
 
     @Test
     void insertWithSetMethodMultipleColumns() {
-        String sql = insertInto("users")
+        String sql = dsl.insertInto("users")
                 .set("name", "John")
                 .set("age", 30)
                 .set("active", true)
@@ -36,7 +44,7 @@ class InsertBuilderSetMethodTest {
 
     @Test
     void insertWithSetMethodMixedTypes() {
-        String sql = insertInto("users")
+        String sql = dsl.insertInto("users")
                 .set("id", 1)
                 .set("name", "Jane")
                 .set("score", 99.5)
@@ -52,7 +60,7 @@ class InsertBuilderSetMethodTest {
 
     @Test
     void insertWithSetMethodNullValue() {
-        String sql = insertInto("users")
+        String sql = dsl.insertInto("users")
                 .set("name", "John")
                 .set("email", (String) null)
                 .build();
@@ -67,7 +75,7 @@ class InsertBuilderSetMethodTest {
     @Test
     void insertWithSetMethodDateValue() {
         LocalDate birthdate = LocalDate.of(1999, 1, 23);
-        String sql = insertInto("users")
+        String sql = dsl.insertInto("users")
                 .set("name", "John")
                 .set("birthdate", birthdate)
                 .build();
@@ -77,14 +85,14 @@ class InsertBuilderSetMethodTest {
 
     @Test
     void insertWithSetMethodEmptyColumnName() {
-        assertThatThrownBy(() -> insertInto("users").set("", "value"))
+        assertThatThrownBy(() -> dsl.insertInto("users").set("", "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void insertWithSetMethodNullColumnName() {
-        assertThatThrownBy(() -> insertInto("users").set(null, "value"))
+        assertThatThrownBy(() -> dsl.insertInto("users").set(null, "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
@@ -93,7 +101,7 @@ class InsertBuilderSetMethodTest {
     void insertWithSetMethodCombinedWithColumnsAndValuesNotAllowed() {
         // Once you use set(), you can't mix with columns()/values()
         // This test verifies the current behavior
-        String sql = insertInto("users").set("name", "John").set("age", 25).build();
+        String sql = dsl.insertInto("users").set("name", "John").set("age", 25).build();
 
         assertThat(sql)
                 .isEqualTo(

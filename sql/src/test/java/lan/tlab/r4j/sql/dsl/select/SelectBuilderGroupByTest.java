@@ -1,24 +1,34 @@
 package lan.tlab.r4j.sql.dsl.select;
 
-import static lan.tlab.r4j.sql.dsl.DSL.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderGroupByTest {
 
+    private lan.tlab.r4j.sql.dsl.DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void singleColumn() {
-        String sql = select("*").from("orders").groupBy("customer_id").build();
+        String sql = dsl.select("*").from("orders").groupBy("customer_id").build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"orders\".\"customer_id\"");
     }
 
     @Test
     void multipleColumns() {
-        String sql =
-                select("*").from("orders").groupBy("customer_id", "product_id").build();
+        String sql = dsl.select("*")
+                .from("orders")
+                .groupBy("customer_id", "product_id")
+                .build();
 
         assertThat(sql)
                 .isEqualTo("SELECT * FROM \"orders\" GROUP BY \"orders\".\"customer_id\", \"orders\".\"product_id\"");
@@ -26,7 +36,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withTableAlias() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .as("o")
                 .groupBy("customer_id", "product_id")
@@ -37,7 +47,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withQualifiedColumns() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .groupBy("orders.customer_id", "orders.product_id")
                 .build();
@@ -48,7 +58,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withAliasAndQualifiedColumns() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .as("o")
                 .groupBy("o.customer_id", "o.product_id")
@@ -59,7 +69,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withWhere() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .where("status")
                 .eq("completed")
@@ -73,7 +83,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withOrderBy() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .groupBy("customer_id")
                 .orderBy("customer_id")
@@ -86,7 +96,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withJoin() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .as("o")
                 .innerJoin("customers")
@@ -102,7 +112,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withJoinWhereAndOrderBy() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .as("o")
                 .innerJoin("customers")
@@ -121,7 +131,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withFetchAndOffset() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .groupBy("customer_id")
                 .fetch(10)
@@ -135,7 +145,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void manyColumns() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("orders")
                 .groupBy("customer_id", "product_id", "region", "status", "payment_method")
                 .build();
@@ -147,7 +157,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void complexQuery() {
-        String sql = select("customer_id", "product_id", "total")
+        String sql = dsl.select("customer_id", "product_id", "total")
                 .from("orders")
                 .as("o")
                 .innerJoin("customers")
@@ -170,28 +180,28 @@ class SelectBuilderGroupByTest {
 
     @Test
     void noColumnsThrowsException() {
-        assertThatThrownBy(() -> select("*").from("orders").groupBy())
+        assertThatThrownBy(() -> dsl.select("*").from("orders").groupBy())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one column must be specified for GROUP BY");
     }
 
     @Test
     void nullColumnsThrowsException() {
-        assertThatThrownBy(() -> select("*").from("orders").groupBy((String[]) null))
+        assertThatThrownBy(() -> dsl.select("*").from("orders").groupBy((String[]) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one column must be specified for GROUP BY");
     }
 
     @Test
     void emptyColumnThrowsException() {
-        assertThatThrownBy(() -> select("*").from("orders").groupBy("customer_id", ""))
+        assertThatThrownBy(() -> dsl.select("*").from("orders").groupBy("customer_id", ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void nullColumnInArrayThrowsException() {
-        assertThatThrownBy(() -> select("*").from("orders").groupBy("customer_id", null))
+        assertThatThrownBy(() -> dsl.select("*").from("orders").groupBy("customer_id", null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
