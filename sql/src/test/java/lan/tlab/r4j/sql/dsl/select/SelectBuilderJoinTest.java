@@ -1,16 +1,24 @@
 package lan.tlab.r4j.sql.dsl.select;
 
-import static lan.tlab.r4j.sql.dsl.DSL.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderJoinTest {
 
+    private lan.tlab.r4j.sql.dsl.DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void innerJoin() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
@@ -23,7 +31,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void leftJoin() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .leftJoin("profiles")
                 .on("users.id", "profiles.user_id")
@@ -36,7 +44,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void rightJoin() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .rightJoin("departments")
                 .on("users.dept_id", "departments.id")
@@ -49,7 +57,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void fullJoin() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .fullJoin("roles")
                 .on("users.role_id", "roles.id")
@@ -61,14 +69,14 @@ class SelectBuilderJoinTest {
 
     @Test
     void crossJoin() {
-        String sql = select("*").from("users").crossJoin("settings").build();
+        String sql = dsl.select("*").from("users").crossJoin("settings").build();
 
         assertThat(sql).isEqualTo("SELECT * FROM \"users\" CROSS JOIN \"settings\"");
     }
 
     @Test
     void innerJoinWithAlias() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -83,7 +91,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void multipleJoins() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -101,7 +109,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithSelectedColumns() {
-        String sql = select("name", "email", "order_id")
+        String sql = dsl.select("name", "email", "order_id")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -116,7 +124,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithWhereClause() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -133,7 +141,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithOrderBy() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
@@ -147,7 +155,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithFetchAndOffset() {
-        String sql = select("*")
+        String sql = dsl.select("*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
@@ -162,7 +170,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void complexJoinQuery() {
-        String sql = select("name", "email", "order_total")
+        String sql = dsl.select("name", "email", "order_total")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -186,28 +194,31 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithoutFromThrowsException() {
-        assertThatThrownBy(() -> select("*").innerJoin("orders"))
+        assertThatThrownBy(() -> dsl.select("*").innerJoin("orders"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified before adding a join");
     }
 
     @Test
     void joinWithEmptyLeftColumnThrowsException() {
-        assertThatThrownBy(() -> select("*").from("users").innerJoin("orders").on("", "orders.user_id"))
+        assertThatThrownBy(
+                        () -> dsl.select("*").from("users").innerJoin("orders").on("", "orders.user_id"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Left column cannot be null or empty");
     }
 
     @Test
     void joinWithEmptyRightColumnThrowsException() {
-        assertThatThrownBy(() -> select("*").from("users").innerJoin("orders").on("users.id", ""))
+        assertThatThrownBy(
+                        () -> dsl.select("*").from("users").innerJoin("orders").on("users.id", ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Right column cannot be null or empty");
     }
 
     @Test
     void joinWithEmptyAliasThrowsException() {
-        assertThatThrownBy(() -> select("*").from("users").innerJoin("orders").as(""))
+        assertThatThrownBy(
+                        () -> dsl.select("*").from("users").innerJoin("orders").as(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty");
     }

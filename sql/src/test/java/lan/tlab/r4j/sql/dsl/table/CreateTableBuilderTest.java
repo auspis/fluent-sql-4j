@@ -1,18 +1,26 @@
 package lan.tlab.r4j.sql.dsl.table;
 
-import static lan.tlab.r4j.sql.dsl.DSL.createTable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CreateTableBuilderTest {
 
+    private lan.tlab.r4j.sql.dsl.DSL dsl;
+
+    @BeforeEach
+    void setUp() {
+        dsl = TestDialectRendererFactory.dslStandardSql2008();
+    }
+
     @Test
     void createUserTable() {
-        String sql = createTable("User")
+        String sql = dsl.createTable("User")
                 .column("id")
                 .integer()
                 .notNull()
@@ -43,10 +51,11 @@ class CreateTableBuilderTest {
 
     @Test
     void columnIntegerPrimaryKey() {
-        String sqlShortForm = createTable("Test").columnIntegerPrimaryKey("id").build();
+        String sqlShortForm =
+                dsl.createTable("Test").columnIntegerPrimaryKey("id").build();
         assertThat(sqlShortForm).contains("\"id\" INTEGER NOT NULL").contains("PRIMARY KEY (\"id\")");
 
-        String sqlLongForm = createTable("Test")
+        String sqlLongForm = dsl.createTable("Test")
                 .column("id")
                 .integer()
                 .notNull()
@@ -59,11 +68,11 @@ class CreateTableBuilderTest {
     @Test
     void columnStringPrimaryKey() {
         String sqlShortForm =
-                createTable("Test").columnStringPrimaryKey("code", 50).build();
+                dsl.createTable("Test").columnStringPrimaryKey("code", 50).build();
 
         assertThat(sqlShortForm).contains("\"code\" VARCHAR(50) NOT NULL").contains("PRIMARY KEY (\"code\")");
 
-        String sqlLongForm = createTable("Test")
+        String sqlLongForm = dsl.createTable("Test")
                 .column("code")
                 .varchar(50)
                 .notNull()
@@ -76,12 +85,15 @@ class CreateTableBuilderTest {
     @Test
     void columnTimestampNotNull() {
         String sqlShortForm =
-                createTable("Test").columnTimestampNotNull("created_at").build();
+                dsl.createTable("Test").columnTimestampNotNull("created_at").build();
 
         assertThat(sqlShortForm).contains("\"created_at\" TIMESTAMP NOT NULL");
 
-        String sqlLongForm =
-                createTable("Test").column("created_at").timestamp().notNull().build();
+        String sqlLongForm = dsl.createTable("Test")
+                .column("created_at")
+                .timestamp()
+                .notNull()
+                .build();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
@@ -89,12 +101,12 @@ class CreateTableBuilderTest {
     @Test
     void columnVarcharNotNull() {
         String sqlShortForm =
-                createTable("Test").columnVarcharNotNull("name", 100).build();
+                dsl.createTable("Test").columnVarcharNotNull("name", 100).build();
 
         assertThat(sqlShortForm).contains("\"name\" VARCHAR(100) NOT NULL");
 
         String sqlLongForm =
-                createTable("Test").column("name").varchar(100).notNull().build();
+                dsl.createTable("Test").column("name").varchar(100).notNull().build();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
@@ -102,19 +114,19 @@ class CreateTableBuilderTest {
     @Test
     void columnDecimalNotNull() {
         String sqlShortForm =
-                createTable("Test").columnDecimalNotNull("price", 10, 2).build();
+                dsl.createTable("Test").columnDecimalNotNull("price", 10, 2).build();
 
         assertThat(sqlShortForm).contains("\"price\" DECIMAL(10, 2) NOT NULL");
 
         String sqlLongForm =
-                createTable("Test").column("price").decimal(10, 2).notNull().build();
+                dsl.createTable("Test").column("price").decimal(10, 2).notNull().build();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
 
     @Test
     void allConvenienceMethodsTogether() {
-        String sql = createTable("Product")
+        String sql = dsl.createTable("Product")
                 .column("id")
                 .integer()
                 .notNull()
@@ -144,7 +156,7 @@ class CreateTableBuilderTest {
 
     @Test
     void compositePrimaryKeyWithFluentApi() {
-        String sql = createTable("Orders")
+        String sql = dsl.createTable("Orders")
                 .column("customer_id")
                 .integer()
                 .notNull()
@@ -164,7 +176,7 @@ class CreateTableBuilderTest {
 
     @Test
     void uniqueConstraint() {
-        String sql = createTable("Users")
+        String sql = dsl.createTable("Users")
                 .column("id")
                 .integer()
                 .notNull()
@@ -178,7 +190,7 @@ class CreateTableBuilderTest {
 
     @Test
     void foreignKeyConstraint() {
-        String sql = createTable("Orders")
+        String sql = dsl.createTable("Orders")
                 .column("id")
                 .integer()
                 .notNull()
@@ -192,7 +204,7 @@ class CreateTableBuilderTest {
 
     @Test
     void tableWithoutPrimaryKey() {
-        String sql = createTable("Log")
+        String sql = dsl.createTable("Log")
                 .columnTimestampNotNull("timestamp")
                 .columnVarcharNotNull("message", 500)
                 .build();
@@ -205,14 +217,14 @@ class CreateTableBuilderTest {
 
     @Test
     void booleanColumn() {
-        String sql = createTable("Settings").column("enabled").bool().build();
+        String sql = dsl.createTable("Settings").column("enabled").bool().build();
 
         assertThat(sql).contains("\"enabled\" BOOLEAN");
     }
 
     @Test
     void mixedFluentAndConvenienceApis() {
-        String sql = createTable("Mixed")
+        String sql = dsl.createTable("Mixed")
                 .columnIntegerPrimaryKey("id")
                 .column("description")
                 .varchar(255)
@@ -231,7 +243,7 @@ class CreateTableBuilderTest {
 
     @Test
     void checkConstraint() {
-        String sql = createTable("People")
+        String sql = dsl.createTable("People")
                 .column("id")
                 .integer()
                 .notNull()
@@ -247,7 +259,7 @@ class CreateTableBuilderTest {
 
     @Test
     void defaultConstraint() {
-        String sql = createTable("Settings")
+        String sql = dsl.createTable("Settings")
                 .column("id")
                 .integer()
                 .notNull()
@@ -261,7 +273,7 @@ class CreateTableBuilderTest {
 
     @Test
     void singleIndex() {
-        String sql = createTable("Users")
+        String sql = dsl.createTable("Users")
                 .column("id")
                 .integer()
                 .notNull()
@@ -275,7 +287,7 @@ class CreateTableBuilderTest {
 
     @Test
     void compositeIndex() {
-        String sql = createTable("Orders")
+        String sql = dsl.createTable("Orders")
                 .column("customer_id")
                 .integer()
                 .column("order_date")
@@ -288,7 +300,7 @@ class CreateTableBuilderTest {
 
     @Test
     void columnWithoutExplicitTypeUsesDefault() {
-        String sql = createTable("Test").column("default_column").notNull().build();
+        String sql = dsl.createTable("Test").column("default_column").notNull().build();
 
         // ColumnDefinition has a default of VARCHAR(255)
         assertThat(sql).contains("\"default_column\" VARCHAR(255) NOT NULL");
@@ -297,7 +309,7 @@ class CreateTableBuilderTest {
     @Test
     void primaryKeyWithExplicitOrderControl() {
         // Demonstrates explicit control of the order of columns in the primary key
-        String sql = createTable("OrderItems")
+        String sql = dsl.createTable("OrderItems")
                 .column("item_id")
                 .integer()
                 .notNull()
