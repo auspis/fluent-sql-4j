@@ -58,7 +58,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * RegistryResult<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
+ * Result<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();

@@ -12,8 +12,9 @@ import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.RegistryResult.Failure;
-import lan.tlab.r4j.sql.plugin.RegistryResult.Success;
+import lan.tlab.r4j.sql.functional.Result;
+import lan.tlab.r4j.sql.functional.Result.Failure;
+import lan.tlab.r4j.sql.functional.Result.Success;
 import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li><b>Immutability</b>: Once created, a registry instance cannot be modified</li>
  *   <li><b>Pure functions</b>: Query methods have no side effects</li>
- *   <li><b>No exceptions</b>: Operations return {@link RegistryResult} instead of throwing</li>
+ *   <li><b>No exceptions</b>: Operations return {@link lan.tlab.r4j.sql.functional.Result} instead of throwing</li>
  *   <li><b>Thread-safe by design</b>: Immutability eliminates concurrency issues</li>
  * </ul>
  * <p>
@@ -43,12 +44,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>Using the registry:</b>
  * <pre>{@code
- * RegistryResult<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
+ * Result<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
  *
  * switch (result) {
  *     case Success<SqlRenderer>(SqlRenderer renderer) -> // use renderer
- *     case Failure<SqlRenderer>(String message) -> // handle error
- * }
+ * import lan.tlab.r4j.sql.functional.Result;
+ * import lan.tlab.r4j.sql.functional.Result.Failure;
+ * import lan.tlab.r4j.sql.functional.Result.Success;
  *
  * // Or use helper methods
  * SqlRenderer renderer = registry.getRenderer("mysql", "8.0.35").orElseThrow();
@@ -62,7 +64,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see SqlDialectPlugin
  * @see SqlDialectPluginProvider
- * @see RegistryResult
+ * @see lan.tlab.r4j.sql.functional.Result
  * @since 1.0
  */
 public final class SqlDialectPluginRegistry {
@@ -190,7 +192,7 @@ public final class SqlDialectPluginRegistry {
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @return a result containing the renderer, or a failure if the dialect is not supported
      */
-    public RegistryResult<DialectRenderer> getRenderer(String dialect) {
+    public Result<DialectRenderer> getRenderer(String dialect) {
         return getDialectRenderer(dialect, null);
     }
 
@@ -214,19 +216,19 @@ public final class SqlDialectPluginRegistry {
      * <p>
      * <b>Example with SemVer:</b>
      * <pre>{@code
-     * RegistryResult<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
+     * Result<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
      * }</pre>
      * <p>
      * <b>Example with non-SemVer:</b>
      * <pre>{@code
-     * RegistryResult<DialectRenderer> result = registry.getRenderer("standardsql", "2008");
+     * Result<DialectRenderer> result = registry.getRenderer("standardsql", "2008");
      * }</pre>
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @param version the database version, may be {@code null} to match any version
      * @return a result containing the renderer, or a failure if no matching plugin is found
      */
-    public RegistryResult<DialectRenderer> getDialectRenderer(String dialect, String version) {
+    public Result<DialectRenderer> getDialectRenderer(String dialect, String version) {
         if (dialect == null) {
             return new Failure<>("Dialect name must not be null");
         }
@@ -256,9 +258,9 @@ public final class SqlDialectPluginRegistry {
      *
      * @param dialect the dialect name
      * @param version the version to match
-     * @return a {@link RegistryResult} containing either the SQL renderer or an error message
+     * @return a {@link lan.tlab.r4j.sql.functional.Result} containing either the SQL renderer or an error message
      */
-    public RegistryResult<SqlRenderer> getSqlRenderer(String dialect, String version) {
+    public Result<SqlRenderer> getSqlRenderer(String dialect, String version) {
         return getDialectRenderer(dialect, version).map(DialectRenderer::sqlRenderer);
     }
 
@@ -269,9 +271,9 @@ public final class SqlDialectPluginRegistry {
      *
      * @param dialect the dialect name
      * @param version the version to match
-     * @return a {@link RegistryResult} containing either the PS renderer or an error message
+     * @return a {@link lan.tlab.r4j.sql.functional.Result} containing either the PS renderer or an error message
      */
-    public RegistryResult<PreparedStatementRenderer> getPsRenderer(String dialect, String version) {
+    public Result<PreparedStatementRenderer> getPsRenderer(String dialect, String version) {
         return getDialectRenderer(dialect, version).map(DialectRenderer::psRenderer);
     }
 

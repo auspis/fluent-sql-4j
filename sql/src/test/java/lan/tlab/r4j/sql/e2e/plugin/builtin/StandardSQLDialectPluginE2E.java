@@ -11,7 +11,7 @@ import java.util.List;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
-import lan.tlab.r4j.sql.plugin.RegistryResult;
+import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
@@ -59,38 +59,38 @@ class StandardSQLDialectPluginE2E {
 
     @Test
     void getRenderer() {
-        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
+        Result<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
 
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result).isInstanceOf(Result.Success.class);
         DialectRenderer renderer = result.orElseThrow();
         assertThat(renderer).isNotNull();
     }
 
     @Test
     void versionMatching() {
-        RegistryResult<DialectRenderer> exactMatch = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
-        assertThat(exactMatch).isInstanceOf(RegistryResult.Success.class);
+        Result<DialectRenderer> exactMatch = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
+        assertThat(exactMatch).isInstanceOf(Result.Success.class);
 
-        RegistryResult<DialectRenderer> wrongVersion = registry.getDialectRenderer(DIALECT_NAME, "2011");
-        assertThat(wrongVersion).isInstanceOf(RegistryResult.Failure.class);
+        Result<DialectRenderer> wrongVersion = registry.getDialectRenderer(DIALECT_NAME, "2011");
+        assertThat(wrongVersion).isInstanceOf(Result.Failure.class);
 
-        RegistryResult<DialectRenderer> wrongVersion2 = registry.getDialectRenderer(DIALECT_NAME, "2016");
-        assertThat(wrongVersion2).isInstanceOf(RegistryResult.Failure.class);
+        Result<DialectRenderer> wrongVersion2 = registry.getDialectRenderer(DIALECT_NAME, "2016");
+        assertThat(wrongVersion2).isInstanceOf(Result.Failure.class);
     }
 
     @Test
     void getRendererWithoutVersion() {
         // When version is not specified, should return available plugin
-        RegistryResult<DialectRenderer> result = registry.getRenderer(DIALECT_NAME);
+        Result<DialectRenderer> result = registry.getRenderer(DIALECT_NAME);
 
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
     }
 
     @Test
     void shouldProduceWorkingRenderer() throws SQLException {
         // Get renderer from registry
-        RegistryResult<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
+        Result<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         DialectRenderer renderer = result.orElseThrow();
 
         // Verify renderer works with real queries using the DSL
@@ -189,7 +189,7 @@ class StandardSQLDialectPluginE2E {
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
-        RegistryResult<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
-        assertThat(result).isInstanceOf(RegistryResult.Success.class);
+        Result<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
+        assertThat(result).isInstanceOf(Result.Success.class);
     }
 }
