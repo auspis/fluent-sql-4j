@@ -18,10 +18,12 @@ import org.junit.jupiter.api.Test;
 class InsertBuilderIntegrationTest {
 
     private Connection connection;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
+        dsl = TestDatabaseUtil.getDSL();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.createProductsTable(connection);
     }
@@ -34,7 +36,7 @@ class InsertBuilderIntegrationTest {
     @Test
     void singleStringValue() throws SQLException {
         PreparedStatement ps =
-                DSL.insertInto("users").set("id", 1).set("name", "John").buildPreparedStatement(connection);
+                dsl.insertInto("users").set("id", 1).set("name", "John").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -50,7 +52,7 @@ class InsertBuilderIntegrationTest {
 
     @Test
     void multipleColumnsWithMixedTypes() throws SQLException {
-        PreparedStatement ps = DSL.insertInto("users")
+        PreparedStatement ps = dsl.insertInto("users")
                 .set("id", 2)
                 .set("name", "Jane")
                 .set("email", "jane@example.com")
@@ -80,7 +82,7 @@ class InsertBuilderIntegrationTest {
 
     @Test
     void nullValues() throws SQLException {
-        PreparedStatement ps = DSL.insertInto("users")
+        PreparedStatement ps = dsl.insertInto("users")
                 .set("id", 3)
                 .set("name", "Bob")
                 .set("email", (String) null)
@@ -103,7 +105,7 @@ class InsertBuilderIntegrationTest {
 
     @Test
     void decimalValues() throws SQLException {
-        PreparedStatement ps = DSL.insertInto("products")
+        PreparedStatement ps = dsl.insertInto("products")
                 .set("id", 1)
                 .set("name", "Widget")
                 .set("price", 19.99)
@@ -126,7 +128,7 @@ class InsertBuilderIntegrationTest {
 
     @Test
     void multipleRows() throws SQLException {
-        PreparedStatement ps1 = DSL.insertInto("users")
+        PreparedStatement ps1 = dsl.insertInto("users")
                 .set("id", 10)
                 .set("name", "Alice")
                 .set("active", true)
@@ -134,7 +136,7 @@ class InsertBuilderIntegrationTest {
         assertThat(ps1.executeUpdate()).isEqualTo(1);
 
         // Insert second row
-        PreparedStatement ps2 = DSL.insertInto("users")
+        PreparedStatement ps2 = dsl.insertInto("users")
                 .set("id", 11)
                 .set("name", "Charlie")
                 .set("active", false)
@@ -159,14 +161,14 @@ class InsertBuilderIntegrationTest {
 
     @Test
     void typeSpecificMethods() throws SQLException {
-        PreparedStatement ps1 = DSL.insertInto("users")
+        PreparedStatement ps1 = dsl.insertInto("users")
                 .set("id", 20)
                 .set("name", "David")
                 .set("email", "david@example.com")
                 .buildPreparedStatement(connection);
         assertThat(ps1.executeUpdate()).isEqualTo(1);
 
-        PreparedStatement ps2 = DSL.insertInto("products")
+        PreparedStatement ps2 = dsl.insertInto("products")
                 .set("id", 20)
                 .set("price", 29.99)
                 .set("quantity", 50)
@@ -190,7 +192,7 @@ class InsertBuilderIntegrationTest {
 
     @Test
     void setMethod() throws SQLException {
-        PreparedStatement ps = DSL.insertInto("users")
+        PreparedStatement ps = dsl.insertInto("users")
                 .set("id", 30)
                 .set("name", "Emily")
                 .set("email", "emily@example.com")
