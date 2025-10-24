@@ -40,6 +40,29 @@ public sealed interface Result<T> {
         };
     }
 
+    /**
+     * Executes a side-effect action on the success value without transforming the result.
+     * <p>
+     * This method is useful for logging or other side effects while maintaining the functional
+     * chain. The consumer is only called if this is a {@link Success}.
+     * <p>
+     * <b>Example usage:</b>
+     * <pre>{@code
+     * DSL dsl = registry.dslFor("mysql", "8.0.35")
+     *     .peek(d -> logger.info("MySQL DSL loaded successfully"))
+     *     .orElseThrow();
+     * }</pre>
+     *
+     * @param consumer the action to perform on the success value
+     * @return this result unchanged
+     */
+    default Result<T> peek(java.util.function.Consumer<T> consumer) {
+        if (this instanceof Success<T>(T value)) {
+            consumer.accept(value);
+        }
+        return this;
+    }
+
     default T orElseThrow() {
         return switch (this) {
             case Success<T>(T value) -> value;
@@ -51,6 +74,28 @@ public sealed interface Result<T> {
         return switch (this) {
             case Success<T>(T value) -> value;
             case Failure<T> ignored -> defaultValue;
+        };
+    }
+
+    /**
+     * Returns the success value if present, or computes a default value from the supplier.
+     * <p>
+     * Unlike {@link #orElse(Object)}, the supplier is only called if this is a {@link Failure},
+     * making it suitable for expensive fallback operations.
+     * <p>
+     * <b>Example usage:</b>
+     * <pre>{@code
+     * DSL dsl = registry.dslFor("exotic-db", "1.0")
+     *     .orElseGet(() -> registry.dslFor("standardsql", "2008").orElseThrow());
+     * }</pre>
+     *
+     * @param supplier the supplier to compute the default value
+     * @return the success value or the computed default
+     */
+    default T orElseGet(java.util.function.Supplier<T> supplier) {
+        return switch (this) {
+            case Success<T>(T value) -> value;
+            case Failure<T> ignored -> supplier.get();
         };
     }
 
