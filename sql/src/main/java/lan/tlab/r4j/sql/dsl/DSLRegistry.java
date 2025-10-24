@@ -1,6 +1,9 @@
 package lan.tlab.r4j.sql.dsl;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 
@@ -43,7 +46,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
  * <ul>
  *   <li><b>Separation of Concerns</b>: Plugin management is separated from DSL usage</li>
  *   <li><b>Simpler API</b>: Users work with DSL directly, not with renderers</li>
- *   <li><b>Extensibility</b>: Future enhancements like DSL caching or pooling</li>
+ *   <li><b>Caching</b>: DSL instances are cached per dialect/version for efficiency</li>
  *   <li><b>Type Safety</b>: Returns {@link Result} for explicit error handling</li>
  *   <li><b>Testability</b>: Easy to mock and test</li>
  * </ul>
@@ -56,6 +59,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 public final class DSLRegistry {
 
     private final SqlDialectPluginRegistry pluginRegistry;
+    private final Map<String, DSL> dslCache;
 
     /**
      * Private constructor. Use factory methods to create instances.
@@ -64,6 +68,7 @@ public final class DSLRegistry {
      */
     private DSLRegistry(SqlDialectPluginRegistry pluginRegistry) {
         this.pluginRegistry = Objects.requireNonNull(pluginRegistry, "SqlDialectPluginRegistry must not be null");
+        this.dslCache = new ConcurrentHashMap<>();
     }
 
     /**
@@ -111,6 +116,10 @@ public final class DSLRegistry {
     /**
      * Creates a DSL instance for the specified SQL dialect and version.
      * <p>
+     * DSL instances are cached per dialect/version combination. Multiple calls
+     * with the same parameters will return the same DSL instance, following
+     * the Registry pattern convention.
+     * <p>
      * The dialect name is matched case-insensitively. The registry finds all plugins
      * registered for the given dialect and filters them by version compatibility.
      * <p>
@@ -135,6 +144,73 @@ public final class DSLRegistry {
      * @return a result containing the DSL instance, or a failure if no matching plugin is found
      */
     public Result<DSL> dslFor(String dialect, String version) {
-        return pluginRegistry.getDialectRenderer(dialect, version).map(DSL::new);
+        String cacheKey = buildCacheKey(dialect, version);
+
+        // Check cache first
+        DSL cachedDsl = dslCache.get(cacheKey);
+        if (cachedDsl != null) {
+            return new Result.Success<>(cachedDsl);
+        }
+
+        // Not in cache, create new DSL and cache it
+        return pluginRegistry.getDialectRenderer(dialect, version).map(renderer -> {
+            DSL dsl = new DSL(renderer);
+            dslCache.put(cacheKey, dsl);
+            return dsl;
+        });
+    }
+
+    /**
+     * Returns the set of all supported SQL dialects.
+     * <p>
+     * The returned set contains the names of all dialects that have at least one
+     * registered plugin. Dialect names are returned in their normalized form (lowercase).
+     *
+     * @return an immutable set of supported dialect names
+     */
+    public Set<String> getSupportedDialects() {
+        return pluginRegistry.getSupportedDialects();
+    }
+
+    /**
+     * Checks if a specific SQL dialect is supported by this registry.
+     * <p>
+     * The dialect name is matched case-insensitively.
+     *
+     * @param dialect the name of the SQL dialect to check
+     * @return {@code true} if the dialect is supported, {@code false} otherwise
+     */
+    public boolean isSupported(String dialect) {
+        return pluginRegistry.isSupported(dialect);
+    }
+
+    /**
+     * Clears the internal DSL cache.
+     * <p>
+     * This method is useful for testing or when you want to force recreation
+     * of DSL instances after configuration changes.
+     */
+    public void clearCache() {
+        dslCache.clear();
+    }
+
+    /**
+     * Returns the number of cached DSL instances.
+     * <p>
+     * This method is useful for monitoring cache usage and testing.
+     *
+     * @return the number of DSL instances currently in cache
+     */
+    public int getCacheSize() {
+        return dslCache.size();
+    }
+
+    /**
+     * Builds a cache key from dialect and version.
+     */
+    private String buildCacheKey(String dialect, String version) {
+        String normalizedDialect = dialect != null ? dialect.toLowerCase() : "null";
+        String normalizedVersion = version != null ? version : "*";
+        return normalizedDialect + ":" + normalizedVersion;
     }
 }
