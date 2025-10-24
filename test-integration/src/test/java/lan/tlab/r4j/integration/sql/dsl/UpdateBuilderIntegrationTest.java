@@ -16,10 +16,12 @@ import org.junit.jupiter.api.Test;
 class UpdateBuilderIntegrationTest {
 
     private Connection connection;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
+        dsl = TestDatabaseUtil.getDSL();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.createProductsTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
@@ -33,7 +35,7 @@ class UpdateBuilderIntegrationTest {
     @Test
     void singleColumnWithWhereCondition() throws SQLException {
         PreparedStatement ps =
-                DSL.update("users").set("name", "Johnny").where("id").eq(1).buildPreparedStatement(connection);
+                dsl.update("users").set("name", "Johnny").where("id").eq(1).buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -53,7 +55,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void multipleColumns() throws SQLException {
-        PreparedStatement ps = DSL.update("users")
+        PreparedStatement ps = dsl.update("users")
                 .set("name", "Johnny")
                 .set("age", 35)
                 .where("id")
@@ -73,7 +75,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void andCondition() throws SQLException {
-        PreparedStatement ps = DSL.update("users")
+        PreparedStatement ps = dsl.update("users")
                 .set("email", "jane.updated@example.com")
                 .where("age")
                 .gt(18)
@@ -99,7 +101,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void orCondition() throws SQLException {
-        PreparedStatement ps = DSL.update("users")
+        PreparedStatement ps = dsl.update("users")
                 .set("email", "updated@example.com")
                 .where("name")
                 .eq("John Doe")
@@ -119,7 +121,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void likeCondition() throws SQLException {
-        PreparedStatement ps = DSL.update("users")
+        PreparedStatement ps = dsl.update("users")
                 .set("email", "verified@example.com")
                 .where("email")
                 .like("%example.com")
@@ -138,7 +140,7 @@ class UpdateBuilderIntegrationTest {
     @Test
     void allRows() throws SQLException {
         PreparedStatement ps =
-                DSL.update("users").set("email", "updated@example.com").buildPreparedStatement(connection);
+                dsl.update("users").set("email", "updated@example.com").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);
@@ -152,7 +154,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void numberComparison() throws SQLException {
-        PreparedStatement ps = DSL.update("users")
+        PreparedStatement ps = dsl.update("users")
                 .set("name", "Older User")
                 .where("age")
                 .gt(30)
@@ -176,7 +178,7 @@ class UpdateBuilderIntegrationTest {
 
     @Test
     void booleanUpdate() throws SQLException {
-        PreparedStatement ps = DSL.update("users")
+        PreparedStatement ps = dsl.update("users")
                 .set("active", false)
                 .where("name")
                 .eq("John Doe")
