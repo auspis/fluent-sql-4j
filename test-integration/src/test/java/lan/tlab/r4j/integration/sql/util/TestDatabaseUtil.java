@@ -4,14 +4,29 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.dsl.DSLRegistry;
 
 /**
  * Utility class for creating and managing test database connections and tables in integration tests.
  */
 public final class TestDatabaseUtil {
 
+    private static final DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+    private static final DSL dsl = registry.dslFor("standardsql", "2008").orElseThrow();
+
     private TestDatabaseUtil() {
         // Utility class - prevent instantiation
+    }
+
+    /**
+     * Returns a DSL instance configured for Standard SQL 2008 dialect.
+     * This is the dialect used by H2 in integration tests.
+     *
+     * @return DSL instance for building SQL queries
+     */
+    public static DSL getDSL() {
+        return dsl;
     }
 
     /**
