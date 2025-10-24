@@ -20,10 +20,12 @@ import org.junit.jupiter.api.Test;
 class ResultSetUtilIntegrationTest {
 
     private Connection connection;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
+        dsl = TestDatabaseUtil.getDSL();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
     }
@@ -35,7 +37,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void streamOfResultSet() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
                 ResultSet rs = ps.executeQuery();
                 Stream<String> names = ResultSetUtil.stream(rs, r -> r.getString("name"))) {
 
@@ -47,7 +49,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void streamOfResultSetClosesResultSetWhenMapperThrows() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
 
         ResultSet rs = ps.executeQuery();
         Stream<String> names = ResultSetUtil.stream(rs, r -> r.getString("nonexistent_column"));
@@ -60,7 +62,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void streamOfResultSetFilter() throws SQLException {
-        try (PreparedStatement ps = DSL.select("age").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps = dsl.select("age").from("users").buildPreparedStatement(connection);
                 ResultSet rs = ps.executeQuery();
                 Stream<Integer> ages = ResultSetUtil.stream(rs, r -> r.getInt("age"))) {
 
@@ -74,7 +76,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void streamOfPreparedStatementClosesPreparedStatementWhenExhausted() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
 
         try (Stream<String> names = ResultSetUtil.stream(ps, r -> r.getString("name"))) {
             // consume all rows
@@ -89,7 +91,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void streamOfPreparedStatementClosesPreparedStatementWhenClosedPrematurely() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
 
         Stream<String> names = ResultSetUtil.stream(ps, r -> r.getString("name"));
 
@@ -106,7 +108,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void streamOfPreparedStatementClosesPreparedStatementWhenMapperThrows() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
 
         Stream<String> names = ResultSetUtil.stream(ps, r -> r.getString("nonexistent_column"));
 
@@ -117,7 +119,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void listOfResultSet() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age").from("users").buildPreparedStatement(connection);
+        try (PreparedStatement ps = dsl.select("name", "age").from("users").buildPreparedStatement(connection);
                 ResultSet rs = ps.executeQuery()) {
 
             List<List<Object>> list = ResultSetUtil.list(rs, r -> List.of(r.getString("name"), r.getInt("age")));
@@ -131,7 +133,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void listOfPreparedStatement() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age").from("users").buildPreparedStatement(connection)) {
+        try (PreparedStatement ps = dsl.select("name", "age").from("users").buildPreparedStatement(connection)) {
 
             List<List<Object>> list = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
@@ -144,7 +146,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void listOfResultSetClosesResultSet() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
 
         ResultSet rs = ps.executeQuery();
         try {
@@ -162,7 +164,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void listOfPreparedStatementReturnsContentAndClosesPs() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
 
         List<String> list = ResultSetUtil.list(ps, r -> r.getString("name"));
         assertThat(list).hasSize(10);
@@ -171,7 +173,7 @@ class ResultSetUtilIntegrationTest {
 
     @Test
     void listOfPreparedStatementClosesPsWhenMapperThrows() throws SQLException {
-        PreparedStatement ps = DSL.select("name").from("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(connection);
 
         assertThatThrownBy(() -> ResultSetUtil.list(ps, r -> r.getString("nonexistent_column")))
                 .isInstanceOf(RuntimeException.class);
