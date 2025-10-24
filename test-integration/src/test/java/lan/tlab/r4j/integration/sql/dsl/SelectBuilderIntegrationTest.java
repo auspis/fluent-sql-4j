@@ -19,10 +19,12 @@ import org.junit.jupiter.api.Test;
 class SelectBuilderIntegrationTest {
 
     private Connection connection;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
+        dsl = TestDatabaseUtil.getDSL();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.createProductsTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
@@ -35,7 +37,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectSpecificColumns() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "email").from("users").buildPreparedStatement(connection)) {
+        try (PreparedStatement ps = dsl.select("name", "email").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getString("email")));
 
             assertThat(rows)
@@ -52,7 +54,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void selectAllColumns() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select("id", "name", "email", "age", "active").from("users").buildPreparedStatement(connection)) {
+                dsl.select("id", "name", "email", "age", "active").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(
                     ps,
                     r -> List.of(
@@ -76,7 +78,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void whereEqualCondition() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = dsl.select("name", "age")
                 .from("users")
                 .where("name")
                 .eq("John Doe")
@@ -93,7 +95,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void whereGreaterThan() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").gt(25).buildPreparedStatement(connection)) {
+                dsl.select("name", "age").from("users").where("age").gt(25).buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
             assertThat(rows)
@@ -106,7 +108,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void whereLessThan() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").lt(20).buildPreparedStatement(connection)) {
+                dsl.select("name", "age").from("users").where("age").lt(20).buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
             assertThat(rows)
@@ -119,7 +121,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void whereGreaterThanOrEqual() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").gte(30).buildPreparedStatement(connection)) {
+                dsl.select("name", "age").from("users").where("age").gte(30).buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
             assertThat(rows)
@@ -132,7 +134,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void whereLessThanOrEqual() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select("name", "age").from("users").where("age").lte(25).buildPreparedStatement(connection)) {
+                dsl.select("name", "age").from("users").where("age").lte(25).buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
             assertThat(rows)
@@ -144,7 +146,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void whereNotEqual() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = dsl.select("name", "age")
                 .from("users")
                 .where("name")
                 .ne("John Doe")
@@ -157,7 +159,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void whereLike() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "email")
+        try (PreparedStatement ps = dsl.select("name", "email")
                 .from("users")
                 .where("email")
                 .like("%example.com")
@@ -171,7 +173,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void andCondition() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age", "active")
+        try (PreparedStatement ps = dsl.select("name", "age", "active")
                 .from("users")
                 .where("age")
                 .gt(18)
@@ -191,7 +193,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void orCondition() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = dsl.select("name", "age")
                 .from("users")
                 .where("name")
                 .eq("John Doe")
@@ -209,7 +211,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void andOrCondition() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age", "active")
+        try (PreparedStatement ps = dsl.select("name", "age", "active")
                 .from("users")
                 .where("age")
                 .gt(20)
@@ -231,7 +233,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void orderByAscending() throws SQLException {
         PreparedStatement ps =
-                DSL.select("name", "age").from("users").orderBy("age").buildPreparedStatement(connection);
+                dsl.select("name", "age").from("users").orderBy("age").buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -267,7 +269,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void orderByDescending() throws SQLException {
         PreparedStatement ps =
-                DSL.select("name", "age").from("users").orderByDesc("age").buildPreparedStatement(connection);
+                dsl.select("name", "age").from("users").orderByDesc("age").buildPreparedStatement(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -294,7 +296,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void fetch() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name").from("users").fetch(2).buildPreparedStatement(connection)) {
+        try (PreparedStatement ps = dsl.select("name").from("users").fetch(2).buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
             assertThat(rows).hasSize(2).extracting(r -> (String) r.get(0)).containsExactly("John Doe", "Jane Smith");
@@ -304,7 +306,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void offset() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select("name").from("users").offset(2).fetch(2).buildPreparedStatement(connection)) {
+                dsl.select("name").from("users").offset(2).fetch(2).buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
             assertThat(rows).hasSize(2).extracting(r -> (String) r.get(0)).containsExactly("Bob", "Alice");
@@ -314,7 +316,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void fetchAndOffset() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select("name").from("users").fetch(2).offset(1).buildPreparedStatement(connection)) {
+                dsl.select("name").from("users").fetch(2).offset(1).buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
             assertThat(rows).hasSize(2).extracting(r -> (String) r.get(0)).containsExactly("Jane Smith", "Bob");
@@ -323,7 +325,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void fullSelectQuery() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "email", "age")
+        try (PreparedStatement ps = dsl.select("name", "email", "age")
                 .from("users")
                 .where("age")
                 .gte(18)
@@ -345,7 +347,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void fromWithAlias() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "email")
+        try (PreparedStatement ps = dsl.select("name", "email")
                 .from("users")
                 .as("u")
                 .where("name")
@@ -362,7 +364,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void whereWithOrderByAndFetch() throws SQLException {
-        try (PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = dsl.select("name", "age")
                 .from("users")
                 .where("active")
                 .eq(true)
@@ -383,10 +385,10 @@ class SelectBuilderIntegrationTest {
     @Test
     void fromSubquery() throws SQLException {
         SelectBuilder subquery =
-                DSL.select("name", "age").from("users").where("age").gt(20);
+                dsl.select("name", "age").from("users").where("age").gt(20);
 
         try (PreparedStatement ps =
-                DSL.select("name", "age").from(subquery, "u").buildPreparedStatement(connection)) {
+                dsl.select("name", "age").from(subquery, "u").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
 
             // Users with age > 20: Jane(25), Diana(25), Grace(28), John(30), Charlie(30), Henry(30), Alice(35),
@@ -398,9 +400,9 @@ class SelectBuilderIntegrationTest {
     @Test
     void fromSubqueryWithWhere() throws SQLException {
         SelectBuilder subquery =
-                DSL.select("name", "age").from("users").where("active").eq(true);
+                dsl.select("name", "age").from("users").where("active").eq(true);
 
-        try (PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = dsl.select("name", "age")
                 .from(subquery, "u")
                 .where("age")
                 .gte(30)
@@ -415,10 +417,10 @@ class SelectBuilderIntegrationTest {
     @Test
     void whereWithScalarSubquery() throws SQLException {
         // Create a subquery that returns a single value (average age)
-        SelectBuilder avgAgeSubquery = DSL.select("age").from("users").fetch(1);
+        SelectBuilder avgAgeSubquery = dsl.select("age").from("users").fetch(1);
 
         // This test verifies the scalar subquery is generated correctly in SQL
-        try (PreparedStatement ps = DSL.select("name", "age")
+        try (PreparedStatement ps = dsl.select("name", "age")
                 .from("users")
                 .where("age")
                 .gte(avgAgeSubquery)
@@ -432,7 +434,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void groupByWithHaving() throws SQLException {
-        try (PreparedStatement ps = DSL.select("age")
+        try (PreparedStatement ps = dsl.select("age")
                 .from("users")
                 .groupBy("age")
                 .having("age")
@@ -451,7 +453,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void groupByWithHavingAndCondition() throws SQLException {
-        try (PreparedStatement ps = DSL.select("age")
+        try (PreparedStatement ps = dsl.select("age")
                 .from("users")
                 .groupBy("age")
                 .having("age")
@@ -472,7 +474,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void groupByWithHavingOrCondition() throws SQLException {
-        try (PreparedStatement ps = DSL.select("age")
+        try (PreparedStatement ps = dsl.select("age")
                 .from("users")
                 .groupBy("age")
                 .having("age")
@@ -489,7 +491,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void whereGroupByHavingOrderBy() throws SQLException {
-        try (PreparedStatement ps = DSL.select("age")
+        try (PreparedStatement ps = dsl.select("age")
                 .from("users")
                 .where("active")
                 .eq(true)
@@ -506,7 +508,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectCountStar() throws SQLException {
-        try (PreparedStatement ps = DSL.select().countStar().from("users").buildPreparedStatement(connection)) {
+        try (PreparedStatement ps = dsl.select().countStar().from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt(1)));
 
             assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(10);
@@ -516,7 +518,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void selectCountStarWithAlias() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select().countStar().as("total_users").from("users").buildPreparedStatement(connection)) {
+                dsl.select().countStar().as("total_users").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("total_users")));
 
             assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(10);
@@ -525,7 +527,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectSumWithGroupBy() throws SQLException {
-        try (PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = dsl.select()
                 .sum("id")
                 .as("total_ids")
                 .from("users")
@@ -550,7 +552,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectAvgWithGroupByAndHaving() throws SQLException {
-        try (PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = dsl.select()
                 .avg("id")
                 .as("avg_id")
                 .from("users")
@@ -572,14 +574,14 @@ class SelectBuilderIntegrationTest {
     @Test
     void selectMaxAndMin() throws SQLException {
         try (PreparedStatement psMax =
-                DSL.select().max("age").as("max_age").from("users").buildPreparedStatement(connection)) {
+                dsl.select().max("age").as("max_age").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(psMax, r -> List.of(r.getInt("max_age")));
 
             assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(40);
         }
 
         try (PreparedStatement psMin =
-                DSL.select().min("age").as("min_age").from("users").buildPreparedStatement(connection)) {
+                dsl.select().min("age").as("min_age").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(psMin, r -> List.of(r.getInt("min_age")));
 
             assertThat(rows).hasSize(1).extracting(r -> (Integer) r.get(0)).containsExactly(15);
@@ -588,7 +590,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectCountDistinct() throws SQLException {
-        try (PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = dsl.select()
                 .countDistinct("age")
                 .as("unique_ages")
                 .from("users")
@@ -604,7 +606,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectCountWithWhere() throws SQLException {
-        try (PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = dsl.select()
                 .count("id")
                 .as("active_count")
                 .from("users")
@@ -620,7 +622,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void selectMultipleAggregatesWithoutAliases() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select().sum("age").max("createdAt").from("users").buildPreparedStatement(connection)) {
+                dsl.select().sum("age").max("createdAt").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt(1), r.getTimestamp(2)));
 
             assertThat(rows).hasSize(1);
@@ -631,7 +633,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectMultipleAggregatesWithAliases() throws SQLException {
-        try (PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = dsl.select()
                 .sum("age")
                 .as("total_age")
                 .max("createdAt")
@@ -650,7 +652,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void selectMultipleAggregatesWithOneAlias() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select().sum("age").max("id").as("max_id").from("users").buildPreparedStatement(connection)) {
+                dsl.select().sum("age").max("id").as("max_id").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt(1), r.getInt("max_id")));
 
             assertThat(rows).hasSize(1);
@@ -661,7 +663,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectColumn() throws SQLException {
-        try (PreparedStatement ps = DSL.select().column("name").from("users").buildPreparedStatement(connection)) {
+        try (PreparedStatement ps = dsl.select().column("name").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name")));
 
             assertThat(rows)
@@ -674,7 +676,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void selectColumnWithAlias() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select().column("name").as("user_name").from("users").buildPreparedStatement(connection)) {
+                dsl.select().column("name").as("user_name").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("user_name")));
 
             assertThat(rows).hasSize(10).extracting(r -> (String) r.get(0)).contains("John Doe");
@@ -684,7 +686,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void selectMultipleColumns() throws SQLException {
         try (PreparedStatement ps =
-                DSL.select().column("name").column("email").from("users").buildPreparedStatement(connection)) {
+                dsl.select().column("name").column("email").from("users").buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getString("email")));
 
             assertThat(rows)
@@ -696,7 +698,7 @@ class SelectBuilderIntegrationTest {
 
     @Test
     void selectMixedColumnsAndAggregates() throws SQLException {
-        try (PreparedStatement ps = DSL.select()
+        try (PreparedStatement ps = dsl.select()
                 .column("age")
                 .count("id")
                 .as("user_count")

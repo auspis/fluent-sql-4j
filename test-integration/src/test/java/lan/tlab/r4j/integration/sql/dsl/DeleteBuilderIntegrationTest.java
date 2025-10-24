@@ -16,10 +16,12 @@ import org.junit.jupiter.api.Test;
 class DeleteBuilderIntegrationTest {
 
     private Connection connection;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
+        dsl = TestDatabaseUtil.getDSL();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.createProductsTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
@@ -32,7 +34,7 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void whereCondition() throws SQLException {
-        PreparedStatement ps = DSL.deleteFrom("users").where("id").eq(2).buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.deleteFrom("users").where("id").eq(2).buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -51,7 +53,7 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void multipleConditions() throws SQLException {
-        PreparedStatement ps = DSL.deleteFrom("users").where("age").lt(18).buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.deleteFrom("users").where("age").lt(18).buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -65,7 +67,7 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void andCondition() throws SQLException {
-        PreparedStatement ps = DSL.deleteFrom("users")
+        PreparedStatement ps = dsl.deleteFrom("users")
                 .where("age")
                 .gt(18)
                 .and("name")
@@ -88,7 +90,7 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void orCondition() throws SQLException {
-        PreparedStatement ps = DSL.deleteFrom("users")
+        PreparedStatement ps = dsl.deleteFrom("users")
                 .where("name")
                 .eq("John Doe")
                 .or("name")
@@ -119,7 +121,7 @@ class DeleteBuilderIntegrationTest {
     @Test
     void stringLike() throws SQLException {
         PreparedStatement ps =
-                DSL.deleteFrom("users").where("email").like("%example.com").buildPreparedStatement(connection);
+                dsl.deleteFrom("users").where("email").like("%example.com").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);
@@ -133,7 +135,7 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void allRows() throws SQLException {
-        PreparedStatement ps = DSL.deleteFrom("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.deleteFrom("users").buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);

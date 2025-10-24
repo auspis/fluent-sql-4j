@@ -16,10 +16,12 @@ import org.junit.jupiter.api.Test;
 class CreateTableBuilderIntegrationTest {
 
     private Connection connection;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
+        dsl = TestDatabaseUtil.getDSL();
     }
 
     @AfterEach
@@ -31,7 +33,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void simpleTableWithPrimaryKey() throws SQLException {
-        String sql = DSL.createTable("test_users")
+        String sql = dsl.createTable("test_users")
                 .column("id")
                 .integer()
                 .notNull()
@@ -51,7 +53,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void tableWithMultipleColumns() throws SQLException {
-        String sql = DSL.createTable("products")
+        String sql = dsl.createTable("products")
                 .column("id")
                 .integer()
                 .notNull()
@@ -78,7 +80,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void tableWithDifferentDataTypes() throws SQLException {
-        String sql = DSL.createTable("mixed_types")
+        String sql = dsl.createTable("mixed_types")
                 .column("id")
                 .integer()
                 .notNull()
@@ -104,7 +106,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void tableWithCompositePrimaryKey() throws SQLException {
-        String sql = DSL.createTable("order_items")
+        String sql = dsl.createTable("order_items")
                 .column("order_id")
                 .integer()
                 .notNull()
@@ -128,7 +130,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void convenienceMethodColumnIntegerPrimaryKey() throws SQLException {
-        String sql = DSL.createTable("simple").columnIntegerPrimaryKey("id").build();
+        String sql = dsl.createTable("simple").columnIntegerPrimaryKey("id").build();
 
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
@@ -140,7 +142,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void convenienceMethodColumnVarcharNotNull() throws SQLException {
-        String sql = DSL.createTable("text_table")
+        String sql = dsl.createTable("text_table")
                 .columnIntegerPrimaryKey("id")
                 .columnVarcharNotNull("name", 100)
                 .build();
@@ -156,7 +158,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void convenienceMethodColumnTimestampNotNull() throws SQLException {
-        String sql = DSL.createTable("timestamps")
+        String sql = dsl.createTable("timestamps")
                 .columnIntegerPrimaryKey("id")
                 .columnTimestampNotNull("created_at")
                 .build();
@@ -172,7 +174,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void insertDataAfterTableCreation() throws SQLException {
-        String sql = DSL.createTable("test_insert")
+        String sql = dsl.createTable("test_insert")
                 .column("id")
                 .integer()
                 .notNull()
