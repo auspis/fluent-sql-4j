@@ -5,13 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CreateTableBuilderTest {
 
-    private lan.tlab.r4j.sql.dsl.DSL dsl;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() {

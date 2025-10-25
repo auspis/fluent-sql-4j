@@ -2,8 +2,7 @@ package lan.tlab.r4j.sql.ast.statement.dml;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
-import lan.tlab.r4j.sql.ast.identifier.Alias;
+import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction;
 import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
@@ -17,10 +16,7 @@ import lombok.Getter;
 @Getter
 public class MergeStatement implements DataManipulationStatement {
 
-    private final TableExpression targetTable;
-
-    @Default
-    private final Alias targetAlias = Alias.nullObject();
+    private final TableIdentifier targetTable;
 
     private final MergeUsing using;
 
