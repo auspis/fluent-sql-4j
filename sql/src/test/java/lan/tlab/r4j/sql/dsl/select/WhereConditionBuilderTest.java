@@ -131,8 +131,7 @@ class WhereConditionBuilderTest {
     }
 
     @Test
-    void stringSpecialOperations() {
-        // Test LIKE operation
+    void likePatternMatching() {
         String sql =
                 dsl.select("name").from("users").where("name").like("John%").build();
         assertThat(sql).contains("WHERE").contains("name").contains("LIKE 'John%'");
