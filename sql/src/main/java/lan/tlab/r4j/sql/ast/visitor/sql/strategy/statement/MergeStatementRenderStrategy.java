@@ -11,11 +11,6 @@ public class MergeStatementRenderStrategy implements StatementRenderStrategy {
         StringBuilder sql = new StringBuilder("MERGE INTO ");
         sql.append(statement.getTargetTable().accept(sqlRenderer, ctx));
 
-        String targetAlias = statement.getTargetAlias().accept(sqlRenderer, ctx);
-        if (!targetAlias.isEmpty()) {
-            sql.append(" ").append(targetAlias);
-        }
-
         sql.append(" USING ");
         sql.append(statement.getUsing().accept(sqlRenderer, ctx));
 

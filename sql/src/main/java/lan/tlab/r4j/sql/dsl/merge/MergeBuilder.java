@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.Expression;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
+import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
@@ -27,8 +28,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 
 public class MergeBuilder {
     private final DialectRenderer renderer;
-    private TableExpression targetTable;
-    private Alias targetAlias = Alias.nullObject();
+    private TableIdentifier targetTable;
     private MergeUsing using;
     private Predicate onCondition;
     private final List<MergeAction> actions = new ArrayList<>();
@@ -45,7 +45,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.targetAlias = new Alias(alias);
+        this.targetTable = new TableIdentifier(this.targetTable.getName(), alias);
         return this;
     }
 
@@ -117,6 +117,17 @@ public class MergeBuilder {
         return this;
     }
 
+    public WhenMatchedUpdateBuilder whenMatched() {
+        return new WhenMatchedUpdateBuilder(this, null);
+    }
+
+    public WhenMatchedUpdateBuilder whenMatched(Predicate condition) {
+        if (condition == null) {
+            throw new IllegalArgumentException("Condition cannot be null");
+        }
+        return new WhenMatchedUpdateBuilder(this, condition);
+    }
+
     public MergeBuilder whenMatchedThenDelete() {
         this.actions.add(new WhenMatchedDelete(null));
         return this;
@@ -158,6 +169,17 @@ public class MergeBuilder {
         return this;
     }
 
+    public WhenNotMatchedInsertBuilder whenNotMatched() {
+        return new WhenNotMatchedInsertBuilder(this, null);
+    }
+
+    public WhenNotMatchedInsertBuilder whenNotMatched(Predicate condition) {
+        if (condition == null) {
+            throw new IllegalArgumentException("Condition cannot be null");
+        }
+        return new WhenNotMatchedInsertBuilder(this, condition);
+    }
+
     public String build() {
         validateState();
         MergeStatement statement = getCurrentStatement();
@@ -194,7 +216,6 @@ public class MergeBuilder {
     private MergeStatement getCurrentStatement() {
         return MergeStatement.builder()
                 .targetTable(targetTable)
-                .targetAlias(targetAlias)
                 .using(using)
                 .onCondition(onCondition)
                 .actions(actions)
@@ -207,5 +228,220 @@ public class MergeBuilder {
             return ColumnReference.of(parts[0], parts[1]);
         }
         return ColumnReference.of("", column);
+    }
+
+    public static class WhenMatchedUpdateBuilder {
+        private final MergeBuilder parent;
+        private final Predicate condition;
+        private final List<UpdateItem> updateItems = new ArrayList<>();
+        private boolean actionCommitted = false;
+
+        WhenMatchedUpdateBuilder(MergeBuilder parent, Predicate condition) {
+            this.parent = parent;
+            this.condition = condition;
+        }
+
+        public WhenMatchedUpdateBuilder set(String column, String value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            return this;
+        }
+
+        public WhenMatchedUpdateBuilder set(String column, Number value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            return this;
+        }
+
+        public WhenMatchedUpdateBuilder set(String column, Boolean value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            return this;
+        }
+
+        public WhenMatchedUpdateBuilder set(String column, Expression value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            if (!(value instanceof ScalarExpression)) {
+                throw new IllegalArgumentException("Value must be a ScalarExpression");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            ScalarExpression expr = value == null ? Literal.ofNull() : (ScalarExpression) value;
+            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            return this;
+        }
+
+        private void commitAction() {
+            if (actionCommitted) {
+                return;
+            }
+            if (updateItems.isEmpty()) {
+                throw new IllegalStateException("At least one SET clause must be specified for UPDATE");
+            }
+            if (condition == null) {
+                parent.actions.add(new WhenMatchedUpdate(updateItems));
+            } else {
+                parent.actions.add(new WhenMatchedUpdate(condition, updateItems));
+            }
+            actionCommitted = true;
+        }
+
+        public WhenMatchedUpdateBuilder whenMatched() {
+            commitAction();
+            return parent.whenMatched();
+        }
+
+        public WhenMatchedUpdateBuilder whenMatched(Predicate condition) {
+            commitAction();
+            return parent.whenMatched(condition);
+        }
+
+        public WhenNotMatchedInsertBuilder whenNotMatched() {
+            commitAction();
+            return parent.whenNotMatched();
+        }
+
+        public WhenNotMatchedInsertBuilder whenNotMatched(Predicate condition) {
+            commitAction();
+            return parent.whenNotMatched(condition);
+        }
+
+        public WhenMatchedUpdateBuilder delete() {
+            if (!updateItems.isEmpty()) {
+                throw new IllegalStateException("Cannot use delete() with SET clauses");
+            }
+            if (actionCommitted) {
+                throw new IllegalStateException("Action already committed");
+            }
+            parent.actions.add(new WhenMatchedDelete(condition));
+            actionCommitted = true;
+            return this;
+        }
+
+        public String build() {
+            commitAction();
+            return parent.build();
+        }
+
+        public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+            commitAction();
+            return parent.buildPreparedStatement(connection);
+        }
+    }
+
+    public static class WhenNotMatchedInsertBuilder {
+        private final MergeBuilder parent;
+        private final Predicate condition;
+        private final List<ColumnReference> columns = new ArrayList<>();
+        private final List<Expression> values = new ArrayList<>();
+        private boolean actionCommitted = false;
+
+        WhenNotMatchedInsertBuilder(MergeBuilder parent, Predicate condition) {
+            this.parent = parent;
+            this.condition = condition;
+        }
+
+        public WhenNotMatchedInsertBuilder set(String column, String value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            this.columns.add(colRef);
+            this.values.add(expr);
+            return this;
+        }
+
+        public WhenNotMatchedInsertBuilder set(String column, Number value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            this.columns.add(colRef);
+            this.values.add(expr);
+            return this;
+        }
+
+        public WhenNotMatchedInsertBuilder set(String column, Boolean value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            this.columns.add(colRef);
+            this.values.add(expr);
+            return this;
+        }
+
+        public WhenNotMatchedInsertBuilder set(String column, Expression value) {
+            if (column == null || column.trim().isEmpty()) {
+                throw new IllegalArgumentException("Column name cannot be null or empty");
+            }
+            ColumnReference colRef = parent.parseColumnReference(column);
+            Expression expr = value == null ? Literal.ofNull() : value;
+            this.columns.add(colRef);
+            this.values.add(expr);
+            return this;
+        }
+
+        private void commitAction() {
+            if (actionCommitted) {
+                return;
+            }
+            if (columns.isEmpty()) {
+                throw new IllegalStateException("At least one column must be specified for INSERT");
+            }
+            InsertData insertData = new InsertValues(values);
+            if (condition == null) {
+                parent.actions.add(new WhenNotMatchedInsert(columns, insertData));
+            } else {
+                parent.actions.add(new WhenNotMatchedInsert(condition, columns, insertData));
+            }
+            actionCommitted = true;
+        }
+
+        public WhenMatchedUpdateBuilder whenMatched() {
+            commitAction();
+            return parent.whenMatched();
+        }
+
+        public WhenMatchedUpdateBuilder whenMatched(Predicate condition) {
+            commitAction();
+            return parent.whenMatched(condition);
+        }
+
+        public WhenNotMatchedInsertBuilder whenNotMatched() {
+            commitAction();
+            return parent.whenNotMatched();
+        }
+
+        public WhenNotMatchedInsertBuilder whenNotMatched(Predicate condition) {
+            commitAction();
+            return parent.whenNotMatched(condition);
+        }
+
+        public String build() {
+            commitAction();
+            return parent.build();
+        }
+
+        public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+            commitAction();
+            return parent.buildPreparedStatement(connection);
+        }
     }
 }
