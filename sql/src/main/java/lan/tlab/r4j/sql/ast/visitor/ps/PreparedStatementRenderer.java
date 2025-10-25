@@ -41,6 +41,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
+import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
@@ -859,14 +860,14 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(MergeUsing.TableSource item, AstContext ctx) {
+    public PsDto visit(MergeUsing item, AstContext ctx) {
         // Render as SQL for now
         String sql = sqlRenderer.visit(item, ctx);
         return new PsDto(sql, List.of());
     }
 
     @Override
-    public PsDto visit(MergeUsing.SubquerySource item, AstContext ctx) {
+    public PsDto visit(AliasedTableExpression item, AstContext ctx) {
         // Render as SQL for now
         String sql = sqlRenderer.visit(item, ctx);
         return new PsDto(sql, List.of());

@@ -7,10 +7,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class FromSubqueryRenderStrategy implements ClauseRenderStrategy {
 
     public String render(FromSubquery fromSubquery, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format(
-                        "(%s) %s",
-                        fromSubquery.getSubquery().accept(sqlRenderer, ctx),
-                        fromSubquery.getAs().accept(sqlRenderer, ctx))
-                .trim();
+        // Delegate to AliasedTableExpression rendering
+        return fromSubquery.aliased().accept(sqlRenderer, ctx);
     }
 }
