@@ -1,5 +1,6 @@
 package lan.tlab.r4j.sql.functional;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -56,7 +57,7 @@ public sealed interface Result<T> {
      * @param consumer the action to perform on the success value
      * @return this result unchanged
      */
-    default Result<T> peek(java.util.function.Consumer<T> consumer) {
+    default Result<T> peek(Consumer<T> consumer) {
         if (this instanceof Success<T>(T value)) {
             consumer.accept(value);
         }
