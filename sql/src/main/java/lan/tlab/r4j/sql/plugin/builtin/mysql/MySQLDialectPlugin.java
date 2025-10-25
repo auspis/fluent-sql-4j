@@ -3,6 +3,7 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.dialect.mysql.strategy.statement.MySqlMergeStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.fetch.FetchRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
@@ -170,6 +171,7 @@ public final class MySQLDialectPlugin {
                 .dateArithmeticStrategy(DateArithmeticRenderStrategy.mysql())
                 .concatStrategy(ConcatRenderStrategy.mysql())
                 .dataLengthStrategy(DataLengthRenderStrategy.mysql())
+                .mergeStatementStrategy(new MySqlMergeStatementRenderStrategy())
                 .build();
 
         PreparedStatementRenderer psRenderer =
