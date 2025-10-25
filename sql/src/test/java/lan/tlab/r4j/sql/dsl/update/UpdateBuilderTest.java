@@ -10,6 +10,7 @@ import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 class UpdateBuilderTest {
 
-    private lan.tlab.r4j.sql.dsl.DSL dsl;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() {

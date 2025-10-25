@@ -3,13 +3,14 @@ package lan.tlab.r4j.sql.dsl.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderGroupByTest {
 
-    private lan.tlab.r4j.sql.dsl.DSL dsl;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() {
