@@ -18,59 +18,36 @@ class UpdateDSLIntegrationTest {
     }
 
     @Test
-    void updateWithSingleSet() {
+    void createsUpdateBuilderWithRenderer() {
         String result =
                 dsl.update("users").set("name", "John").where("id").eq(1).build();
 
-        assertThat(result)
-                .contains("UPDATE")
-                .contains("users")
-                .contains("SET")
-                .contains("name")
-                .contains("WHERE");
+        assertThat(result).isEqualTo("""
+                UPDATE "users" SET "name" = 'John' WHERE "users"."id" = 1""");
     }
 
     @Test
-    void updateWithMultipleSets() {
-        String result = dsl.update("users")
-                .set("name", "John")
-                .set("age", 30)
-                .where("id")
-                .eq(1)
-                .build();
+    void appliesRendererQuoting() {
+        String result = dsl.update("temp_table").set("status", "active").build();
 
-        assertThat(result)
-                .contains("UPDATE")
-                .contains("users")
-                .contains("SET")
-                .contains("name")
-                .contains("age")
-                .contains("WHERE");
+        assertThat(result).isEqualTo("""
+                UPDATE "temp_table" SET "status" = 'active'""");
     }
 
     @Test
-    void updateWithoutWhere() {
-        String result = dsl.update("users").set("status", "active").build();
-
-        assertThat(result).contains("UPDATE").contains("users").contains("SET").contains("status");
-    }
-
-    @Test
-    void updateWithComplexWhere() {
+    void fluentApiWithComplexConditions() {
         String result = dsl.update("products")
                 .set("stock", 0)
-                .where("discontinued")
-                .eq(true)
-                .and("last_order_date")
+                .set("discontinued", true)
+                .where("last_order_date")
                 .lt("2023-01-01")
+                .and("quantity")
+                .eq(0)
                 .build();
 
         assertThat(result)
-                .contains("UPDATE")
-                .contains("products")
-                .contains("SET")
-                .contains("stock")
-                .contains("WHERE")
-                .contains("AND");
+                .isEqualTo(
+                        """
+                UPDATE "products" SET "stock" = 0, "discontinued" = true WHERE ("products"."last_order_date" < '2023-01-01') AND ("products"."quantity" = 0)""");
     }
 }
