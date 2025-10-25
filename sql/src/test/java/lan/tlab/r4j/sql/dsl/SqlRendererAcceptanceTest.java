@@ -3,8 +3,6 @@ package lan.tlab.r4j.sql.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.delete.DeleteBuilder;
 import lan.tlab.r4j.sql.dsl.insert.InsertBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
@@ -20,15 +18,10 @@ import org.junit.jupiter.api.Test;
  */
 class SqlRendererAcceptanceTest {
 
-    private DialectRenderer createDialectRenderer(SqlRenderer sqlRenderer) {
-        PreparedStatementRenderer psRenderer =
-                PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
-        return new DialectRenderer(sqlRenderer, psRenderer);
-    }
-
     @Test
     void selectBuilderUsesStandardSql2008Renderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.standardSql2008());
+        // DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.standardSql2008());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
         String sql = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .where("age")
@@ -40,7 +33,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void selectBuilderUsesMySqlRenderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.mysql());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererMysql();
         String sql = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .where("age")
@@ -53,7 +46,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void selectBuilderUsesSqlServerRenderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.sqlServer());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererSqlServer();
         String sql = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .where("age")
@@ -66,7 +59,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void selectProjectionBuilderUsesStandardSql2008Renderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.standardSql2008());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
         String sql = new SelectProjectionBuilder(renderer)
                 .column("name")
                 .column("email")
@@ -78,7 +71,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void selectProjectionBuilderUsesMySqlRenderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.mysql());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererMysql();
         String sql = new SelectProjectionBuilder(renderer)
                 .column("name")
                 .column("email")
@@ -90,7 +83,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void insertBuilderUsesStandardSql2008Renderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.standardSql2008());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
         String sql = new InsertBuilder(renderer, "users")
                 .set("name", "John")
                 .set("age", 30)
@@ -101,7 +94,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void insertBuilderUsesMySqlRenderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.mysql());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererMysql();
         String sql = new InsertBuilder(renderer, "users")
                 .set("name", "John")
                 .set("age", 30)
@@ -112,7 +105,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void updateBuilderUsesStandardSql2008Renderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.standardSql2008());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
         String sql = new UpdateBuilder(renderer, "users")
                 .set("name", "John")
                 .set("age", 30)
@@ -125,7 +118,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void updateBuilderUsesMySqlRenderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.mysql());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererMysql();
         String sql = new UpdateBuilder(renderer, "users")
                 .set("name", "John")
                 .set("age", 30)
@@ -138,7 +131,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void deleteBuilderUsesStandardSql2008Renderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.standardSql2008());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
         String sql = new DeleteBuilder(renderer, "users").where("id").eq(1).build();
 
         assertThat(sql).contains("DELETE FROM \"users\"").contains("WHERE \"users\".\"id\"");
@@ -146,7 +139,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void deleteBuilderUsesMySqlRenderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.mysql());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererMysql();
         String sql = new DeleteBuilder(renderer, "users").where("id").eq(1).build();
 
         assertThat(sql).contains("DELETE FROM `users`").contains("WHERE `users`.`id`");
@@ -154,7 +147,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void createTableBuilderUsesStandardSql2008Renderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.standardSql2008());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
         String sql = new CreateTableBuilder(renderer, "users")
                 .columnIntegerPrimaryKey("id")
                 .columnVarcharNotNull("name", 100)
@@ -165,7 +158,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void createTableBuilderUsesMySqlRenderer() {
-        DialectRenderer renderer = createDialectRenderer(TestDialectRendererFactory.mysql());
+        DialectRenderer renderer = TestDialectRendererFactory.dialectRendererMysql();
         String sql = new CreateTableBuilder(renderer, "users")
                 .columnIntegerPrimaryKey("id")
                 .columnVarcharNotNull("name", 100)
@@ -195,7 +188,7 @@ class SqlRendererAcceptanceTest {
 
     @Test
     void dslStaticMethodsAcceptCustomRenderer() {
-        DialectRenderer mysqlRenderer = createDialectRenderer(TestDialectRendererFactory.mysql());
+        DialectRenderer mysqlRenderer = TestDialectRendererFactory.dialectRendererMysql();
 
         // These should use the provided MySQL renderer
         String selectSql = DSL.select(mysqlRenderer, "name").from("users").build();
