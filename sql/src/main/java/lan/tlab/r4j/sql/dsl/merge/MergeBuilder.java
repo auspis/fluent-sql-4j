@@ -401,7 +401,7 @@ public class MergeBuilder {
                 return;
             }
             if (columns.isEmpty()) {
-                throw new IllegalStateException("At least one column must be specified for INSERT");
+                throw new IllegalStateException("At least one column must be specified for WHEN NOT MATCHED THEN INSERT");
             }
             InsertData insertData = new InsertValues(values);
             if (condition == null) {
