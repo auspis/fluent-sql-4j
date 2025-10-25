@@ -26,6 +26,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
 
 public class MergeBuilder {
     private final DialectRenderer renderer;
@@ -88,8 +89,8 @@ public class MergeBuilder {
             throw new IllegalArgumentException("Right column cannot be null or empty");
         }
 
-        ColumnReference left = parseColumnReference(leftColumn);
-        ColumnReference right = parseColumnReference(rightColumn);
+        ColumnReference left = ColumnReferenceUtil.parseColumnReference(leftColumn, "");
+        ColumnReference right = ColumnReferenceUtil.parseColumnReference(rightColumn, "");
         this.onCondition = Comparison.eq(left, right);
         return this;
     }
@@ -223,14 +224,6 @@ public class MergeBuilder {
                 .build();
     }
 
-    private ColumnReference parseColumnReference(String column) {
-        if (column.contains(".")) {
-            String[] parts = column.split("\\.", 2);
-            return ColumnReference.of(parts[0], parts[1]);
-        }
-        return ColumnReference.of("", column);
-    }
-
     public static class WhenMatchedUpdateBuilder {
         private final MergeBuilder parent;
         private final Predicate condition;
@@ -246,8 +239,10 @@ public class MergeBuilder {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
-            ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
+            ScalarExpression expr = value == null
+                    ? Literal.ofNull()
+                    : (value.contains(".") ? ColumnReferenceUtil.parseColumnReference(value, "") : Literal.of(value));
             this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
             return this;
         }
@@ -256,7 +251,7 @@ public class MergeBuilder {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
             return this;
@@ -266,7 +261,7 @@ public class MergeBuilder {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
             return this;
@@ -279,7 +274,7 @@ public class MergeBuilder {
             if (!(value instanceof ScalarExpression)) {
                 throw new IllegalArgumentException("Value must be a ScalarExpression");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : (ScalarExpression) value;
             this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
             return this;
@@ -359,8 +354,10 @@ public class MergeBuilder {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
-            Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
+            Expression expr = value == null
+                    ? Literal.ofNull()
+                    : (value.contains(".") ? ColumnReferenceUtil.parseColumnReference(value, "") : Literal.of(value));
             this.columns.add(colRef);
             this.values.add(expr);
             return this;
@@ -370,7 +367,7 @@ public class MergeBuilder {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             this.columns.add(colRef);
             this.values.add(expr);
@@ -381,7 +378,7 @@ public class MergeBuilder {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             this.columns.add(colRef);
             this.values.add(expr);
@@ -392,7 +389,7 @@ public class MergeBuilder {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = parent.parseColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             Expression expr = value == null ? Literal.ofNull() : value;
             this.columns.add(colRef);
             this.values.add(expr);
