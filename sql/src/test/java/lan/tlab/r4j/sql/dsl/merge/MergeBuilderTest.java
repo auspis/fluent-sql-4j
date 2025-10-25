@@ -326,4 +326,30 @@ class MergeBuilderTest {
                         WHEN NOT MATCHED AND "src"."value" > 100 THEN INSERT ("id", "value") VALUES ("src"."id", "src"."value")\
                         """);
     }
+
+    @Test
+    void fluentApiWithDotNotationForColumnReferences() {
+        String sql = new MergeBuilder(renderer, "target")
+                .using("source", "src")
+                .on("target.id", "src.id")
+                .whenMatched()
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .whenNotMatched()
+                .set("id", "src.id")
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                        MERGE INTO "target" \
+                        USING "source" AS src \
+                        ON "target"."id" = "src"."id" \
+                        WHEN MATCHED THEN UPDATE SET "name" = "src"."name", "email" = "src"."email", "age" = "src"."age" \
+                        WHEN NOT MATCHED THEN INSERT ("id", "name", "email") VALUES ("src"."id", "src"."name", "src"."email")\
+                        """);
+    }
 }
