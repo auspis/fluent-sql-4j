@@ -69,10 +69,15 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedDelete;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 
@@ -86,6 +91,8 @@ public interface Visitor<T> {
     T visit(UpdateStatement updateStatement, AstContext ctx);
 
     T visit(DeleteStatement deleteStatement, AstContext ctx);
+
+    T visit(MergeStatement mergeStatement, AstContext ctx);
 
     T visit(CreateTableStatement createTableStatement, AstContext ctx);
 
@@ -215,6 +222,14 @@ public interface Visitor<T> {
     T visit(InsertSource item, AstContext ctx);
 
     T visit(DefaultValues item, AstContext ctx);
+
+    T visit(MergeUsing item, AstContext ctx);
+
+    T visit(WhenMatchedUpdate item, AstContext ctx);
+
+    T visit(WhenMatchedDelete item, AstContext ctx);
+
+    T visit(WhenNotMatchedInsert item, AstContext ctx);
 
     T visit(ReferencesItem item, AstContext ctx);
 
