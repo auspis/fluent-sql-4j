@@ -18,73 +18,35 @@ class DeleteDSLIntegrationTest {
     }
 
     @Test
-    void deleteWithSimpleWhere() {
-        String result = dsl.deleteFrom("users").where("status").eq("inactive").build();
+    void createsDeleteBuilderWithRenderer() {
+        String result = dsl.deleteFrom("users").where("id").eq(1).build();
 
-        assertThat(result)
-                .contains("DELETE FROM")
-                .contains("users")
-                .contains("WHERE")
-                .contains("status");
+        assertThat(result).isEqualTo("""
+                DELETE FROM "users" WHERE "users"."id" = 1""");
     }
 
     @Test
-    void deleteWithMultipleConditions() {
-        String result = dsl.deleteFrom("users")
-                .where("status")
-                .eq("inactive")
-                .and("last_login")
-                .lt("2023-01-01")
-                .build();
+    void appliesRendererQuoting() {
+        String result = dsl.deleteFrom("temp_table").build();
 
-        assertThat(result)
-                .contains("DELETE FROM")
-                .contains("users")
-                .contains("WHERE")
-                .contains("AND");
+        assertThat(result).isEqualTo("""
+                DELETE FROM "temp_table\"""");
     }
 
     @Test
-    void deleteWithOrCondition() {
-        String result = dsl.deleteFrom("products")
-                .where("stock")
-                .eq(0)
-                .or("discontinued")
-                .eq(true)
-                .build();
-
-        assertThat(result)
-                .contains("DELETE FROM")
-                .contains("products")
-                .contains("WHERE")
-                .contains("OR");
-    }
-
-    @Test
-    void deleteWithComplexConditions() {
+    void fluentApiWithComplexConditions() {
         String result = dsl.deleteFrom("orders")
                 .where("status")
                 .eq("cancelled")
-                .and("created_at")
-                .lt("2023-01-01")
-                .or("amount")
-                .eq(0)
+                .and("amount")
+                .gt(100)
                 .build();
 
         assertThat(result)
-                .contains("DELETE FROM")
-                .contains("orders")
-                .contains("WHERE")
-                .contains("status")
-                .contains("cancelled")
-                .contains("created_at")
-                .contains("amount");
-    }
-
-    @Test
-    void deleteWithoutWhere() {
-        String result = dsl.deleteFrom("temp_table").build();
-
-        assertThat(result).isEqualTo("DELETE FROM \"temp_table\"");
+                .isEqualTo(
+                        """
+                DELETE FROM "orders" \
+                WHERE ("orders"."status" = 'cancelled') \
+                AND ("orders"."amount" > 100)""");
     }
 }
