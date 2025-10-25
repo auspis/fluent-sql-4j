@@ -15,15 +15,16 @@
   <properties>
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.dependency.plugin.version>3.9.0</maven.dependency.plugin.version>
     <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
     <maven.failsafe.plugin.version>3.5.4</maven.failsafe.plugin.version>
     <maven.spotless.plugin.version>3.0.0</maven.spotless.plugin.version>
     <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
-    <maven.exec.plugin.version>3.6.0</maven.exec.plugin.version>
+    <maven.exec.plugin.version>3.6.2</maven.exec.plugin.version>
     <maven.versions.plugin.version>2.19.1</maven.versions.plugin.version>
-    <maven.enforcer.plugin.version>3.6.1</maven.enforcer.plugin.version>
-    <maven.rewrite.plugin.version>6.19.0</maven.rewrite.plugin.version>
+    <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
+    <maven.rewrite.plugin.version>6.22.1</maven.rewrite.plugin.version>
 
     <dep.lombok.version>1.18.42</dep.lombok.version>
     <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
@@ -256,7 +257,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.7.0</version>
+          <version>${maven.dependency.plugin.version}</version>
           <configuration>
             <artifactItems>
               <artifactItem>
