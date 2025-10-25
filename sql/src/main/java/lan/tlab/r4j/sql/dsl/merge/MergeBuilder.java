@@ -285,7 +285,8 @@ public class MergeBuilder {
                 return;
             }
             if (updateItems.isEmpty()) {
-                throw new IllegalStateException("At least one SET clause must be specified for WHEN MATCHED THEN UPDATE");
+                throw new IllegalStateException(
+                        "At least one SET clause must be specified for WHEN MATCHED THEN UPDATE");
             }
             if (condition == null) {
                 parent.actions.add(new WhenMatchedUpdate(updateItems));
@@ -401,7 +402,8 @@ public class MergeBuilder {
                 return;
             }
             if (columns.isEmpty()) {
-                throw new IllegalStateException("At least one column must be specified for WHEN NOT MATCHED THEN INSERT");
+                throw new IllegalStateException(
+                        "At least one column must be specified for WHEN NOT MATCHED THEN INSERT");
             }
             InsertData insertData = new InsertValues(values);
             if (condition == null) {
