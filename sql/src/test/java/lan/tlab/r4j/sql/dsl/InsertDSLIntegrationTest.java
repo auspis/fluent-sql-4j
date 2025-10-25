@@ -2,7 +2,6 @@ package lan.tlab.r4j.sql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDate;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,71 +18,32 @@ class InsertDSLIntegrationTest {
     }
 
     @Test
-    void insertWithDefaultValues() {
-        String sql = dsl.insertInto("users").defaultValues().build();
+    void createsInsertBuilderWithRenderer() {
+        String result = dsl.insertInto("users").set("name", "John").build();
 
-        assertThat(sql).contains("INSERT INTO").contains("users").contains("DEFAULT VALUES");
+        assertThat(result).isEqualTo("""
+                INSERT INTO "users" ("users"."name") VALUES ('John')""");
     }
 
     @Test
-    void insertWithSingleColumn() {
-        String sql = dsl.insertInto("users").set("name", "John").build();
+    void appliesRendererQuoting() {
+        String result = dsl.insertInto("temp_table").defaultValues().build();
 
-        assertThat(sql)
-                .contains("INSERT INTO")
-                .contains("users")
-                .contains("name")
-                .contains("VALUES");
+        assertThat(result).isEqualTo("""
+                INSERT INTO "temp_table" DEFAULT VALUES""");
     }
 
     @Test
-    void insertWithMultipleColumns() {
-        String sql = dsl.insertInto("users")
+    void fluentApiWithMultipleColumns() {
+        String result = dsl.insertInto("products")
                 .set("id", 1)
-                .set("name", "John")
-                .set("email", "john@example.com")
+                .set("name", "Widget")
+                .set("price", 19.99)
                 .build();
 
-        assertThat(sql)
-                .contains("INSERT INTO")
-                .contains("users")
-                .contains("id")
-                .contains("name")
-                .contains("email")
-                .contains("VALUES");
-    }
-
-    @Test
-    void insertWithMixedTypes() {
-        String sql = dsl.insertInto("users")
-                .set("name", "Alice")
-                .set("age", 30)
-                .set("active", true)
-                .set("salary", 50000.50)
-                .build();
-
-        assertThat(sql)
-                .contains("INSERT INTO")
-                .contains("users")
-                .contains("name")
-                .contains("age")
-                .contains("active")
-                .contains("salary")
-                .contains("VALUES");
-    }
-
-    @Test
-    void insertWithDate() {
-        LocalDate birthdate = LocalDate.of(1990, 1, 15);
-        String sql = dsl.insertInto("users")
-                .set("name", "Bob")
-                .set("birthdate", birthdate)
-                .build();
-
-        assertThat(sql)
-                .contains("INSERT INTO")
-                .contains("users")
-                .contains("birthdate")
-                .contains("VALUES");
+        assertThat(result)
+                .isEqualTo(
+                        """
+                INSERT INTO "products" ("products"."id", "products"."name", "products"."price") VALUES (1, 'Widget', 19.99)""");
     }
 }
