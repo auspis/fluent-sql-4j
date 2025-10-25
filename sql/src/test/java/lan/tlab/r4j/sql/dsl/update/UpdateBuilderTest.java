@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
-import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,23 +18,26 @@ import org.junit.jupiter.api.Test;
 
 class UpdateBuilderTest {
 
-    private DSL dsl;
+    private DialectRenderer renderer;
 
     @BeforeEach
     void setUp() {
-        dsl = TestDialectRendererFactory.dslStandardSql2008();
+        renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
     }
 
     @Test
     void singleSet() {
-        String result =
-                dsl.update("users").set("name", "John").where("id").eq(1).build();
+        String result = new UpdateBuilder(renderer, "users")
+                .set("name", "John")
+                .where("id")
+                .eq(1)
+                .build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"name\" = 'John' WHERE \"users\".\"id\" = 1");
     }
 
     @Test
     void multipleSets() {
-        String result = dsl.update("users")
+        String result = new UpdateBuilder(renderer, "users")
                 .set("name", "John")
                 .set("age", 30)
                 .where("id")
@@ -45,19 +48,24 @@ class UpdateBuilderTest {
 
     @Test
     void noWhere() {
-        String result = dsl.update("users").set("status", "active").build();
+        String result =
+                new UpdateBuilder(renderer, "users").set("status", "active").build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"status\" = 'active'");
     }
 
     @Test
     void whereWithNumber() {
-        String result = dsl.update("users").set("age", 25).where("id").eq(42).build();
+        String result = new UpdateBuilder(renderer, "users")
+                .set("age", 25)
+                .where("id")
+                .eq(42)
+                .build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"age\" = 25 WHERE \"users\".\"id\" = 42");
     }
 
     @Test
     void and() {
-        String result = dsl.update("users")
+        String result = new UpdateBuilder(renderer, "users")
                 .set("status", "inactive")
                 .where("age")
                 .lt(18)
@@ -72,7 +80,7 @@ class UpdateBuilderTest {
 
     @Test
     void or() {
-        String result = dsl.update("users")
+        String result = new UpdateBuilder(renderer, "users")
                 .set("status", "deleted")
                 .where("status")
                 .eq("banned")
@@ -87,7 +95,7 @@ class UpdateBuilderTest {
 
     @Test
     void andOr() {
-        String result = dsl.update("users")
+        String result = new UpdateBuilder(renderer, "users")
                 .set("status", "inactive")
                 .where("age")
                 .lt(18)
@@ -104,7 +112,7 @@ class UpdateBuilderTest {
 
     @Test
     void isNull() {
-        String result = dsl.update("users")
+        String result = new UpdateBuilder(renderer, "users")
                 .set("deleted_at", (String) null)
                 .where("status")
                 .isNull()
@@ -115,7 +123,7 @@ class UpdateBuilderTest {
 
     @Test
     void like() {
-        String result = dsl.update("users")
+        String result = new UpdateBuilder(renderer, "users")
                 .set("status", "verified")
                 .where("email")
                 .like("%@example.com")
@@ -128,7 +136,7 @@ class UpdateBuilderTest {
 
     @Test
     void allComparisonOperators() {
-        String result = dsl.update("products")
+        String result = new UpdateBuilder(renderer, "products")
                 .set("discount", 20)
                 .where("price")
                 .gt(100)
@@ -149,21 +157,22 @@ class UpdateBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> dsl.update(""))
+        assertThatThrownBy(() -> new UpdateBuilder(renderer, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> dsl.update("users").set("", "value"))
+        assertThatThrownBy(() -> new UpdateBuilder(renderer, "users").set("", "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void buildWithoutSetThrowsException() {
-        assertThatThrownBy(() -> dsl.update("users").where("id").eq(1).build())
+        assertThatThrownBy(() ->
+                        new UpdateBuilder(renderer, "users").where("id").eq(1).build())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("At least one SET clause must be specified");
     }
