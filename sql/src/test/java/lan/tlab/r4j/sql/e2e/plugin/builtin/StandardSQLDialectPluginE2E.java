@@ -192,4 +192,94 @@ class StandardSQLDialectPluginE2E {
         Result<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(result).isInstanceOf(Result.Success.class);
     }
+
+    @Test
+    void mergeStatementWithRealDatabase() throws SQLException {
+        // Get renderer from registry
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+
+        // Create source table with user updates
+        try (var stmt = connection.createStatement()) {
+            stmt.execute(
+                    """
+                    CREATE TABLE users_updates (
+                        "id" INTEGER PRIMARY KEY,
+                        "name" VARCHAR(50),
+                        "email" VARCHAR(100),
+                        "age" INTEGER,
+                        "active" BOOLEAN
+                    )
+                    """);
+
+            // Source has: updated John Doe (age changed), new user (id=11), Jane Smith unchanged
+            stmt.execute("INSERT INTO users_updates VALUES (1, 'John Doe', 'john.newemail@example.com', 31, true)");
+            stmt.execute("INSERT INTO users_updates VALUES (2, 'Jane Smith', 'jane@example.com', 25, true)");
+            stmt.execute("INSERT INTO users_updates VALUES (11, 'New User', 'newuser@example.com', 28, true)");
+        }
+
+        // Build and execute MERGE statement using DSL
+        String mergeSql = DSL.mergeInto(renderer, "users")
+                .as("tgt")
+                .using("users_updates", "src")
+                .on("tgt.id", "src.id")
+                .whenMatched()
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .whenNotMatched()
+                .set("id", "src.id")
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .build();
+
+        try (var stmt = connection.createStatement()) {
+            int affectedRows = stmt.executeUpdate(mergeSql);
+            assertThat(affectedRows).isGreaterThanOrEqualTo(0);
+        }
+
+        // Verify John Doe was updated
+        List<List<Object>> johnDoe = ResultSetUtil.list(
+                DSL.select(renderer, "id", "name", "email", "age", "active")
+                        .from("users")
+                        .where("id")
+                        .eq(1)
+                        .buildPreparedStatement(connection),
+                r -> List.of(
+                        r.getInt("id"),
+                        r.getString("name"),
+                        r.getString("email"),
+                        r.getInt("age"),
+                        r.getBoolean("active")));
+
+        assertThat(johnDoe).hasSize(1);
+        assertThat(johnDoe.get(0)).containsExactly(1, "John Doe", "john.newemail@example.com", 31, true);
+
+        // Verify new user was inserted
+        List<List<Object>> newUser = ResultSetUtil.list(
+                DSL.select(renderer, "id", "name", "email", "age", "active")
+                        .from("users")
+                        .where("id")
+                        .eq(11)
+                        .buildPreparedStatement(connection),
+                r -> List.of(
+                        r.getInt("id"),
+                        r.getString("name"),
+                        r.getString("email"),
+                        r.getInt("age"),
+                        r.getBoolean("active")));
+
+        assertThat(newUser).hasSize(1);
+        assertThat(newUser.get(0)).containsExactly(11, "New User", "newuser@example.com", 28, true);
+
+        // Verify total count (original 10 + 1 new = 11)
+        List<Integer> count = ResultSetUtil.list(
+                DSL.select(renderer, "COUNT(*) as cnt").from("users").buildPreparedStatement(connection),
+                r -> r.getInt("cnt"));
+
+        assertThat(count.get(0)).isEqualTo(11);
+    }
 }
