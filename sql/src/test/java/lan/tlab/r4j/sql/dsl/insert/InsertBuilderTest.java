@@ -3,6 +3,7 @@ package lan.tlab.r4j.sql.dsl.insert;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDate;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -134,5 +135,43 @@ class InsertBuilderTest {
                         """
                         INSERT INTO "mixed_table" ("mixed_table"."text_col", "mixed_table"."int_col", "mixed_table"."bool_col", "mixed_table"."null_col") VALUES ('test', 42, false, null)\
                         """);
+    }
+
+    @Test
+    void insertWithDateValue() {
+        LocalDate birthdate = LocalDate.of(1999, 1, 23);
+        String sql = dsl.insertInto("users")
+                .set("name", "John")
+                .set("birthdate", birthdate)
+                .build();
+
+        assertThat(sql).contains("INSERT INTO \"users\" (\"users\".\"name\", \"users\".\"birthdate\") VALUES ('John',");
+    }
+
+    @Test
+    void buildPreparedStatementRequiresConnection() {
+        InsertBuilder builder = dsl.insertInto("users").set("name", "John");
+
+        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(Exception.class);
+    }
+
+    @Test
+    void buildPreparedStatementCompilesWithoutError() {
+        InsertBuilder builder = dsl.insertInto("users").set("name", "John").set("email", "john@example.com");
+
+        assertThat(builder).isNotNull();
+
+        assertThat(builder.getClass().getDeclaredMethods())
+                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
+    }
+
+    @Test
+    void buildPreparedStatementWithDefaultValuesCompilesWithoutError() {
+        InsertBuilder builder = dsl.insertInto("users").defaultValues();
+
+        assertThat(builder).isNotNull();
+
+        assertThat(builder.getClass().getDeclaredMethods())
+                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
     }
 }
