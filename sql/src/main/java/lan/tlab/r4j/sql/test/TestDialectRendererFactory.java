@@ -2,6 +2,7 @@ package lan.tlab.r4j.sql.test;
 
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.oracle.OracleDialectPlugin;
@@ -36,6 +37,9 @@ import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
  *
  * @since 1.1
  */
+
+// TODO: Consider deprecating this class in future versions to encourage direct use of SqlDialectPluginRegistry in
+// tests.
 public final class TestDialectRendererFactory {
 
     private static final SqlDialectPluginRegistry REGISTRY = SqlDialectPluginRegistry.createWithServiceLoader();
@@ -148,7 +152,7 @@ public final class TestDialectRendererFactory {
      * @throws IllegalArgumentException if the StandardSQL plugin is not available
      * @since 1.1
      */
-    public static lan.tlab.r4j.sql.dsl.DSL dslStandardSql2008() {
-        return new lan.tlab.r4j.sql.dsl.DSL(dialectRendererStandardSql2008());
+    public static DSL dslStandardSql2008() {
+        return new DSL(dialectRendererStandardSql2008());
     }
 }
