@@ -9,6 +9,7 @@ import lan.tlab.r4j.sql.ast.expression.Expression;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
@@ -53,7 +54,7 @@ public class MergeBuilder {
         if (sourceTableName == null || sourceTableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Source table name cannot be null or empty");
         }
-        this.using = new MergeUsing.TableSource(new TableIdentifier(sourceTableName));
+        this.using = new MergeUsing(new TableIdentifier(sourceTableName));
         return this;
     }
 
@@ -64,7 +65,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.using = new MergeUsing.TableSource(new TableIdentifier(sourceTableName, alias));
+        this.using = new MergeUsing(new TableIdentifier(sourceTableName, alias));
         return this;
     }
 
@@ -75,7 +76,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.using = new MergeUsing.SubquerySource(subquery, new Alias(alias));
+        this.using = new MergeUsing(new AliasedTableExpression(subquery, new Alias(alias)));
         return this;
     }
 

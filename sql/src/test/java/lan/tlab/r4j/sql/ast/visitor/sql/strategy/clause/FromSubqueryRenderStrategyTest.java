@@ -8,7 +8,6 @@ import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.identifier.Alias;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -31,7 +30,7 @@ class FromSubqueryRenderStrategyTest {
     void ok() {
         SelectStatement subquery = SelectStatement.builder()
                 .select(new Select())
-                .from(From.builder().source(new TableIdentifier("Customer")).build())
+                .from(From.fromTable("Customer"))
                 .build();
         FromSubquery fromSubquery = FromSubquery.of(subquery, Alias.nullObject());
         String sql = strategy.render(fromSubquery, sqlRenderer, new AstContext());
@@ -44,7 +43,7 @@ class FromSubqueryRenderStrategyTest {
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("Customer", "db_name"), new Alias("name")),
                         new ScalarExpressionProjection(ColumnReference.of("Customer", "score"), new Alias("score"))))
-                .from(From.builder().source(new TableIdentifier("Customer")).build())
+                .from(From.fromTable("Customer"))
                 .build();
         FromSubquery fromSubquery = FromSubquery.of(subquery, "tmp");
         String sql = strategy.render(fromSubquery, sqlRenderer, new AstContext());
