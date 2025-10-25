@@ -53,7 +53,7 @@ public class MergeBuilder {
         if (sourceTableName == null || sourceTableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Source table name cannot be null or empty");
         }
-        this.using = new MergeUsing(new TableIdentifier(sourceTableName));
+        this.using = new MergeUsing.TableSource(new TableIdentifier(sourceTableName));
         return this;
     }
 
@@ -64,7 +64,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.using = new MergeUsing(new TableIdentifier(sourceTableName), new Alias(alias));
+        this.using = new MergeUsing.TableSource(new TableIdentifier(sourceTableName, alias));
         return this;
     }
 
@@ -75,7 +75,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.using = new MergeUsing(subquery, new Alias(alias));
+        this.using = new MergeUsing.SubquerySource(subquery, new Alias(alias));
         return this;
     }
 
