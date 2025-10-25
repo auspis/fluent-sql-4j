@@ -39,6 +39,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
+import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
@@ -213,6 +214,8 @@ public interface Visitor<T> {
     // sql items
     T visit(TableIdentifier item, AstContext ctx);
 
+    T visit(AliasedTableExpression item, AstContext ctx);
+
     T visit(Alias item, AstContext ctx);
 
     T visit(UpdateItem item, AstContext ctx);
@@ -223,9 +226,7 @@ public interface Visitor<T> {
 
     T visit(DefaultValues item, AstContext ctx);
 
-    T visit(MergeUsing.TableSource item, AstContext ctx);
-
-    T visit(MergeUsing.SubquerySource item, AstContext ctx);
+    T visit(MergeUsing item, AstContext ctx);
 
     T visit(WhenMatchedUpdate item, AstContext ctx);
 

@@ -39,6 +39,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
+import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
@@ -134,6 +135,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnaryArithmeticExpre
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnaryNumericRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnaryStringRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnionRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.set.AliasedTableExpressionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.AsRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.DefaultValuesRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.InsertSourceRenderStrategy;
@@ -376,6 +378,10 @@ public class SqlRenderer implements Visitor<String> {
 
     @Default
     private final DefaultValuesRenderStrategy defaultValuesStrategy = new DefaultValuesRenderStrategy();
+
+    @Default
+    private final AliasedTableExpressionRenderStrategy aliasedTableExpressionStrategy =
+            new AliasedTableExpressionRenderStrategy();
 
     @Default
     private final MergeUsingRenderStrategy mergeUsingStrategy = new MergeUsingRenderStrategy();
@@ -757,13 +763,13 @@ public class SqlRenderer implements Visitor<String> {
     }
 
     @Override
-    public String visit(MergeUsing.TableSource item, AstContext ctx) {
+    public String visit(MergeUsing item, AstContext ctx) {
         return mergeUsingStrategy.render(item, this, ctx);
     }
 
     @Override
-    public String visit(MergeUsing.SubquerySource item, AstContext ctx) {
-        return mergeUsingStrategy.render(item, this, ctx);
+    public String visit(AliasedTableExpression item, AstContext ctx) {
+        return aliasedTableExpressionStrategy.render(item, this, ctx);
     }
 
     @Override

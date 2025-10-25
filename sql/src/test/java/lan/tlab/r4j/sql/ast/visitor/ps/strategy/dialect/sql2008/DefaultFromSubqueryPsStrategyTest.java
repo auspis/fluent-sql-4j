@@ -39,7 +39,7 @@ class DefaultFromSubqueryPsStrategyTest {
                 .from(lan.tlab.r4j.sql.ast.clause.from.From.of(new TableIdentifier("User")))
                 .build();
 
-        var fromSubquery = FromSubquery.builder().subquery(subquery).build();
+        var fromSubquery = FromSubquery.of(subquery, Alias.nullObject());
 
         var strategy = new DefaultFromSubqueryPsStrategy();
         var visitor = new PreparedStatementRenderer();
