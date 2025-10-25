@@ -36,30 +36,73 @@ A Java library for building SQL statements using a fluent DSL (Domain-Specific L
 
 ## Quick Start
 
-The DSL provides a fluent API for building SQL statements with type safety and compile-time validation. All operations start with the `DSL` class:
+The DSL provides a fluent API for building SQL statements with type safety and compile-time validation.
+
+### Using DSLRegistry (Recommended)
+
+The recommended way to use the DSL is through `DSLRegistry`, which provides a simplified API for working with different SQL dialects:
 
 ```java
 import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.dsl.DSLRegistry;
+
+// Create a registry and get a DSL instance for your database
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 
 // Simple SELECT
-String sql = DSL.select("name", "email")
+String sql = dsl.select("name", "email")
     .from("users")
     .where("age").gt(18)
     .build();
 
-// Column API support alias
-String sql = DSL.select()
+// Column API with alias
+String sql = dsl.select()
     .column("name")
     .column("email").as("emailAddress")
     .from("users")
     .build();
-// → SELECT "users"."name", "users"."email" as emailAddress FROM "users"
+// → SELECT `users`.`name`, `users`.`email` as emailAddress FROM `users`
 
 // Build a PreparedStatement directly
-PreparedStatement ps = DSL.select("name", "email")
+PreparedStatement ps = dsl.select("name", "email")
     .from("users")
     .where("age").gt(18)
     .buildPreparedStatement(connection);
+```
+
+### Working with Multiple Dialects
+
+DSLRegistry makes it easy to work with different database dialects:
+
+```java
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+
+// MySQL uses backticks for identifiers
+DSL mysqlDsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+String mysqlSql = mysqlDsl.select("name").from("users").build();
+// → SELECT `users`.`name` FROM `users`
+
+// Standard SQL uses double quotes
+DSL standardDsl = registry.dslFor("standardsql", "2008").orElseThrow();
+String standardSql = standardDsl.select("name").from("users").build();
+// → SELECT "users"."name" FROM "users"
+```
+
+### Using Static Methods (Advanced)
+
+For advanced use cases where you need explicit control over the renderer:
+
+```java
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
+
+SqlDialectPluginRegistry pluginRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
+DialectRenderer renderer = pluginRegistry.getDialectRenderer("mysql", "8.0.35").orElseThrow();
+
+String sql = DSL.select(renderer, "name", "email")
+    .from("users")
+    .build();
 ```
 
 ## DSL Features
@@ -69,8 +112,12 @@ PreparedStatement ps = DSL.select("name", "email")
 Create tables with column definitions and constraints:
 
 ```java
+// Get a DSL instance for your database dialect
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // Simple table with primary key
-String sql = DSL.createTable("users")
+String sql = dsl.createTable("users")
     .column("id").integer().notNull()
     .column("name").varchar(100)
     .column("email").varchar(255)
@@ -78,7 +125,7 @@ String sql = DSL.createTable("users")
     .build();
 
 // Table with multiple data types
-String sql = DSL.createTable("products")
+String sql = dsl.createTable("products")
     .column("id").integer().notNull()
     .column("name").varchar(100).notNull()
     .column("price").decimal(10, 2)
@@ -95,13 +142,17 @@ String sql = DSL.createTable("products")
 #### Basic SELECT
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // Select specific columns
-PreparedStatement ps = DSL.select("name", "email")
+PreparedStatement ps = dsl.select("name", "email")
     .from("users")
     .buildPreparedStatement(connection);
 
 // Select all columns
-PreparedStatement ps = DSL.selectAll()
+PreparedStatement ps = dsl.selectAll()
     .from("users")
     .buildPreparedStatement(connection);
 ```
@@ -109,34 +160,38 @@ PreparedStatement ps = DSL.selectAll()
 #### WHERE Clause
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // Equal condition
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .where("name").eq("John Doe")
     .buildPreparedStatement(connection);
 
 // Greater than
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .where("age").gt(25)
     .buildPreparedStatement(connection);
 
 // Multiple conditions with AND
-PreparedStatement ps = DSL.select("name", "age", "active")
+PreparedStatement ps = dsl.select("name", "age", "active")
     .from("users")
     .where("age").gt(18)
     .and("active").eq(true)
     .buildPreparedStatement(connection);
 
 // Multiple conditions with OR
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .where("name").eq("John Doe")
     .or("name").eq("Jane Smith")
     .buildPreparedStatement(connection);
 
 // Complex conditions (AND + OR)
-PreparedStatement ps = DSL.select("name", "age", "active")
+PreparedStatement ps = dsl.select("name", "age", "active")
     .from("users")
     .where("age").gt(20)
     .and("active").eq(true)
@@ -147,49 +202,53 @@ PreparedStatement ps = DSL.select("name", "age", "active")
 #### JOIN Operations
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // INNER JOIN
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users")
     .innerJoin("orders")
     .on("users.id", "orders.user_id")
     .build();
 
 // LEFT JOIN
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users")
     .leftJoin("profiles")
     .on("users.id", "profiles.user_id")
     .build();
 
 // RIGHT JOIN
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users")
     .rightJoin("departments")
     .on("users.dept_id", "departments.id")
     .build();
 
 // FULL JOIN
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users")
     .fullJoin("roles")
     .on("users.role_id", "roles.id")
     .build();
 
 // CROSS JOIN
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users")
     .crossJoin("settings")
     .build();
 
 // JOIN with table aliases
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
     .on("u.id", "o.user_id")
     .build();
 
 // Multiple JOINs
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
     .on("u.id", "o.user_id")
@@ -198,7 +257,7 @@ String sql = DSL.select("*")
     .build();
 
 // JOIN with WHERE clause
-String sql = DSL.select("*")
+String sql = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
     .on("u.id", "o.user_id")
@@ -209,14 +268,18 @@ String sql = DSL.select("*")
 #### GROUP BY
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // Simple GROUP BY
-PreparedStatement ps = DSL.select("customer_id")
+PreparedStatement ps = dsl.select("customer_id")
     .from("orders")
     .groupBy("customer_id")
     .buildPreparedStatement(connection);
 
 // GROUP BY with multiple columns
-PreparedStatement ps = DSL.select("customer_id", "status")
+PreparedStatement ps = dsl.select("customer_id", "status")
     .from("orders")
     .groupBy("customer_id", "status")
     .buildPreparedStatement(connection);
@@ -225,15 +288,19 @@ PreparedStatement ps = DSL.select("customer_id", "status")
 #### HAVING Clause
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // HAVING with single condition
-PreparedStatement ps = DSL.select("customer_id")
+PreparedStatement ps = dsl.select("customer_id")
     .from("orders")
     .groupBy("customer_id")
     .having("customer_id").gt(100)
     .buildPreparedStatement(connection);
 
 // HAVING with AND condition
-PreparedStatement ps = DSL.select("region")
+PreparedStatement ps = dsl.select("region")
     .from("sales")
     .groupBy("region")
     .having("region").ne("South")
@@ -241,7 +308,7 @@ PreparedStatement ps = DSL.select("region")
     .buildPreparedStatement(connection);
 
 // HAVING with OR condition
-PreparedStatement ps = DSL.select("category")
+PreparedStatement ps = dsl.select("category")
     .from("inventory")
     .groupBy("category")
     .having("category").eq("Electronics")
@@ -249,7 +316,7 @@ PreparedStatement ps = DSL.select("category")
     .buildPreparedStatement(connection);
 
 // Complete query with WHERE, GROUP BY, HAVING, and ORDER BY
-PreparedStatement ps = DSL.select("user_id")
+PreparedStatement ps = dsl.select("user_id")
     .from("transactions")
     .where("status").eq("completed")
     .groupBy("user_id")
@@ -261,31 +328,35 @@ PreparedStatement ps = DSL.select("user_id")
 #### Subqueries
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // FROM subquery
-SelectBuilder subquery = DSL.select("name", "age")
+SelectBuilder subquery = dsl.select("name", "age")
     .from("users")
     .where("age").gt(20);
 
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from(subquery, "u")
     .buildPreparedStatement(connection);
 
 // FROM subquery with additional WHERE
-SelectBuilder subquery = DSL.select("name", "age")
+SelectBuilder subquery = dsl.select("name", "age")
     .from("users")
     .where("active").eq(true);
 
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from(subquery, "u")
     .where("age").gte(30)
     .buildPreparedStatement(connection);
 
 // Scalar subquery in WHERE clause
-SelectBuilder avgAgeSubquery = DSL.select("age")
+SelectBuilder avgAgeSubquery = dsl.select("age")
     .from("users")
     .fetch(1);
 
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .where("age").gte(avgAgeSubquery)
     .buildPreparedStatement(connection);
@@ -294,33 +365,37 @@ PreparedStatement ps = DSL.select("name", "age")
 #### ORDER BY and Pagination
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // ORDER BY ascending
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .orderBy("age")
     .buildPreparedStatement(connection);
 
 // ORDER BY descending
-PreparedStatement ps = DSL.select("name", "age")
+PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .orderByDesc("age")
     .buildPreparedStatement(connection);
 
 // FETCH (LIMIT)
-PreparedStatement ps = DSL.select("name")
+PreparedStatement ps = dsl.select("name")
     .from("users")
     .fetch(2)
     .buildPreparedStatement(connection);
 
 // OFFSET
-PreparedStatement ps = DSL.select("name")
+PreparedStatement ps = dsl.select("name")
     .from("users")
     .offset(2)
     .fetch(2)
     .buildPreparedStatement(connection);
 
 // Complete query with all clauses
-PreparedStatement ps = DSL.select("name", "email", "age")
+PreparedStatement ps = dsl.select("name", "email", "age")
     .from("users")
     .where("age").gte(18)
     .and("active").eq(true)
@@ -335,12 +410,16 @@ PreparedStatement ps = DSL.select("name", "email", "age")
 The DSL supports SQL aggregate functions with a fluent API:
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("standardsql", "2008").orElseThrow();
+
 // COUNT all users
-String sql = DSL.select().countStar().from("users").build();
+String sql = dsl.select().countStar().from("users").build();
 // → SELECT COUNT(*) FROM "users"
 
 // SUM with GROUP BY
-String sql = DSL.select()
+String sql = dsl.select()
     .sum("amount").as("total")
     .from("orders")
     .groupBy("customer_id")
@@ -348,7 +427,7 @@ String sql = DSL.select()
 // → SELECT SUM("orders"."amount") AS total FROM "orders" GROUP BY "orders"."customer_id"
 
 // AVG with HAVING clause
-String sql = DSL.select()
+String sql = dsl.select()
     .avg("salary")
     .from("employees")
     .groupBy("department")
@@ -359,7 +438,7 @@ String sql = DSL.select()
 //   HAVING "employees"."department" != 'HR'
 
 // COUNT DISTINCT with WHERE
-String sql = DSL.select()
+String sql = dsl.select()
     .countDistinct("email").as("unique_emails")
     .from("users")
     .where("active").eq(true)
@@ -368,7 +447,7 @@ String sql = DSL.select()
 //   FROM "users" WHERE "users"."active" = true
 
 // Multiple aggregates
-String sql = DSL.select()
+String sql = dsl.select()
     .sum("score").as("total_score")
     .max("createdAt").as("latest")
     .from("users")
@@ -376,7 +455,7 @@ String sql = DSL.select()
 // → SELECT SUM("users"."score") AS total_score, MAX("users"."createdAt") AS latest FROM "users"
 
 // Table-qualified columns
-String sql = DSL.select()
+String sql = dsl.select()
     .sum("orders", "amount").as("total_amount")
     .from("users").as("u")
     .innerJoin("orders").as("o").on("u.id", "o.user_id")
@@ -388,14 +467,18 @@ String sql = DSL.select()
 ### INSERT Statements
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // Simple INSERT
-PreparedStatement ps = DSL.insertInto("users")
+PreparedStatement ps = dsl.insertInto("users")
     .set("id", 1)
     .set("name", "John")
     .buildPreparedStatement(connection);
 
 // INSERT with multiple columns and mixed types
-PreparedStatement ps = DSL.insertInto("users")
+PreparedStatement ps = dsl.insertInto("users")
     .set("id", 2)
     .set("name", "Jane")
     .set("email", "jane@example.com")
@@ -409,21 +492,25 @@ PreparedStatement ps = DSL.insertInto("users")
 ### UPDATE Statements
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // UPDATE with WHERE condition
-PreparedStatement ps = DSL.update("users")
+PreparedStatement ps = dsl.update("users")
     .set("name", "Johnny")
     .where("id").eq(1)
     .buildPreparedStatement(connection);
 
 // UPDATE multiple columns
-PreparedStatement ps = DSL.update("users")
+PreparedStatement ps = dsl.update("users")
     .set("name", "Johnny")
     .set("age", 35)
     .where("id").eq(1)
     .buildPreparedStatement(connection);
 
 // UPDATE with complex WHERE conditions
-PreparedStatement ps = DSL.update("users")
+PreparedStatement ps = dsl.update("users")
     .set("email", "jane.updated@example.com")
     .where("age").gt(18)
     .and("name").eq("Jane Smith")
@@ -433,18 +520,22 @@ PreparedStatement ps = DSL.update("users")
 ### DELETE Statements
 
 ```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
 // DELETE with WHERE condition
-PreparedStatement ps = DSL.deleteFrom("users")
+PreparedStatement ps = dsl.deleteFrom("users")
     .where("id").eq(2)
     .buildPreparedStatement(connection);
 
 // DELETE with complex conditions
-PreparedStatement ps = DSL.deleteFrom("users")
+PreparedStatement ps = dsl.deleteFrom("users")
     .where("age").lt(18)
     .buildPreparedStatement(connection);
 
 // DELETE with AND condition
-PreparedStatement ps = DSL.deleteFrom("users")
+PreparedStatement ps = dsl.deleteFrom("users")
     .where("age").gt(18)
     .and("name").eq("Alice")
     .buildPreparedStatement(connection);
