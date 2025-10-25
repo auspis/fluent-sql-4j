@@ -332,4 +332,99 @@ class MySQLDialectPluginE2E {
             assertThat(count).isGreaterThan(0);
         }
     }
+
+    @Test
+    void mergeStatementWithRealDatabase() throws SQLException {
+        // Get renderer from registry
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+
+        // Create source table with user updates
+        try (var stmt = connection.createStatement()) {
+            stmt.execute("DROP TABLE IF EXISTS users_updates");
+            stmt.execute(
+                    """
+                    CREATE TABLE users_updates (
+                        id INTEGER PRIMARY KEY,
+                        name VARCHAR(50),
+                        email VARCHAR(100),
+                        age INTEGER,
+                        active BOOLEAN,
+                        birthdate DATE,
+                        createdAt TIMESTAMP
+                    )
+                    """);
+
+            // Source has: updated John Doe (age changed), new user (id=11), Jane Smith unchanged
+            stmt.execute(
+                    "INSERT INTO users_updates VALUES (1, 'John Doe', 'john.newemail@example.com', 31, true, '1990-01-01', '2023-01-01')");
+            stmt.execute(
+                    "INSERT INTO users_updates VALUES (2, 'Jane Smith', 'jane@example.com', 25, true, '1995-01-01', '2023-01-01')");
+            stmt.execute(
+                    "INSERT INTO users_updates VALUES (11, 'New User', 'newuser@example.com', 28, true, '1992-01-01', '2023-01-10')");
+        }
+
+        // Build and execute MERGE statement using DSL
+        String mergeSql = lan.tlab
+                .r4j
+                .sql
+                .dsl
+                .DSL
+                .mergeInto(renderer, "users")
+                .as("tgt")
+                .using("users_updates", "src")
+                .on("tgt.id", "src.id")
+                .whenMatched()
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .set("birthdate", "src.birthdate")
+                .set("createdAt", "src.createdAt")
+                .whenNotMatched()
+                .set("id", "src.id")
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .set("birthdate", "src.birthdate")
+                .set("createdAt", "src.createdAt")
+                .build();
+
+        try (var stmt = connection.createStatement()) {
+            int affectedRows = stmt.executeUpdate(mergeSql);
+            // MySQL ON DUPLICATE KEY UPDATE returns affected rows count
+            // 1 = inserted, 2 = updated (technically 1 deleted + 1 inserted in MySQL's logic)
+            assertThat(affectedRows).isGreaterThan(0);
+        }
+
+        // Verify John Doe was updated
+        try (var ps = connection.prepareStatement("SELECT * FROM users WHERE id = 1");
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(1);
+            assertThat(rs.getString("name")).isEqualTo("John Doe");
+            assertThat(rs.getString("email")).isEqualTo("john.newemail@example.com");
+            assertThat(rs.getInt("age")).isEqualTo(31);
+            assertThat(rs.getBoolean("active")).isTrue();
+        }
+
+        // Verify new user was inserted
+        try (var ps = connection.prepareStatement("SELECT * FROM users WHERE id = 11");
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(11);
+            assertThat(rs.getString("name")).isEqualTo("New User");
+            assertThat(rs.getString("email")).isEqualTo("newuser@example.com");
+            assertThat(rs.getInt("age")).isEqualTo(28);
+            assertThat(rs.getBoolean("active")).isTrue();
+        }
+
+        // Verify total count (original 10 + 1 new = 11)
+        try (var ps = connection.prepareStatement("SELECT COUNT(*) as cnt FROM users");
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("cnt")).isEqualTo(11);
+        }
+    }
 }
