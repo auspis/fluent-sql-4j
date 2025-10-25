@@ -69,10 +69,15 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedDelete;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -133,8 +138,12 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.AsRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.DefaultValuesRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.InsertSourceRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.InsertValueRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.MergeUsingRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.TableRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.UpdateItemRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.WhenMatchedDeleteRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.WhenMatchedUpdateRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.WhenNotMatchedInsertRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.ColumnDefinitionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.IndexDefinitionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.ParameterizedDataTypeRenderStrategy;
@@ -150,6 +159,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.UniqueConst
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.CreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.DeleteStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.InsertStatementRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.SelectStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.UpdateStatementRenderStrategy;
 import lombok.Builder;
@@ -175,6 +185,9 @@ public class SqlRenderer implements Visitor<String> {
 
     @Default
     private final DeleteStatementRenderStrategy deleteStatementStrategy = new DeleteStatementRenderStrategy();
+
+    @Default
+    private final MergeStatementRenderStrategy mergeStatementStrategy = new MergeStatementRenderStrategy();
 
     @Default
     private final CreateTableStatementRenderStrategy createTableStatementStrategy =
@@ -365,6 +378,19 @@ public class SqlRenderer implements Visitor<String> {
     private final DefaultValuesRenderStrategy defaultValuesStrategy = new DefaultValuesRenderStrategy();
 
     @Default
+    private final MergeUsingRenderStrategy mergeUsingStrategy = new MergeUsingRenderStrategy();
+
+    @Default
+    private final WhenMatchedUpdateRenderStrategy whenMatchedUpdateStrategy = new WhenMatchedUpdateRenderStrategy();
+
+    @Default
+    private final WhenMatchedDeleteRenderStrategy whenMatchedDeleteStrategy = new WhenMatchedDeleteRenderStrategy();
+
+    @Default
+    private final WhenNotMatchedInsertRenderStrategy whenNotMatchedInsertStrategy =
+            new WhenNotMatchedInsertRenderStrategy();
+
+    @Default
     private final ReferencesItemRenderStrategy referencesItemStrategy = new ReferencesItemRenderStrategy();
 
     @Default
@@ -421,6 +447,11 @@ public class SqlRenderer implements Visitor<String> {
     @Override
     public String visit(DeleteStatement statement, AstContext ctx) {
         return deleteStatementStrategy.render(statement, this, ctx);
+    }
+
+    @Override
+    public String visit(MergeStatement statement, AstContext ctx) {
+        return mergeStatementStrategy.render(statement, this, ctx);
     }
 
     @Override
@@ -723,6 +754,26 @@ public class SqlRenderer implements Visitor<String> {
     @Override
     public String visit(DefaultValues item, AstContext ctx) {
         return defaultValuesStrategy.render(item, this, ctx);
+    }
+
+    @Override
+    public String visit(MergeUsing item, AstContext ctx) {
+        return mergeUsingStrategy.render(item, this, ctx);
+    }
+
+    @Override
+    public String visit(WhenMatchedUpdate item, AstContext ctx) {
+        return whenMatchedUpdateStrategy.render(item, this, ctx);
+    }
+
+    @Override
+    public String visit(WhenMatchedDelete item, AstContext ctx) {
+        return whenMatchedDeleteStrategy.render(item, this, ctx);
+    }
+
+    @Override
+    public String visit(WhenNotMatchedInsert item, AstContext ctx) {
+        return whenNotMatchedInsertStrategy.render(item, this, ctx);
     }
 
     @Override

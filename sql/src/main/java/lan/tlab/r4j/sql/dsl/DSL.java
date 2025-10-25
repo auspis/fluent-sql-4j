@@ -3,6 +3,7 @@ package lan.tlab.r4j.sql.dsl;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.dsl.delete.DeleteBuilder;
 import lan.tlab.r4j.sql.dsl.insert.InsertBuilder;
+import lan.tlab.r4j.sql.dsl.merge.MergeBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import lan.tlab.r4j.sql.dsl.select.SelectProjectionBuilder;
 import lan.tlab.r4j.sql.dsl.table.CreateTableBuilder;
@@ -69,6 +70,10 @@ public class DSL {
 
     public static UpdateBuilder update(DialectRenderer renderer, String tableName) {
         return new UpdateBuilder(renderer, tableName);
+    }
+
+    public static MergeBuilder mergeInto(DialectRenderer renderer, String targetTableName) {
+        return new MergeBuilder(renderer, targetTableName);
     }
 
     // Instance methods using the configured renderer (new instance-based API)
@@ -141,5 +146,15 @@ public class DSL {
      */
     public UpdateBuilder update(String tableName) {
         return update(renderer, tableName);
+    }
+
+    /**
+     * Creates a MERGE INTO builder using this DSL instance's configured renderer.
+     *
+     * @param targetTableName the name of the target table for the merge operation
+     * @return a new MergeBuilder instance
+     */
+    public MergeBuilder mergeInto(String targetTableName) {
+        return mergeInto(renderer, targetTableName);
     }
 }
