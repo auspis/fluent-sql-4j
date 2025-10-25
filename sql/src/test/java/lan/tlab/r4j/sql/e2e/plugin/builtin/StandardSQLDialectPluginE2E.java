@@ -277,8 +277,7 @@ class StandardSQLDialectPluginE2E {
 
         // Verify total count (original 10 + 1 new = 11)
         List<Integer> count = ResultSetUtil.list(
-                DSL.select(renderer, "COUNT(*) as cnt").from("users").buildPreparedStatement(connection),
-                r -> r.getInt("cnt"));
+                connection.prepareStatement("SELECT COUNT(*) as cnt FROM users"), r -> r.getInt("cnt"));
 
         assertThat(count.get(0)).isEqualTo(11);
     }
