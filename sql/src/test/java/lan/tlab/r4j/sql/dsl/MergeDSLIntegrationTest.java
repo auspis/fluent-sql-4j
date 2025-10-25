@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.e2e.merge;
+package lan.tlab.r4j.sql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,12 +9,13 @@ import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
-import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MergeE2ETest {
+@IntegrationTest
+class MergeDSLIntegrationTest {
 
     private DSL dsl;
 
