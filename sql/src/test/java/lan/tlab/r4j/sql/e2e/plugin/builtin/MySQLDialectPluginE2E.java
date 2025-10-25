@@ -332,4 +332,95 @@ class MySQLDialectPluginE2E {
             assertThat(count).isGreaterThan(0);
         }
     }
+
+    @Test
+    void mergeStatementWithRealDatabase() throws SQLException {
+        // Get renderer from registry
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+
+        // Create source table with user updates
+        try (var stmt = connection.createStatement()) {
+            stmt.execute(
+                    """
+                    CREATE TABLE users_updates (
+                        id INTEGER PRIMARY KEY,
+                        name VARCHAR(50),
+                        email VARCHAR(100),
+                        age INTEGER,
+                        active BOOLEAN
+                    )
+                    """);
+
+            // Source has: updated John Doe (age changed), new user (id=11), Jane Smith unchanged
+            stmt.execute("INSERT INTO users_updates VALUES (1, 'John Doe', 'john.newemail@example.com', 31, true)");
+            stmt.execute("INSERT INTO users_updates VALUES (2, 'Jane Smith', 'jane@example.com', 25, true)");
+            stmt.execute("INSERT INTO users_updates VALUES (11, 'New User', 'newuser@example.com', 28, true)");
+        }
+
+        // Build and execute MERGE statement using DSL
+        // MySQL will translate this to INSERT ... ON DUPLICATE KEY UPDATE
+        String mergeSql = lan.tlab
+                .r4j
+                .sql
+                .dsl
+                .DSL
+                .mergeInto(renderer, "users")
+                .as("tgt")
+                .using("users_updates", "src")
+                .on("tgt.id", "src.id")
+                .whenMatched()
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .whenNotMatched()
+                .set("id", "src.id")
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .build();
+
+        // Verify generated SQL is MySQL-specific (INSERT ... ON DUPLICATE KEY UPDATE)
+        assertThat(mergeSql).contains("INSERT INTO");
+        assertThat(mergeSql).contains("ON DUPLICATE KEY UPDATE");
+        assertThat(mergeSql).doesNotContain("MERGE INTO");
+
+        try (var stmt = connection.createStatement()) {
+            int affectedRows = stmt.executeUpdate(mergeSql);
+            assertThat(affectedRows).isGreaterThanOrEqualTo(0);
+        }
+
+        // Verify John Doe was updated
+        try (var ps = connection.prepareStatement("SELECT id, name, email, age, active FROM users WHERE id = 1");
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(1);
+            assertThat(rs.getString("name")).isEqualTo("John Doe");
+            assertThat(rs.getString("email")).isEqualTo("john.newemail@example.com");
+            assertThat(rs.getInt("age")).isEqualTo(31);
+            assertThat(rs.getBoolean("active")).isTrue();
+        }
+
+        // Verify new user was inserted
+        try (var ps = connection.prepareStatement("SELECT id, name, email, age, active FROM users WHERE id = 11");
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(11);
+            assertThat(rs.getString("name")).isEqualTo("New User");
+            assertThat(rs.getString("email")).isEqualTo("newuser@example.com");
+            assertThat(rs.getInt("age")).isEqualTo(28);
+            assertThat(rs.getBoolean("active")).isTrue();
+        }
+
+        // Verify Jane Smith was also updated (even though values unchanged)
+        try (var ps = connection.prepareStatement("SELECT id, name, email FROM users WHERE id = 2");
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(2);
+            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
+            assertThat(rs.getString("email")).isEqualTo("jane@example.com");
+        }
+    }
 }
