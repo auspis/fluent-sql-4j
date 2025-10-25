@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.dsl.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,23 +11,24 @@ import org.junit.jupiter.api.Test;
 // TODO: add integration tests that actually run the prepared statements against a real database
 class SelectBuilderPreparedStatementTest {
 
-    private DSL dsl;
+    private DialectRenderer renderer;
 
     @BeforeEach
     void setUp() {
-        dsl = TestDialectRendererFactory.dslStandardSql2008();
+        renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
     }
 
     @Test
     void buildPreparedStatementRequiresConnection() {
-        SelectBuilder builder = dsl.selectAll().from("users").where("age").gt(20);
+        SelectBuilder builder =
+                new SelectBuilder(renderer, "*").from("users").where("age").gt(20);
 
         assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(Exception.class);
     }
 
     @Test
     void buildPreparedStatementCompilesWithoutError() {
-        SelectBuilder builder = dsl.select("name", "email")
+        SelectBuilder builder = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .where("age")
                 .gte(18)
@@ -42,7 +43,7 @@ class SelectBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementWithJoinCompilesWithoutError() {
-        SelectBuilder builder = dsl.select("name", "email")
+        SelectBuilder builder = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
