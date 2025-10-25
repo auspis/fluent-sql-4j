@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.ast.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
-import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,34 +18,37 @@ import org.junit.jupiter.api.Test;
 
 class DeleteBuilderTest {
 
-    private DSL dsl;
+    private DialectRenderer renderer;
 
     @BeforeEach
     void setUp() {
-        dsl = TestDialectRendererFactory.dslStandardSql2008();
+        renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
     }
 
     @Test
     void ok() {
-        String result = dsl.deleteFrom("users").where("status").eq("inactive").build();
+        String result = new DeleteBuilder(renderer, "users")
+                .where("status")
+                .eq("inactive")
+                .build();
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"status\" = 'inactive'");
     }
 
     @Test
     void noWhere() {
-        String result = dsl.deleteFrom("users").build();
+        String result = new DeleteBuilder(renderer, "users").build();
         assertThat(result).isEqualTo("DELETE FROM \"users\"");
     }
 
     @Test
     void whereWithNumber() {
-        String result = dsl.deleteFrom("users").where("id").eq(42).build();
+        String result = new DeleteBuilder(renderer, "users").where("id").eq(42).build();
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"id\" = 42");
     }
 
     @Test
     void and() {
-        String result = dsl.deleteFrom("users")
+        String result = new DeleteBuilder(renderer, "users")
                 .where("status")
                 .eq("inactive")
                 .and("age")
@@ -59,7 +62,7 @@ class DeleteBuilderTest {
 
     @Test
     void or() {
-        String result = dsl.deleteFrom("users")
+        String result = new DeleteBuilder(renderer, "users")
                 .where("status")
                 .eq("deleted")
                 .or("status")
@@ -73,7 +76,7 @@ class DeleteBuilderTest {
 
     @Test
     void andOr() {
-        String result = dsl.deleteFrom("users")
+        String result = new DeleteBuilder(renderer, "users")
                 .where("status")
                 .eq("inactive")
                 .and("age")
@@ -89,22 +92,27 @@ class DeleteBuilderTest {
 
     @Test
     void isNull() {
-        String result = dsl.deleteFrom("users").where("deleted_at").isNotNull().build();
+        String result = new DeleteBuilder(renderer, "users")
+                .where("deleted_at")
+                .isNotNull()
+                .build();
 
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"deleted_at\" IS NOT NULL");
     }
 
     @Test
     void like() {
-        String result =
-                dsl.deleteFrom("users").where("email").like("%@temp.com").build();
+        String result = new DeleteBuilder(renderer, "users")
+                .where("email")
+                .like("%@temp.com")
+                .build();
 
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"email\" LIKE '%@temp.com'");
     }
 
     @Test
     void allComparisonOperators() {
-        String result = dsl.deleteFrom("products")
+        String result = new DeleteBuilder(renderer, "products")
                 .where("price")
                 .gt(100)
                 .and("discount")
@@ -124,14 +132,14 @@ class DeleteBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> dsl.deleteFrom(""))
+        assertThatThrownBy(() -> new DeleteBuilder(renderer, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> dsl.deleteFrom("users").where(""))
+        assertThatThrownBy(() -> new DeleteBuilder(renderer, "users").where(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
