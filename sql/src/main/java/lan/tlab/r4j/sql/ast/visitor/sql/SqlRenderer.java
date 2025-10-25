@@ -757,7 +757,12 @@ public class SqlRenderer implements Visitor<String> {
     }
 
     @Override
-    public String visit(MergeUsing item, AstContext ctx) {
+    public String visit(MergeUsing.TableSource item, AstContext ctx) {
+        return mergeUsingStrategy.render(item, this, ctx);
+    }
+
+    @Override
+    public String visit(MergeUsing.SubquerySource item, AstContext ctx) {
         return mergeUsingStrategy.render(item, this, ctx);
     }
 

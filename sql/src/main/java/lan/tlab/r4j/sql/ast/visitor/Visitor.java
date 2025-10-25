@@ -223,7 +223,9 @@ public interface Visitor<T> {
 
     T visit(DefaultValues item, AstContext ctx);
 
-    T visit(MergeUsing item, AstContext ctx);
+    T visit(MergeUsing.TableSource item, AstContext ctx);
+
+    T visit(MergeUsing.SubquerySource item, AstContext ctx);
 
     T visit(WhenMatchedUpdate item, AstContext ctx);
 
