@@ -859,7 +859,14 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(MergeUsing item, AstContext ctx) {
+    public PsDto visit(MergeUsing.TableSource item, AstContext ctx) {
+        // Render as SQL for now
+        String sql = sqlRenderer.visit(item, ctx);
+        return new PsDto(sql, List.of());
+    }
+
+    @Override
+    public PsDto visit(MergeUsing.SubquerySource item, AstContext ctx) {
         // Render as SQL for now
         String sql = sqlRenderer.visit(item, ctx);
         return new PsDto(sql, List.of());
