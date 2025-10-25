@@ -285,7 +285,7 @@ public class MergeBuilder {
                 return;
             }
             if (updateItems.isEmpty()) {
-                throw new IllegalStateException("At least one SET clause must be specified for UPDATE");
+                throw new IllegalStateException("At least one SET clause must be specified for WHEN MATCHED THEN UPDATE");
             }
             if (condition == null) {
                 parent.actions.add(new WhenMatchedUpdate(updateItems));
