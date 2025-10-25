@@ -1,5 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.ps;
 
+import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.conditional.having.Having;
 import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
@@ -70,10 +71,15 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
 import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
+import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedDelete;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -535,6 +541,14 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     }
 
     @Override
+    public PsDto visit(MergeStatement mergeStatement, AstContext ctx) {
+        // For now, render as SQL without parameterization
+        // Full PreparedStatement support can be added later
+        String sql = sqlRenderer.visit(mergeStatement, ctx);
+        return new PsDto(sql, List.of());
+    }
+
+    @Override
     public PsDto visit(CreateTableStatement createTableStatement, AstContext ctx) {
         return createTableStatementStrategy.handle(createTableStatement, this, ctx);
     }
@@ -842,6 +856,34 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Override
     public PsDto visit(DefaultValues item, AstContext ctx) {
         return defaultValuesStrategy.handle(item, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(MergeUsing item, AstContext ctx) {
+        // Render as SQL for now
+        String sql = sqlRenderer.visit(item, ctx);
+        return new PsDto(sql, List.of());
+    }
+
+    @Override
+    public PsDto visit(WhenMatchedUpdate item, AstContext ctx) {
+        // Render as SQL for now
+        String sql = sqlRenderer.visit(item, ctx);
+        return new PsDto(sql, List.of());
+    }
+
+    @Override
+    public PsDto visit(WhenMatchedDelete item, AstContext ctx) {
+        // Render as SQL for now
+        String sql = sqlRenderer.visit(item, ctx);
+        return new PsDto(sql, List.of());
+    }
+
+    @Override
+    public PsDto visit(WhenNotMatchedInsert item, AstContext ctx) {
+        // Render as SQL for now
+        String sql = sqlRenderer.visit(item, ctx);
+        return new PsDto(sql, List.of());
     }
 
     // Handle FromSource dispatch for FROM clause
