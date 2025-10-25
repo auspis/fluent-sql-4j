@@ -4,11 +4,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class Trim implements FunctionCall {
 
@@ -21,6 +18,12 @@ public class Trim implements FunctionCall {
     private final ScalarExpression stringExpression;
     private final TrimMode mode;
     private final ScalarExpression charactersToRemove;
+
+    Trim(ScalarExpression stringExpression, TrimMode mode, ScalarExpression charactersToRemove) {
+        this.stringExpression = stringExpression;
+        this.mode = mode;
+        this.charactersToRemove = charactersToRemove;
+    }
 
     public static Trim trim(ScalarExpression stringExpression) {
         return new Trim(stringExpression, null, null);

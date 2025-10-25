@@ -5,15 +5,17 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class UnaryNumeric implements FunctionCall {
     private final String functionName;
     private final ScalarExpression numericExpression;
+
+    UnaryNumeric(String functionName, ScalarExpression numericExpression) {
+        this.functionName = functionName;
+        this.numericExpression = numericExpression;
+    }
 
     public static UnaryNumeric abs(Number value) {
         return abs(Literal.of(value));

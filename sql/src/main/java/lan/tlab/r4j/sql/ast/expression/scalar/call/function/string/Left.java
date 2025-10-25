@@ -5,16 +5,18 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class Left implements FunctionCall {
 
     private final ScalarExpression expression;
     private final ScalarExpression length;
+
+    Left(ScalarExpression expression, ScalarExpression length) {
+        this.expression = expression;
+        this.length = length;
+    }
 
     public static Left of(ScalarExpression expression, int startPosition) {
         return of(expression, Literal.of(startPosition));

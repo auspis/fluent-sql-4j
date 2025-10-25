@@ -6,16 +6,18 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class Concat implements FunctionCall {
 
     private final String separator;
     private final List<ScalarExpression> stringExpressions;
+
+    Concat(String separator, List<ScalarExpression> stringExpressions) {
+        this.separator = separator;
+        this.stringExpressions = stringExpressions;
+    }
 
     public static Concat concat(ScalarExpression... expressions) {
         return new Concat("", Stream.of(expressions).toList());
