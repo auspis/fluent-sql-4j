@@ -1,10 +1,6 @@
 # MERGE Statement Implementation
 
-This document describes the implementation of SQL:2008 MERGE functionality in r4j.
-
-## Overview
-
-The MERGE statement (also known as UPSERT) allows inserting a new record or updating an existing one based on a condition, eliminating the need for separate INSERT/UPDATE logic.
+This document describes the technical implementation of SQL:2008 MERGE functionality in r4j.
 
 ## Architecture
 
@@ -12,190 +8,290 @@ The MERGE statement (also known as UPSERT) allows inserting a new record or upda
 
 #### MergeStatement
 
-Main statement node containing:
-- `targetTable`: Target table expression
-- `targetAlias`: Optional alias for target table
-- `using`: Source specification (MergeUsing)
-- `onCondition`: Join condition predicate
-- `actions`: List of WHEN clauses (MergeAction)
+Main statement node representing the complete MERGE statement:
+
+```java
+@Builder
+public class MergeStatement implements Statement {
+    private final TableExpression targetTable;
+    private final Alias targetAlias;
+    private final MergeUsing using;
+    private final Predicate onCondition;
+    private final List<MergeAction> actions;
+}
+```
+
+**Fields:**
+- `targetTable`: Target table expression (where data will be merged into)
+- `targetAlias`: Optional alias for the target table
+- `using`: Source specification (table or subquery with optional alias)
+- `onCondition`: Join condition predicate (how to match source and target rows)
+- `actions`: List of WHEN clauses defining what to do when rows match or don't match
 
 #### MergeUsing
 
-Represents the USING clause:
-- `source`: Table expression (table or subquery)
-- `sourceAlias`: Optional alias for source
+Represents the USING clause, specifying the source of data:
+
+```java
+public class MergeUsing implements Visitable {
+    private final TableExpression source;
+    private final Alias sourceAlias;
+}
+```
+
+**Supports:**
+- Table references: `USING source_table`
+- Subqueries: `USING (SELECT ...) AS alias`
+- Optional aliasing for both cases
 
 #### MergeAction
 
-Interface with three implementations:
-- `WhenMatchedUpdate`: UPDATE when rows match
-- `WhenMatchedDelete`: DELETE when rows match
-- `WhenNotMatchedInsert`: INSERT when rows don't match
+Abstract base class with three concrete implementations:
 
-Each action can have an optional conditional predicate.
-
-### DSL Builder
-
-The `MergeBuilder` provides a fluent API:
+**WhenMatchedUpdate**: Executes UPDATE when source and target rows match
 
 ```java
-dsl.mergeInto("target_table")
-    .as("tgt")
-    .using("source_table", "src")
-    .on("tgt.id", "src.id")
-    .whenMatchedThenUpdate(updateItems)
-    .whenNotMatchedThenInsert(columns, values)
-    .build();
+public static class WhenMatchedUpdate extends MergeAction {
+    private final List<UpdateItem> updateItems;
+}
 ```
 
-#### Builder Methods
+**WhenMatchedDelete**: Executes DELETE when source and target rows match
 
-- `as(String alias)`: Set target table alias
-- `using(String table)`: Specify source table
-- `using(String table, String alias)`: Specify source table with alias
-- `using(SelectStatement subquery, String alias)`: Use subquery as source
-- `on(String leftColumn, String rightColumn)`: Set join condition
-- `on(Predicate condition)`: Set custom join condition
-- `whenMatchedThenUpdate(List<UpdateItem>)`: Add UPDATE action
-- `whenMatchedThenUpdate(Predicate, List<UpdateItem>)`: Add conditional UPDATE
-- `whenMatchedThenDelete()`: Add DELETE action
-- `whenMatchedThenDelete(Predicate)`: Add conditional DELETE
-- `whenNotMatchedThenInsert(List<ColumnReference>, List<Expression>)`: Add INSERT action
-- `whenNotMatchedThenInsert(Predicate, List<ColumnReference>, List<Expression>)`: Add conditional INSERT
+```java
+public static class WhenMatchedDelete extends MergeAction {
+    // No additional fields needed
+}
+```
+
+**WhenNotMatchedInsert**: Executes INSERT when source row has no match in target
+
+```java
+public static class WhenNotMatchedInsert extends MergeAction {
+    private final List<ColumnReference> columns;
+    private final InsertData data;
+}
+```
+
+All actions support optional conditional predicates via `searchCondition` field.
+
+### DSL Builder Architecture
+
+The `MergeBuilder` uses a **nested builder pattern** with two inner classes:
+
+#### WhenMatchedUpdateBuilder
+
+Handles WHEN MATCHED THEN UPDATE actions:
+- Provides fluent `set()` methods for different data types
+- Auto-commits the action when transitioning to next clause or calling `build()`
+- Validates that at least one SET clause is specified
+- Supports conditional updates via constructor parameter
+
+#### WhenNotMatchedInsertBuilder
+
+Handles WHEN NOT MATCHED THEN INSERT actions:
+- Provides fluent `set()` methods that build column/value pairs
+- Auto-commits the action when transitioning to next clause or calling `build()`
+- Validates that at least one column is specified
+- Validates column count matches value count
+- Supports conditional inserts via constructor parameter
+
+#### Auto-Commit Mechanism
+
+Both nested builders implement an **auto-commit pattern**:
+1. User calls fluent `set()` methods to accumulate data
+2. When user calls `whenMatched()`, `whenNotMatched()`, or `build()`, the builder automatically:
+- Validates accumulated data
+- Creates the appropriate `MergeAction` instance
+- Adds it to the parent `MergeBuilder.actions` list
+- Marks itself as committed to prevent duplicate actions
+
+This eliminates the need for explicit `then*()` methods, making the API more intuitive.
 
 ### Render Strategies
 
 #### MergeStatementRenderStrategy
 
-Renders the complete MERGE statement.
+**Location**: `lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy`
+
+**Responsibilities:**
+- Orchestrates rendering of complete MERGE statement
+- Delegates to specialized strategies for each clause
+- Handles SQL:2008 standard syntax
+
+**Output Format:**
+
+```sql
+MERGE INTO target_table [AS alias]
+USING source
+ON condition
+WHEN MATCHED [AND condition] THEN UPDATE SET ...
+WHEN MATCHED [AND condition] THEN DELETE
+WHEN NOT MATCHED [AND condition] THEN INSERT (...) VALUES (...)
+```
 
 #### MergeUsingRenderStrategy
 
-Renders the USING clause, wrapping subqueries in parentheses.
+**Handles:**
+- Table references: `source_table [AS alias]`
+- Subqueries: `(SELECT ...) AS alias`
+- Wraps subqueries in parentheses
 
 #### WhenMatchedUpdateRenderStrategy
 
-Renders UPDATE actions with optional conditions.
+**Renders:**
+- `WHEN MATCHED` keyword
+- Optional `AND condition` clause
+- `THEN UPDATE SET` clause
+- Comma-separated update items
 
 #### WhenMatchedDeleteRenderStrategy
 
-Renders DELETE actions with optional conditions.
+**Renders:**
+- `WHEN MATCHED` keyword
+- Optional `AND condition` clause
+- `THEN DELETE` keyword
 
 #### WhenNotMatchedInsertRenderStrategy
 
-Renders INSERT actions with optional conditions.
+**Renders:**
+- `WHEN NOT MATCHED` keyword
+- Optional `AND condition` clause
+- `THEN INSERT` keyword
+- Column list in parentheses
+- `VALUES` keyword
+- Value list in parentheses
 
-## SQL:2008 Standard Syntax
+### Prepared Statement Support
+
+Both `MergeBuilder` and nested builders support prepared statements:
+
+```java
+PreparedStatement buildPreparedStatement(Connection connection) throws SQLException
+```
+
+**Process:**
+1. Validates the builder state
+2. Constructs the `MergeStatement` AST node
+3. Renders to SQL with parameter placeholders (`?`)
+4. Extracts parameter values in order
+5. Creates `PreparedStatement` and binds parameters
+
+## SQL:2008 Standard Compliance
+
+The implementation follows SQL:2008 standard syntax:
 
 ```sql
-MERGE INTO target_table [AS target_alias]
-USING source_table|subquery [AS source_alias]
-ON join_condition
-[WHEN MATCHED [AND condition] THEN UPDATE SET ...]
-[WHEN MATCHED [AND condition] THEN DELETE]
-[WHEN NOT MATCHED [AND condition] THEN INSERT (...) VALUES (...)]
+<merge statement> ::=
+  MERGE INTO <target table> [ [ AS ] <merge correlation name> ]
+  USING <table reference>
+  ON <search condition>
+  <merge operation specification>
+
+<merge operation specification> ::=
+  <when clause>...
+
+<when clause> ::=
+  <when matched clause> | <when not matched clause>
+
+<when matched clause> ::=
+  WHEN MATCHED [ AND <search condition> ]
+  THEN <merge update or delete specification>
+
+<when not matched clause> ::=
+  WHEN NOT MATCHED [ AND <search condition> ]
+  THEN <merge insert specification>
 ```
 
-## Examples
+### Standard Features Supported
 
-### Basic Table-to-Table Merge
+✅ Target table with optional alias  
+✅ Table or subquery as source with alias  
+✅ Complex join conditions  
+✅ Multiple WHEN clauses  
+✅ Conditional WHEN clauses (AND condition)  
+✅ UPDATE action  
+✅ DELETE action  
+✅ INSERT action  
+✅ Prepared statement support
+
+### Limitations
+
+⚠️ The implementation currently supports:
+- One UPDATE action per MERGE (standard allows multiple with different conditions)
+- One DELETE action per MERGE (standard allows multiple with different conditions)
+- One INSERT action per MERGE (standard allows multiple with different conditions)
+
+This is a design choice to keep the DSL API simple. For complex scenarios, use multiple MERGE statements.
+
+## Testing Strategy
+
+### Unit Tests
+
+**Location**: `lan.tlab.r4j.sql.dsl.merge.MergeBuilderTest`
+
+**Coverage:**
+- Basic merge with table source
+- Merge with subquery source
+- Conditional actions (WHEN ... AND condition)
+- DELETE actions
+- Multiple actions in same MERGE
+- Fluent API with multiple SET clauses
+- Mixed data types (String, Number, Boolean, Expression)
+- Column reference expressions
+- Validation (missing clauses, mismatched columns/values)
+- Error handling
+
+### Integration Tests
+
+**Location**: `test-integration` module
+
+Tests actual SQL execution against real databases using Testcontainers.
+
+## Implementation Notes
+
+### Why Nested Builders?
+
+1. **Type Safety**: Compile-time guarantee that only valid method sequences are possible
+2. **Discoverability**: IDE auto-completion guides users through valid API calls
+3. **Consistency**: Matches `UpdateBuilder` and `InsertBuilder` patterns
+4. **Simplicity**: No need to manually construct AST nodes
+
+### Why Auto-Commit?
+
+Traditional approach required explicit `then*()` methods:
 
 ```java
-String sql = dsl.mergeInto("products")
-    .as("p")
-    .using("new_products", "np")
-    .on("p.product_id", "np.product_id")
-    .whenMatchedThenUpdate(List.of(
-        UpdateItem.of("name", ColumnReference.of("np", "name")),
-        UpdateItem.of("price", ColumnReference.of("np", "price"))))
-    .whenNotMatchedThenInsert(
-        List.of(ColumnReference.of("p", "product_id")),
-        List.of(ColumnReference.of("np", "product_id")))
-    .build();
+.whenMatched().set(...).thenUpdate()  // Explicit commit
 ```
 
-### Using Subquery as Source
+Auto-commit approach is more intuitive:
 
 ```java
-SelectStatement subquery = dsl.select("id", "name")
-    .from("staging_products")
-    .where("status").eq("active")
-    .getCurrentStatement();
-
-String sql = dsl.mergeInto("products")
-    .using(subquery, "src")
-    .on("products.id", "src.id")
-    .whenMatchedThenUpdate(List.of(
-        UpdateItem.of("name", ColumnReference.of("src", "name"))))
-    .build();
+.whenMatched().set(...)  // Implicit commit on transition
+.whenNotMatched().set(...)
 ```
 
-### Conditional Actions
+The builder detects when you're moving to the next clause and automatically commits the current action.
 
-```java
-String sql = dsl.mergeInto("inventory")
-    .using("new_stock", "ns")
-    .on("inventory.product_id", "ns.product_id")
-    .whenMatchedThenUpdate(
-        Comparison.gt(ColumnReference.of("ns", "quantity"), Literal.of(0)),
-        List.of(UpdateItem.of("quantity", ColumnReference.of("ns", "quantity"))))
-    .whenMatchedThenDelete(
-        Comparison.eq(ColumnReference.of("ns", "quantity"), Literal.of(0)))
-    .build();
-```
+### Delete Action Design
 
-## Use Cases
+The `delete()` method is part of `WhenMatchedUpdateBuilder` because:
+1. DELETE is only valid for WHEN MATCHED (not WHEN NOT MATCHED)
+2. DELETE and UPDATE are mutually exclusive
+3. Validation ensures `delete()` cannot be called after `set()`
 
-1. **Data Synchronization**: Sync data between tables or from external sources
-2. **ETL Operations**: Load and update data in data warehouses
-3. **Incremental Loads**: Update changed records and insert new ones
-4. **Avoiding Race Conditions**: Single statement prevents concurrent update issues
+## Future Enhancements
 
-## Testing
-
-### Unit Tests (MergeBuilderTest)
-
-- Basic MERGE operations
-- Subquery sources
-- Conditional actions
-- Validation and error handling
-- 11 tests covering all builder methods
-
-### E2E Tests (MergeE2ETest)
-
-- Real-world scenarios
-- Complex multi-action merges
-- Subquery integration
-- 4 comprehensive integration tests
-
-## Limitations and Future Work
-
-### Current Limitations
-
-1. **PreparedStatement Support**: Currently renders as direct SQL without parameterization
-2. **No Dialect-Specific Optimizations**: Uses only standard SQL:2008 syntax
-
-### Future Enhancements
-
-1. Add full PreparedStatement parameterization
-2. Implement dialect-specific syntax:
-   - MySQL: `INSERT ... ON DUPLICATE KEY UPDATE`
-   - PostgreSQL: `INSERT ... ON CONFLICT`
-3. Add database integration tests
-4. Support MERGE with VALUES clause
-5. Add performance optimizations
-
-## Integration with Existing Code
-
-The MERGE implementation follows the existing patterns:
-- AST nodes implement `Visitable`
-- Builder follows fluent API pattern like InsertBuilder, UpdateBuilder
-- Render strategies follow existing strategy pattern
-- Tests use TestDialectRendererFactory
+Potential improvements:
+- Support for MERGE...RETURNING clause
+- Support for multiple conditional actions of same type
+- Default values for INSERT when source column is NULL
+- Bulk MERGE operations
+- Diagnostic output for complex MERGE statements
 
 ## References
 
-- SQL:2008 Standard (ISO/IEC 9075-2:2008)
-- [Issue #XX](link-to-issue): Original feature request
-- Test files: `MergeBuilderTest.java`, `MergeE2ETest.java`
+- SQL:2008 Standard, Foundation (SQL/Foundation), Section 14.12: MERGE statement
+- [README.md](./README.md) - Usage examples and quick start guide
 

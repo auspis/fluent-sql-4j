@@ -4,13 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class WhereConditionBuilderTest {
 
-    private lan.tlab.r4j.sql.dsl.DSL dsl;
+    private DSL dsl;
 
     @BeforeEach
     void setUp() {
