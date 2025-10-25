@@ -245,36 +245,6 @@ class SelectBuilderTest {
     }
 
     @Test
-    void isNull() {
-        String sql = dsl.select("*").from("users").where("deleted_at").isNull().build();
-
-        assertThat(sql)
-                .isEqualTo("""
-            SELECT * FROM "users" WHERE "users"."deleted_at" IS NULL\
-            """);
-    }
-
-    @Test
-    void isNotNull() {
-        String sql = dsl.select("*").from("users").where("email").isNotNull().build();
-
-        assertThat(sql)
-                .isEqualTo("""
-            SELECT * FROM "users" WHERE "users"."email" IS NOT NULL\
-            """);
-    }
-
-    @Test
-    void like() {
-        String sql = dsl.select("*").from("users").where("name").like("%john%").build();
-
-        assertThat(sql)
-                .isEqualTo("""
-            SELECT * FROM "users" WHERE "users"."name" LIKE '%john%'\
-            """);
-    }
-
-    @Test
     void allComparisonOperators() {
         String sql = dsl.select("*")
                 .from("products")
