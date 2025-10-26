@@ -6,19 +6,17 @@ import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.clause.Clause;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@Getter
-public class OrderBy implements Clause {
+public record OrderBy(List<Sorting> sortings) implements Clause {
 
-    @Default
-    private final List<Sorting> sortings = new ArrayList<>();
+    public OrderBy {
+        if (sortings == null) {
+            sortings = new ArrayList<>();
+        }
+    }
 
     public static OrderBy of(Sorting... sortings) {
-        return builder().sortings(Stream.of(sortings).toList()).build();
+        return new OrderBy(Stream.of(sortings).toList());
     }
 
     @Override

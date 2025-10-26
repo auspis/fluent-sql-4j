@@ -50,7 +50,7 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         // ORDER BY ... (optional)
         PsDto orderByResult = null;
         String orderByClause = "";
-        if (stmt.getOrderBy() != null && !stmt.getOrderBy().getSortings().isEmpty()) {
+        if (stmt.getOrderBy() != null && !stmt.getOrderBy().sortings().isEmpty()) {
             orderByResult = stmt.getOrderBy().accept(renderer, ctx);
             orderByClause = " ORDER BY " + orderByResult.sql();
         }
