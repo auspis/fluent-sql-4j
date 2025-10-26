@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.ast.predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
-public class NullPredicate implements Predicate {
+public record NullPredicate() implements Predicate {
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
