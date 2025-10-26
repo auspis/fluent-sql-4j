@@ -62,9 +62,9 @@ class DefaultFromClausePsStrategyTest {
     @Test
     void multipleTablesWithAliases() {
         From from = From.of(
-                From.fromTable("User", "u").getSources().get(0),
-                From.fromTable("Order", "o").getSources().get(0),
-                From.fromTable("Product", "p").getSources().get(0));
+                From.fromTable("User", "u").sources().get(0),
+                From.fromTable("Order", "o").sources().get(0),
+                From.fromTable("Product", "p").sources().get(0));
 
         PsDto result = strategy.handle(from, visitor, ctx);
 

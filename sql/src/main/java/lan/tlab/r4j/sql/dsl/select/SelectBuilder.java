@@ -100,12 +100,11 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         }
 
         From currentFrom = getCurrentStatement().getFrom();
-        if (currentFrom == null || currentFrom.getSources().isEmpty()) {
+        if (currentFrom == null || currentFrom.sources().isEmpty()) {
             throw new IllegalStateException("Cannot set alias before specifying table with from()");
         }
 
-        TableIdentifier currentTable =
-                (TableIdentifier) currentFrom.getSources().get(0);
+        TableIdentifier currentTable = (TableIdentifier) currentFrom.sources().get(0);
         TableIdentifier tableWithAlias = new TableIdentifier(currentTable.name(), alias);
 
         baseTable = tableWithAlias;
@@ -291,7 +290,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
         return updateFetch(fetch -> {
             int currentOffset = fetch != null ? fetch.offset() : 0;
-            return Fetch.of(currentOffset, rows);
+            return new Fetch(currentOffset, rows);
         });
     }
 
@@ -302,7 +301,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
         return updateFetch(fetch -> {
             Integer currentRows = fetch != null ? fetch.rows() : null;
-            return Fetch.of(offset, currentRows);
+            return new Fetch(offset, currentRows);
         });
     }
 
@@ -412,7 +411,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
     private void validateState() {
         From from = getCurrentStatement().getFrom();
-        if (from == null || from.getSources().isEmpty()) {
+        if (from == null || from.sources().isEmpty()) {
             throw new IllegalStateException("FROM table must be specified");
         }
     }
