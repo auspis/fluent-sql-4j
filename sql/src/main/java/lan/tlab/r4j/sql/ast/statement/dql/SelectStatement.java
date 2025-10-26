@@ -34,7 +34,7 @@ public class SelectStatement implements DataQueryStatement, TableExpression {
     private final Having having = Having.builder().build();
 
     @Default
-    private final OrderBy orderBy = OrderBy.builder().build();
+    private final OrderBy orderBy = new OrderBy(null);
 
     @Default
     private final Fetch fetch = new Fetch(0, null);
