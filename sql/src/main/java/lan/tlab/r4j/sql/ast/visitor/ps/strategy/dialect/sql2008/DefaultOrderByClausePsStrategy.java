@@ -13,7 +13,7 @@ public class DefaultOrderByClausePsStrategy implements OrderByClausePsStrategy {
     public PsDto handle(OrderBy clause, Visitor<PsDto> renderer, AstContext ctx) {
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-        for (var sorting : clause.getSortings()) {
+        for (var sorting : clause.sortings()) {
             PsDto res = sorting.accept(renderer, ctx);
             sqlParts.add(res.sql());
             params.addAll(res.parameters());
