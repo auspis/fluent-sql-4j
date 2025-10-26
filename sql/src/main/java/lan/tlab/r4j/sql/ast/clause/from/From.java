@@ -7,27 +7,23 @@ import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
 
-@Builder
-@Getter
-public class From implements Clause {
-
-    @Singular
-    private final List<FromSource> sources;
+public record From(List<FromSource> sources) implements Clause {
 
     public static From fromTable(String name) {
-        return From.builder().source(new TableIdentifier(name)).build();
+        return new From(List.of(new TableIdentifier(name)));
     }
 
     public static From fromTable(String name, String alias) {
-        return From.builder().source(new TableIdentifier(name, alias)).build();
+        return new From(List.of(new TableIdentifier(name, alias)));
     }
 
     public static From of(FromSource... fromSource) {
-        return From.builder().sources(Stream.of(fromSource).toList()).build();
+        return new From(Stream.of(fromSource).toList());
+    }
+
+    public static From nullObject() {
+        return new From(List.of());
     }
 
     @Override
