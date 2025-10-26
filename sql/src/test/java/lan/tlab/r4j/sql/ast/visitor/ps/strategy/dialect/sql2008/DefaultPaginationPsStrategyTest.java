@@ -16,7 +16,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitOnly() {
-        Fetch pagination = Fetch.builder().rows(10).build();
+        Fetch pagination = new Fetch(0, 10);
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
@@ -26,7 +26,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage1() {
-        Fetch pagination = Fetch.builder().rows(5).offset(0).build();
+        Fetch pagination = new Fetch(0, 5);
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
@@ -36,7 +36,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage2() {
-        Fetch pagination = Fetch.builder().rows(10).offset(10).build();
+        Fetch pagination = new Fetch(10, 10);
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
@@ -46,7 +46,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage3() {
-        Fetch pagination = Fetch.builder().rows(5).offset(10).build();
+        Fetch pagination = new Fetch(10, 5);
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
@@ -56,7 +56,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetLargePage() {
-        Fetch pagination = Fetch.builder().rows(20).offset(80).build();
+        Fetch pagination = new Fetch(80, 20);
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
@@ -66,7 +66,7 @@ class DefaultPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetCalculation() {
-        Fetch pagination = Fetch.builder().rows(15).offset(45).build();
+        Fetch pagination = new Fetch(45, 15);
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
