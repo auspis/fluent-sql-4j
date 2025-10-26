@@ -19,10 +19,10 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
     @Override
     public PsDto handle(InsertStatement stmt, Visitor<PsDto> renderer, AstContext ctx) {
         // TableIdentifier name
-        TableIdentifier table = (TableIdentifier) stmt.getTable();
+        TableIdentifier table = (TableIdentifier) stmt.table();
         String tableName = table.name();
 
-        InsertData data = stmt.getData();
+        InsertData data = stmt.data();
 
         if (data instanceof DefaultValues defaultValues) {
             // Handle DEFAULT VALUES case
@@ -32,7 +32,7 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
         } else if (data instanceof InsertValues values) {
             // Handle explicit values case
             // Column names
-            List<String> columns = stmt.getColumns().stream()
+            List<String> columns = stmt.columns().stream()
                     .map(ColumnReference::column)
                     .map(name -> "\"" + name + "\"")
                     .collect(Collectors.toList());
