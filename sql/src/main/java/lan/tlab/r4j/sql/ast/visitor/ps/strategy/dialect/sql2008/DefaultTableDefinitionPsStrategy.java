@@ -12,7 +12,7 @@ public class DefaultTableDefinitionPsStrategy implements TableDefinitionPsStrate
     public PsDto handle(TableDefinition tableDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
         // For table definitions, we use the SQL renderer since DDL definitions typically don't have parameters
         // The table name itself might have parameters if it's a complex expression, but column definitions are static
-        PsDto tableDto = tableDefinition.getTable().accept(renderer, ctx);
+        PsDto tableDto = tableDefinition.table().accept(renderer, ctx);
 
         // Generate the column definitions using the SQL renderer from the PreparedStatementRenderer
         // This ensures we use the same dialect configuration (MySQL, PostgreSQL, etc.)
