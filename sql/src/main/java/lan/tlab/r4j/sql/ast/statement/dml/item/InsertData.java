@@ -1,10 +1,8 @@
 package lan.tlab.r4j.sql.ast.statement.dml.item;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
 import lan.tlab.r4j.sql.ast.expression.set.SetExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
@@ -19,16 +17,7 @@ public interface InsertData extends Visitable {
         }
     }
 
-    public static class InsertValues implements InsertData {
-        private List<Expression> valueExpressions = new ArrayList<>();
-
-        public InsertValues(List<Expression> valueExpressions) {
-            this.valueExpressions = new ArrayList<>(valueExpressions);
-        }
-
-        public List<Expression> getValueExpressions() {
-            return valueExpressions;
-        }
+    public static record InsertValues(List<Expression> valueExpressions) implements InsertData {
 
         public static InsertValues of(Expression... expressions) {
             return new InsertValues(Stream.of(expressions).toList());
@@ -40,16 +29,7 @@ public interface InsertData extends Visitable {
         }
     }
 
-    public static class InsertSource implements InsertData {
-        private SetExpression setExpression = new NullSetExpression();
-
-        public InsertSource(SetExpression setExpression) {
-            this.setExpression = setExpression;
-        }
-
-        public SetExpression getSetExpression() {
-            return setExpression;
-        }
+    public static record InsertSource(SetExpression setExpression) implements InsertData {
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
