@@ -7,6 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class NotRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Not expression, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format("NOT (%s)", expression.getExpression().accept(sqlRenderer, ctx));
+        return String.format("NOT (%s)", expression.expression().accept(sqlRenderer, ctx));
     }
 }
