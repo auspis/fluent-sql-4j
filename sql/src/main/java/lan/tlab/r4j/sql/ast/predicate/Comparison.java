@@ -3,20 +3,9 @@ package lan.tlab.r4j.sql.ast.predicate;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class Comparison implements Predicate {
+public record Comparison(ScalarExpression lhs, ComparisonOperator operator, ScalarExpression rhs) implements Predicate {
 
-    private final ScalarExpression lhs;
-    private final ComparisonOperator operator;
-    private final ScalarExpression rhs;
-
-    @Getter
-    @AllArgsConstructor
     public enum ComparisonOperator {
         EQUALS("="),
         NOT_EQUALS("!="),
@@ -28,6 +17,14 @@ public class Comparison implements Predicate {
         LESS_THAN_OR_EQUALS("<=");
 
         private final String sqlSymbol;
+
+        ComparisonOperator(String sqlSymbol) {
+            this.sqlSymbol = sqlSymbol;
+        }
+
+        public String getSqlSymbol() {
+            return sqlSymbol;
+        }
     }
 
     public static Comparison eq(ScalarExpression lhs, ScalarExpression rhs) {

@@ -12,25 +12,25 @@ public class DefaultComparisonPsStrategy implements ComparisonPsStrategy {
     @Override
     public PsDto handle(Comparison cmp, Visitor<PsDto> renderer, AstContext ctx) {
         String operator;
-        switch (cmp.getOperator()) {
+        switch (cmp.operator()) {
             case EQUALS -> operator = "=";
             case NOT_EQUALS -> operator = "<>";
             case GREATER_THAN -> operator = ">";
             case GREATER_THAN_OR_EQUALS -> operator = ">=";
             case LESS_THAN -> operator = "<";
             case LESS_THAN_OR_EQUALS -> operator = "<=";
-            default -> throw new UnsupportedOperationException("Operator not supported: " + cmp.getOperator());
+            default -> throw new UnsupportedOperationException("Operator not supported: " + cmp.operator());
         }
 
         List<Object> params = new ArrayList<>();
 
         // Handle LHS (Left Hand Side)
-        PsDto lhsResult = cmp.getLhs().accept(renderer, ctx.copy());
+        PsDto lhsResult = cmp.lhs().accept(renderer, ctx.copy());
         String lhs = lhsResult.sql();
         params.addAll(lhsResult.parameters());
 
         // Handle RHS (Right Hand Side)
-        PsDto rhsResult = cmp.getRhs().accept(renderer, ctx);
+        PsDto rhsResult = cmp.rhs().accept(renderer, ctx);
         String rhsSql = rhsResult.sql();
         params.addAll(rhsResult.parameters());
 
