@@ -17,8 +17,8 @@ public class DefaultReferencesItemPsStrategy implements ReferencesItemPsStrategy
 
         String sql = String.format(
                 "REFERENCES %s (%s)",
-                escapeStrategy.apply(item.getTable()),
-                item.getColumns().stream().map(escapeStrategy::apply).collect(Collectors.joining(", ")));
+                escapeStrategy.apply(item.table()),
+                item.columns().stream().map(escapeStrategy::apply).collect(Collectors.joining(", ")));
 
         return new PsDto(sql, Collections.emptyList());
     }
