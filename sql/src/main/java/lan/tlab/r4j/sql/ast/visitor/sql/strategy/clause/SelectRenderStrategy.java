@@ -10,10 +10,10 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class SelectRenderStrategy implements ClauseRenderStrategy {
 
     public String render(Select clause, SqlRenderer sqlRenderer, AstContext ctx) {
-        List<Projection> projections = clause.getProjections();
+        List<Projection> projections = clause.projections();
         String values = projections.isEmpty()
                 ? "*"
-                : clause.getProjections().stream()
+                : clause.projections().stream()
                         .map(expr -> expr.accept(sqlRenderer, ctx))
                         .collect(Collectors.joining(", "));
         return String.format("SELECT %s", values);
