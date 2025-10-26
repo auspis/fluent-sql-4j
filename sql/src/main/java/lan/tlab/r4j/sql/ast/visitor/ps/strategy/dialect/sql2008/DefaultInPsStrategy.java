@@ -12,11 +12,10 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.InPsStrategy;
 public class DefaultInPsStrategy implements InPsStrategy {
     @Override
     public PsDto handle(In in, Visitor<PsDto> renderer, AstContext ctx) {
-        PsDto expressionDto = in.getExpression().accept(renderer, ctx);
+        PsDto expressionDto = in.expression().accept(renderer, ctx);
 
-        List<PsDto> valueDtos = in.getValues().stream()
-                .map(value -> value.accept(renderer, ctx))
-                .collect(Collectors.toList());
+        List<PsDto> valueDtos =
+                in.values().stream().map(value -> value.accept(renderer, ctx)).collect(Collectors.toList());
 
         String valuesSql = valueDtos.stream().map(PsDto::sql).collect(Collectors.joining(", "));
 
