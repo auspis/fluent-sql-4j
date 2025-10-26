@@ -5,15 +5,8 @@ import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
-public class IndexDefinition implements Visitable {
-
-    private final String name;
-    private final List<String> columnNames;
+public record IndexDefinition(String name, List<String> columnNames) implements Visitable {
 
     public IndexDefinition(String name, String... columns) {
         this(name, Stream.of(columns).toList());
