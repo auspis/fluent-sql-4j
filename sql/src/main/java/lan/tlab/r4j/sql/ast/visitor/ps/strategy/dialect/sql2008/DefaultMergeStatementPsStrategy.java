@@ -46,8 +46,8 @@ public class DefaultMergeStatementPsStrategy implements MergeStatementPsStrategy
 
                 List<String> updateClauses = new ArrayList<>();
                 for (var item : whenMatched.updateItems()) {
-                    PsDto colDto = item.getColumn().accept(renderer, ctx);
-                    PsDto valDto = item.getValue().accept(renderer, onCtx);
+                    PsDto colDto = item.column().accept(renderer, ctx);
+                    PsDto valDto = item.value().accept(renderer, onCtx);
                     updateClauses.add(colDto.sql() + " = " + valDto.sql());
                     params.addAll(valDto.parameters());
                 }
