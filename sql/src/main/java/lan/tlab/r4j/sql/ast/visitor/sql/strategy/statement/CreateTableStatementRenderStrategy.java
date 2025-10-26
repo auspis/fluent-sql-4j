@@ -7,6 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class CreateTableStatementRenderStrategy implements StatementRenderStrategy {
 
     public String render(CreateTableStatement statement, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format("CREATE TABLE %s", statement.getTableDefinition().accept(sqlRenderer, ctx));
+        return String.format("CREATE TABLE %s", statement.tableDefinition().accept(sqlRenderer, ctx));
     }
 }
