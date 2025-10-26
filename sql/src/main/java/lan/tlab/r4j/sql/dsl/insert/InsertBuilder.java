@@ -69,7 +69,7 @@ public class InsertBuilder {
         if (columnName == null || columnName.trim().isEmpty()) {
             throw new IllegalArgumentException("Column name cannot be null or empty");
         }
-        columns.add(ColumnReference.of(table.getName(), columnName));
+        columns.add(ColumnReference.of(table.name(), columnName));
 
         List<Expression> expressions = getOrCreateExpressionList();
         expressions.add(value == null ? Literal.ofNull() : LiteralUtil.createLiteral(value));

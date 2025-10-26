@@ -12,8 +12,8 @@ public class DefaultTablePsStrategy implements TablePsStrategy {
     @Override
     public PsDto handle(TableIdentifier table, Visitor<PsDto> renderer, AstContext ctx) {
         PreparedStatementRenderer psRenderer = (PreparedStatementRenderer) renderer;
-        String sql = psRenderer.getEscapeStrategy().apply(table.getName());
-        String alias = table.getAs() != null ? table.getAs().name() : null;
+        String sql = psRenderer.getEscapeStrategy().apply(table.name());
+        String alias = table.alias() != null ? table.alias().name() : null;
         if (alias != null && !alias.isBlank()) {
             sql += " AS " + alias;
         }

@@ -4,15 +4,8 @@ import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class TableIdentifier implements TableExpression, FromSource {
-
-    private String name = "";
-    private Alias alias = Alias.nullObject();
+public record TableIdentifier(String name, Alias alias) implements TableExpression, FromSource {
 
     public TableIdentifier(String name) {
         this(name, Alias.nullObject());
