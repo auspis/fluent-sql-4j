@@ -39,7 +39,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
 
         // INSERT INTO target_table
         String sql = "INSERT INTO "
-                + renderer.getEscapeStrategy().apply(stmt.getTargetTable().getName());
+                + renderer.getEscapeStrategy().apply(stmt.getTargetTable().name());
 
         // Column list
         if (!insertAction.columns().isEmpty()) {
