@@ -20,7 +20,7 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
     public PsDto handle(InsertStatement stmt, Visitor<PsDto> renderer, AstContext ctx) {
         // TableIdentifier name
         TableIdentifier table = (TableIdentifier) stmt.getTable();
-        String tableName = table.getName();
+        String tableName = table.name();
 
         InsertData data = stmt.getData();
 
