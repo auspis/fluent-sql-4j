@@ -11,7 +11,7 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
 public record InsertStatement(TableExpression table, List<ColumnReference> columns, InsertData data)
         implements DataManipulationStatement {
-
+    // TODO: prevent table null
     public InsertStatement {
         if (columns == null) columns = new ArrayList<>();
         if (data == null) data = new DefaultValues();

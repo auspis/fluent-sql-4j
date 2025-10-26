@@ -52,7 +52,7 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
 
     @Override
     public DeleteBuilder updateWhere(Function<Where, Where> updater) {
-        Where currentWhere = getCurrentStatement().getWhere();
+        Where currentWhere = getCurrentStatement().where();
         Where newWhere = updater.apply(currentWhere);
         statementBuilder = statementBuilder.where(newWhere);
         return this;
