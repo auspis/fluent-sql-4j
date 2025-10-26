@@ -11,19 +11,17 @@ public class DefaultParameterizedDataTypePsStrategy implements ParameterizedData
 
     @Override
     public PsDto handle(ParameterizedDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
-        // Handle parameters by processing each one
-        var parameterResults = type.getParameters().stream()
+        var parameterResults = type.parameters().stream()
                 .map(param -> param.accept(renderer, ctx))
                 .collect(Collectors.toList());
 
-        // Combine all parameters
         var combinedParameters = parameterResults.stream()
                 .flatMap(dto -> dto.parameters().stream())
                 .collect(Collectors.toList());
 
         var parameterSql = parameterResults.stream().map(PsDto::sql).collect(Collectors.joining(", "));
 
-        var sql = String.format("%s(%s)", type.getName(), parameterSql);
+        var sql = String.format("%s(%s)", type.name(), parameterSql);
 
         return new PsDto(sql, combinedParameters);
     }
