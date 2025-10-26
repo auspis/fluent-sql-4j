@@ -15,7 +15,7 @@ public class DeleteStatement implements DataManipulationStatement {
     private final TableExpression table;
 
     @Default
-    private final Where where = Where.builder().build();
+    private final Where where = Where.nullObject();
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {

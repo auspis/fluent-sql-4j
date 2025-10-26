@@ -18,7 +18,7 @@ public class UpdateStatement implements DataManipulationStatement {
     private final List<UpdateItem> set;
 
     @Default
-    private final Where where = Where.builder().build();
+    private final Where where = Where.nullObject();
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {

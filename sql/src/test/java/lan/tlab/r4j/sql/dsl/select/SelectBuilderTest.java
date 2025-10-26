@@ -368,7 +368,7 @@ class SelectBuilderTest {
 
         Where result = SelectBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.AND);
 
-        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+        assertThat(result.condition()).isInstanceOf(AndOr.class);
     }
 
     @Test
@@ -379,8 +379,8 @@ class SelectBuilderTest {
 
         Where result = SelectBuilder.combineWithExisting(existingWhere, newCondition, LogicalCombinator.OR);
 
-        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
-        AndOr andOr = (AndOr) result.getCondition();
+        assertThat(result.condition()).isInstanceOf(AndOr.class);
+        AndOr andOr = (AndOr) result.condition();
         assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.sql.ast.predicate.logical.LogicalOperator.OR);
     }
 
@@ -390,7 +390,7 @@ class SelectBuilderTest {
 
         Where result = SelectBuilder.combineConditions(null, condition, LogicalCombinator.AND);
 
-        assertThat(result.getCondition()).isEqualTo(condition);
+        assertThat(result.condition()).isEqualTo(condition);
     }
 
     @Test
@@ -401,7 +401,7 @@ class SelectBuilderTest {
 
         Where result = SelectBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.OR);
 
-        assertThat(result.getCondition()).isInstanceOf(AndOr.class);
+        assertThat(result.condition()).isInstanceOf(AndOr.class);
     }
 
     @Test
@@ -412,7 +412,7 @@ class SelectBuilderTest {
 
         Where result = SelectBuilder.combineConditions(existingWhere, newCondition, LogicalCombinator.AND);
 
-        assertThat(result.getCondition()).isEqualTo(newCondition);
+        assertThat(result.condition()).isEqualTo(newCondition);
     }
 
     @Test
