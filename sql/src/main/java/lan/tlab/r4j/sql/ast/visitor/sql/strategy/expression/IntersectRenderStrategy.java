@@ -9,10 +9,10 @@ public class IntersectRenderStrategy implements ExpressionRenderStrategy {
     public String render(IntersectExpression expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "((%s) %s (%s))",
-                expression.getLeftSetExpression().accept(sqlRenderer, ctx),
-                expression.getType().equals(IntersectExpression.IntersectType.INTERSECT_ALL)
+                expression.leftSetExpression().accept(sqlRenderer, ctx),
+                expression.type().equals(IntersectExpression.IntersectType.INTERSECT_ALL)
                         ? "INTERSECT ALL"
                         : "INTERSECT",
-                expression.getRightSetExpression().accept(sqlRenderer, ctx));
+                expression.rightSetExpression().accept(sqlRenderer, ctx));
     }
 }
