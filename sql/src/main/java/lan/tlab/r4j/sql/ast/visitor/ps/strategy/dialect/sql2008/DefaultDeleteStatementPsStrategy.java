@@ -21,8 +21,8 @@ public class DefaultDeleteStatementPsStrategy implements DeleteStatementPsStrate
         sql.append("DELETE FROM ").append(tableName);
         Where where = stmt.getWhere();
         if (where != null
-                && where.getCondition() != null
-                && !(where.getCondition() instanceof lan.tlab.r4j.sql.ast.predicate.NullPredicate)) {
+                && where.condition() != null
+                && !(where.condition() instanceof lan.tlab.r4j.sql.ast.predicate.NullPredicate)) {
             PsDto whereDto = where.accept(renderer, ctx);
             sql.append(" WHERE ").append(whereDto.sql());
             params.addAll(whereDto.parameters());
