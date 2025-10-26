@@ -3,16 +3,8 @@ package lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class Interval implements ScalarExpression {
-
-    private final ScalarExpression value;
-    private final IntervalUnit unit;
+public record Interval(ScalarExpression value, IntervalUnit unit) implements ScalarExpression {
 
     // TODO: generalize
     public enum IntervalUnit {

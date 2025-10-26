@@ -11,7 +11,7 @@ public class SubstringRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Substring functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         Stream<ScalarExpression> stream =
-                Stream.of(functionCall.getExpression(), functionCall.getStartPosition(), functionCall.getLength());
+                Stream.of(functionCall.expression(), functionCall.startPosition(), functionCall.length());
 
         return String.format(
                 "SUBSTRING(%s)",

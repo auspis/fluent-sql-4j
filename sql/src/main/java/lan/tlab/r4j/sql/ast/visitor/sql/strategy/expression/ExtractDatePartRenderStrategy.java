@@ -9,6 +9,6 @@ public class ExtractDatePartRenderStrategy implements ExpressionRenderStrategy {
     public String render(ExtractDatePart functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "%s(%s)",
-                functionCall.getFunctionName(), functionCall.getDateExpression().accept(sqlRenderer, ctx));
+                functionCall.functionName(), functionCall.dateExpression().accept(sqlRenderer, ctx));
     }
 }

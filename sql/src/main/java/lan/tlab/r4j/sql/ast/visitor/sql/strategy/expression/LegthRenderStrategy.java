@@ -10,11 +10,11 @@ public interface LegthRenderStrategy extends ExpressionRenderStrategy {
 
     public static LegthRenderStrategy standardSql2008() {
         return (functionCall, sqlRenderer, ctx) ->
-                String.format("LENGTH(%s)", functionCall.getExpression().accept(sqlRenderer, ctx));
+                String.format("LENGTH(%s)", functionCall.expression().accept(sqlRenderer, ctx));
     }
 
     static LegthRenderStrategy sqlServer() {
         return (functionCall, sqlRenderer, ctx) ->
-                String.format("LEN(%s)", functionCall.getExpression().accept(sqlRenderer, ctx));
+                String.format("LEN(%s)", functionCall.expression().accept(sqlRenderer, ctx));
     }
 }

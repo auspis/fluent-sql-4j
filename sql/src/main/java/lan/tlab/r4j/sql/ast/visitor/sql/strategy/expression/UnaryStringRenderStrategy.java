@@ -8,7 +8,6 @@ public class UnaryStringRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(UnaryString functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
-                "%s(%s)",
-                functionCall.getFunctionName(), functionCall.getExpression().accept(sqlRenderer, ctx));
+                "%s(%s)", functionCall.functionName(), functionCall.expression().accept(sqlRenderer, ctx));
     }
 }

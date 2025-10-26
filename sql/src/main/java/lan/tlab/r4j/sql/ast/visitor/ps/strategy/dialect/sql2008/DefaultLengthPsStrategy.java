@@ -10,7 +10,7 @@ public class DefaultLengthPsStrategy implements LengthPsStrategy {
 
     @Override
     public PsDto handle(Length length, PreparedStatementRenderer renderer, AstContext ctx) {
-        var expressionResult = length.getExpression().accept(renderer, ctx);
+        var expressionResult = length.expression().accept(renderer, ctx);
 
         String sql = String.format("LENGTH(%s)", expressionResult.sql());
         return new PsDto(sql, expressionResult.parameters());

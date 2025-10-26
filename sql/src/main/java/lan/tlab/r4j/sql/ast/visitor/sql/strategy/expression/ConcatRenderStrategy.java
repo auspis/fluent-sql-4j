@@ -13,7 +13,7 @@ public interface ConcatRenderStrategy extends ExpressionRenderStrategy {
     public static ConcatRenderStrategy standardSql2008() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "(%s)",
-                functionCall.getStringExpressions().stream()
+                functionCall.stringExpressions().stream()
                         .map(e -> e.accept(sqlRenderer, ctx))
                         .collect(Collectors.joining(" || ")));
     }

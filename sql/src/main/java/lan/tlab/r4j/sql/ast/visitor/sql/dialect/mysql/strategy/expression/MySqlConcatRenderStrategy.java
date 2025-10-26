@@ -17,12 +17,12 @@ public class MySqlConcatRenderStrategy implements ConcatRenderStrategy {
         String functionName = "CONCAT";
         List<ScalarExpression> expressions = new ArrayList<>();
 
-        if (!functionCall.getSeparator().isEmpty()) {
+        if (!functionCall.separator().isEmpty()) {
             functionName = "CONCAT_WS";
-            expressions.add(Literal.of(functionCall.getSeparator()));
+            expressions.add(Literal.of(functionCall.separator()));
         }
 
-        expressions.addAll(functionCall.getStringExpressions());
+        expressions.addAll(functionCall.stringExpressions());
 
         return String.format(
                 "%s(%s)",
