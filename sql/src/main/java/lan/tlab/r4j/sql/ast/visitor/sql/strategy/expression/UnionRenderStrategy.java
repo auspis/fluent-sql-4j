@@ -10,8 +10,8 @@ public class UnionRenderStrategy implements ExpressionRenderStrategy {
     public String render(UnionExpression expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "((%s) %s (%s))",
-                expression.getLeft().accept(sqlRenderer, ctx),
-                (expression.getType() == UnionType.UNION_DISTINCT ? "UNION" : "UNION ALL"),
-                expression.getRight().accept(sqlRenderer, ctx));
+                expression.left().accept(sqlRenderer, ctx),
+                (expression.type() == UnionType.UNION_DISTINCT ? "UNION" : "UNION ALL"),
+                expression.right().accept(sqlRenderer, ctx));
     }
 }
