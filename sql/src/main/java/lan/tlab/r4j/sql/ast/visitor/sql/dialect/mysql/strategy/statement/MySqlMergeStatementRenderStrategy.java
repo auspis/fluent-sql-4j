@@ -78,16 +78,24 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
         // Render source as SELECT statement
         sql.append(" SELECT ");
 
-        // Select the columns from the source table using the insert action's columns
-        String selectColumns = insertAction.columns().stream()
-                .map(col -> {
-                    // Use column reference with source table alias
-                    ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.getColumn());
-                    return sourceCol.accept(sqlRenderer, ctx);
-                })
-                .collect(Collectors.joining(", "));
-
-        sql.append(selectColumns);
+        // Select the values from the insert action's insertData
+        if (insertAction.insertData()
+                instanceof lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues insertValues) {
+            String selectColumns = insertValues.getValueExpressions().stream()
+                    .map(expr -> expr.accept(sqlRenderer, ctx))
+                    .collect(Collectors.joining(", "));
+            sql.append(selectColumns);
+        } else {
+            // Fallback to using column references from source
+            String selectColumns = insertAction.columns().stream()
+                    .map(col -> {
+                        // Use column reference with source table alias
+                        ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.getColumn());
+                        return sourceCol.accept(sqlRenderer, ctx);
+                    })
+                    .collect(Collectors.joining(", "));
+            sql.append(selectColumns);
+        }
 
         // Render FROM using clause
         sql.append(" FROM ");
