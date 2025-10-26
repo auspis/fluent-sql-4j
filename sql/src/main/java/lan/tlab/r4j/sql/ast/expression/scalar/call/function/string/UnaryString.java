@@ -6,7 +6,8 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
 public record UnaryString(String functionName, ScalarExpression expression) implements FunctionCall {
-    // TODO: evaluate if the record is the correct solution: the creation should go only throght factory methods.
+    // TODO: evaluate if the record is the correct solution: the creation should go only through factory methods. see
+    // DateArithmetic.java
 
     // private UnaryString(String functionName, ScalarExpression expression) {
     //     this.functionName = functionName;
