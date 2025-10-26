@@ -9,8 +9,8 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsStrat
 public class DefaultUnaryArithmeticExpressionPsStrategy implements UnaryArithmeticExpressionPsStrategy {
     @Override
     public PsDto handle(UnaryArithmeticExpression expression, Visitor<PsDto> renderer, AstContext ctx) {
-        PsDto exprResult = expression.getExpression().accept(renderer, ctx);
-        String sql = String.format("(%s%s)", expression.getOperator(), exprResult.sql());
+        PsDto exprResult = expression.expression().accept(renderer, ctx);
+        String sql = String.format("(%s%s)", expression.operator(), exprResult.sql());
         return new PsDto(sql, exprResult.parameters());
     }
 }
