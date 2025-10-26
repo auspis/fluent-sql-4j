@@ -13,10 +13,10 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.AndOrPsStrategy;
 public class DefaultAndOrPsStrategy implements AndOrPsStrategy {
     @Override
     public PsDto handle(AndOr expression, Visitor<PsDto> renderer, AstContext ctx) {
-        String operator = expression.getOperator() == LogicalOperator.AND ? "AND" : "OR";
+        String operator = expression.operator() == LogicalOperator.AND ? "AND" : "OR";
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-        for (Predicate expr : expression.getOperands()) {
+        for (Predicate expr : expression.operands()) {
             PsDto res = expr.accept(renderer, ctx);
             sqlParts.add("(" + res.sql() + ")");
             params.addAll(res.parameters());
