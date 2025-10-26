@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.AsPsStrategy;
 public class DefaultAsPsStrategy implements AsPsStrategy {
     @Override
     public PsDto handle(Alias as, Visitor<PsDto> renderer, AstContext ctx) {
-        String sql = "\"" + as.getName() + "\"";
+        String sql = "\"" + as.name() + "\"";
         return new PsDto(sql, List.of());
     }
 }
