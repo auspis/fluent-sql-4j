@@ -8,8 +8,8 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class AndOrRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(AndOr expression, SqlRenderer sqlRenderer, AstContext ctx) {
-        return expression.getOperands().stream()
+        return expression.operands().stream()
                 .map(o -> String.format("(%s)", o.accept(sqlRenderer, ctx)))
-                .collect(Collectors.joining(" " + expression.getOperator().name() + " "));
+                .collect(Collectors.joining(" " + expression.operator().name() + " "));
     }
 }
