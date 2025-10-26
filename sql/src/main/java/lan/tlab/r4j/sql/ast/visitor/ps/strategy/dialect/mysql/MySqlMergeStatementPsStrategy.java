@@ -90,16 +90,16 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
 
             List<String> updateClauses = new ArrayList<>();
             for (UpdateItem item : updateAction.updateItems()) {
-                PsDto colDto = item.getColumn().accept(renderer, ctx);
+                PsDto colDto = item.column().accept(renderer, ctx);
                 String columnName = colDto.sql();
 
                 // Check if value is a ColumnReference to use VALUES()
-                if (item.getValue() instanceof ColumnReference colRef) {
+                if (item.value() instanceof ColumnReference colRef) {
                     String escapedColName = renderer.getEscapeStrategy().apply(colRef.column());
                     updateClauses.add(columnName + " = VALUES(" + escapedColName + ")");
                 } else {
                     // For literals and other expressions, use parameterized value
-                    PsDto valDto = item.getValue().accept(renderer, ctx);
+                    PsDto valDto = item.value().accept(renderer, ctx);
                     updateClauses.add(columnName + " = " + valDto.sql());
                     params.addAll(valDto.parameters());
                 }

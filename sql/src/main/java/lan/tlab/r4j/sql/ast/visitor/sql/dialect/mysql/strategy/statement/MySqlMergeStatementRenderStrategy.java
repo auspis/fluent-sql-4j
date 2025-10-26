@@ -133,15 +133,15 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
      * Uses VALUES(column) to reference the attempted insert values.
      */
     private String renderUpdateItemForMySql(UpdateItem item, SqlRenderer sqlRenderer, AstContext ctx) {
-        String columnName = item.getColumn().accept(sqlRenderer, ctx);
+        String columnName = item.column().accept(sqlRenderer, ctx);
         // For MySQL ON DUPLICATE KEY UPDATE, we use VALUES(column) to reference the insert value
         // However, the DSL typically uses column references like "src.name"
         // We need to extract just the column name and wrap it in VALUES()
-        String valueExpr = item.getValue().accept(sqlRenderer, ctx);
+        String valueExpr = item.value().accept(sqlRenderer, ctx);
 
         // Extract column name from expressions like `src`.`name` or src.name
         // For simplicity, if the value is a ColumnReference, use VALUES(column_name)
-        if (item.getValue() instanceof ColumnReference colRef) {
+        if (item.value() instanceof ColumnReference colRef) {
             String escapedColName = sqlRenderer.getEscapeStrategy().apply(colRef.column());
             return columnName + " = VALUES(" + escapedColName + ")";
         }
