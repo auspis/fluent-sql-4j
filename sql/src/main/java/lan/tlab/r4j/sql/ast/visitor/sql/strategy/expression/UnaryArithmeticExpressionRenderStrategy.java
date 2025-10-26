@@ -8,6 +8,6 @@ public class UnaryArithmeticExpressionRenderStrategy implements ExpressionRender
 
     public String render(UnaryArithmeticExpression expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
-                "(%s%s)", expression.getOperator(), expression.getExpression().accept(sqlRenderer, ctx));
+                "(%s%s)", expression.operator(), expression.expression().accept(sqlRenderer, ctx));
     }
 }
