@@ -33,7 +33,7 @@ class WhereRenderStrategyTest {
 
     @Test
     void empty() {
-        Where where = Where.builder().build();
+        Where where = Where.nullObject();
         String sql = strategy.render(where, renderer, new AstContext());
         assertThat(sql).isEqualTo("");
     }

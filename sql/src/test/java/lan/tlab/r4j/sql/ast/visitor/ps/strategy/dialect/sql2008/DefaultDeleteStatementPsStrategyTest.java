@@ -18,7 +18,7 @@ class DefaultDeleteStatementPsStrategyTest {
     void deleteWithWhere() {
         TableExpression table = new TableIdentifier("users");
         Comparison whereExpr = Comparison.eq(ColumnReference.of("", "id"), Literal.of(42));
-        Where where = Where.builder().condition(whereExpr).build();
+        Where where = Where.of(whereExpr);
         DeleteStatement stmt =
                 DeleteStatement.builder().table(table).where(where).build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
