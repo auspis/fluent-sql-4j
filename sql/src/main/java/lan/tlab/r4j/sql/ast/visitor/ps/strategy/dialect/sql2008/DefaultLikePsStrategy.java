@@ -12,14 +12,14 @@ public class DefaultLikePsStrategy implements LikePsStrategy {
 
     @Override
     public PsDto handle(Like like, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto expressionDto = like.getExpression().accept(renderer, ctx);
+        PsDto expressionDto = like.expression().accept(renderer, ctx);
 
         StringBuilder sql = new StringBuilder();
         sql.append(expressionDto.sql());
         sql.append(" LIKE ?");
 
         List<Object> parameters = new ArrayList<>(expressionDto.parameters());
-        parameters.add(like.getPattern());
+        parameters.add(like.pattern());
 
         return new PsDto(sql.toString(), parameters);
     }
