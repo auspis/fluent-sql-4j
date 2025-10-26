@@ -12,10 +12,9 @@ public class AggregateCallRenderStrategy implements ExpressionRenderStrategy {
     public String render(AggregateCall expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return switch (expression) {
             case AggregateCallImpl e ->
-                String.format(
-                        "%s(%s)", e.getOperator().name(), e.getExpression().accept(sqlRenderer, ctx));
+                String.format("%s(%s)", e.operator().name(), e.expression().accept(sqlRenderer, ctx));
             case CountDistinct e ->
-                String.format("COUNT(DISTINCT %s)", e.getExpression().accept(sqlRenderer, ctx));
+                String.format("COUNT(DISTINCT %s)", e.expression().accept(sqlRenderer, ctx));
             case CountStar e -> "COUNT(*)";
             default -> throw new IllegalArgumentException("Unexpected value: " + expression);
         };
