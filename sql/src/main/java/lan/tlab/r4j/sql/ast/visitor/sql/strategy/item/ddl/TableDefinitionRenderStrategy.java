@@ -14,13 +14,13 @@ public class TableDefinitionRenderStrategy implements SqlItemRenderStrategy {
 
     public String render(TableDefinition item, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder builder = new StringBuilder();
-        builder.append(item.getTable().accept(sqlRenderer, ctx));
+        builder.append(item.table().accept(sqlRenderer, ctx));
         builder.append(" (");
         builder.append(
-                item.getColumns().stream().map(c -> sqlRenderer.visit(c, ctx)).collect(Collectors.joining(", ")));
-        builder.append(primaryKey(item.getPrimaryKey(), sqlRenderer, ctx));
-        builder.append(constraints(item.getConstraints(), sqlRenderer, ctx));
-        builder.append(indexes(item.getIndexes(), sqlRenderer, ctx));
+                item.columns().stream().map(c -> sqlRenderer.visit(c, ctx)).collect(Collectors.joining(", ")));
+        builder.append(primaryKey(item.primaryKey(), sqlRenderer, ctx));
+        builder.append(constraints(item.constraints(), sqlRenderer, ctx));
+        builder.append(indexes(item.indexes(), sqlRenderer, ctx));
         builder.append(")");
         return builder.toString();
     }
