@@ -9,7 +9,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class ColumnReferenceRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(ColumnReference expression, SqlRenderer sqlRenderer, AstContext ctx) {
-        return Stream.of(expression.getTable(), expression.getColumn())
+        return Stream.of(expression.table(), expression.column())
                 .filter(s -> !s.isBlank())
                 .map(s -> "*".equals(s) ? s : sqlRenderer.getEscapeStrategy().apply(s))
                 .collect(Collectors.joining("."));

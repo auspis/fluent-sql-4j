@@ -45,7 +45,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         if (!insertAction.columns().isEmpty()) {
             List<String> columns = new ArrayList<>();
             for (var col : insertAction.columns()) {
-                columns.add(renderer.getEscapeStrategy().apply(col.getColumn()));
+                columns.add(renderer.getEscapeStrategy().apply(col.column()));
             }
             sql += " (" + String.join(", ", columns) + ")";
         }
@@ -72,7 +72,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
             // Fallback: build column references from source
             List<String> selectExprs = new ArrayList<>();
             for (var col : insertAction.columns()) {
-                ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.getColumn());
+                ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.column());
                 PsDto colDto = sourceCol.accept(renderer, selectCtx);
                 selectExprs.add(colDto.sql());
             }
@@ -95,7 +95,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
 
                 // Check if value is a ColumnReference to use VALUES()
                 if (item.getValue() instanceof ColumnReference colRef) {
-                    String escapedColName = renderer.getEscapeStrategy().apply(colRef.getColumn());
+                    String escapedColName = renderer.getEscapeStrategy().apply(colRef.column());
                     updateClauses.add(columnName + " = VALUES(" + escapedColName + ")");
                 } else {
                     // For literals and other expressions, use parameterized value
