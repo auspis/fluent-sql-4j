@@ -106,7 +106,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
         TableIdentifier currentTable =
                 (TableIdentifier) currentFrom.getSources().get(0);
-        TableIdentifier tableWithAlias = new TableIdentifier(currentTable.getName(), alias);
+        TableIdentifier tableWithAlias = new TableIdentifier(currentTable.name(), alias);
 
         baseTable = tableWithAlias;
         currentFromSource = tableWithAlias;
