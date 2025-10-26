@@ -82,7 +82,7 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
         // Select the values from the insert action's insertData
         if (insertAction.insertData()
                 instanceof lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues insertValues) {
-            String selectColumns = insertValues.getValueExpressions().stream()
+            String selectColumns = insertValues.valueExpressions().stream()
                     .map(expr -> expr.accept(sqlRenderer, ctx))
                     .collect(Collectors.joining(", "));
             sql.append(selectColumns);
