@@ -12,11 +12,11 @@ public class DefaultExceptExpressionPsStrategy implements ExceptExpressionPsStra
 
     @Override
     public PsDto handle(ExceptExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto leftDto = expression.getLeft().accept(renderer, ctx);
-        PsDto rightDto = expression.getRight().accept(renderer, ctx);
+        PsDto leftDto = expression.left().accept(renderer, ctx);
+        PsDto rightDto = expression.right().accept(renderer, ctx);
 
         String sql = String.format(
-                "((%s) %s (%s))", leftDto.sql(), expression.isDistinct() ? "EXCEPT" : "EXCEPT ALL", rightDto.sql());
+                "((%s) %s (%s))", leftDto.sql(), expression.distinct() ? "EXCEPT" : "EXCEPT ALL", rightDto.sql());
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(leftDto.parameters());
