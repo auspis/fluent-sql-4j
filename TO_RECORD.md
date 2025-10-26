@@ -96,11 +96,11 @@ Queste classi ampliano la lista dei record candidati, favorendo la chiarezza e l
 
 ## Candidati record dal package statement/dql
 
-### SelectStatement (ignorare)
+### SelectStatement (saltare)
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/dql/SelectStatement.java`
 - Motivo: Campi final, builder pattern, nessun comportamento mutabile.
-- Nota: necessita di un intervento manuale per introdurre il builder: ha tanti field e forse il record non è la soluzione
+- Nota: Ha 7 campi, oltre il limite di 3 campi per costruttore record. Saltare per ora.
 
 ## Candidati record dai package statement/dml
 
@@ -112,11 +112,6 @@ Queste classi ampliano la lista dei record candidati, favorendo la chiarezza e l
 ### InsertStatement
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/dml/InsertStatement.java`
-- Motivo: Campi final, builder pattern, nessun comportamento mutabile.
-
-### DeleteStatement
-
-- Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/dml/DeleteStatement.java`
 - Motivo: Campi final, builder pattern, nessun comportamento mutabile.
 
 ### MergeStatement
