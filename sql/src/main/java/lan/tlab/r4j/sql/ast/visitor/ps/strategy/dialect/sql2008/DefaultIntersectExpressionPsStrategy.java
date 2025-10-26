@@ -2,6 +2,7 @@ package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
@@ -12,13 +13,13 @@ public class DefaultIntersectExpressionPsStrategy implements IntersectExpression
 
     @Override
     public PsDto handle(IntersectExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto leftDto = expression.getLeftSetExpression().accept(renderer, ctx);
-        PsDto rightDto = expression.getRightSetExpression().accept(renderer, ctx);
+        PsDto leftDto = expression.leftSetExpression().accept(renderer, ctx);
+        PsDto rightDto = expression.rightSetExpression().accept(renderer, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",
                 leftDto.sql(),
-                expression.getType().equals(IntersectExpression.IntersectType.INTERSECT_ALL)
+                expression.type().equals(IntersectExpression.IntersectType.INTERSECT_ALL)
                         ? "INTERSECT ALL"
                         : "INTERSECT",
                 rightDto.sql());
