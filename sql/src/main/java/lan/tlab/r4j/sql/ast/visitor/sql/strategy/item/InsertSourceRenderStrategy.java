@@ -7,6 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class InsertSourceRenderStrategy implements SqlItemRenderStrategy {
 
     public String render(InsertSource item, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format("%s", item.getSetExpression().accept(sqlRenderer, ctx));
+        return String.format("%s", item.setExpression().accept(sqlRenderer, ctx));
     }
 }

@@ -62,7 +62,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         // Render the values from insertData
         if (insertAction.insertData() instanceof InsertData.InsertValues insertValues) {
             List<String> selectExprs = new ArrayList<>();
-            for (var expr : insertValues.getValueExpressions()) {
+            for (var expr : insertValues.valueExpressions()) {
                 PsDto exprDto = expr.accept(renderer, selectCtx);
                 selectExprs.add(exprDto.sql());
                 params.addAll(exprDto.parameters());
