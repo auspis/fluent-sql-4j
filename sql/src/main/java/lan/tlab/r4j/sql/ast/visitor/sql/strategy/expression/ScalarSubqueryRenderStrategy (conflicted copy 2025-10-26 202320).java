@@ -7,6 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class ScalarSubqueryRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(ScalarSubquery expression, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format("(%s)", expression.getTableExpression().accept(sqlRenderer, ctx));
+        return String.format("(%s)", expression.tableExpression().accept(sqlRenderer, ctx));
     }
 }
