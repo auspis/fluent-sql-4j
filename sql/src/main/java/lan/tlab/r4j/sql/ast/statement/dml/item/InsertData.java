@@ -9,24 +9,26 @@ import lan.tlab.r4j.sql.ast.expression.set.SetExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 public interface InsertData extends Visitable {
 
-    @AllArgsConstructor
-    @Getter
-    public static class DefaultValues implements InsertData {
+    public static record DefaultValues() implements InsertData {
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
             return visitor.visit(this, ctx);
         }
     }
 
-    @AllArgsConstructor
-    @Getter
     public static class InsertValues implements InsertData {
         private List<Expression> valueExpressions = new ArrayList<>();
+
+        public InsertValues(List<Expression> valueExpressions) {
+            this.valueExpressions = new ArrayList<>(valueExpressions);
+        }
+
+        public List<Expression> getValueExpressions() {
+            return valueExpressions;
+        }
 
         public static InsertValues of(Expression... expressions) {
             return new InsertValues(Stream.of(expressions).toList());
@@ -38,10 +40,16 @@ public interface InsertData extends Visitable {
         }
     }
 
-    @AllArgsConstructor
-    @Getter
     public static class InsertSource implements InsertData {
         private SetExpression setExpression = new NullSetExpression();
+
+        public InsertSource(SetExpression setExpression) {
+            this.setExpression = setExpression;
+        }
+
+        public SetExpression getSetExpression() {
+            return setExpression;
+        }
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {

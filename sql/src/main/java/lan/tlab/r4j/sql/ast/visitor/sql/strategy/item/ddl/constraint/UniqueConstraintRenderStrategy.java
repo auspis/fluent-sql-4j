@@ -11,8 +11,8 @@ public class UniqueConstraintRenderStrategy implements SqlItemRenderStrategy {
 
     public String render(UniqueConstraintDefinition constraint, SqlRenderer sqlRenderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = sqlRenderer.getEscapeStrategy();
-        return String.format(
-                "UNIQUE (%s)",
-                constraint.getColumns().stream().map(escapeStrategy::apply).collect(Collectors.joining(", ")));
+        String columns =
+                constraint.columns().stream().map(c -> escapeStrategy.apply(c)).collect(Collectors.joining(", "));
+        return String.format("UNIQUE (%s)", columns);
     }
 }

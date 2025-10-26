@@ -208,9 +208,9 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     private AggregateCall updateAggregateCallWithTable(AggregateCall aggCall, TableIdentifier table) {
         return switch (aggCall) {
             case AggregateCallImpl impl -> {
-                if (impl.getExpression() instanceof ColumnReference colRef) {
+                if (impl.expression() instanceof ColumnReference colRef) {
                     ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.column());
-                    yield switch (impl.getOperator()) {
+                    yield switch (impl.operator()) {
                         case MAX -> AggregateCall.max(updatedColRef);
                         case MIN -> AggregateCall.min(updatedColRef);
                         case AVG -> AggregateCall.avg(updatedColRef);
@@ -221,7 +221,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                 yield impl;
             }
             case CountDistinct cd -> {
-                if (cd.getExpression() instanceof ColumnReference colRef) {
+                if (cd.expression() instanceof ColumnReference colRef) {
                     ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.column());
                     yield AggregateCall.countDistinct(updatedColRef);
                 }

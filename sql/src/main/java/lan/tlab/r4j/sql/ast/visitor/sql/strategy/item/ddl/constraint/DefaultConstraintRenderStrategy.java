@@ -7,6 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.SqlItemRenderStrategy;
 
 public class DefaultConstraintRenderStrategy implements SqlItemRenderStrategy {
     public String render(DefaultConstraintDefinition constraint, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format("DEFAULT %s", constraint.getValue().accept(sqlRenderer, ctx));
+        return String.format("DEFAULT %s", constraint.value().accept(sqlRenderer, ctx));
     }
 }
