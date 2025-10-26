@@ -12,7 +12,7 @@ public class PrimaryKeyRenderStrategy implements SqlItemRenderStrategy {
     public String render(PrimaryKeyDefinition item, SqlRenderer sqlRenderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = sqlRenderer.getEscapeStrategy();
         String columns =
-                item.getColumns().stream().map(c -> escapeStrategy.apply(c)).collect(Collectors.joining(", "));
+                item.columns().stream().map(c -> escapeStrategy.apply(c)).collect(Collectors.joining(", "));
 
         return String.format("PRIMARY KEY (%s)", columns);
     }

@@ -15,16 +15,15 @@ public class DefaultAggregateCallPsStrategy implements AggregateCallPsStrategy {
     public PsDto handle(AggregateCall aggregateCall, Visitor<PsDto> renderer, AstContext ctx) {
         return switch (aggregateCall) {
             case AggregateCallImpl e -> {
-                String functionName = e.getOperator().name();
-                PsDto argResult =
-                        e.getExpression() == null ? null : e.getExpression().accept(renderer, ctx);
+                String functionName = e.operator().name();
+                PsDto argResult = e.expression() == null ? null : e.expression().accept(renderer, ctx);
                 String argumentSql = argResult == null ? "*" : argResult.sql();
                 List<Object> params = argResult == null ? List.of() : argResult.parameters();
                 String sql = functionName + "(" + argumentSql + ")";
                 yield new PsDto(sql, params);
             }
             case CountDistinct e -> {
-                PsDto argResult = e.getExpression().accept(renderer, ctx);
+                PsDto argResult = e.expression().accept(renderer, ctx);
                 String sql = "COUNT(DISTINCT " + argResult.sql() + ")";
                 yield new PsDto(sql, argResult.parameters());
             }
