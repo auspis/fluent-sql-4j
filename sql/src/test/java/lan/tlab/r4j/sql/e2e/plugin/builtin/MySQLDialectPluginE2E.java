@@ -224,7 +224,7 @@ class MySQLDialectPluginE2E {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "name"))))
                 .from(From.fromTable("users"))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("users", "name"))))
-                .fetch(Fetch.builder().rows(3).offset(5).build())
+                .fetch(new Fetch(5, 3))
                 .build();
 
         String sql = renderer.renderSql(statement);
@@ -313,7 +313,7 @@ class MySQLDialectPluginE2E {
                 .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
                         Comparison.gte(ColumnReference.of("users", "age"), Literal.of(25))))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("users", "name"))))
-                .fetch(Fetch.builder().rows(5).offset(0).build())
+                .fetch(new Fetch(0, 5))
                 .build();
 
         String sql = renderer.renderSql(statement);
