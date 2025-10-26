@@ -28,7 +28,7 @@ public class TableIdentifier implements TableExpression, FromSource {
     }
 
     public String getTableReference() {
-        return alias.getName().isEmpty() ? name : alias.getName();
+        return alias.name().isEmpty() ? name : alias.name();
     }
 
     public Alias getAs() {
