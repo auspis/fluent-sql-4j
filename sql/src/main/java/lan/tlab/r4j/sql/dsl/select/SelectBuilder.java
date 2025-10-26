@@ -175,7 +175,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                     if (!"*".equals(colRef.getColumn())) {
                         // Preserve the alias if present
                         if (scalarProj.getAs() != null
-                                && !scalarProj.getAs().getName().isEmpty()) {
+                                && !scalarProj.getAs().name().isEmpty()) {
                             updatedProjections.add(new ScalarExpressionProjection(
                                     ColumnReference.of(table.getTableReference(), colRef.getColumn()),
                                     scalarProj.getAs()));
@@ -190,7 +190,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                     // Update aggregate call projections with table reference
                     AggregateCall aggCall = (AggregateCall) aggProj.getExpression();
                     AggregateCall updatedAggCall = updateAggregateCallWithTable(aggCall, table);
-                    if (aggProj.getAs() != null && !aggProj.getAs().getName().isEmpty()) {
+                    if (aggProj.getAs() != null && !aggProj.getAs().name().isEmpty()) {
                         updatedProjections.add(new AggregateCallProjection(updatedAggCall, aggProj.getAs()));
                     } else {
                         updatedProjections.add(new AggregateCallProjection(updatedAggCall));
