@@ -10,8 +10,8 @@ public class InRenderStrategy implements ExpressionRenderStrategy {
     public String render(In expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "%s IN(%s)",
-                expression.getExpression().accept(sqlRenderer, ctx),
-                expression.getValues().stream()
+                expression.expression().accept(sqlRenderer, ctx),
+                expression.values().stream()
                         .map(e -> e.accept(sqlRenderer, ctx))
                         .collect(Collectors.joining(", ")));
     }
