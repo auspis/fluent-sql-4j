@@ -10,8 +10,8 @@ public class DefaultUnaryNumericPsStrategy implements UnaryNumericPsStrategy {
 
     @Override
     public PsDto handle(UnaryNumeric functionCall, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto expressionDto = functionCall.getNumericExpression().accept(renderer, ctx);
-        String sql = String.format("%s(%s)", functionCall.getFunctionName(), expressionDto.sql());
+        PsDto expressionDto = functionCall.numericExpression().accept(renderer, ctx);
+        String sql = String.format("%s(%s)", functionCall.functionName(), expressionDto.sql());
         return new PsDto(sql, expressionDto.parameters());
     }
 }

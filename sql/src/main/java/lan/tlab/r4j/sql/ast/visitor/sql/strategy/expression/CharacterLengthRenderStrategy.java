@@ -9,8 +9,8 @@ public interface CharacterLengthRenderStrategy extends ExpressionRenderStrategy 
     public String render(CharacterLength functionCall, SqlRenderer sqlRenderer, AstContext ctx);
 
     public static CharacterLengthRenderStrategy standardSql2008() {
-        return (functionCall, sqlRenderer, ctx) -> String.format(
-                "CHARACTER_LENGTH(%s)", functionCall.getExpression().accept(sqlRenderer, ctx));
+        return (functionCall, sqlRenderer, ctx) ->
+                String.format("CHARACTER_LENGTH(%s)", functionCall.expression().accept(sqlRenderer, ctx));
     }
 
     public static CharacterLengthRenderStrategy sqlServer() {

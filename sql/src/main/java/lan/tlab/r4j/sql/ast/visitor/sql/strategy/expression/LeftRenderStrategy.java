@@ -9,7 +9,7 @@ public class LeftRenderStrategy implements ExpressionRenderStrategy {
     public String render(Left functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "LEFT(%s, %s)",
-                functionCall.getExpression().accept(sqlRenderer, ctx),
-                functionCall.getLength().accept(sqlRenderer, ctx));
+                functionCall.expression().accept(sqlRenderer, ctx),
+                functionCall.length().accept(sqlRenderer, ctx));
     }
 }

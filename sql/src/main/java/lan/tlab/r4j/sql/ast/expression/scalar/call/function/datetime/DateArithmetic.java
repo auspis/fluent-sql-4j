@@ -5,17 +5,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class DateArithmetic implements FunctionCall {
-
-    private final boolean add;
-    private final ScalarExpression dateExpression;
-    private final Interval interval;
+public record DateArithmetic(boolean add, ScalarExpression dateExpression, Interval interval) implements FunctionCall {
 
     public static DateArithmetic add(ScalarExpression dateExpression, Interval interval) {
         return new DateArithmetic(true, dateExpression, interval);

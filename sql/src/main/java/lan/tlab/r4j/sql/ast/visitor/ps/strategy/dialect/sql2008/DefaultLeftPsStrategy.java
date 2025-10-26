@@ -12,8 +12,8 @@ public class DefaultLeftPsStrategy implements LeftPsStrategy {
 
     @Override
     public PsDto handle(Left left, PreparedStatementRenderer renderer, AstContext ctx) {
-        var expressionResult = left.getExpression().accept(renderer, ctx);
-        var lengthResult = left.getLength().accept(renderer, ctx);
+        var expressionResult = left.expression().accept(renderer, ctx);
+        var lengthResult = left.length().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(expressionResult.parameters());

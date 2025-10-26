@@ -10,12 +10,12 @@ public interface CastRenderStrategy extends ExpressionRenderStrategy {
 
     public static CastRenderStrategy standard() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
-                "CAST(%s AS %s)", functionCall.getExpression().accept(sqlRenderer, ctx), functionCall.getDataType());
+                "CAST(%s AS %s)", functionCall.expression().accept(sqlRenderer, ctx), functionCall.dataType());
     }
 
     public static CastRenderStrategy sqlServer() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "CONVERT(%s, %s)",
-                functionCall.getDataType(), functionCall.getExpression().accept(sqlRenderer, ctx));
+                functionCall.dataType(), functionCall.expression().accept(sqlRenderer, ctx));
     }
 }

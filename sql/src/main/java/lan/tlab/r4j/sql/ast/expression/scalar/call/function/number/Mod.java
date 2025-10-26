@@ -5,14 +5,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
-public class Mod implements FunctionCall {
-    private final ScalarExpression dividend;
-    private final ScalarExpression divisor;
+public record Mod(ScalarExpression dividend, ScalarExpression divisor) implements FunctionCall {
 
     public static Mod of(Number dividend, Number divisor) {
         return of(Literal.of(dividend), Literal.of(divisor));

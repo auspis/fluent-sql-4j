@@ -10,8 +10,8 @@ public class DefaultIntervalPsStrategy implements IntervalPsStrategy {
 
     @Override
     public PsDto handle(Interval interval, PreparedStatementRenderer renderer, AstContext ctx) {
-        var valueResult = interval.getValue().accept(renderer, ctx);
-        String unitName = interval.getUnit().name();
+        var valueResult = interval.value().accept(renderer, ctx);
+        String unitName = interval.unit().name();
 
         String sql = String.format("INTERVAL %s %s", valueResult.sql(), unitName);
         return new PsDto(sql, valueResult.parameters());
