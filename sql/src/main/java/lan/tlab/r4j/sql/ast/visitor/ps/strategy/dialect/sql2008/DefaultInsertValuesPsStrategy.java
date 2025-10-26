@@ -17,7 +17,7 @@ public class DefaultInsertValuesPsStrategy implements InsertValuesPsStrategy {
         for (var expr : insertValues.getValueExpressions()) {
             if (expr instanceof Literal<?> literal) {
                 placeholders.add("?");
-                params.add(literal.getValue());
+                params.add(literal.value());
             } else {
                 // Fallback for non-literal expressions
                 placeholders.add("?");
