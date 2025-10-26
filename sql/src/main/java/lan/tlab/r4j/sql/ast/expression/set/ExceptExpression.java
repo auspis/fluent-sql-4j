@@ -2,17 +2,8 @@ package lan.tlab.r4j.sql.ast.expression.set;
 
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class ExceptExpression implements SetExpression {
-
-    private final SetExpression left;
-    private final SetExpression right;
-    private final boolean distinct;
+public record ExceptExpression(SetExpression left, SetExpression right, boolean distinct) implements SetExpression {
 
     public static ExceptExpression except(SetExpression left, SetExpression right) {
         return new ExceptExpression(left, right, true);
