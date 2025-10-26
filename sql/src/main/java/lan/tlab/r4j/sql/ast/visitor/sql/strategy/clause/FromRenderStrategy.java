@@ -10,7 +10,7 @@ public class FromRenderStrategy implements ClauseRenderStrategy {
     public String render(From clause, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "FROM %s",
-                clause.getSources().stream()
+                clause.sources().stream()
                         .map(src -> src.accept(sqlRenderer, ctx))
                         .collect(Collectors.joining(", ")));
     }

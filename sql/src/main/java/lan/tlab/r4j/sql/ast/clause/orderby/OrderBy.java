@@ -1,6 +1,7 @@
 package lan.tlab.r4j.sql.ast.clause.orderby;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.clause.Clause;
@@ -11,8 +12,12 @@ public record OrderBy(List<Sorting> sortings) implements Clause {
 
     public OrderBy {
         if (sortings == null) {
-            sortings = new ArrayList<>();
+            sortings = Collections.unmodifiableList(new ArrayList<>());
         }
+    }
+
+    public static OrderBy nullObject() {
+        return new OrderBy(null);
     }
 
     public static OrderBy of(Sorting... sortings) {

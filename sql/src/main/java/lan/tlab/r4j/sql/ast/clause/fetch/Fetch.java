@@ -13,12 +13,12 @@ public record Fetch(Integer offset, Integer rows) implements Clause {
         }
     }
 
-    public static Fetch of(Integer rows) {
-        return new Fetch(0, rows);
+    public static Fetch nullObject() {
+        return new Fetch(0, null);
     }
 
-    public static Fetch of(Integer offset, Integer rows) {
-        return new Fetch(offset, rows);
+    public static Fetch of(Integer rows) {
+        return new Fetch(0, rows);
     }
 
     @Override

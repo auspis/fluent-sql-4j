@@ -22,22 +22,22 @@ public class SelectStatement implements DataQueryStatement, TableExpression {
     private final Select select = Select.builder().build();
 
     @Default
-    private final From from = From.builder().build();
+    private final From from = From.nullObject();
 
     @Default
     private final Where where = Where.nullObject();
 
     @Default
-    private final GroupBy groupBy = new GroupBy(null);
+    private final GroupBy groupBy = GroupBy.nullObject();
 
     @Default
     private final Having having = Having.builder().build();
 
     @Default
-    private final OrderBy orderBy = new OrderBy(null);
+    private final OrderBy orderBy = OrderBy.nullObject();
 
     @Default
-    private final Fetch fetch = new Fetch(0, null);
+    private final Fetch fetch = Fetch.nullObject();
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
