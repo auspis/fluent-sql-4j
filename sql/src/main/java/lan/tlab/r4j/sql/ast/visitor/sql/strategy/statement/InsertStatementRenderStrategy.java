@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class InsertStatementRenderStrategy implements StatementRenderStrategy {
 
     public String render(InsertStatement statement, SqlRenderer sqlRenderer, AstContext ctx) {
-        String columnNames = statement.getColumns().stream()
+        String columnNames = statement.columns().stream()
                 .map(column -> column.accept(sqlRenderer, ctx))
                 .collect(Collectors.joining(", "));
 
@@ -18,8 +18,8 @@ public class InsertStatementRenderStrategy implements StatementRenderStrategy {
 
         return String.format(
                 "INSERT INTO %s%s %s",
-                statement.getTable().accept(sqlRenderer, ctx),
+                statement.table().accept(sqlRenderer, ctx),
                 columnNames,
-                statement.getData().accept(sqlRenderer, ctx));
+                statement.data().accept(sqlRenderer, ctx));
     }
 }
