@@ -19,7 +19,7 @@ import lombok.Getter;
 public class SelectStatement implements DataQueryStatement, TableExpression {
 
     @Default
-    private final Select select = Select.builder().build();
+    private final Select select = new Select();
 
     @Default
     private final From from = From.nullObject();
