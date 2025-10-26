@@ -101,7 +101,7 @@ public class StandardSqlRendererMySqlE2E {
                 .orderBy(OrderBy.of(
                         Sorting.desc(ColumnReference.of("Customer", "name")),
                         Sorting.asc(ColumnReference.of("Customer", "createdAt"))))
-                .fetch(Fetch.builder().rows(5).offset(0).build())
+                .fetch(new Fetch(0, 5))
                 .build();
         String sql = statement.accept(renderer, new AstContext());
         assertThat(sql)
