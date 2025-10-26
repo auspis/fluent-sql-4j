@@ -164,10 +164,10 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
     private void updateSelectClauseWithTable(TableIdentifier table) {
         Select currentSelect = getCurrentStatement().getSelect();
-        if (currentSelect != null && !currentSelect.getProjections().isEmpty()) {
+        if (currentSelect != null && !currentSelect.projections().isEmpty()) {
             List<Projection> updatedProjections = new ArrayList<>();
 
-            for (var projection : currentSelect.getProjections()) {
+            for (var projection : currentSelect.projections()) {
                 if (projection instanceof ScalarExpressionProjection scalarProj
                         && scalarProj.getExpression() instanceof ColumnReference colRef) {
 
