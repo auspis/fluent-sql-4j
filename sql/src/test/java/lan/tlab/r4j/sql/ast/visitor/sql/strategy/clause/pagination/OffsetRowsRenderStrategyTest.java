@@ -23,7 +23,7 @@ class OffsetRowsRenderStrategyTest {
 
     @Test
     void empty() {
-        Fetch pagination = Fetch.builder().build();
+        Fetch pagination = new Fetch(0, null);
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("");
@@ -31,12 +31,12 @@ class OffsetRowsRenderStrategyTest {
 
     @Test
     void ok() {
-        Fetch pagination = Fetch.builder().offset(0).rows(10).build();
+        Fetch pagination = new Fetch(0, 10);
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY");
 
-        pagination = Fetch.builder().offset(16).rows(8).build();
+        pagination = new Fetch(16, 8);
         sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("OFFSET 16 ROWS FETCH NEXT 8 ROWS ONLY");
     }
