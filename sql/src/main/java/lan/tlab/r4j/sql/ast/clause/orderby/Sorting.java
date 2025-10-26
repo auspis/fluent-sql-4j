@@ -4,24 +4,19 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class Sorting implements Visitable {
+public record Sorting(ScalarExpression expression, SortOrder sortOrder) implements Visitable {
 
-    private final ScalarExpression expression;
-    private final SortOrder sortOrder;
-
-    @AllArgsConstructor
     public enum SortOrder {
         ASC("ASC"),
         DESC("DESC"),
         DEFAULT("");
 
         private final String sqlKeyword;
+
+        SortOrder(String sqlKeyword) {
+            this.sqlKeyword = sqlKeyword;
+        }
 
         public String getSqlKeyword() {
             return sqlKeyword;
