@@ -7,6 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class IsNullRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(IsNull expression, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format("%s IS NULL", expression.getExpression().accept(sqlRenderer, ctx));
+        return String.format("%s IS NULL", expression.expression().accept(sqlRenderer, ctx));
     }
 }
