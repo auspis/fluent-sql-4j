@@ -5,22 +5,19 @@ import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class Having implements Clause {
+public record Having(Predicate condition) implements Clause {
 
-    @Default
-    private final Predicate condition = new NullPredicate();
+    public Having() {
+        this(new NullPredicate());
+    }
 
     public static Having of(Predicate condition) {
-        return builder().condition(condition).build();
+        return new Having(condition);
+    }
+
+    public static Having nullObject() {
+        return new Having(new NullPredicate());
     }
 
     @Override
