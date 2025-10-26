@@ -9,8 +9,8 @@ public class BetweenRenderStrategy implements ExpressionRenderStrategy {
     public String render(Between expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "(%s BETWEEN %s AND %s)",
-                expression.getTestExpression().accept(sqlRenderer, ctx),
-                expression.getStartExpression().accept(sqlRenderer, ctx),
-                expression.getEndExpression().accept(sqlRenderer, ctx));
+                expression.testExpression().accept(sqlRenderer, ctx),
+                expression.startExpression().accept(sqlRenderer, ctx),
+                expression.endExpression().accept(sqlRenderer, ctx));
     }
 }
