@@ -92,3 +92,5 @@ La migrazione sistematica delle classi Lombok a Java records è stata completata
 - Fix speciali: MySQL DateArithmetic strategy modificata per costruzione diretta INTERVAL string
 - Validazione: Compilazione e test completi dopo ogni conversione
 
+// TODO: evaluate if the record is the correct solution: the creation should go only throght factory methods. see DateArithmetic.java
+
