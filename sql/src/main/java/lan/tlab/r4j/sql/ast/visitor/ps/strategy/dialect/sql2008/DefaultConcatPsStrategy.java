@@ -16,7 +16,7 @@ public class DefaultConcatPsStrategy implements ConcatPsStrategy {
         List<Object> allParameters = new ArrayList<>();
 
         // Visit all expressions to get their SQL and parameters
-        List<String> sqlExpressions = concat.getStringExpressions().stream()
+        List<String> sqlExpressions = concat.stringExpressions().stream()
                 .map(expr -> {
                     PsDto exprDto = expr.accept(renderer, ctx);
                     allParameters.addAll(exprDto.parameters());
@@ -26,13 +26,13 @@ public class DefaultConcatPsStrategy implements ConcatPsStrategy {
 
         // If there's a separator, we need to insert it between expressions
         String sql;
-        if (concat.getSeparator().isEmpty()) {
+        if (concat.separator().isEmpty()) {
             // Standard CONCAT function
             sql = "CONCAT(" + String.join(", ", sqlExpressions) + ")";
         } else {
             // CONCAT_WS function for concatenation with separator
             // Add separator as first parameter
-            allParameters.add(0, concat.getSeparator());
+            allParameters.add(0, concat.separator());
             sql = "CONCAT_WS(?, " + String.join(", ", sqlExpressions) + ")";
         }
 

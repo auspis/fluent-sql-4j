@@ -12,14 +12,14 @@ public class DefaultDateArithmeticPsStrategy implements DateArithmeticPsStrategy
 
     @Override
     public PsDto handle(DateArithmetic dateArithmetic, PreparedStatementRenderer renderer, AstContext ctx) {
-        var dateExpressionResult = dateArithmetic.getDateExpression().accept(renderer, ctx);
-        var intervalResult = dateArithmetic.getInterval().accept(renderer, ctx);
+        var dateExpressionResult = dateArithmetic.dateExpression().accept(renderer, ctx);
+        var intervalResult = dateArithmetic.interval().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(intervalResult.parameters());
         parameters.addAll(dateExpressionResult.parameters());
 
-        String operation = dateArithmetic.isAdd() ? "DATEADD" : "DATESUB";
+        String operation = dateArithmetic.add() ? "DATEADD" : "DATESUB";
         String sql = String.format("%s(%s, %s)", operation, intervalResult.sql(), dateExpressionResult.sql());
 
         return new PsDto(sql, parameters);

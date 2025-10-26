@@ -10,8 +10,8 @@ public class DefaultUnaryStringPsStrategy implements UnaryStringPsStrategy {
 
     @Override
     public PsDto handle(UnaryString functionCall, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto expressionDto = functionCall.getExpression().accept(renderer, ctx);
-        String sql = String.format("%s(%s)", functionCall.getFunctionName(), expressionDto.sql());
+        PsDto expressionDto = functionCall.expression().accept(renderer, ctx);
+        String sql = String.format("%s(%s)", functionCall.functionName(), expressionDto.sql());
         return new PsDto(sql, expressionDto.parameters());
     }
 }

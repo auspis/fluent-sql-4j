@@ -12,25 +12,26 @@ public interface DateArithmeticRenderStrategy extends ExpressionRenderStrategy {
     public static DateArithmeticRenderStrategy standardSql2008() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "%s %s %s",
-                functionCall.getDateExpression().accept(sqlRenderer, ctx),
-                functionCall.isAdd() ? "+" : "-",
-                functionCall.getInterval().accept(sqlRenderer, ctx));
+                functionCall.dateExpression().accept(sqlRenderer, ctx),
+                functionCall.add() ? "+" : "-",
+                functionCall.interval().accept(sqlRenderer, ctx));
     }
 
     public static DateArithmeticRenderStrategy sqlServer() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "DATEADD(%s, %s%s, %s)",
-                functionCall.getInterval().getUnit(),
-                functionCall.isAdd() ? "" : "-",
-                functionCall.getInterval().getValue().accept(sqlRenderer, ctx),
-                functionCall.getDateExpression().accept(sqlRenderer, ctx));
+                functionCall.interval().unit(),
+                functionCall.add() ? "" : "-",
+                functionCall.interval().value().accept(sqlRenderer, ctx),
+                functionCall.dateExpression().accept(sqlRenderer, ctx));
     }
 
     public static DateArithmeticRenderStrategy mysql() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
-                "%s(%s, %s)",
-                functionCall.isAdd() ? "DATE_ADD" : "DATE_SUB",
-                functionCall.getDateExpression().accept(sqlRenderer, ctx),
-                functionCall.getInterval().accept(sqlRenderer, ctx));
+                "%s(%s, INTERVAL %s %s)",
+                functionCall.add() ? "DATE_ADD" : "DATE_SUB",
+                functionCall.dateExpression().accept(sqlRenderer, ctx),
+                functionCall.interval().value().accept(sqlRenderer, ctx),
+                functionCall.interval().unit().name());
     }
 }

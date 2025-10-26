@@ -9,8 +9,8 @@ public class ReplaceRenderStrategy implements ExpressionRenderStrategy {
     public String render(Replace functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "REPLACE(%s, %s, %s)",
-                functionCall.getExpression().accept(sqlRenderer, ctx),
-                functionCall.getOldSubstring().accept(sqlRenderer, ctx),
-                functionCall.getNewSubstring().accept(sqlRenderer, ctx));
+                functionCall.expression().accept(sqlRenderer, ctx),
+                functionCall.oldSubstring().accept(sqlRenderer, ctx),
+                functionCall.newSubstring().accept(sqlRenderer, ctx));
     }
 }

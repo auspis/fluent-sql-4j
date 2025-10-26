@@ -12,8 +12,8 @@ public class DefaultModPsStrategy implements ModPsStrategy {
 
     @Override
     public PsDto handle(Mod mod, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto dividendResult = mod.getDividend().accept(renderer, ctx);
-        PsDto divisorResult = mod.getDivisor().accept(renderer, ctx);
+        PsDto dividendResult = mod.dividend().accept(renderer, ctx);
+        PsDto divisorResult = mod.divisor().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(dividendResult.parameters());
