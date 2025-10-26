@@ -47,7 +47,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.targetTable = new TableIdentifier(this.targetTable.getName(), alias);
+        this.targetTable = new TableIdentifier(this.targetTable.name(), alias);
         return this;
     }
 
