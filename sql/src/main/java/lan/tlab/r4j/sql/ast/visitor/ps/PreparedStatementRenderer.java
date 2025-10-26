@@ -128,6 +128,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LeftPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LengthPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LikePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LiteralPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ModPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NotNullConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NotPsStrategy;
@@ -202,6 +203,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLeftPsStr
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLengthPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLikePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLiteralPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultMergeStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultModPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNotNullConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNotPsStrategy;
@@ -491,6 +493,9 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Default
     private final DeleteStatementPsStrategy deleteStatementStrategy = new DefaultDeleteStatementPsStrategy();
 
+    @Default
+    private final MergeStatementPsStrategy mergeStatementStrategy = new DefaultMergeStatementPsStrategy();
+
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
         return insertStatementStrategy.handle(stmt, this, ctx);
@@ -543,10 +548,7 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(MergeStatement mergeStatement, AstContext ctx) {
-        // For now, render as SQL without parameterization
-        // Full PreparedStatement support can be added later
-        String sql = sqlRenderer.visit(mergeStatement, ctx);
-        return new PsDto(sql, List.of());
+        return mergeStatementStrategy.handle(mergeStatement, this, ctx);
     }
 
     @Override
