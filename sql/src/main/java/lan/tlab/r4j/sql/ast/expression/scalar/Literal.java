@@ -4,18 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-@ToString
-public class Literal<R> implements ScalarExpression {
-    private final R value;
+public record Literal<R>(R value) implements ScalarExpression {
 
     public static Literal<String> of(String value) {
         return new Literal<>(value);
