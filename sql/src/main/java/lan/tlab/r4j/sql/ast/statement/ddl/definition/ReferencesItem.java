@@ -5,15 +5,8 @@ import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
-public class ReferencesItem implements Visitable {
-
-    private final String table;
-    private final List<String> columns;
+public record ReferencesItem(String table, List<String> columns) implements Visitable {
 
     public ReferencesItem(String table, String... columns) {
         this(table, Stream.of(columns).toList());
