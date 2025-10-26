@@ -11,10 +11,9 @@ public class ForeignKeyConstraintRenderStrategy implements SqlItemRenderStrategy
 
     public String render(ForeignKeyConstraintDefinition constraint, SqlRenderer sqlRenderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = sqlRenderer.getEscapeStrategy();
-        String columns = constraint.getColumns().stream()
-                .map(c -> escapeStrategy.apply(c))
-                .collect(Collectors.joining(", "));
+        String columns =
+                constraint.columns().stream().map(c -> escapeStrategy.apply(c)).collect(Collectors.joining(", "));
         return String.format(
-                "FOREIGN KEY (%s) %s", columns, constraint.getReferences().accept(sqlRenderer, ctx));
+                "FOREIGN KEY (%s) %s", columns, constraint.references().accept(sqlRenderer, ctx));
     }
 }
