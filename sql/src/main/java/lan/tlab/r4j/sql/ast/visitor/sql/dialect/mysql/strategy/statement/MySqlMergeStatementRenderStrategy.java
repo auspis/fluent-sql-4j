@@ -68,7 +68,7 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
         // Render column list from WHEN NOT MATCHED INSERT
         if (!insertAction.columns().isEmpty()) {
             String columns = insertAction.columns().stream()
-                    .map(col -> sqlRenderer.getEscapeStrategy().apply(col.getColumn()))
+                    .map(col -> sqlRenderer.getEscapeStrategy().apply(col.column()))
                     .collect(Collectors.joining(", "));
             sql.append(" (").append(columns).append(")");
         }
@@ -91,7 +91,7 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
             String selectColumns = insertAction.columns().stream()
                     .map(col -> {
                         // Use column reference with source table alias
-                        ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.getColumn());
+                        ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.column());
                         return sourceCol.accept(sqlRenderer, ctx);
                     })
                     .collect(Collectors.joining(", "));
@@ -142,7 +142,7 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
         // Extract column name from expressions like `src`.`name` or src.name
         // For simplicity, if the value is a ColumnReference, use VALUES(column_name)
         if (item.getValue() instanceof ColumnReference colRef) {
-            String escapedColName = sqlRenderer.getEscapeStrategy().apply(colRef.getColumn());
+            String escapedColName = sqlRenderer.getEscapeStrategy().apply(colRef.column());
             return columnName + " = VALUES(" + escapedColName + ")";
         }
 
