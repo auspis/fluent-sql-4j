@@ -189,7 +189,7 @@ public class SqlRenderer implements Visitor<String> {
     private final DeleteStatementRenderStrategy deleteStatementStrategy = new DeleteStatementRenderStrategy();
 
     @Default
-    private final MergeStatementRenderStrategy mergeStatementStrategy = new MergeStatementRenderStrategy();
+    private final MergeStatementRenderStrategy mergeStatementStrategy = MergeStatementRenderStrategy.standardSql2008();
 
     @Default
     private final CreateTableStatementRenderStrategy createTableStatementStrategy =
