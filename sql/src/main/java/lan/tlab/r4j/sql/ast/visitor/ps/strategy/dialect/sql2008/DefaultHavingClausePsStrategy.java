@@ -10,9 +10,9 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.HavingClausePsStrategy;
 public class DefaultHavingClausePsStrategy implements HavingClausePsStrategy {
     @Override
     public PsDto handle(Having clause, Visitor<PsDto> renderer, AstContext ctx) {
-        if (clause.getCondition() == null || clause.getCondition() instanceof NullPredicate) {
+        if (clause.condition() == null || clause.condition() instanceof NullPredicate) {
             return new PsDto("", java.util.List.of());
         }
-        return clause.getCondition().accept(renderer, ctx);
+        return clause.condition().accept(renderer, ctx);
     }
 }
