@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class HavingRenderStrategy implements ClauseRenderStrategy {
 
     public String render(Having clause, SqlRenderer sqlRenderer, AstContext ctx) {
-        Predicate condition = clause.getCondition();
+        Predicate condition = clause.condition();
         String sql = condition.accept(sqlRenderer, ctx);
         if (sql.isBlank()) {
             return "";
