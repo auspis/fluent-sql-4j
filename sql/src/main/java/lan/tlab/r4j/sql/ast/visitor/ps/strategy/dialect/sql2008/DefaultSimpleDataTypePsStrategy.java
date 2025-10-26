@@ -13,6 +13,6 @@ public class DefaultSimpleDataTypePsStrategy implements SimpleDataTypePsStrategy
     public PsDto handle(SimpleDataType simpleDataType, PreparedStatementRenderer renderer, AstContext ctx) {
         // Simple data types are static DDL elements without parameters
         // Just return the type name
-        return new PsDto(simpleDataType.getName(), List.of());
+        return new PsDto(simpleDataType.name(), List.of());
     }
 }

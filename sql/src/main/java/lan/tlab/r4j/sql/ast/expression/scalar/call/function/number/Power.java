@@ -5,15 +5,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
-public class Power implements FunctionCall {
-    private final ScalarExpression base;
-    private final ScalarExpression exponent;
-
+public record Power(ScalarExpression base, ScalarExpression exponent) implements FunctionCall {
     public static Power of(Number base, Number exponent) {
         return of(Literal.of(base), Literal.of(exponent));
     }
