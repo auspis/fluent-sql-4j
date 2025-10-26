@@ -41,7 +41,7 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         // HAVING ... (optional, after GROUP BY)
         PsDto havingResult = null;
         String havingClause = "";
-        if (stmt.getHaving() != null && stmt.getHaving().getCondition() != null) {
+        if (stmt.getHaving() != null && stmt.getHaving().condition() != null) {
             havingResult = stmt.getHaving().accept(renderer, ctx);
             if (!havingResult.sql().isBlank()) {
                 havingClause = " HAVING " + havingResult.sql();

@@ -131,6 +131,7 @@ public class MergeBuilder {
     }
 
     public MergeBuilder whenMatchedThenDelete() {
+        // TODO: remove null
         this.actions.add(new WhenMatchedDelete(null));
         return this;
     }

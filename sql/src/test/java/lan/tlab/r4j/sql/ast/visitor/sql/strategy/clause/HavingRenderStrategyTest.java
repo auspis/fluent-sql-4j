@@ -27,7 +27,7 @@ class HavingRenderStrategyTest {
 
     @Test
     void noGroupingFunctions() {
-        Having having = Having.builder().build();
+        Having having = Having.nullObject();
         String sql = strategy.render(having, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("");
     }
