@@ -5,10 +5,6 @@ import lan.tlab.r4j.sql.ast.expression.Expression;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 public interface DataType extends Expression {
 
@@ -36,12 +32,7 @@ public interface DataType extends Expression {
         return new SimpleDataType("BOOLEAN");
     }
 
-    @AllArgsConstructor
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class SimpleDataType implements DataType {
-        private final String name;
+    public static record SimpleDataType(String name) implements DataType {
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
@@ -49,13 +40,7 @@ public interface DataType extends Expression {
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class ParameterizedDataType implements DataType {
-        private final String name;
-        private final List<Expression> parameters;
+    public record ParameterizedDataType(String name, List<Expression> parameters) implements DataType {
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {

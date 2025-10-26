@@ -8,6 +8,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.SqlItemRenderStrategy;
 public class SimpleDataTypeRenderStrategy implements SqlItemRenderStrategy {
 
     public String render(SimpleDataType type, SqlRenderer sqlRenderer, AstContext ctx) {
-        return type.getName();
+        return type.name();
     }
 }
