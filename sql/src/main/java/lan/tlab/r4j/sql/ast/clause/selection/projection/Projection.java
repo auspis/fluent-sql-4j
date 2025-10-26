@@ -5,6 +5,7 @@ import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lombok.Getter;
 
+// TODO: remove lombok
 @Getter
 public abstract class Projection implements Visitable {
 

@@ -12,9 +12,9 @@ public class DefaultReplacePsStrategy implements ReplacePsStrategy {
 
     @Override
     public PsDto handle(Replace replace, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto expressionResult = replace.getExpression().accept(renderer, ctx);
-        PsDto oldSubstringResult = replace.getOldSubstring().accept(renderer, ctx);
-        PsDto newSubstringResult = replace.getNewSubstring().accept(renderer, ctx);
+        PsDto expressionResult = replace.expression().accept(renderer, ctx);
+        PsDto oldSubstringResult = replace.oldSubstring().accept(renderer, ctx);
+        PsDto newSubstringResult = replace.newSubstring().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(expressionResult.parameters());

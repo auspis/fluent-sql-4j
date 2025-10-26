@@ -10,8 +10,8 @@ public class DefaultExtractDatePartPsStrategy implements ExtractDatePartPsStrate
 
     @Override
     public PsDto handle(ExtractDatePart extractDatePart, PreparedStatementRenderer renderer, AstContext ctx) {
-        var dateExpressionResult = extractDatePart.getDateExpression().accept(renderer, ctx);
-        String functionName = extractDatePart.getFunctionName();
+        var dateExpressionResult = extractDatePart.dateExpression().accept(renderer, ctx);
+        String functionName = extractDatePart.functionName();
 
         String sql = String.format("EXTRACT(%s FROM %s)", functionName, dateExpressionResult.sql());
         return new PsDto(sql, dateExpressionResult.parameters());

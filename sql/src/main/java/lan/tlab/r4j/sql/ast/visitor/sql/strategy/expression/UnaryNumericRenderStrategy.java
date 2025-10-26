@@ -9,7 +9,6 @@ public class UnaryNumericRenderStrategy implements ExpressionRenderStrategy {
     public String render(UnaryNumeric functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "%s(%s)",
-                functionCall.getFunctionName(),
-                functionCall.getNumericExpression().accept(sqlRenderer, ctx));
+                functionCall.functionName(), functionCall.numericExpression().accept(sqlRenderer, ctx));
     }
 }

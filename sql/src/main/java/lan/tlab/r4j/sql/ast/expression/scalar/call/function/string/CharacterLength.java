@@ -4,14 +4,8 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor
-@Getter
-public class CharacterLength implements FunctionCall {
-
-    private final ScalarExpression expression;
+public record CharacterLength(ScalarExpression expression) implements FunctionCall {
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
