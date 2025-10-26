@@ -8,24 +8,46 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
 import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@Getter
-public class InsertStatement implements DataManipulationStatement {
+public record InsertStatement(TableExpression table, List<ColumnReference> columns, InsertData data)
+        implements DataManipulationStatement {
 
-    private final TableExpression table;
-
-    @Default
-    private final List<ColumnReference> columns = new ArrayList<>();
-
-    @Default
-    private final InsertData data = new DefaultValues();
+    public InsertStatement {
+        if (columns == null) columns = new ArrayList<>();
+        if (data == null) data = new DefaultValues();
+    }
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
+    }
+
+    public static InsertStatementBuilder builder() {
+        return new InsertStatementBuilder();
+    }
+
+    public static class InsertStatementBuilder {
+        private TableExpression table;
+        private List<ColumnReference> columns;
+        private InsertData data;
+
+        public InsertStatementBuilder table(TableExpression table) {
+            this.table = table;
+            return this;
+        }
+
+        public InsertStatementBuilder columns(List<ColumnReference> columns) {
+            this.columns = columns;
+            return this;
+        }
+
+        public InsertStatementBuilder data(InsertData data) {
+            this.data = data;
+            return this;
+        }
+
+        public InsertStatement build() {
+            return new InsertStatement(table, columns, data);
+        }
     }
 }
