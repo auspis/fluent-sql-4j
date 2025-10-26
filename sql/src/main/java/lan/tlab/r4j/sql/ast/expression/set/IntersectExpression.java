@@ -2,17 +2,9 @@ package lan.tlab.r4j.sql.ast.expression.set;
 
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class IntersectExpression implements SetExpression {
-
-    private final SetExpression leftSetExpression;
-    private final SetExpression rightSetExpression;
-    private final IntersectType type;
+public record IntersectExpression(SetExpression leftSetExpression, SetExpression rightSetExpression, IntersectType type)
+        implements SetExpression {
 
     public enum IntersectType {
         INTERSECT_DISTINCT,
