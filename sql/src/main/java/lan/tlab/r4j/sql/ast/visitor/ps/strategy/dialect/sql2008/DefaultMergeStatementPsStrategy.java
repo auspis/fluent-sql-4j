@@ -75,7 +75,7 @@ public class DefaultMergeStatementPsStrategy implements MergeStatementPsStrategy
                 // since they can be column references from the source table
                 if (whenNotMatched.insertData() instanceof InsertData.InsertValues insertValues) {
                     List<String> valueClauses = new ArrayList<>();
-                    for (var expr : insertValues.getValueExpressions()) {
+                    for (var expr : insertValues.valueExpressions()) {
                         PsDto exprDto = expr.accept(renderer, onCtx);
                         valueClauses.add(exprDto.sql());
                         params.addAll(exprDto.parameters());
