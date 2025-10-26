@@ -243,7 +243,7 @@ public class MergeBuilder {
             ScalarExpression expr = value == null
                     ? Literal.ofNull()
                     : (value.contains(".") ? ColumnReferenceUtil.parseColumnReference(value, "") : Literal.of(value));
-            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            this.updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
@@ -253,7 +253,7 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
-            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            this.updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
@@ -263,7 +263,7 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
-            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            this.updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
@@ -276,7 +276,7 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : (ScalarExpression) value;
-            this.updateItems.add(UpdateItem.builder().column(colRef).value(expr).build());
+            this.updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 

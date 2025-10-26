@@ -28,14 +28,8 @@ class DefaultMergeStatementPsStrategyTest {
                 .onCondition(Comparison.eq(ColumnReference.of("tgt", "id"), ColumnReference.of("src", "id")))
                 .actions(List.of(
                         new WhenMatchedUpdate(List.of(
-                                UpdateItem.builder()
-                                        .column(ColumnReference.of("", "name"))
-                                        .value(ColumnReference.of("src", "name"))
-                                        .build(),
-                                UpdateItem.builder()
-                                        .column(ColumnReference.of("", "status"))
-                                        .value(Literal.of("updated"))
-                                        .build())),
+                                new UpdateItem(ColumnReference.of("", "name"), ColumnReference.of("src", "name")),
+                                new UpdateItem(ColumnReference.of("", "status"), Literal.of("updated")))),
                         new WhenNotMatchedInsert(
                                 List.of(
                                         ColumnReference.of("", "id"),
@@ -91,10 +85,8 @@ class DefaultMergeStatementPsStrategyTest {
                 .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
                 .onCondition(Comparison.eq(ColumnReference.of("users", "id"), Literal.of(1)))
                 .actions(List.of(
-                        new WhenMatchedUpdate(List.of(UpdateItem.builder()
-                                .column(ColumnReference.of("", "status"))
-                                .value(Literal.of("active"))
-                                .build())),
+                        new WhenMatchedUpdate(
+                                List.of(new UpdateItem(ColumnReference.of("", "status"), Literal.of("active")))),
                         new WhenNotMatchedInsert(
                                 List.of(ColumnReference.of("", "id"), ColumnReference.of("", "status")),
                                 InsertData.InsertValues.of(Literal.of(2), Literal.of("pending")))))
