@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class LiteralRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Literal<?> literal, SqlRenderer sqlRenderer, AstContext ctx) {
-        Object value = literal.getValue();
+        Object value = literal.value();
         if (Objects.isNull(value)) {
             return "null";
         }
