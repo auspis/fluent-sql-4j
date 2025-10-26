@@ -13,7 +13,7 @@ public class DefaultGroupByClausePsStrategy implements GroupByClausePsStrategy {
     public PsDto handle(GroupBy clause, Visitor<PsDto> renderer, AstContext ctx) {
         List<String> exprSqls = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-        for (var expr : clause.getGroupingExpressions()) {
+        for (var expr : clause.groupingExpressions()) {
             PsDto res = expr.accept(renderer, ctx);
             exprSqls.add(res.sql());
             params.addAll(res.parameters());
