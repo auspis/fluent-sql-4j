@@ -12,8 +12,8 @@ public class DefaultUpdateItemPsStrategy implements UpdateItemPsStrategy {
 
     @Override
     public PsDto handle(UpdateItem item, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto columnDto = item.getColumn().accept(renderer, ctx);
-        PsDto valueDto = item.getValue().accept(renderer, ctx);
+        PsDto columnDto = item.column().accept(renderer, ctx);
+        PsDto valueDto = item.value().accept(renderer, ctx);
 
         String sql = String.format("%s = %s", columnDto.sql(), valueDto.sql());
 
