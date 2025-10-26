@@ -44,11 +44,13 @@
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/expression/scalar/call/aggregate/AggregateCallImpl.java`
 - Motivo: Campi final, costruttore, nessun comportamento mutabile.
+- Stato: **COMPLETATO** - Convertito a record con campi `operator` e `expression`.
 
 ### CountDistinct
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/expression/scalar/call/aggregate/CountDistinct.java`
 - Motivo: Campo final, costruttore, nessun comportamento mutabile.
+- Stato: **COMPLETATO** - Convertito a record con campo `expression`.
 
 ### InsertData.DefaultValues
 
@@ -64,29 +66,35 @@
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ConstraintDefinition.java`
 - Motivo: Campo final, costruttore, nessun comportamento mutabile.
+- Stato: **COMPLETATO** - Convertito a record con campo `columns` e costruttore varargs.
 
 ### ConstraintDefinition.NotNullConstraintDefinition
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ConstraintDefinition.java`
 - Motivo: Nessun campo, solo marker per constraint not null.
+- Stato: **COMPLETATO** - Convertito a record senza campi.
 
 ### ConstraintDefinition.UniqueConstraintDefinition
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ConstraintDefinition.java`
 - Motivo: Campo final, costruttore, nessun comportamento mutabile.
+- Stato: **COMPLETATO** - Convertito a record con campo `columns` e costruttore varargs.
 
 ### ConstraintDefinition.ForeignKeyConstraintDefinition
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ConstraintDefinition.java`
 - Motivo: Campi final, costruttore, nessun comportamento mutabile.
+- Stato: **COMPLETATO** - Convertito a record con campi `columns` e `references`.
 
 ### ConstraintDefinition.CheckConstraintDefinition
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ConstraintDefinition.java`
 - Motivo: Campo final, costruttore, nessun comportamento mutabile.
+- Stato: **COMPLETATO** - Convertito a record con campo `expression`.
 
 ### ConstraintDefinition.DefaultConstraintDefinition
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ConstraintDefinition.java`
 - Motivo: Campo final, costruttore, nessun comportamento mutabile.
+- Stato: **COMPLETATO** - Convertito a record con campo `value`.
 
