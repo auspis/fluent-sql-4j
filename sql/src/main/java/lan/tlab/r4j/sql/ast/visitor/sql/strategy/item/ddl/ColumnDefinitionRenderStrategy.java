@@ -14,9 +14,9 @@ public class ColumnDefinitionRenderStrategy implements SqlItemRenderStrategy {
             return "";
         }
 
-        String columnName = sqlRenderer.getEscapeStrategy().apply(item.getName());
-        String type = item.getType().accept(sqlRenderer, ctx);
-        String constraints = Stream.of(item.getNotNullConstraint(), item.getDefaultConstraint())
+        String columnName = sqlRenderer.getEscapeStrategy().apply(item.name());
+        String type = item.type().accept(sqlRenderer, ctx);
+        String constraints = Stream.of(item.notNullConstraint(), item.defaultConstraint())
                 .filter(c -> c != null)
                 .map(c -> c.accept(sqlRenderer, ctx))
                 .collect(Collectors.joining(" "))
