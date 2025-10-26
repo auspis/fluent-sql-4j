@@ -11,15 +11,14 @@ public interface ExceptRenderStrategy extends ExpressionRenderStrategy {
     public static ExceptRenderStrategy standardSql2008() {
         return (expression, sqlRenderer, ctx) -> String.format(
                 "((%s) %s (%s))",
-                expression.getLeft().accept(sqlRenderer, ctx),
-                expression.isDistinct() ? "EXCEPT" : "EXCEPT ALL",
-                expression.getRight().accept(sqlRenderer, ctx));
+                expression.left().accept(sqlRenderer, ctx),
+                expression.distinct() ? "EXCEPT" : "EXCEPT ALL",
+                expression.right().accept(sqlRenderer, ctx));
     }
 
     public static ExceptRenderStrategy oracle() {
         return (expression, sqlRenderer, ctx) -> String.format(
                 "((%s) MINUS (%s))",
-                expression.getLeft().accept(sqlRenderer, ctx),
-                expression.getRight().accept(sqlRenderer, ctx));
+                expression.left().accept(sqlRenderer, ctx), expression.right().accept(sqlRenderer, ctx));
     }
 }
