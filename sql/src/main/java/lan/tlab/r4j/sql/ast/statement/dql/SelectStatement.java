@@ -31,7 +31,7 @@ public class SelectStatement implements DataQueryStatement, TableExpression {
     private final GroupBy groupBy = GroupBy.nullObject();
 
     @Default
-    private final Having having = Having.builder().build();
+    private final Having having = Having.nullObject();
 
     @Default
     private final OrderBy orderBy = OrderBy.nullObject();
