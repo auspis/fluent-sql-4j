@@ -14,7 +14,7 @@ public class DefaultScalarSubqueryPsStrategy implements ScalarSubqueryPsStrategy
     public PsDto handle(ScalarSubquery subquery, PreparedStatementRenderer renderer, AstContext ctx) {
         // Scalar subqueries contain table expressions that may have parameters
         // Use hybrid approach: delegate to visitor for parameter handling
-        PsDto innerResult = subquery.getTableExpression().accept(renderer, ctx);
+        PsDto innerResult = subquery.tableExpression().accept(renderer, ctx);
 
         // Wrap in parentheses as required for scalar subqueries
         String sql = "(" + innerResult.sql() + ")";
