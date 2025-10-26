@@ -6,26 +6,25 @@ import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class Where implements Clause {
+public record Where(Predicate condition) implements Clause {
 
-    @Default
-    private final Predicate condition = new NullPredicate();
+    public Where {
+        if (condition == null) {
+            condition = new NullPredicate();
+        }
+    }
+
+    public static Where nullObject() {
+        return new Where(new NullPredicate());
+    }
 
     public static Where andOf(Predicate... conditions) {
-        return builder().condition(AndOr.and(conditions)).build();
+        return new Where(AndOr.and(conditions));
     }
 
     public static Where of(Predicate condition) {
-        return builder().condition(condition).build();
+        return new Where(condition);
     }
 
     @Override
