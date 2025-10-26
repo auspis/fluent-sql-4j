@@ -39,14 +39,8 @@ class MySqlMergeStatementRenderStrategyTest {
                 .onCondition(Comparison.eq(ColumnReference.of("tgt", "id"), ColumnReference.of("src", "id")))
                 .actions(List.of(
                         new WhenMatchedUpdate(List.of(
-                                UpdateItem.builder()
-                                        .column(ColumnReference.of("", "name"))
-                                        .value(ColumnReference.of("src", "name"))
-                                        .build(),
-                                UpdateItem.builder()
-                                        .column(ColumnReference.of("", "email"))
-                                        .value(ColumnReference.of("src", "email"))
-                                        .build())),
+                                new UpdateItem(ColumnReference.of("", "name"), ColumnReference.of("src", "name")),
+                                new UpdateItem(ColumnReference.of("", "email"), ColumnReference.of("src", "email")))),
                         new WhenNotMatchedInsert(
                                 List.of(
                                         ColumnReference.of("", "id"),
@@ -98,10 +92,8 @@ class MySqlMergeStatementRenderStrategyTest {
                 .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
                 .onCondition(Comparison.eq(ColumnReference.of("users", "id"), ColumnReference.of("src", "id")))
                 .actions(List.of(
-                        new WhenMatchedUpdate(List.of(UpdateItem.builder()
-                                .column(ColumnReference.of("", "status"))
-                                .value(Literal.of("active"))
-                                .build())),
+                        new WhenMatchedUpdate(
+                                List.of(new UpdateItem(ColumnReference.of("", "status"), Literal.of("active")))),
                         new WhenNotMatchedInsert(
                                 List.of(ColumnReference.of("", "id"), ColumnReference.of("", "status")),
                                 InsertData.InsertValues.of(ColumnReference.of("src", "id"), Literal.of("pending")))))
@@ -124,10 +116,8 @@ class MySqlMergeStatementRenderStrategyTest {
                 .targetTable(new TableIdentifier("users"))
                 .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
                 .onCondition(Comparison.eq(ColumnReference.of("users", "id"), ColumnReference.of("src", "id")))
-                .actions(List.of(new WhenMatchedUpdate(List.of(UpdateItem.builder()
-                        .column(ColumnReference.of("", "status"))
-                        .value(Literal.of("active"))
-                        .build()))))
+                .actions(List.of(new WhenMatchedUpdate(
+                        List.of(new UpdateItem(ColumnReference.of("", "status"), Literal.of("active"))))))
                 .build();
 
         assertThatThrownBy(() -> strategy.render(statement, renderer, new AstContext()))
@@ -143,14 +133,8 @@ class MySqlMergeStatementRenderStrategyTest {
                 .onCondition(Comparison.eq(ColumnReference.of("users", "id"), ColumnReference.of("src", "id")))
                 .actions(List.of(
                         new WhenMatchedUpdate(List.of(
-                                UpdateItem.builder()
-                                        .column(ColumnReference.of("", "status"))
-                                        .value(Literal.of("active"))
-                                        .build(),
-                                UpdateItem.builder()
-                                        .column(ColumnReference.of("", "name"))
-                                        .value(ColumnReference.of("src", "name"))
-                                        .build())),
+                                new UpdateItem(ColumnReference.of("", "status"), Literal.of("active")),
+                                new UpdateItem(ColumnReference.of("", "name"), ColumnReference.of("src", "name")))),
                         new WhenNotMatchedInsert(
                                 List.of(ColumnReference.of("", "id"), ColumnReference.of("", "name")),
                                 InsertData.InsertValues.of(

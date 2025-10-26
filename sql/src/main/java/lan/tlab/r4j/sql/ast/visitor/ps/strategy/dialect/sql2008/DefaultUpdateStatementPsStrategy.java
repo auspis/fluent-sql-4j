@@ -21,9 +21,9 @@ public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrate
         List<Object> params = new ArrayList<>();
         for (UpdateItem item : setItems) {
             // Colonna
-            PsDto colDto = item.getColumn().accept(renderer, ctx);
+            PsDto colDto = item.column().accept(renderer, ctx);
             // Valore
-            PsDto valDto = item.getValue().accept(renderer, ctx);
+            PsDto valDto = item.value().accept(renderer, ctx);
             setClauses.add(colDto.sql() + " = " + valDto.sql());
             params.addAll(valDto.parameters());
         }
