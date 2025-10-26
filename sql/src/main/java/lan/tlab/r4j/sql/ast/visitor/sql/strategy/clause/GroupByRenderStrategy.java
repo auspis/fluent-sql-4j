@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class GroupByRenderStrategy implements ClauseRenderStrategy {
 
     public String render(GroupBy groupBy, SqlRenderer sqlRenderer, AstContext ctx) {
-        String sql = groupBy.getGroupingExpressions().stream()
+        String sql = groupBy.groupingExpressions().stream()
                 .map(e -> e.accept(sqlRenderer, ctx))
                 .collect(Collectors.joining(", "));
 
