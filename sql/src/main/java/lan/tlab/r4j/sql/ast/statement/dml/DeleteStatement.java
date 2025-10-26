@@ -4,21 +4,38 @@ import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
 import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@Getter
-public class DeleteStatement implements DataManipulationStatement {
+public record DeleteStatement(TableExpression table, Where where) implements DataManipulationStatement {
 
-    private final TableExpression table;
-
-    @Default
-    private final Where where = Where.nullObject();
+    public DeleteStatement {
+        if (where == null) where = Where.nullObject();
+    }
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
+    }
+
+    public static DeleteStatementBuilder builder() {
+        return new DeleteStatementBuilder();
+    }
+
+    public static class DeleteStatementBuilder {
+        private TableExpression table;
+        private Where where;
+
+        public DeleteStatementBuilder table(TableExpression table) {
+            this.table = table;
+            return this;
+        }
+
+        public DeleteStatementBuilder where(Where where) {
+            this.where = where;
+            return this;
+        }
+
+        public DeleteStatement build() {
+            return new DeleteStatement(table, where);
+        }
     }
 }
