@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor;
 
-public class AstContext {
+public record AstContext(Scope scope) {
     public enum Scope {
         // In futuro: WHERE, HAVING, GROUP_BY, ecc.
         DEFAULT,
@@ -8,21 +8,11 @@ public class AstContext {
         UNION
     }
 
-    private final Scope scope;
-
     public AstContext() {
-        scope = Scope.DEFAULT;
-    }
-
-    public AstContext(Scope scope) {
-        this.scope = scope;
-    }
-
-    public Scope getScope() {
-        return scope;
+        this(Scope.DEFAULT);
     }
 
     public AstContext copy() {
-        return new AstContext(getScope());
+        return new AstContext(scope());
     }
 }
