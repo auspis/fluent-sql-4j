@@ -60,7 +60,7 @@ public class InsertBuilder {
 
     private List<Expression> getOrCreateExpressionList() {
         if (data instanceof InsertValues insertValues) {
-            return new ArrayList<>(insertValues.getValueExpressions());
+            return new ArrayList<>(insertValues.valueExpressions());
         }
         return new ArrayList<>();
     }
@@ -104,10 +104,10 @@ public class InsertBuilder {
         }
         if (data instanceof InsertValues insertValues) {
             if (!columns.isEmpty()
-                    && columns.size() != insertValues.getValueExpressions().size()) {
+                    && columns.size() != insertValues.valueExpressions().size()) {
                 throw new IllegalStateException(
                         "Number of columns (" + columns.size() + ") does not match number of values ("
-                                + insertValues.getValueExpressions().size() + ")");
+                                + insertValues.valueExpressions().size() + ")");
             }
         }
     }
