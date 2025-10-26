@@ -13,13 +13,13 @@ public class DefaultUnionExpressionPsStrategy implements UnionExpressionPsStrate
     @Override
     public PsDto handle(UnionExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
 
-        PsDto leftPart = expression.getLeft().accept(renderer, ctx);
-        PsDto rightPart = expression.getRight().accept(renderer, ctx);
+        PsDto leftPart = expression.left().accept(renderer, ctx);
+        PsDto rightPart = expression.right().accept(renderer, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",
                 leftPart.sql(),
-                (expression.getType() == UnionType.UNION_DISTINCT ? "UNION" : "UNION ALL"),
+                (expression.type() == UnionType.UNION_DISTINCT ? "UNION" : "UNION ALL"),
                 rightPart.sql());
 
         List<Object> parameters = new ArrayList<>();
