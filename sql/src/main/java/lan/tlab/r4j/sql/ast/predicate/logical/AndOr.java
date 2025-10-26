@@ -5,16 +5,8 @@ import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class AndOr implements LogicalExpression {
-
-    private final LogicalOperator operator;
-    private final List<Predicate> operands;
+public record AndOr(LogicalOperator operator, List<Predicate> operands) implements LogicalExpression {
 
     public static AndOr and(Predicate... operands) {
         return and(Stream.of(operands).toList());

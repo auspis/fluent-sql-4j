@@ -180,7 +180,7 @@ class DeleteBuilderTest {
 
         assertThat(result.getCondition()).isInstanceOf(AndOr.class);
         AndOr andOr = (AndOr) result.getCondition();
-        assertThat(andOr.getOperator()).isEqualTo(lan.tlab.r4j.sql.ast.predicate.logical.LogicalOperator.OR);
+        assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.sql.ast.predicate.logical.LogicalOperator.OR);
     }
 
     @Test
