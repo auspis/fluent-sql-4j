@@ -10,7 +10,7 @@ public class DefaultCharacterLengthPsStrategy implements CharacterLengthPsStrate
 
     @Override
     public PsDto handle(CharacterLength characterLength, PreparedStatementRenderer renderer, AstContext ctx) {
-        var expressionResult = characterLength.getExpression().accept(renderer, ctx);
+        var expressionResult = characterLength.expression().accept(renderer, ctx);
 
         String sql = String.format("CHARACTER_LENGTH(%s)", expressionResult.sql());
         return new PsDto(sql, expressionResult.parameters());

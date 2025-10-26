@@ -9,9 +9,9 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class TrimRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Trim functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
-        TrimMode mode = functionCall.getMode();
-        ScalarExpression charactersToRemove = functionCall.getCharactersToRemove();
-        ScalarExpression stringExpression = functionCall.getStringExpression();
+        TrimMode mode = functionCall.mode();
+        ScalarExpression charactersToRemove = functionCall.charactersToRemove();
+        ScalarExpression stringExpression = functionCall.stringExpression();
 
         StringBuilder sb = new StringBuilder();
         sb.append("TRIM(");
