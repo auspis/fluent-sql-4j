@@ -9,8 +9,8 @@ public class ComparisonRenderStrategy implements ExpressionRenderStrategy {
     public String render(Comparison expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "%s %s %s",
-                expression.getLhs().accept(sqlRenderer, ctx),
-                expression.getOperator().getSqlSymbol(),
-                expression.getRhs().accept(sqlRenderer, ctx));
+                expression.lhs().accept(sqlRenderer, ctx),
+                expression.operator().getSqlSymbol(),
+                expression.rhs().accept(sqlRenderer, ctx));
     }
 }
