@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
@@ -218,10 +219,7 @@ class MySQLDialectPluginIntegrationTest {
                 .from(From.fromTable("users"))
                 .orderBy(lan.tlab.r4j.sql.ast.clause.orderby.OrderBy.of(
                         lan.tlab.r4j.sql.ast.clause.orderby.Sorting.asc(ColumnReference.of("users", "name"))))
-                .fetch(lan.tlab.r4j.sql.ast.clause.fetch.Fetch.builder()
-                        .rows(3)
-                        .offset(5)
-                        .build())
+                .fetch(new Fetch(5, 3))
                 .build();
 
         String sql = renderer.renderSql(statement);
@@ -315,10 +313,7 @@ class MySQLDialectPluginIntegrationTest {
                                 lan.tlab.r4j.sql.ast.expression.scalar.Literal.of(25))))
                 .orderBy(lan.tlab.r4j.sql.ast.clause.orderby.OrderBy.of(
                         lan.tlab.r4j.sql.ast.clause.orderby.Sorting.asc(ColumnReference.of("users", "name"))))
-                .fetch(lan.tlab.r4j.sql.ast.clause.fetch.Fetch.builder()
-                        .rows(5)
-                        .offset(0)
-                        .build())
+                .fetch(new Fetch(0, 5))
                 .build();
 
         String sql = renderer.renderSql(statement);

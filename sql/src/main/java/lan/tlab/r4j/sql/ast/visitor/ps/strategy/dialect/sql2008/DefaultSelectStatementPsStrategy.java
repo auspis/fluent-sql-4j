@@ -18,7 +18,7 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         // WHERE ... (optional)
         PsDto whereResult = null;
         String whereClause = "";
-        if (stmt.getWhere() != null && stmt.getWhere().getCondition() != null) {
+        if (stmt.getWhere() != null && stmt.getWhere().condition() != null) {
             whereResult = stmt.getWhere().accept(renderer, ctx);
             String whereSql = whereResult.sql();
             if (!whereSql.isBlank()) {
