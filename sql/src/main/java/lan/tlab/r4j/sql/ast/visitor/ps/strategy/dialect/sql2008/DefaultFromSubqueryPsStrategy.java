@@ -15,7 +15,7 @@ public class DefaultFromSubqueryPsStrategy implements FromSubqueryPsStrategy {
         String sql = "(" + subqueryResult.sql() + ")";
 
         // Add alias if present (not empty name)
-        if (!fromSubquery.getAs().getName().isEmpty()) {
+        if (!fromSubquery.getAs().name().isEmpty()) {
             PsDto aliasResult = fromSubquery.getAs().accept(renderer, ctx);
             sql += " AS " + aliasResult.sql();
         }

@@ -20,6 +20,6 @@ public record AliasedTableExpression(TableExpression expression, Alias alias) im
     }
 
     public String getTableReference() {
-        return alias.getName();
+        return alias.name();
     }
 }
