@@ -34,7 +34,7 @@ public class DefaultSelectStatementPsStrategy implements SelectStatementPsStrate
         PsDto groupByResult = null;
         String groupByClause = "";
         if (stmt.getGroupBy() != null
-                && !stmt.getGroupBy().getGroupingExpressions().isEmpty()) {
+                && !stmt.getGroupBy().groupingExpressions().isEmpty()) {
             groupByResult = stmt.getGroupBy().accept(renderer, ctx);
             groupByClause = " GROUP BY " + groupByResult.sql();
         }
