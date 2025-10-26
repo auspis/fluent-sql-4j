@@ -605,7 +605,7 @@ class PreparedStatementRendererTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(Fetch.builder().rows(10).build())
+                .fetch(new Fetch(0, 10))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -618,7 +618,7 @@ class PreparedStatementRendererTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(Fetch.builder().rows(10).offset(10).build())
+                .fetch(new Fetch(10, 10))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -632,7 +632,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
-                .fetch(Fetch.builder().rows(5).offset(5).build())
+                .fetch(new Fetch(5, 5))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -647,7 +647,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
-                .fetch(Fetch.builder().rows(3).offset(3).build())
+                .fetch(new Fetch(3, 3))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -662,7 +662,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .fetch(Fetch.builder().rows(2).offset(4).build())
+                .fetch(new Fetch(4, 2))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -776,7 +776,7 @@ class PreparedStatementRendererTest {
                         new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
                         new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
                 .from(From.of(join))
-                .fetch(Fetch.builder().rows(5).offset(0).build())
+                .fetch(new Fetch(0, 5))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(stmt, new AstContext());
@@ -913,7 +913,7 @@ class PreparedStatementRendererTest {
                 .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
                         Comparison.lt(AggregateCall.min(ColumnReference.of("User", "id")), Literal.of(100))))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "email"))))
-                .fetch(Fetch.builder().rows(5).offset(0).build())
+                .fetch(new Fetch(0, 5))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -1013,7 +1013,7 @@ class PreparedStatementRendererTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(Fetch.builder().rows(10).offset(0).build())
+                .fetch(new Fetch(0, 10))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -1026,7 +1026,7 @@ class PreparedStatementRendererTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(Fetch.builder().rows(25).offset(225).build())
+                .fetch(new Fetch(225, 25))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -1046,7 +1046,7 @@ class PreparedStatementRendererTest {
                 .orderBy(OrderBy.of(
                         Sorting.asc(ColumnReference.of("User", "name")),
                         Sorting.desc(ColumnReference.of("User", "id"))))
-                .fetch(Fetch.builder().rows(15).offset(30).build())
+                .fetch(new Fetch(30, 15))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());

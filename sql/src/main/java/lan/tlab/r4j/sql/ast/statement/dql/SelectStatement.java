@@ -37,7 +37,7 @@ public class SelectStatement implements DataQueryStatement, TableExpression {
     private final OrderBy orderBy = OrderBy.builder().build();
 
     @Default
-    private final Fetch fetch = Fetch.builder().build();
+    private final Fetch fetch = new Fetch(0, null);
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
