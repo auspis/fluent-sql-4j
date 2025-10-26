@@ -23,7 +23,7 @@ public class DefaultAggregationFunctionProjectionPsStrategy implements Aggregati
         String sql = exprResult.sql();
         // Handle alias if present
         String alias = aggregationFunctionProjection.getAs() != null
-                ? aggregationFunctionProjection.getAs().getName()
+                ? aggregationFunctionProjection.getAs().name()
                 : null;
         if (alias != null && !alias.isBlank()) {
             sql += " AS " + escapeStrategy.apply(alias);

@@ -19,7 +19,7 @@ public class DefaultScalarExpressionProjectionPsStrategy implements ScalarExpres
         }
 
         Expression expr = scalarExpressionProjection.getExpression();
-        String alias = scalarExpressionProjection.getAs().getName();
+        String alias = scalarExpressionProjection.getAs().name();
 
         PsDto exprResult = expr.accept(renderer, ctx);
         String sql = exprResult.sql();
