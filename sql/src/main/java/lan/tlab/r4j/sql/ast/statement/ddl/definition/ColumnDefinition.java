@@ -5,32 +5,71 @@ import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNul
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.Tolerate;
 
-@Builder
-@Getter
-@EqualsAndHashCode
-@ToString
-public class ColumnDefinition implements Visitable {
+public record ColumnDefinition(
+        String name,
+        DataType type,
+        NotNullConstraintDefinition notNullConstraint,
+        DefaultConstraintDefinition defaultConstraint)
+        implements Visitable {
 
-    private final String name;
-
-    @Default
-    private final DataType type = DataType.varchar(255);
-
-    private final NotNullConstraintDefinition notNullConstraint;
-    private final DefaultConstraintDefinition defaultConstraint;
+    public ColumnDefinition(
+            String name,
+            DataType type,
+            NotNullConstraintDefinition notNullConstraint,
+            DefaultConstraintDefinition defaultConstraint) {
+        this.name = name;
+        this.type = type != null ? type : DataType.varchar(255);
+        this.notNullConstraint = notNullConstraint;
+        this.defaultConstraint = defaultConstraint;
+    }
 
     public static ColumnDefinition nullObject() {
-        return builder().build();
+        return new ColumnDefinition(null, null, null, null);
+    }
+
+    public static ColumnDefinitionBuilder builder() {
+        return new ColumnDefinitionBuilder();
+    }
+
+    public static ColumnDefinitionBuilder builder(String name, DataType type) {
+        return new ColumnDefinitionBuilder().name(name).type(type);
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
     }
 
     public static class ColumnDefinitionBuilder {
+        private String name;
+        private DataType type = DataType.varchar(255);
+        private NotNullConstraintDefinition notNullConstraint;
+        private DefaultConstraintDefinition defaultConstraint;
+
+        public ColumnDefinitionBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public ColumnDefinitionBuilder type(DataType type) {
+            this.type = type;
+            return this;
+        }
+
+        public ColumnDefinitionBuilder notNullConstraint(NotNullConstraintDefinition notNullConstraint) {
+            this.notNullConstraint = notNullConstraint;
+            return this;
+        }
+
+        public ColumnDefinitionBuilder defaultConstraint(DefaultConstraintDefinition defaultConstraint) {
+            this.defaultConstraint = defaultConstraint;
+            return this;
+        }
+
+        public ColumnDefinition build() {
+            return new ColumnDefinition(name, type, notNullConstraint, defaultConstraint);
+        }
 
         public static ColumnDefinitionBuilder integer(String name) {
             return builder(name, DataType.integer());
@@ -47,15 +86,5 @@ public class ColumnDefinition implements Visitable {
         public static ColumnDefinitionBuilder bool(String name) {
             return builder(name, DataType.bool());
         }
-    }
-
-    @Tolerate
-    public static ColumnDefinitionBuilder builder(String name, DataType type) {
-        return builder().name(name).type(type);
-    }
-
-    @Override
-    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
-        return visitor.visit(this, ctx);
     }
 }

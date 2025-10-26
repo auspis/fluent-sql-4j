@@ -22,17 +22,17 @@ public class DefaultColumnDefinitionPsStrategy implements ColumnDefinitionPsStra
         List<Object> parameters = new ArrayList<>();
 
         // Handle column name - use escape strategy from visitor
-        String columnName = renderer.getEscapeStrategy().apply(columnDefinition.getName());
+        String columnName = renderer.getEscapeStrategy().apply(columnDefinition.name());
         builder.append(columnName);
 
         // Handle data type using the SQL renderer from the PreparedStatementRenderer
         // This ensures we use the same dialect configuration
-        String typeString = columnDefinition.getType().accept(renderer.getSqlRenderer(), ctx);
+        String typeString = columnDefinition.type().accept(renderer.getSqlRenderer(), ctx);
         builder.append(" ").append(typeString);
 
         // Handle constraints (NOT NULL, DEFAULT) - these may have parameters
         List<PsDto> constraintDtos = Stream.of(
-                        columnDefinition.getNotNullConstraint(), columnDefinition.getDefaultConstraint())
+                        columnDefinition.notNullConstraint(), columnDefinition.defaultConstraint())
                 .filter(c -> c != null)
                 .map(c -> c.accept(renderer, ctx))
                 .collect(Collectors.toList());
