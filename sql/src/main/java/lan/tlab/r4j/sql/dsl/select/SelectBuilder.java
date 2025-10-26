@@ -378,11 +378,11 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     }
 
     static boolean hasValidHavingCondition(Having having) {
-        return !(having.getCondition() instanceof NullPredicate);
+        return !(having.condition() instanceof NullPredicate);
     }
 
     static Having combineHavingWithExisting(Having having, Predicate newCondition, LogicalCombinator combinator) {
-        Predicate existingCondition = having.getCondition();
+        Predicate existingCondition = having.condition();
         Predicate combinedCondition = combinator.combine(existingCondition, newCondition);
         return Having.of(combinedCondition);
     }

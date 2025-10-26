@@ -29,7 +29,7 @@ class DefaultHavingClausePsStrategyTest {
 
     @Test
     void nullCondition() {
-        Having having = Having.builder().build();
+        Having having = Having.nullObject();
 
         PsDto result = strategy.handle(having, visitor, ctx);
 
