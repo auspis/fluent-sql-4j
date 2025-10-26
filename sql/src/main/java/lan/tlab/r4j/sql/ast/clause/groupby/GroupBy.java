@@ -7,19 +7,14 @@ import lan.tlab.r4j.sql.ast.clause.Clause;
 import lan.tlab.r4j.sql.ast.expression.Expression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class GroupBy implements Clause {
+public record GroupBy(List<Expression> groupingExpressions) implements Clause {
 
-    @Default
-    private final List<Expression> groupingExpressions = new ArrayList<>();
+    public GroupBy {
+        if (groupingExpressions == null) {
+            groupingExpressions = new ArrayList<>();
+        }
+    }
 
     public static GroupBy of(Expression... expressions) {
         return of(Stream.of(expressions).toList());
