@@ -7,11 +7,6 @@
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/identifier/TableIdentifier.java`
 - Motivo: Campi `name` e `alias`, costruttori e getter, nessuno stato mutabile.
 
-### Sorting
-
-- Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/clause/orderby/Sorting.java`
-- Motivo: Campi final, factory statici, enum interna, nessun comportamento mutabile.
-
 ### AggregateCallProjection
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/clause/selection/projection/AggregateCallProjection.java`
