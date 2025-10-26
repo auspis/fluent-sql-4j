@@ -67,12 +67,12 @@ public class ColumnBuilder {
 
     public CreateTableBuilder unique() {
         ColumnDefinition columnDef = buildAndAdd();
-        return tableBuilder.unique(columnDef.getName());
+        return tableBuilder.unique(columnDef.name());
     }
 
     public CreateTableBuilder foreignKey(String refTable, String... refColumns) {
         ColumnDefinition columnDef = buildAndAdd();
-        return tableBuilder.foreignKey(columnDef.getName(), refTable, refColumns);
+        return tableBuilder.foreignKey(columnDef.name(), refTable, refColumns);
     }
 
     public CreateTableBuilder check(Predicate expr) {
