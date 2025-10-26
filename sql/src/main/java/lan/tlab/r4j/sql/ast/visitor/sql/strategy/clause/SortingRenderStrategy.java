@@ -9,8 +9,8 @@ public class SortingRenderStrategy implements ClauseRenderStrategy {
     public String render(Sorting sorting, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                         "%s %s",
-                        sorting.getExpression().accept(sqlRenderer, ctx),
-                        sorting.getSortOrder().getSqlKeyword())
+                        sorting.expression().accept(sqlRenderer, ctx),
+                        sorting.sortOrder().getSqlKeyword())
                 .strip();
     }
 }
