@@ -2,29 +2,15 @@ package lan.tlab.r4j.sql.ast.expression.scalar;
 
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class ColumnReference implements ScalarExpression {
-
-    @Default
-    private final String table = "";
-
-    @Default
-    private final String column = "";
+public record ColumnReference(String table, String column) implements ScalarExpression {
 
     public static ColumnReference of(String table, String name) {
-        return builder().table(table).column(name).build();
+        return new ColumnReference(table, name);
     }
 
     public static ColumnReference star() {
-        return of("", "*");
+        return new ColumnReference("", "*");
     }
 
     @Override

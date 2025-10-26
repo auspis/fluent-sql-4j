@@ -172,16 +172,16 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                 if (projection instanceof ScalarExpressionProjection scalarProj
                         && scalarProj.getExpression() instanceof ColumnReference colRef) {
 
-                    if (!"*".equals(colRef.getColumn())) {
+                    if (!"*".equals(colRef.column())) {
                         // Preserve the alias if present
                         if (scalarProj.getAs() != null
                                 && !scalarProj.getAs().name().isEmpty()) {
                             updatedProjections.add(new ScalarExpressionProjection(
-                                    ColumnReference.of(table.getTableReference(), colRef.getColumn()),
+                                    ColumnReference.of(table.getTableReference(), colRef.column()),
                                     scalarProj.getAs()));
                         } else {
                             updatedProjections.add(new ScalarExpressionProjection(
-                                    ColumnReference.of(table.getTableReference(), colRef.getColumn())));
+                                    ColumnReference.of(table.getTableReference(), colRef.column())));
                         }
                     } else {
                         updatedProjections.add(scalarProj);
@@ -210,7 +210,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return switch (aggCall) {
             case AggregateCallImpl impl -> {
                 if (impl.getExpression() instanceof ColumnReference colRef) {
-                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.getColumn());
+                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.column());
                     yield switch (impl.getOperator()) {
                         case MAX -> AggregateCall.max(updatedColRef);
                         case MIN -> AggregateCall.min(updatedColRef);
@@ -223,7 +223,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
             }
             case CountDistinct cd -> {
                 if (cd.getExpression() instanceof ColumnReference colRef) {
-                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.getColumn());
+                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.column());
                     yield AggregateCall.countDistinct(updatedColRef);
                 }
                 yield cd;
