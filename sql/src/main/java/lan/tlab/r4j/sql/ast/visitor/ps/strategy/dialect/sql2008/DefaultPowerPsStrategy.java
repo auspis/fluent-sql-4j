@@ -12,8 +12,8 @@ public class DefaultPowerPsStrategy implements PowerPsStrategy {
 
     @Override
     public PsDto handle(Power power, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto baseResult = power.getBase().accept(renderer, ctx);
-        PsDto exponentResult = power.getExponent().accept(renderer, ctx);
+        PsDto baseResult = power.base().accept(renderer, ctx);
+        PsDto exponentResult = power.exponent().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(baseResult.parameters());
