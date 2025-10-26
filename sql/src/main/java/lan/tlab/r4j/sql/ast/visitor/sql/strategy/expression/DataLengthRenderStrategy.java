@@ -10,7 +10,7 @@ public interface DataLengthRenderStrategy extends ExpressionRenderStrategy {
 
     public static DataLengthRenderStrategy sqlServer() {
         return (functionCall, sqlRenderer, ctx) ->
-                String.format("DATALENGTH(%s)", functionCall.getExpression().accept(sqlRenderer, ctx));
+                String.format("DATALENGTH(%s)", functionCall.expression().accept(sqlRenderer, ctx));
     }
 
     public static DataLengthRenderStrategy standardSql2008() {

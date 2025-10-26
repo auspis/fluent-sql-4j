@@ -11,10 +11,10 @@ public class DefaultCastPsStrategy implements CastPsStrategy {
     @Override
     public PsDto handle(Cast cast, PreparedStatementRenderer renderer, AstContext ctx) {
         // Visit the inner expression to get its SQL and parameters
-        PsDto expressionDto = cast.getExpression().accept(renderer, ctx);
+        PsDto expressionDto = cast.expression().accept(renderer, ctx);
 
         // Build the CAST SQL syntax
-        String sql = "CAST(" + expressionDto.sql() + " AS " + cast.getDataType() + ")";
+        String sql = "CAST(" + expressionDto.sql() + " AS " + cast.dataType() + ")";
 
         // Return the parameters from the inner expression
         return new PsDto(sql, expressionDto.parameters());
