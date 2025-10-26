@@ -7,7 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class LikeRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Like expression, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format(
-                "%s LIKE '%s'", expression.getExpression().accept(sqlRenderer, ctx), expression.getPattern());
+        return String.format("%s LIKE '%s'", expression.expression().accept(sqlRenderer, ctx), expression.pattern());
     }
 }
