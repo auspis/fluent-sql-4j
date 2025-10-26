@@ -13,7 +13,7 @@ public class DefaultFromClausePsStrategy implements FromClausePsStrategy {
     public PsDto handle(From clause, Visitor<PsDto> renderer, AstContext ctx) {
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-        for (var source : clause.getSources()) {
+        for (var source : clause.sources()) {
             PsDto res = source.accept(renderer, ctx);
             sqlParts.add(res.sql());
             params.addAll(res.parameters());
