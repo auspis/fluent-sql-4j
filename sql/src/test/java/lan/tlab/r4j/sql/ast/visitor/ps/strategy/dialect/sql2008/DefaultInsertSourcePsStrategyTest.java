@@ -14,7 +14,6 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class DefaultInsertSourcePsStrategyTest {
@@ -58,9 +57,7 @@ class DefaultInsertSourcePsStrategyTest {
             """);
     }
 
-    // FIXME: enable this test as soon as all ps strategies will be ok
     @Test
-    @Disabled
     void empty() {
         InsertSource item = new InsertSource(new NullSetExpression());
         PsDto result = strategy.handle(item, visitor, new AstContext());
