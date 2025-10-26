@@ -7,22 +7,10 @@ import lan.tlab.r4j.sql.ast.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Singular;
-import lombok.ToString;
 
 public interface ConstraintDefinition extends Visitable {
 
-    @AllArgsConstructor
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class PrimaryKeyDefinition implements ConstraintDefinition {
-        @Singular
-        private final List<String> columns;
+    public static record PrimaryKeyDefinition(List<String> columns) implements ConstraintDefinition {
 
         public PrimaryKeyDefinition(String... columns) {
             this(Stream.of(columns).toList());
@@ -34,23 +22,14 @@ public interface ConstraintDefinition extends Visitable {
         }
     }
 
-    @NoArgsConstructor
-    @EqualsAndHashCode
-    @ToString
-    public static class NotNullConstraintDefinition implements ConstraintDefinition {
+    public static record NotNullConstraintDefinition() implements ConstraintDefinition {
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
             return visitor.visit(this, ctx);
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public class UniqueConstraintDefinition implements ConstraintDefinition {
-
-        private final List<String> columns;
+    public static record UniqueConstraintDefinition(List<String> columns) implements ConstraintDefinition {
 
         public UniqueConstraintDefinition(String... columns) {
             this(Stream.of(columns).toList());
@@ -62,13 +41,8 @@ public interface ConstraintDefinition extends Visitable {
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class ForeignKeyConstraintDefinition implements ConstraintDefinition {
-        private final List<String> columns;
-        private final ReferencesItem references;
+    public static record ForeignKeyConstraintDefinition(List<String> columns, ReferencesItem references)
+            implements ConstraintDefinition {
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
@@ -76,12 +50,7 @@ public interface ConstraintDefinition extends Visitable {
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class CheckConstraintDefinition implements ConstraintDefinition {
-        private final Predicate expression;
+    public static record CheckConstraintDefinition(Predicate expression) implements ConstraintDefinition {
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
@@ -89,12 +58,7 @@ public interface ConstraintDefinition extends Visitable {
         }
     }
 
-    @AllArgsConstructor
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class DefaultConstraintDefinition implements ConstraintDefinition {
-        private final ScalarExpression value;
+    public static record DefaultConstraintDefinition(ScalarExpression value) implements ConstraintDefinition {
 
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {

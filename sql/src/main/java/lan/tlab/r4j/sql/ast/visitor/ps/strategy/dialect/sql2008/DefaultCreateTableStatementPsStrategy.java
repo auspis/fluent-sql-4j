@@ -14,7 +14,7 @@ public class DefaultCreateTableStatementPsStrategy implements CreateTableStateme
         // For CREATE TABLE statements, we use the SQL renderer from the PreparedStatementRenderer
         // This ensures we use the same dialect configuration
         String sql = String.format(
-                "CREATE TABLE %s", createTableStatement.getTableDefinition().accept(renderer.getSqlRenderer(), ctx));
+                "CREATE TABLE %s", createTableStatement.tableDefinition().accept(renderer.getSqlRenderer(), ctx));
 
         return new PsDto(sql, Collections.emptyList());
     }
