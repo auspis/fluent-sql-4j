@@ -2,11 +2,6 @@
 
 ## Classi candidabili per conversione a record
 
-### TableIdentifier
-
-- Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/identifier/TableIdentifier.java`
-- Motivo: Campi `name` e `alias`, costruttori e getter, nessuno stato mutabile.
-
 ### AggregateCallProjection
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/clause/selection/projection/AggregateCallProjection.java`
