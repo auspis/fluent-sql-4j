@@ -17,10 +17,7 @@ class DefaultUpdateItemPsStrategyTest {
     @Test
     void shouldHandleUpdateItem() {
         // given
-        var updateItem = UpdateItem.builder()
-                .column(ColumnReference.of("table", "name"))
-                .value(Literal.of("John"))
-                .build();
+        var updateItem = new UpdateItem(ColumnReference.of("table", "name"), Literal.of("John"));
         var visitor = PreparedStatementRenderer.builder().build();
         var ctx = new AstContext();
 

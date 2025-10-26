@@ -5,21 +5,11 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.Builder;
-import lombok.Getter;
 
-@Builder
-@Getter
-public class UpdateItem implements Visitable {
-
-    private final ColumnReference column;
-    private final ScalarExpression value;
+public record UpdateItem(ColumnReference column, ScalarExpression value) implements Visitable {
 
     public static UpdateItem of(String column, ScalarExpression value) {
-        return UpdateItem.builder()
-                .column(ColumnReference.of("", column))
-                .value(value)
-                .build();
+        return new UpdateItem(ColumnReference.of("", column), value);
     }
 
     @Override
