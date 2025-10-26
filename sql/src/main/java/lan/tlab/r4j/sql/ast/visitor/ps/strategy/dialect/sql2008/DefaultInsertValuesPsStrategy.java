@@ -14,7 +14,7 @@ public class DefaultInsertValuesPsStrategy implements InsertValuesPsStrategy {
     public PsDto handle(InsertValues insertValues, Visitor<PsDto> renderer, AstContext ctx) {
         List<String> placeholders = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-        for (var expr : insertValues.getValueExpressions()) {
+        for (var expr : insertValues.valueExpressions()) {
             if (expr instanceof Literal<?> literal) {
                 placeholders.add("?");
                 params.add(literal.value());
