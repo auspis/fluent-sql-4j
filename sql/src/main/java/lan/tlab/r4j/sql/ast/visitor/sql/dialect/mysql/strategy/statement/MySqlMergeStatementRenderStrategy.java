@@ -63,7 +63,7 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
 
         // Render target table name only (MySQL INSERT doesn't support aliases after table name)
         sql.append(
-                sqlRenderer.getEscapeStrategy().apply(statement.getTargetTable().getName()));
+                sqlRenderer.getEscapeStrategy().apply(statement.getTargetTable().name()));
 
         // Render column list from WHEN NOT MATCHED INSERT
         if (!insertAction.columns().isEmpty()) {
