@@ -1,6 +1,7 @@
 package lan.tlab.r4j.sql.ast.clause.groupby;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.clause.Clause;
@@ -12,8 +13,12 @@ public record GroupBy(List<Expression> groupingExpressions) implements Clause {
 
     public GroupBy {
         if (groupingExpressions == null) {
-            groupingExpressions = new ArrayList<>();
+            groupingExpressions = Collections.unmodifiableList(new ArrayList<>());
         }
+    }
+
+    public static GroupBy nullObject() {
+        return new GroupBy(null);
     }
 
     public static GroupBy of(Expression... expressions) {

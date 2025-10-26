@@ -23,7 +23,7 @@ class OffsetRowsRenderStrategyTest {
 
     @Test
     void empty() {
-        Fetch pagination = new Fetch(0, null);
+        Fetch pagination = Fetch.nullObject();
 
         String sql = strategy.render(pagination, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("");

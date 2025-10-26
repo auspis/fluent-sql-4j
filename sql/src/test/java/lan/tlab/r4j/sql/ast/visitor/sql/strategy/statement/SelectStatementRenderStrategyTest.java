@@ -36,7 +36,7 @@ class SelectStatementRenderStrategyTest {
     @Test
     void star() {
         SelectStatement statement = SelectStatement.builder()
-                .from(From.builder().source(new TableIdentifier("users")).build())
+                .from(From.of(new TableIdentifier("users")))
                 .build();
 
         String sql = strategy.render(statement, renderer, new AstContext());
@@ -102,7 +102,7 @@ class SelectStatementRenderStrategyTest {
     @Test
     void orderBy() {
         SelectStatement statement = SelectStatement.builder()
-                .from(From.builder().source(new TableIdentifier("orders")).build())
+                .from(From.of(new TableIdentifier("orders")))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("orders", "orderDate"))))
                 .build();
 
