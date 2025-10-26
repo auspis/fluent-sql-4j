@@ -9,8 +9,8 @@ public class BinaryArithmeticExpressionRenderStrategy implements ExpressionRende
     public String render(BinaryArithmeticExpression expression, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "(%s %s %s)",
-                expression.getLhs().accept(sqlRenderer, ctx),
-                expression.getOperator(),
-                expression.getRhs().accept(sqlRenderer, ctx));
+                expression.lhs().accept(sqlRenderer, ctx),
+                expression.operator(),
+                expression.rhs().accept(sqlRenderer, ctx));
     }
 }
