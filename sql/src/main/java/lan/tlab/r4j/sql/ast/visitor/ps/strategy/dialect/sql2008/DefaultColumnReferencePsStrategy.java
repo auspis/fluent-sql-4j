@@ -19,10 +19,10 @@ public class DefaultColumnReferencePsStrategy implements ColumnReferencePsStrate
 
         boolean qualify = ctx.getScope() == AstContext.Scope.JOIN_ON || ctx.getScope() == AstContext.Scope.UNION;
         String sql;
-        if (qualify && !col.getTable().isBlank()) {
-            sql = escapeStrategy.apply(col.getTable()) + "." + escapeStrategy.apply(col.getColumn());
+        if (qualify && !col.table().isBlank()) {
+            sql = escapeStrategy.apply(col.table()) + "." + escapeStrategy.apply(col.column());
         } else {
-            sql = escapeStrategy.apply(col.getColumn());
+            sql = escapeStrategy.apply(col.column());
         }
         return new PsDto(sql, List.of());
     }

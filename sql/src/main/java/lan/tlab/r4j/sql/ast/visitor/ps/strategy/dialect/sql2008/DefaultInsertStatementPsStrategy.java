@@ -33,7 +33,7 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
             // Handle explicit values case
             // Column names
             List<String> columns = stmt.getColumns().stream()
-                    .map(ColumnReference::getColumn)
+                    .map(ColumnReference::column)
                     .map(name -> "\"" + name + "\"")
                     .collect(Collectors.toList());
             String columnList = String.join(", ", columns);
