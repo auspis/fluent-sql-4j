@@ -11,7 +11,7 @@ public class RoundRenderStrategy implements ExpressionRenderStrategy {
     public String render(Round functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                 "ROUND(%s)",
-                Stream.of(functionCall.getNumericExpression(), functionCall.getDecimalPlaces())
+                Stream.of(functionCall.numericExpression(), functionCall.decimalPlaces())
                         .map(e -> e.accept(sqlRenderer, ctx))
                         .filter(s -> !s.isBlank())
                         .collect(Collectors.joining(", ")));

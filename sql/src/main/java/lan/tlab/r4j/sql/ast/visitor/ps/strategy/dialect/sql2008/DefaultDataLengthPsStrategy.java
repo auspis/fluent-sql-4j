@@ -10,7 +10,7 @@ public class DefaultDataLengthPsStrategy implements DataLengthPsStrategy {
 
     @Override
     public PsDto handle(DataLength dataLength, PreparedStatementRenderer renderer, AstContext ctx) {
-        var expressionResult = dataLength.getExpression().accept(renderer, ctx);
+        var expressionResult = dataLength.expression().accept(renderer, ctx);
 
         String sql = String.format("DATALENGTH(%s)", expressionResult.sql());
         return new PsDto(sql, expressionResult.parameters());

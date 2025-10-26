@@ -14,9 +14,9 @@ public class DefaultTrimPsStrategy implements TrimPsStrategy {
 
     @Override
     public PsDto handle(Trim functionCall, PreparedStatementRenderer renderer, AstContext ctx) {
-        TrimMode mode = functionCall.getMode();
-        ScalarExpression charactersToRemove = functionCall.getCharactersToRemove();
-        ScalarExpression stringExpression = functionCall.getStringExpression();
+        TrimMode mode = functionCall.mode();
+        ScalarExpression charactersToRemove = functionCall.charactersToRemove();
+        ScalarExpression stringExpression = functionCall.stringExpression();
 
         StringBuilder sb = new StringBuilder();
         sb.append("TRIM(");

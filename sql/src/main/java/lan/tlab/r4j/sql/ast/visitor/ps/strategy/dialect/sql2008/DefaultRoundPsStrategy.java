@@ -13,18 +13,18 @@ public class DefaultRoundPsStrategy implements RoundPsStrategy {
 
     @Override
     public PsDto handle(Round round, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto numericResult = round.getNumericExpression().accept(renderer, ctx);
+        PsDto numericResult = round.numericExpression().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>(numericResult.parameters());
         String sql;
 
         // Check if decimalPlaces is specified (not null)
-        if (round.getDecimalPlaces() instanceof NullScalarExpression) {
+        if (round.decimalPlaces() instanceof NullScalarExpression) {
             // ROUND with only one parameter
             sql = String.format("ROUND(%s)", numericResult.sql());
         } else {
             // ROUND with two parameters
-            PsDto decimalPlacesResult = round.getDecimalPlaces().accept(renderer, ctx);
+            PsDto decimalPlacesResult = round.decimalPlaces().accept(renderer, ctx);
             parameters.addAll(decimalPlacesResult.parameters());
             sql = String.format("ROUND(%s, %s)", numericResult.sql(), decimalPlacesResult.sql());
         }
