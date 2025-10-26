@@ -43,7 +43,7 @@ public class DefaultInsertStatementPsStrategy implements InsertStatementPsStrate
             String placeholders = values.getValueExpressions().stream()
                     .map(val -> {
                         if (val instanceof Literal<?> literal) {
-                            params.add(literal.getValue());
+                            params.add(literal.value());
                         } else {
                             params.add(null); // fallback
                         }
