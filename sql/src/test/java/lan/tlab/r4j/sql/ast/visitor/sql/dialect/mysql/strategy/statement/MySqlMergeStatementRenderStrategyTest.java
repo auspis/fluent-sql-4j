@@ -62,7 +62,7 @@ class MySqlMergeStatementRenderStrategyTest {
         assertThat(sql)
                 .isEqualTo(
                         """
-                INSERT INTO `users` AS tgt (`id`, `name`, `email`) \
+                INSERT INTO `users` (`id`, `name`, `email`) \
                 SELECT `src`.`id`, `src`.`name`, `src`.`email` \
                 FROM `users_updates` AS src \
                 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `email` = VALUES(`email`)\
