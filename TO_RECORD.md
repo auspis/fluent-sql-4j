@@ -96,10 +96,11 @@ Queste classi ampliano la lista dei record candidati, favorendo la chiarezza e l
 
 ## Candidati record dal package statement/dql
 
-### SelectStatement
+### SelectStatement (ignorare)
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/dql/SelectStatement.java`
 - Motivo: Campi final, builder pattern, nessun comportamento mutabile.
+- Nota: necessita di un intervento manuale per introdurre il builder: ha tanti field e forse il record non è la soluzione
 
 ## Candidati record dai package statement/dml
 
@@ -197,20 +198,5 @@ Queste classi ampliano la lista dei record candidati, favorendo la chiarezza e l
 ### IndexDefinition
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/IndexDefinition.java`
-- Motivo: Campi final, costruttore, nessun comportamento mutabile.
-
-### ColumnDefinition
-
-- Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ColumnDefinition.java`
-- Motivo: Campi final, builder pattern, nessun comportamento mutabile.
-
-### TableDefinition
-
-- Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/TableDefinition.java`
-- Motivo: Campi final, builder pattern, nessun comportamento mutabile.
-
-### ReferencesItem
-
-- Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/statement/ddl/definition/ReferencesItem.java`
 - Motivo: Campi final, costruttore, nessun comportamento mutabile.
 
