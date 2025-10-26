@@ -7,29 +7,36 @@ import lan.tlab.r4j.sql.ast.clause.Clause;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
 
-@Builder
-@AllArgsConstructor
-@Getter
-public class Select implements Clause {
-
-    @Singular
-    private final List<Projection> projections;
+public record Select(List<Projection> projections) implements Clause {
 
     public Select() {
         this(new ArrayList<>());
     }
 
     public static Select of(Projection... items) {
-        return of(Stream.of(items).toList());
+        return new Select(Stream.of(items).toList());
     }
 
     public static Select of(List<Projection> items) {
-        return builder().projections(items).build();
+        return new Select(items);
+    }
+
+    public static SelectBuilder builder() {
+        return new SelectBuilder();
+    }
+
+    public static class SelectBuilder {
+        private List<Projection> projections = new ArrayList<>();
+
+        public SelectBuilder projection(Projection projection) {
+            this.projections.add(projection);
+            return this;
+        }
+
+        public Select build() {
+            return new Select(projections);
+        }
     }
 
     @Override
