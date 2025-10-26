@@ -4,21 +4,22 @@ import java.util.Objects;
 import lan.tlab.r4j.sql.ast.clause.Clause;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
 
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-public class Fetch implements Clause {
+public record Fetch(Integer offset, Integer rows) implements Clause {
 
-    @Default
-    private final Integer offset = 0;
+    public Fetch {
+        if (offset == null) {
+            offset = 0;
+        }
+    }
 
-    private final Integer rows;
+    public static Fetch of(Integer rows) {
+        return new Fetch(0, rows);
+    }
+
+    public static Fetch of(Integer offset, Integer rows) {
+        return new Fetch(offset, rows);
+    }
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {

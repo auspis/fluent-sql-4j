@@ -13,8 +13,8 @@ public class MySqlLimitOffsetRenderStrategy implements FetchRenderStrategy {
             return "";
         }
 
-        Integer offset = clause.getOffset();
-        Integer rows = clause.getRows();
+        Integer offset = clause.offset();
+        Integer rows = clause.rows();
         return String.format("LIMIT %s OFFSET %s", rows, offset);
     }
 }

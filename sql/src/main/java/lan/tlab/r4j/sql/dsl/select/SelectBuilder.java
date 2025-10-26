@@ -290,8 +290,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         }
 
         return updateFetch(fetch -> {
-            int currentOffset = fetch != null ? fetch.getOffset() : 0;
-            return Fetch.builder().offset(currentOffset).rows(rows).build();
+            int currentOffset = fetch != null ? fetch.offset() : 0;
+            return Fetch.of(currentOffset, rows);
         });
     }
 
@@ -301,8 +301,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         }
 
         return updateFetch(fetch -> {
-            Integer currentRows = fetch != null ? fetch.getRows() : null;
-            return Fetch.builder().offset(offset).rows(currentRows).build();
+            Integer currentRows = fetch != null ? fetch.rows() : null;
+            return Fetch.of(offset, currentRows);
         });
     }
 
