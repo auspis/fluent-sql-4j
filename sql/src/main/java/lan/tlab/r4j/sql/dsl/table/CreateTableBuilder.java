@@ -94,7 +94,7 @@ public class CreateTableBuilder {
 
     void addColumn(ColumnDefinition column) {
         // replace existing column with same name if present
-        columns.removeIf(c -> c.getName().equals(column.getName()));
+        columns.removeIf(c -> c.name().equals(column.name()));
         columns.add(column);
     }
 
@@ -142,12 +142,12 @@ public class CreateTableBuilder {
     public CreateTableBuilder notNullColumn(String columnName) {
         for (int i = 0; i < columns.size(); i++) {
             ColumnDefinition c = columns.get(i);
-            if (c.getName().equals(columnName)) {
+            if (c.name().equals(columnName)) {
                 ColumnDefinition updated = ColumnDefinition.builder()
-                        .name(c.getName())
-                        .type(c.getType())
+                        .name(c.name())
+                        .type(c.type())
                         .notNullConstraint(new NotNullConstraintDefinition())
-                        .defaultConstraint(c.getDefaultConstraint())
+                        .defaultConstraint(c.defaultConstraint())
                         .build();
 
                 columns.set(i, updated);
