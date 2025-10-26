@@ -13,10 +13,10 @@ public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrate
     @Override
     public PsDto handle(UpdateStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
         // TableIdentifier name
-        PsDto tableDto = stmt.getTable().accept(renderer, ctx); // Usa il visitor su qualunque TableExpression
+        PsDto tableDto = stmt.table().accept(renderer, ctx); // Usa il visitor su qualunque TableExpression
         String tableName = tableDto.sql();
 
-        List<UpdateItem> setItems = stmt.getSet();
+        List<UpdateItem> setItems = stmt.set();
         List<String> setClauses = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (UpdateItem item : setItems) {
@@ -32,8 +32,8 @@ public class DefaultUpdateStatementPsStrategy implements UpdateStatementPsStrate
         // WHERE
         String whereSql = "";
         List<Object> whereParams = new ArrayList<>();
-        if (stmt.getWhere() != null) {
-            PsDto whereDto = stmt.getWhere().accept(renderer, ctx);
+        if (stmt.where() != null) {
+            PsDto whereDto = stmt.where().accept(renderer, ctx);
             if (whereDto.sql() != null && !whereDto.sql().isBlank()) {
                 whereSql = " WHERE " + whereDto.sql();
                 whereParams.addAll(whereDto.parameters());

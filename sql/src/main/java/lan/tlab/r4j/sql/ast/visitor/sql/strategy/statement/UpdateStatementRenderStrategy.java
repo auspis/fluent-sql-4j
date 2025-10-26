@@ -8,14 +8,14 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class UpdateStatementRenderStrategy implements StatementRenderStrategy {
 
     public String render(UpdateStatement statement, SqlRenderer sqlRenderer, AstContext ctx) {
-        String setList = statement.getSet().stream()
+        String setList = statement.set().stream()
                 .map(item -> sqlRenderer.visit(item, ctx))
                 .collect(Collectors.joining(", "));
         return String.format(
                         "UPDATE %s SET %s %s",
-                        statement.getTable().accept(sqlRenderer, ctx),
+                        statement.table().accept(sqlRenderer, ctx),
                         setList,
-                        statement.getWhere().accept(sqlRenderer, ctx))
+                        statement.where().accept(sqlRenderer, ctx))
                 .trim();
     }
 }
