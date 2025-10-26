@@ -66,11 +66,11 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
     }
 
     static boolean hasValidCondition(Where where) {
-        return !(where.getCondition() instanceof NullPredicate);
+        return !(where.condition() instanceof NullPredicate);
     }
 
     static Where combineWithExisting(Where where, Predicate newCondition, LogicalCombinator combinator) {
-        Predicate existingCondition = where.getCondition();
+        Predicate existingCondition = where.condition();
         Predicate combinedCondition = combinator.combine(existingCondition, newCondition);
         return Where.of(combinedCondition);
     }

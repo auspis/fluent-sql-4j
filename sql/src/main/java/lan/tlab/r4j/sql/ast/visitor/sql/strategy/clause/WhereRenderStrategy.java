@@ -8,7 +8,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public class WhereRenderStrategy implements ClauseRenderStrategy {
 
     public String render(Where clause, SqlRenderer sqlRenderer, AstContext ctx) {
-        String sql = clause.getCondition().accept(sqlRenderer, ctx);
+        String sql = clause.condition().accept(sqlRenderer, ctx);
         if (Objects.isNull(sql) || sql.isBlank()) {
             return "";
         }

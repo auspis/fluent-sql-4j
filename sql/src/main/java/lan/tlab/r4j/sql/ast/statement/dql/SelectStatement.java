@@ -25,7 +25,7 @@ public class SelectStatement implements DataQueryStatement, TableExpression {
     private final From from = From.builder().build();
 
     @Default
-    private final Where where = Where.builder().build();
+    private final Where where = Where.nullObject();
 
     @Default
     private final GroupBy groupBy = new GroupBy(null);
