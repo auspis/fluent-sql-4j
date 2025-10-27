@@ -46,7 +46,7 @@ class ModRenderStrategyTest {
 
     @Test
     void testModWithArithmeticExpressions() {
-        Mod func = Mod.of(
+        Mod func = new Mod(
                 ArithmeticExpression.addition(ColumnReference.of("my_table", "x"), Literal.of(1)),
                 ArithmeticExpression.multiplication(ColumnReference.of("my_table", "y"), Literal.of(2)));
         String sql = strategy.render(func, sqlRenderer, new AstContext());

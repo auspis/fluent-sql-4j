@@ -25,10 +25,6 @@ public record Interval(ScalarExpression value, IntervalUnit unit) implements Sca
         MINUTE_SECOND // MySQL specific
     }
 
-    public static Interval of(ScalarExpression value, IntervalUnit unit) {
-        return new Interval(value, unit);
-    }
-
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
