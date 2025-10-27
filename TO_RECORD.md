@@ -65,7 +65,7 @@ La migrazione sistematica delle classi Lombok a Java records è stata completata
 3. **Replace** ✅ - Convertito a record con campi `expression`, `pattern`, `replacement`
 4. **UnaryString** ✅ - Convertito a record con campi `functionName`, `expression`
 5. **Cast** ✅ - Convertito a record con campi `expression`, `dataType`
-6. **ExtractDatePart** ✅ - Convertito a record con campi `functionName`, `dateExpression`
+6. **ExtractDatePart** ✅ - Convertito a record con campi `datePart`, `dateExpression` (enum DatePart invece di String)
 7. **DataLength** ✅ - Convertito a record con campo `expression`
 8. **DateArithmetic** ✅ - Convertito a record con campi `operation`, `dateExpression`, `interval` (enum Operation invece di boolean)
 9. **Concat** ✅ - Convertito a record con campi `separator`, `stringExpressions`
