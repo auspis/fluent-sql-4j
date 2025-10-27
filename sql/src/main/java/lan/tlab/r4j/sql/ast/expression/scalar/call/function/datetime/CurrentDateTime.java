@@ -3,9 +3,7 @@ package lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lombok.Getter;
 
-@Getter
 public class CurrentDateTime implements FunctionCall {
 
     @Override
