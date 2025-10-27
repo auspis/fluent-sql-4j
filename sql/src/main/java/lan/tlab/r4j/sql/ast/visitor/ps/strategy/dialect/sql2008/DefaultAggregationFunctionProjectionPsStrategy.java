@@ -18,12 +18,12 @@ public class DefaultAggregationFunctionProjectionPsStrategy implements Aggregati
         }
 
         // The AggregationFunctionProjection wraps an AggregateCall (e.g., COUNT, SUM, etc.)
-        var expr = aggregationFunctionProjection.getExpression();
+        var expr = aggregationFunctionProjection.expression();
         PsDto exprResult = expr.accept(renderer, ctx);
         String sql = exprResult.sql();
         // Handle alias if present
-        String alias = aggregationFunctionProjection.getAs() != null
-                ? aggregationFunctionProjection.getAs().name()
+        String alias = aggregationFunctionProjection.as() != null
+                ? aggregationFunctionProjection.as().name()
                 : null;
         if (alias != null && !alias.isBlank()) {
             sql += " AS " + escapeStrategy.apply(alias);
