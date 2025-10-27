@@ -5,18 +5,24 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
-public record ExtractDatePart(String functionName, ScalarExpression dateExpression) implements FunctionCall {
+public record ExtractDatePart(FunctionName functionName, ScalarExpression dateExpression) implements FunctionCall {
+
+    public enum FunctionName {
+        YEAR,
+        MONTH,
+        DAY
+    }
 
     public static ExtractDatePart year(ScalarExpression dateExpression) {
-        return new ExtractDatePart("YEAR", dateExpression);
+        return new ExtractDatePart(FunctionName.YEAR, dateExpression);
     }
 
     public static ExtractDatePart month(ScalarExpression dateExpression) {
-        return new ExtractDatePart("MONTH", dateExpression);
+        return new ExtractDatePart(FunctionName.MONTH, dateExpression);
     }
 
     public static ExtractDatePart day(ScalarExpression dateExpression) {
-        return new ExtractDatePart("DAY", dateExpression);
+        return new ExtractDatePart(FunctionName.DAY, dateExpression);
     }
 
     @Override
