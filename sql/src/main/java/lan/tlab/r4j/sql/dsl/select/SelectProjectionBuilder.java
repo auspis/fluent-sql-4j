@@ -104,10 +104,10 @@ public class SelectProjectionBuilder {
 
         // Replace pending projection with aliased version
         if (pendingProjection instanceof AggregateCallProjection aggProj) {
-            pendingProjection = new AggregateCallProjection((AggregateCall) aggProj.getExpression(), alias);
+            pendingProjection = new AggregateCallProjection((AggregateCall) aggProj.expression(), alias);
         } else if (pendingProjection instanceof ScalarExpressionProjection scalarProj) {
             pendingProjection = new ScalarExpressionProjection(
-                    (lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression) scalarProj.getExpression(), alias);
+                    (lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression) scalarProj.expression(), alias);
         }
 
         return this;
