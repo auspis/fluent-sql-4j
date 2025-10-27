@@ -6,10 +6,9 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
-public record UnaryNumeric(UnaryNumericFunctionName functionName, ScalarExpression numericExpression)
-        implements FunctionCall {
+public record UnaryNumeric(FunctionName functionName, ScalarExpression numericExpression) implements FunctionCall {
 
-    public enum UnaryNumericFunctionName {
+    public enum FunctionName {
         ABS,
         CEIL,
         FLOOR,
@@ -21,7 +20,7 @@ public record UnaryNumeric(UnaryNumericFunctionName functionName, ScalarExpressi
     }
 
     public static UnaryNumeric abs(ScalarExpression numericExpression) {
-        return new UnaryNumeric(UnaryNumericFunctionName.ABS, numericExpression);
+        return new UnaryNumeric(FunctionName.ABS, numericExpression);
     }
 
     public static UnaryNumeric ceil(Number value) {
@@ -29,7 +28,7 @@ public record UnaryNumeric(UnaryNumericFunctionName functionName, ScalarExpressi
     }
 
     public static UnaryNumeric ceil(ScalarExpression numericExpression) {
-        return new UnaryNumeric(UnaryNumericFunctionName.CEIL, numericExpression);
+        return new UnaryNumeric(FunctionName.CEIL, numericExpression);
     }
 
     public static UnaryNumeric floor(Number value) {
@@ -37,7 +36,7 @@ public record UnaryNumeric(UnaryNumericFunctionName functionName, ScalarExpressi
     }
 
     public static UnaryNumeric floor(ScalarExpression numericExpression) {
-        return new UnaryNumeric(UnaryNumericFunctionName.FLOOR, numericExpression);
+        return new UnaryNumeric(FunctionName.FLOOR, numericExpression);
     }
 
     public static UnaryNumeric sqrt(Number value) {
@@ -45,7 +44,7 @@ public record UnaryNumeric(UnaryNumericFunctionName functionName, ScalarExpressi
     }
 
     public static UnaryNumeric sqrt(ScalarExpression numericExpression) {
-        return new UnaryNumeric(UnaryNumericFunctionName.SQRT, numericExpression);
+        return new UnaryNumeric(FunctionName.SQRT, numericExpression);
     }
 
     @Override

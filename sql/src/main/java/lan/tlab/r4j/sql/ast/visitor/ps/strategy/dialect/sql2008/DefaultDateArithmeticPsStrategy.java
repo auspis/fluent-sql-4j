@@ -19,7 +19,7 @@ public class DefaultDateArithmeticPsStrategy implements DateArithmeticPsStrategy
         parameters.addAll(intervalResult.parameters());
         parameters.addAll(dateExpressionResult.parameters());
 
-        String operation = dateArithmetic.add() ? "DATEADD" : "DATESUB";
+        String operation = dateArithmetic.isAddition() ? "DATEADD" : "DATESUB";
         String sql = String.format("%s(%s, %s)", operation, intervalResult.sql(), dateExpressionResult.sql());
 
         return new PsDto(sql, parameters);
