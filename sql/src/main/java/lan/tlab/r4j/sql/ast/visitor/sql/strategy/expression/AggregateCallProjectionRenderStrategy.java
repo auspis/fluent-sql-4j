@@ -9,8 +9,8 @@ public class AggregateCallProjectionRenderStrategy implements ExpressionRenderSt
     public String render(AggregateCallProjection projection, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format(
                         "%s %s",
-                        projection.getExpression().accept(sqlRenderer, ctx),
-                        projection.getAs().accept(sqlRenderer, ctx))
+                        projection.expression().accept(sqlRenderer, ctx),
+                        projection.as().accept(sqlRenderer, ctx))
                 .trim();
     }
 }
