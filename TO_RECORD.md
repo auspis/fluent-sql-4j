@@ -102,5 +102,3 @@ Dopo la migrazione iniziale, è stato deciso di convertire **UnaryString** e **D
 - **Soluzione**: Classi finali con costruttori privati + factory methods pubblici
 - **Vantaggio**: Controllo completo sull'istanziazione mantenendo immutabilità e API identica
 
-// TODO: evaluate if the record is the correct solution: the creation should go only throght factory methods. see DateArithmetic.java
-
