@@ -91,6 +91,16 @@ La migrazione sistematica delle classi Lombok a Java records è stata completata
 - Pattern applicato: Conversione a record + aggiornamento sistematico client code
 - Fix speciali: MySQL DateArithmetic strategy modificata per costruzione diretta INTERVAL string
 - Validazione: Compilazione e test completi dopo ogni conversione
+- **Correzione post-migrazione**: UnaryString e DateArithmetic convertiti da record a classi finali tradizionali per forzare l'uso esclusivo dei factory methods
+
+### Classi Convertite a Classi Finali Tradizionali
+
+Dopo la migrazione iniziale, è stato deciso di convertire **UnaryString** e **DateArithmetic** da record a classi finali tradizionali perché:
+
+- **Problema**: I record espongono costruttori canonici pubblici che permettono istanziazione diretta
+- **Requisito**: Queste classi dovrebbero essere istanziate solo attraverso factory methods controllati
+- **Soluzione**: Classi finali con costruttori privati + factory methods pubblici
+- **Vantaggio**: Controllo completo sull'istanziazione mantenendo immutabilità e API identica
 
 // TODO: evaluate if the record is the correct solution: the creation should go only throght factory methods. see DateArithmetic.java
 
