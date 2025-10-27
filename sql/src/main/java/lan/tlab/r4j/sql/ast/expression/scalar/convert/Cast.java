@@ -8,6 +8,7 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
 public record Cast(ScalarExpression expression, String dataType) implements FunctionCall {
 
     // TODO: move to DSL
+    // TODO: evaluate enum see UnaryString
     //    public static final String SQL_VARCHAR_255 = "VARCHAR(255)";
     //    public static final String SQL_NVARCHAR_50 = "NVARCHAR(50)";
     //    public static final String SQL_INT = "INT";
