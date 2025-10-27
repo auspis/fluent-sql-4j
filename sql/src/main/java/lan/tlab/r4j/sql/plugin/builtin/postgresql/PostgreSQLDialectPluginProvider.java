@@ -23,7 +23,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
  * Developers do not typically interact with this class directly. Instead, the plugin
  * is automatically discovered when creating a registry with ServiceLoader:
  * <pre>{@code
- * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+ * SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
  * // PostgreSQLDialectPlugin is now registered and available
  * }</pre>
  * <p>

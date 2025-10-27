@@ -45,7 +45,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
  * <b>Usage Example:</b>
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
- * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+ * SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
  * Result<DialectRenderer> result = registry.getRenderer("postgresql", "14.5");
  *
  * // Or created directly
