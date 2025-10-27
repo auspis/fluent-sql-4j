@@ -130,12 +130,6 @@ public class MergeBuilder {
         return new WhenMatchedUpdateBuilder(this, condition);
     }
 
-    public MergeBuilder whenMatchedThenDelete() {
-        // TODO: remove null
-        this.actions.add(new WhenMatchedDelete(null));
-        return this;
-    }
-
     public MergeBuilder whenMatchedThenDelete(Predicate condition) {
         this.actions.add(new WhenMatchedDelete(condition));
         return this;
