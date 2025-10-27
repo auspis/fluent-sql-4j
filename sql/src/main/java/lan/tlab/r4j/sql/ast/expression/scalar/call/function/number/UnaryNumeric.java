@@ -6,14 +6,22 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.FunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
-public record UnaryNumeric(String functionName, ScalarExpression numericExpression) implements FunctionCall {
+public record UnaryNumeric(UnaryNumericFunctionName functionName, ScalarExpression numericExpression)
+        implements FunctionCall {
+
+    public enum UnaryNumericFunctionName {
+        ABS,
+        CEIL,
+        FLOOR,
+        SQRT
+    }
 
     public static UnaryNumeric abs(Number value) {
         return abs(Literal.of(value));
     }
 
     public static UnaryNumeric abs(ScalarExpression numericExpression) {
-        return new UnaryNumeric("ABS", numericExpression);
+        return new UnaryNumeric(UnaryNumericFunctionName.ABS, numericExpression);
     }
 
     public static UnaryNumeric ceil(Number value) {
@@ -21,7 +29,7 @@ public record UnaryNumeric(String functionName, ScalarExpression numericExpressi
     }
 
     public static UnaryNumeric ceil(ScalarExpression numericExpression) {
-        return new UnaryNumeric("CEIL", numericExpression);
+        return new UnaryNumeric(UnaryNumericFunctionName.CEIL, numericExpression);
     }
 
     public static UnaryNumeric floor(Number value) {
@@ -29,7 +37,7 @@ public record UnaryNumeric(String functionName, ScalarExpression numericExpressi
     }
 
     public static UnaryNumeric floor(ScalarExpression numericExpression) {
-        return new UnaryNumeric("FLOOR", numericExpression);
+        return new UnaryNumeric(UnaryNumericFunctionName.FLOOR, numericExpression);
     }
 
     public static UnaryNumeric sqrt(Number value) {
@@ -37,7 +45,7 @@ public record UnaryNumeric(String functionName, ScalarExpression numericExpressi
     }
 
     public static UnaryNumeric sqrt(ScalarExpression numericExpression) {
-        return new UnaryNumeric("SQRT", numericExpression);
+        return new UnaryNumeric(UnaryNumericFunctionName.SQRT, numericExpression);
     }
 
     @Override
