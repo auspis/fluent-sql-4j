@@ -169,15 +169,13 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
             for (var projection : currentSelect.projections()) {
                 if (projection instanceof ScalarExpressionProjection scalarProj
-                        && scalarProj.getExpression() instanceof ColumnReference colRef) {
+                        && scalarProj.expression() instanceof ColumnReference colRef) {
 
                     if (!"*".equals(colRef.column())) {
                         // Preserve the alias if present
-                        if (scalarProj.getAs() != null
-                                && !scalarProj.getAs().name().isEmpty()) {
+                        if (scalarProj.as() != null && !scalarProj.as().name().isEmpty()) {
                             updatedProjections.add(new ScalarExpressionProjection(
-                                    ColumnReference.of(table.getTableReference(), colRef.column()),
-                                    scalarProj.getAs()));
+                                    ColumnReference.of(table.getTableReference(), colRef.column()), scalarProj.as()));
                         } else {
                             updatedProjections.add(new ScalarExpressionProjection(
                                     ColumnReference.of(table.getTableReference(), colRef.column())));
@@ -187,10 +185,10 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                     }
                 } else if (projection instanceof AggregateCallProjection aggProj) {
                     // Update aggregate call projections with table reference
-                    AggregateCall aggCall = (AggregateCall) aggProj.getExpression();
+                    AggregateCall aggCall = (AggregateCall) aggProj.expression();
                     AggregateCall updatedAggCall = updateAggregateCallWithTable(aggCall, table);
-                    if (aggProj.getAs() != null && !aggProj.getAs().name().isEmpty()) {
-                        updatedProjections.add(new AggregateCallProjection(updatedAggCall, aggProj.getAs()));
+                    if (aggProj.as() != null && !aggProj.as().name().isEmpty()) {
+                        updatedProjections.add(new AggregateCallProjection(updatedAggCall, aggProj.as()));
                     } else {
                         updatedProjections.add(new AggregateCallProjection(updatedAggCall));
                     }
