@@ -13,7 +13,7 @@ public interface DateArithmeticRenderStrategy extends ExpressionRenderStrategy {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "%s %s %s",
                 functionCall.dateExpression().accept(sqlRenderer, ctx),
-                functionCall.add() ? "+" : "-",
+                functionCall.isAddition() ? "+" : "-",
                 functionCall.interval().accept(sqlRenderer, ctx));
     }
 
@@ -21,7 +21,7 @@ public interface DateArithmeticRenderStrategy extends ExpressionRenderStrategy {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "DATEADD(%s, %s%s, %s)",
                 functionCall.interval().unit(),
-                functionCall.add() ? "" : "-",
+                functionCall.isAddition() ? "" : "-",
                 functionCall.interval().value().accept(sqlRenderer, ctx),
                 functionCall.dateExpression().accept(sqlRenderer, ctx));
     }
@@ -29,7 +29,7 @@ public interface DateArithmeticRenderStrategy extends ExpressionRenderStrategy {
     public static DateArithmeticRenderStrategy mysql() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "%s(%s, INTERVAL %s %s)",
-                functionCall.add() ? "DATE_ADD" : "DATE_SUB",
+                functionCall.isAddition() ? "DATE_ADD" : "DATE_SUB",
                 functionCall.dateExpression().accept(sqlRenderer, ctx),
                 functionCall.interval().value().accept(sqlRenderer, ctx),
                 functionCall.interval().unit().name());

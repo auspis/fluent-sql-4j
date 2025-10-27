@@ -28,7 +28,7 @@ class DateArithmeticMySqlRenderStrategyTest {
 
     @Test
     void add() {
-        DateArithmetic exp = DateArithmetic.add(
+        DateArithmetic exp = DateArithmetic.addition(
                 ColumnReference.of("my_table", "start_date"), new Interval(Literal.of(7), IntervalUnit.DAY));
         String sql = strategy.render(exp, renderer, new AstContext());
         assertThat(sql).isEqualTo("DATE_ADD(`my_table`.`start_date`, INTERVAL 7 DAY)");
@@ -36,8 +36,8 @@ class DateArithmeticMySqlRenderStrategyTest {
 
     @Test
     void add_manyIntervals() {
-        DateArithmetic exp = DateArithmetic.add(
-                DateArithmetic.add(
+        DateArithmetic exp = DateArithmetic.addition(
+                DateArithmetic.addition(
                         ColumnReference.of("my_table", "start_date"), new Interval(Literal.of(1), IntervalUnit.YEAR)),
                 new Interval(Literal.of(7), IntervalUnit.DAY));
         String sql = strategy.render(exp, renderer, new AstContext());
@@ -46,7 +46,7 @@ class DateArithmeticMySqlRenderStrategyTest {
 
     @Test
     void subtract() {
-        DateArithmetic exp = DateArithmetic.subtract(
+        DateArithmetic exp = DateArithmetic.subtraction(
                 ColumnReference.of("my_table", "start_date"), new Interval(Literal.of(7), IntervalUnit.DAY));
         String sql = strategy.render(exp, renderer, new AstContext());
         assertThat(sql).isEqualTo("DATE_SUB(`my_table`.`start_date`, INTERVAL 7 DAY)");
@@ -54,7 +54,8 @@ class DateArithmeticMySqlRenderStrategyTest {
 
     @Test
     void subtract_currrentDate() {
-        DateArithmetic exp = DateArithmetic.subtract(new CurrentDate(), new Interval(Literal.of(7), IntervalUnit.DAY));
+        DateArithmetic exp =
+                DateArithmetic.subtraction(new CurrentDate(), new Interval(Literal.of(7), IntervalUnit.DAY));
         String sql = strategy.render(exp, renderer, new AstContext());
         assertThat(sql).isEqualTo("DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
     }
