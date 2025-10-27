@@ -36,7 +36,7 @@ class DefaultRoundPsStrategyTest {
 
     @Test
     void roundWithLiteralAndDecimalPlaces() {
-        Round round = Round.of(Literal.of(3.14159), Literal.of(2));
+        Round round = new Round(Literal.of(3.14159), Literal.of(2));
 
         PsDto result = strategy.handle(round, visitor, ctx);
 
@@ -66,7 +66,7 @@ class DefaultRoundPsStrategyTest {
 
     @Test
     void roundWithMixedExpressions() {
-        Round round = Round.of(ColumnReference.of("orders", "amount"), Literal.of(3));
+        Round round = new Round(ColumnReference.of("orders", "amount"), Literal.of(3));
 
         PsDto result = strategy.handle(round, visitor, ctx);
 
