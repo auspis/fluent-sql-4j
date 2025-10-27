@@ -1354,7 +1354,7 @@ class PreparedStatementRendererTest {
     @Test
     void selectWithDateAddition() {
         var interval = new Interval(Literal.of(30), Interval.IntervalUnit.DAY);
-        var dateAdd = DateArithmetic.add(ColumnReference.of("orders", "created_date"), interval);
+        var dateAdd = DateArithmetic.addition(ColumnReference.of("orders", "created_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
                 .from(From.of(new TableIdentifier("orders")))
@@ -1368,7 +1368,7 @@ class PreparedStatementRendererTest {
     @Test
     void selectWithDateSubtraction() {
         var interval = new Interval(Literal.of(7), Interval.IntervalUnit.DAY);
-        var dateSub = DateArithmetic.subtract(ColumnReference.of("events", "event_date"), interval);
+        var dateSub = DateArithmetic.subtraction(ColumnReference.of("events", "event_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateSub)))
                 .from(From.of(new TableIdentifier("events")))
@@ -1382,7 +1382,7 @@ class PreparedStatementRendererTest {
     @Test
     void selectWithDateArithmeticSimple() {
         var interval = new Interval(Literal.of(1), Interval.IntervalUnit.MONTH);
-        var dateAdd = DateArithmetic.add(ColumnReference.of("subscriptions", "start_date"), interval);
+        var dateAdd = DateArithmetic.addition(ColumnReference.of("subscriptions", "start_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
                 .from(From.of(new TableIdentifier("subscriptions")))

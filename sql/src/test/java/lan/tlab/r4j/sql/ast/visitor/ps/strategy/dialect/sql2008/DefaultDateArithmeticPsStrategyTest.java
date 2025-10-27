@@ -17,7 +17,7 @@ class DefaultDateArithmeticPsStrategyTest {
     void handlesDateAddWithLiteral() {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(30), Interval.IntervalUnit.DAY);
-        var dateArithmetic = DateArithmetic.add(ColumnReference.of("orders", "created_date"), interval);
+        var dateArithmetic = DateArithmetic.addition(ColumnReference.of("orders", "created_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
@@ -31,7 +31,7 @@ class DefaultDateArithmeticPsStrategyTest {
     void handlesDateSubtractWithLiteral() {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(7), Interval.IntervalUnit.DAY);
-        var dateArithmetic = DateArithmetic.subtract(ColumnReference.of("events", "event_date"), interval);
+        var dateArithmetic = DateArithmetic.subtraction(ColumnReference.of("events", "event_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
@@ -45,7 +45,7 @@ class DefaultDateArithmeticPsStrategyTest {
     void handlesDateAddWithMonthInterval() {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(3), Interval.IntervalUnit.MONTH);
-        var dateArithmetic = DateArithmetic.add(ColumnReference.of("subscriptions", "start_date"), interval);
+        var dateArithmetic = DateArithmetic.addition(ColumnReference.of("subscriptions", "start_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
@@ -59,7 +59,7 @@ class DefaultDateArithmeticPsStrategyTest {
     void handlesDateSubtractWithYearInterval() {
         var strategy = new DefaultDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(1), Interval.IntervalUnit.YEAR);
-        var dateArithmetic = DateArithmetic.subtract(ColumnReference.of("employees", "hire_date"), interval);
+        var dateArithmetic = DateArithmetic.subtraction(ColumnReference.of("employees", "hire_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
