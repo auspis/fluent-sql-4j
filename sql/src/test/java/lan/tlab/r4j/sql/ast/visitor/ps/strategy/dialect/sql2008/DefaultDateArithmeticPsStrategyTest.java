@@ -16,7 +16,7 @@ class DefaultDateArithmeticPsStrategyTest {
     @Test
     void handlesDateAddWithLiteral() {
         var strategy = new DefaultDateArithmeticPsStrategy();
-        var interval = Interval.of(Literal.of(30), Interval.IntervalUnit.DAY);
+        var interval = new Interval(Literal.of(30), Interval.IntervalUnit.DAY);
         var dateArithmetic = DateArithmetic.add(ColumnReference.of("orders", "created_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
@@ -30,7 +30,7 @@ class DefaultDateArithmeticPsStrategyTest {
     @Test
     void handlesDateSubtractWithLiteral() {
         var strategy = new DefaultDateArithmeticPsStrategy();
-        var interval = Interval.of(Literal.of(7), Interval.IntervalUnit.DAY);
+        var interval = new Interval(Literal.of(7), Interval.IntervalUnit.DAY);
         var dateArithmetic = DateArithmetic.subtract(ColumnReference.of("events", "event_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
@@ -44,7 +44,7 @@ class DefaultDateArithmeticPsStrategyTest {
     @Test
     void handlesDateAddWithMonthInterval() {
         var strategy = new DefaultDateArithmeticPsStrategy();
-        var interval = Interval.of(Literal.of(3), Interval.IntervalUnit.MONTH);
+        var interval = new Interval(Literal.of(3), Interval.IntervalUnit.MONTH);
         var dateArithmetic = DateArithmetic.add(ColumnReference.of("subscriptions", "start_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
@@ -58,7 +58,7 @@ class DefaultDateArithmeticPsStrategyTest {
     @Test
     void handlesDateSubtractWithYearInterval() {
         var strategy = new DefaultDateArithmeticPsStrategy();
-        var interval = Interval.of(Literal.of(1), Interval.IntervalUnit.YEAR);
+        var interval = new Interval(Literal.of(1), Interval.IntervalUnit.YEAR);
         var dateArithmetic = DateArithmetic.subtract(ColumnReference.of("employees", "hire_date"), interval);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
