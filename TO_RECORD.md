@@ -18,12 +18,6 @@
 - Motivo: Campi final, builder pattern, nessun comportamento mutabile.
 - Nota: Ha 7 campi, oltre il limite di 3 campi per costruttore record. Saltare per ora.
 
-### OnJoin (saltare)
-
-- Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/clause/from/source/join/OnJoin.java`
-- Motivo: Campi final, costruttori, nessun comportamento mutabile.
-- Nota: Ha 4 campi, oltre il limite di 3 campi per costruttore record. Saltare per ora.
-
 ### CountStar (saltare)
 
 - Percorso: `sql/src/main/java/lan/tlab/r4j/sql/ast/expression/scalar/call/aggregate/CountStar.java`
@@ -58,7 +52,7 @@
 
 La migrazione sistematica delle classi Lombok a Java records è stata completata con successo.
 
-### Classi Convertite (17 totali)
+### Classi Convertite (18 totali)
 
 1. **Trim** ✅ - Convertito a record con campo `expression`
 2. **Substring** ✅ - Convertito a record con campi `expression`, `start`, `length`
@@ -76,6 +70,9 @@ La migrazione sistematica delle classi Lombok a Java records è stata completata
 14. **Round** ✅ - Convertito a record con campi `numericExpression`, `decimalPlaces`
 15. **Interval** ✅ - Convertito a record con campi `value`, `unit`
 16. **Length** ✅ - Convertito a record con campo `expression`
+17. **OnJoin** ✅ - Convertito a record con campi `left`, `type`, `right`, `onCondition`
+18. **CurrentDate** ✅ - Convertito a record senza campi
+19. **CurrentDateTime** ✅ - Convertito a record senza campi
 
 ### Risultati della Migrazione
 
