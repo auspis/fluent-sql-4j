@@ -1,5 +1,6 @@
 package lan.tlab.r4j.sql.ast.expression.scalar.call.function.string;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
@@ -9,8 +10,12 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
 
 public record Concat(String separator, List<ScalarExpression> stringExpressions) implements FunctionCall {
 
+    public Concat(List<ScalarExpression> list) {
+        this("", Collections.unmodifiableList(list));
+    }
+
     public static Concat concat(ScalarExpression... expressions) {
-        return new Concat("", Stream.of(expressions).toList());
+        return new Concat(Stream.of(expressions).toList());
     }
 
     public static Concat concatWithSeparator(String separator, ScalarExpression... expressions) {
