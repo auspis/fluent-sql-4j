@@ -14,7 +14,7 @@ class DefaultIntervalPsStrategyTest {
     @Test
     void handlesIntervalWithLiteral() {
         var strategy = new DefaultIntervalPsStrategy();
-        var interval = Interval.of(Literal.of(30), Interval.IntervalUnit.DAY);
+        var interval = new Interval(Literal.of(30), Interval.IntervalUnit.DAY);
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
