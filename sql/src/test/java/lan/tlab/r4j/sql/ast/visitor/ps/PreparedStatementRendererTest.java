@@ -1353,7 +1353,7 @@ class PreparedStatementRendererTest {
 
     @Test
     void selectWithDateAddition() {
-        var interval = Interval.of(Literal.of(30), Interval.IntervalUnit.DAY);
+        var interval = new Interval(Literal.of(30), Interval.IntervalUnit.DAY);
         var dateAdd = DateArithmetic.add(ColumnReference.of("orders", "created_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
@@ -1367,7 +1367,7 @@ class PreparedStatementRendererTest {
 
     @Test
     void selectWithDateSubtraction() {
-        var interval = Interval.of(Literal.of(7), Interval.IntervalUnit.DAY);
+        var interval = new Interval(Literal.of(7), Interval.IntervalUnit.DAY);
         var dateSub = DateArithmetic.subtract(ColumnReference.of("events", "event_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateSub)))
@@ -1381,7 +1381,7 @@ class PreparedStatementRendererTest {
 
     @Test
     void selectWithDateArithmeticSimple() {
-        var interval = Interval.of(Literal.of(1), Interval.IntervalUnit.MONTH);
+        var interval = new Interval(Literal.of(1), Interval.IntervalUnit.MONTH);
         var dateAdd = DateArithmetic.add(ColumnReference.of("subscriptions", "start_date"), interval);
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(dateAdd)))
@@ -1910,7 +1910,7 @@ class PreparedStatementRendererTest {
 
     @Test
     void roundInSelectClause() {
-        Round roundFunction = Round.of(ColumnReference.of("products", "price"), Literal.of(2));
+        Round roundFunction = new Round(ColumnReference.of("products", "price"), Literal.of(2));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(roundFunction, new Alias("rounded_price"))))
                 .from(From.of(new TableIdentifier("products")))
@@ -1941,7 +1941,7 @@ class PreparedStatementRendererTest {
 
     @Test
     void roundWithMixedParameters() {
-        Round roundFunction = Round.of(Literal.of(3.14159), ColumnReference.of("settings", "precision"));
+        Round roundFunction = new Round(Literal.of(3.14159), ColumnReference.of("settings", "precision"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(roundFunction, new Alias("pi_rounded"))))
                 .from(From.of(new TableIdentifier("settings")))

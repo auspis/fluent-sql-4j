@@ -10,23 +10,19 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
 public record Round(ScalarExpression numericExpression, ScalarExpression decimalPlaces) implements FunctionCall {
 
     public static Round of(Number value) {
-        return of(Literal.of(value), new NullScalarExpression());
+        return new Round(Literal.of(value), new NullScalarExpression());
     }
 
     public static Round of(Number value, Number decimalPlaces) {
-        return of(Literal.of(value), Literal.of(decimalPlaces));
+        return new Round(Literal.of(value), Literal.of(decimalPlaces));
     }
 
     public static Round of(ScalarExpression numericExpression) {
-        return of(numericExpression, new NullScalarExpression());
+        return new Round(numericExpression, new NullScalarExpression());
     }
 
     public static Round of(ScalarExpression numericExpression, int number) {
-        return of(numericExpression, Literal.of(number));
-    }
-
-    public static Round of(ScalarExpression numericExpression, ScalarExpression decimalPlaces) {
-        return new Round(numericExpression, decimalPlaces);
+        return new Round(numericExpression, Literal.of(number));
     }
 
     @Override
