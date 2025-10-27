@@ -17,6 +17,7 @@
   - [INSERT Statements](#insert-statements)
   - [UPDATE Statements](#update-statements)
   - [DELETE Statements](#delete-statements)
+  - [MERGE Statements](#merge-statements)
 - [Project structure](#project-structure)
 - [Running Tests](#running-tests)
   - [Test Categories](#test-categories)
@@ -539,6 +540,68 @@ PreparedStatement ps = dsl.deleteFrom("users")
     .where("age").gt(18)
     .and("name").eq("Alice")
     .buildPreparedStatement(connection);
+```
+
+### MERGE Statements
+
+```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
+// Basic MERGE with WHEN MATCHED and WHEN NOT MATCHED
+String sql = dsl.mergeInto("users")
+    .as("tgt")
+    .using("users_updates", "src")
+    .on("tgt.id", "src.id")
+    .whenMatched()
+    .set("name", "src.name")
+    .set("email", "src.email")
+    .whenNotMatched()
+    .set("id", "src.id")
+    .set("name", "src.name")
+    .set("email", "src.email")
+    .build();
+
+// MERGE with multiple columns
+String sql = dsl.mergeInto("users")
+    .as("tgt")
+    .using("users_updates", "src")
+    .on("tgt.id", "src.id")
+    .whenMatched()
+    .set("name", "src.name")
+    .set("email", "src.email")
+    .set("age", "src.age")
+    .set("active", "src.active")
+    .whenNotMatched()
+    .set("id", "src.id")
+    .set("name", "src.name")
+    .set("email", "src.email")
+    .set("age", "src.age")
+    .set("active", "src.active")
+    .build();
+
+// MERGE with additional columns (timestamps, etc.)
+String sql = dsl.mergeInto("users")
+    .as("tgt")
+    .using("users_updates", "src")
+    .on("tgt.id", "src.id")
+    .whenMatched()
+    .set("name", "src.name")
+    .set("email", "src.email")
+    .set("age", "src.age")
+    .set("active", "src.active")
+    .set("birthdate", "src.birthdate")
+    .set("createdAt", "src.createdAt")
+    .whenNotMatched()
+    .set("id", "src.id")
+    .set("name", "src.name")
+    .set("email", "src.email")
+    .set("age", "src.age")
+    .set("active", "src.active")
+    .set("birthdate", "src.birthdate")
+    .set("createdAt", "src.createdAt")
+    .build();
 ```
 
 ## Project structure
