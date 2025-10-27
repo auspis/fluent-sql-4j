@@ -9,7 +9,6 @@ import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,10 +16,7 @@ class DefaultScalarExpressionProjectionPsStrategyTest {
 
     private DefaultScalarExpressionProjectionPsStrategy strategy;
 
-    @AllArgsConstructor
-    static class StubScalarExpression implements ScalarExpression {
-
-        private final PsDto result;
+    static record StubScalarExpression(PsDto result) implements ScalarExpression {
 
         @SuppressWarnings("unchecked")
         @Override
