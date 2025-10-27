@@ -1755,7 +1755,7 @@ class PreparedStatementRendererTest {
 
     @Test
     void selectReplaceFunction() {
-        var replaceFunction = Replace.of(Literal.of("Hello World"), Literal.of("World"), Literal.of("Universe"));
+        var replaceFunction = new Replace(Literal.of("Hello World"), Literal.of("World"), Literal.of("Universe"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
                 .from(From.of(new TableIdentifier("dummy")))
@@ -1769,7 +1769,7 @@ class PreparedStatementRendererTest {
     @Test
     void selectReplaceWithColumn() {
         var replaceFunction =
-                Replace.of(ColumnReference.of("users", "email"), Literal.of("@old.com"), Literal.of("@new.com"));
+                new Replace(ColumnReference.of("users", "email"), Literal.of("@old.com"), Literal.of("@new.com"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(replaceFunction)))
                 .from(From.of(new TableIdentifier("users")))
@@ -1782,7 +1782,7 @@ class PreparedStatementRendererTest {
 
     @Test
     void whereReplaceContains() {
-        var replaceFunction = Replace.of(ColumnReference.of("content", "text"), Literal.of("old"), Literal.of("new"));
+        var replaceFunction = new Replace(ColumnReference.of("content", "text"), Literal.of("old"), Literal.of("new"));
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("content", "id"))))
                 .from(From.of(new TableIdentifier("content")))
