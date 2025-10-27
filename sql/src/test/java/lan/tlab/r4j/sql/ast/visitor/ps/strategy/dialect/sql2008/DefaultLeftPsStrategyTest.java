@@ -16,7 +16,7 @@ class DefaultLeftPsStrategyTest {
     @Test
     void handlesLeftWithLiteralStringAndNumber() {
         var strategy = new DefaultLeftPsStrategy();
-        var left = Left.of(Literal.of("Hello World"), Literal.of(5));
+        var left = new Left(Literal.of("Hello World"), Literal.of(5));
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
@@ -42,7 +42,7 @@ class DefaultLeftPsStrategyTest {
     @Test
     void handlesLeftWithStringAndColumnLength() {
         var strategy = new DefaultLeftPsStrategy();
-        var left = Left.of(Literal.of("Test String"), ColumnReference.of("config", "name_length"));
+        var left = new Left(Literal.of("Test String"), ColumnReference.of("config", "name_length"));
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
@@ -55,7 +55,7 @@ class DefaultLeftPsStrategyTest {
     @Test
     void handlesLeftWithColumnsOnly() {
         var strategy = new DefaultLeftPsStrategy();
-        var left = Left.of(
+        var left = new Left(
                 ColumnReference.of("products", "description"), ColumnReference.of("settings", "preview_length"));
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();

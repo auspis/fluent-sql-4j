@@ -33,14 +33,14 @@ class LeftRenderStrategyTest {
 
     @Test
     void withLiteralStringAndColumnLength() {
-        Left func = Left.of(Literal.of("Some String"), ColumnReference.of("Customer", "prefix_length"));
+        Left func = new Left(Literal.of("Some String"), ColumnReference.of("Customer", "prefix_length"));
         String sql = strategy.render(func, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LEFT('Some String', \"Customer\".\"prefix_length\")");
     }
 
     @Test
     void withArithmeticExpressionAsLength() {
-        Left func = Left.of(
+        Left func = new Left(
                 ColumnReference.of("Customer", "full_name"),
                 ArithmeticExpression.subtraction(
                         new Length(ColumnReference.of("Customer", "full_name")), Literal.of(5)));
