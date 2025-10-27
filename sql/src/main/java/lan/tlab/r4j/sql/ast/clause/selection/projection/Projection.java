@@ -3,10 +3,7 @@ package lan.tlab.r4j.sql.ast.clause.selection.projection;
 import lan.tlab.r4j.sql.ast.expression.Expression;
 import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.Visitable;
-import lombok.Getter;
 
-// TODO: remove lombok
-@Getter
 public abstract class Projection implements Visitable {
 
     protected final Expression expression;
@@ -23,5 +20,13 @@ public abstract class Projection implements Visitable {
     protected Projection(Expression expression, Alias as) {
         this.expression = expression;
         this.as = as;
+    }
+
+    public Alias as() {
+        return as;
+    }
+
+    public Expression expression() {
+        return expression;
     }
 }
