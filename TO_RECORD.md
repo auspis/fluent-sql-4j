@@ -67,7 +67,7 @@ La migrazione sistematica delle classi Lombok a Java records è stata completata
 5. **Cast** ✅ - Convertito a record con campi `expression`, `dataType`
 6. **ExtractDatePart** ✅ - Convertito a record con campi `functionName`, `dateExpression`
 7. **DataLength** ✅ - Convertito a record con campo `expression`
-8. **DateArithmetic** ✅ - Convertito a record con campi `add`, `dateExpression`, `interval`
+8. **DateArithmetic** ✅ - Convertito a record con campi `operation`, `dateExpression`, `interval` (enum Operation invece di boolean)
 9. **Concat** ✅ - Convertito a record con campi `separator`, `stringExpressions`
 10. **Left** ✅ - Convertito a record con campi `expression`, `length`
 11. **CharLength** ✅ - Convertito a record con campo `expression`
@@ -95,10 +95,12 @@ La migrazione sistematica delle classi Lombok a Java records è stata completata
 
 ### Classi Convertite a Classi Finali Tradizionali
 
-Dopo la migrazione iniziale, è stato deciso di convertire **UnaryString** e **DateArithmetic** da record a classi finali tradizionali perché:
+Dopo la migrazione iniziale, è stato deciso di convertire **UnaryString** da record a classe finale tradizionale perché:
 
 - **Problema**: I record espongono costruttori canonici pubblici che permettono istanziazione diretta
-- **Requisito**: Queste classi dovrebbero essere istanziate solo attraverso factory methods controllati
-- **Soluzione**: Classi finali con costruttori privati + factory methods pubblici
+- **Requisito**: Questa classe dovrebbe essere istanziata solo attraverso factory methods controllati
+- **Soluzione**: Classe finale con costruttore privato + factory methods pubblici
 - **Vantaggio**: Controllo completo sull'istanziazione mantenendo immutabilità e API identica
+
+**Nota**: DateArithmetic è stato successivamente riconvertito a record utilizzando un enum `Operation` invece del boolean, garantendo type safety senza compromettere l'API.
 
