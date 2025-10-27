@@ -16,7 +16,7 @@ class DefaultReplacePsStrategyTest {
     @Test
     void handlesReplaceWithAllLiterals() {
         var strategy = new DefaultReplacePsStrategy();
-        var replace = Replace.of(Literal.of("Hello World"), Literal.of("World"), Literal.of("Universe"));
+        var replace = new Replace(Literal.of("Hello World"), Literal.of("World"), Literal.of("Universe"));
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
@@ -29,7 +29,7 @@ class DefaultReplacePsStrategyTest {
     @Test
     void handlesReplaceWithColumnAndLiterals() {
         var strategy = new DefaultReplacePsStrategy();
-        var replace = Replace.of(ColumnReference.of("users", "email"), Literal.of("@old.com"), Literal.of("@new.com"));
+        var replace = new Replace(ColumnReference.of("users", "email"), Literal.of("@old.com"), Literal.of("@new.com"));
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
@@ -42,7 +42,7 @@ class DefaultReplacePsStrategyTest {
     @Test
     void handlesReplaceWithAllColumns() {
         var strategy = new DefaultReplacePsStrategy();
-        var replace = Replace.of(
+        var replace = new Replace(
                 ColumnReference.of("content", "text"),
                 ColumnReference.of("content", "old_pattern"),
                 ColumnReference.of("content", "new_pattern"));
@@ -58,7 +58,7 @@ class DefaultReplacePsStrategyTest {
     @Test
     void handlesReplaceWithMixedExpressions() {
         var strategy = new DefaultReplacePsStrategy();
-        var replace = Replace.of(
+        var replace = new Replace(
                 Literal.of("Test string"), ColumnReference.of("patterns", "search"), Literal.of("replacement"));
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
