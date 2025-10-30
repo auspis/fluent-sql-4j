@@ -24,6 +24,9 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDate
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.DateArithmetic;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Mod;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Power;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Round;
@@ -208,6 +211,12 @@ public interface Visitor<T> {
     T visit(UnaryNumeric functionCall, AstContext ctx);
 
     T visit(UnaryString functionCall, AstContext ctx);
+
+    T visit(JsonExists functionCall, AstContext ctx);
+
+    T visit(JsonQuery functionCall, AstContext ctx);
+
+    T visit(JsonValue functionCall, AstContext ctx);
 
     // set expressions
     T visit(NullSetExpression expression, AstContext ctx);
