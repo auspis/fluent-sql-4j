@@ -38,6 +38,13 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.DenseRank;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lag;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lead;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Ntile;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.OverClause;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Rank;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.RowNumber;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
 import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
@@ -257,4 +264,19 @@ public interface Visitor<T> {
     T visit(CheckConstraintDefinition constraintDefinition, AstContext ctx);
 
     T visit(DefaultConstraintDefinition constraintDefinition, AstContext ctx);
+
+    // window functions
+    T visit(RowNumber functionCall, AstContext ctx);
+
+    T visit(Rank functionCall, AstContext ctx);
+
+    T visit(DenseRank functionCall, AstContext ctx);
+
+    T visit(Ntile functionCall, AstContext ctx);
+
+    T visit(Lag functionCall, AstContext ctx);
+
+    T visit(Lead functionCall, AstContext ctx);
+
+    T visit(OverClause overClause, AstContext ctx);
 }

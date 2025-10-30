@@ -38,6 +38,13 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.DenseRank;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lag;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lead;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Ntile;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.OverClause;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Rank;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.RowNumber;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
 import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
@@ -136,6 +143,13 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnaryNumericRenderSt
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnaryStringRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.set.AliasedTableExpressionRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.DenseRankRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.LagRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.LeadRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.NtileRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.OverClauseRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.RankRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.RowNumberRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.AsRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.DefaultValuesRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.InsertSourceRenderStrategy;
@@ -433,6 +447,27 @@ public class SqlRenderer implements Visitor<String> {
 
     @Default
     private final DefaultConstraintRenderStrategy defaultConstraintStrategy = new DefaultConstraintRenderStrategy();
+
+    @Default
+    private final RowNumberRenderStrategy rowNumberStrategy = new RowNumberRenderStrategy();
+
+    @Default
+    private final RankRenderStrategy rankStrategy = new RankRenderStrategy();
+
+    @Default
+    private final DenseRankRenderStrategy denseRankStrategy = new DenseRankRenderStrategy();
+
+    @Default
+    private final NtileRenderStrategy ntileStrategy = new NtileRenderStrategy();
+
+    @Default
+    private final LagRenderStrategy lagStrategy = new LagRenderStrategy();
+
+    @Default
+    private final LeadRenderStrategy leadStrategy = new LeadRenderStrategy();
+
+    @Default
+    private final OverClauseRenderStrategy overClauseStrategy = new OverClauseRenderStrategy();
 
     // statements
     @Override
@@ -845,5 +880,40 @@ public class SqlRenderer implements Visitor<String> {
     @Override
     public String visit(DefaultConstraintDefinition constraintDefinition, AstContext ctx) {
         return defaultConstraintStrategy.render(constraintDefinition, this, ctx);
+    }
+
+    @Override
+    public String visit(RowNumber functionCall, AstContext ctx) {
+        return rowNumberStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(Rank functionCall, AstContext ctx) {
+        return rankStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(DenseRank functionCall, AstContext ctx) {
+        return denseRankStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(Ntile functionCall, AstContext ctx) {
+        return ntileStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(Lag functionCall, AstContext ctx) {
+        return lagStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(Lead functionCall, AstContext ctx) {
+        return leadStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(OverClause overClause, AstContext ctx) {
+        return overClauseStrategy.render(overClause, this, ctx);
     }
 }
