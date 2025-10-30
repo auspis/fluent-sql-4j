@@ -9,18 +9,18 @@ public class LagRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Lag lag, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("LAG(")
-                .append(lag.getExpression().accept(sqlRenderer, ctx))
+                .append(lag.expression().accept(sqlRenderer, ctx))
                 .append(", ")
-                .append(lag.getOffset());
+                .append(lag.offset());
 
-        if (lag.getDefaultValue() != null) {
-            sql.append(", ").append(lag.getDefaultValue().accept(sqlRenderer, ctx));
+        if (lag.defaultValue() != null) {
+            sql.append(", ").append(lag.defaultValue().accept(sqlRenderer, ctx));
         }
 
         sql.append(")");
 
-        if (lag.getOverClause() != null) {
-            sql.append(" ").append(lag.getOverClause().accept(sqlRenderer, ctx));
+        if (lag.overClause() != null) {
+            sql.append(" ").append(lag.overClause().accept(sqlRenderer, ctx));
         }
 
         return sql.toString();

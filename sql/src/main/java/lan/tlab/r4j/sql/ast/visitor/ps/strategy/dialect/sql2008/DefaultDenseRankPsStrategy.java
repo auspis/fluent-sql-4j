@@ -15,8 +15,8 @@ public class DefaultDenseRankPsStrategy implements DenseRankPsStrategy {
         StringBuilder sql = new StringBuilder("DENSE_RANK()");
         List<Object> parameters = new ArrayList<>();
 
-        if (denseRank.getOverClause() != null) {
-            PsDto overResult = denseRank.getOverClause().accept(visitor, ctx);
+        if (denseRank.overClause() != null) {
+            PsDto overResult = denseRank.overClause().accept(visitor, ctx);
             sql.append(" ").append(overResult.sql());
             parameters.addAll(overResult.parameters());
         }

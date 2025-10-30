@@ -13,22 +13,22 @@ public class DefaultLagPsStrategy implements LagPsStrategy {
     @Override
     public PsDto handle(Lag lag, Visitor<PsDto> visitor, AstContext ctx) {
         List<Object> parameters = new ArrayList<>();
-        PsDto exprResult = lag.getExpression().accept(visitor, ctx);
+        PsDto exprResult = lag.expression().accept(visitor, ctx);
         parameters.addAll(exprResult.parameters());
 
         StringBuilder sql =
-                new StringBuilder("LAG(").append(exprResult.sql()).append(", ").append(lag.getOffset());
+                new StringBuilder("LAG(").append(exprResult.sql()).append(", ").append(lag.offset());
 
-        if (lag.getDefaultValue() != null) {
-            PsDto defaultResult = lag.getDefaultValue().accept(visitor, ctx);
+        if (lag.defaultValue() != null) {
+            PsDto defaultResult = lag.defaultValue().accept(visitor, ctx);
             sql.append(", ").append(defaultResult.sql());
             parameters.addAll(defaultResult.parameters());
         }
 
         sql.append(")");
 
-        if (lag.getOverClause() != null) {
-            PsDto overResult = lag.getOverClause().accept(visitor, ctx);
+        if (lag.overClause() != null) {
+            PsDto overResult = lag.overClause().accept(visitor, ctx);
             sql.append(" ").append(overResult.sql());
             parameters.addAll(overResult.parameters());
         }

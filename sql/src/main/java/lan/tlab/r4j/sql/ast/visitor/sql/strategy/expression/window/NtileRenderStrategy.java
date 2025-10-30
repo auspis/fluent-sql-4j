@@ -8,11 +8,10 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExpressionRenderStra
 public class NtileRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Ntile ntile, SqlRenderer sqlRenderer, AstContext ctx) {
-        StringBuilder sql =
-                new StringBuilder("NTILE(").append(ntile.getBuckets()).append(")");
+        StringBuilder sql = new StringBuilder("NTILE(").append(ntile.buckets()).append(")");
 
-        if (ntile.getOverClause() != null) {
-            sql.append(" ").append(ntile.getOverClause().accept(sqlRenderer, ctx));
+        if (ntile.overClause() != null) {
+            sql.append(" ").append(ntile.overClause().accept(sqlRenderer, ctx));
         }
 
         return sql.toString();
