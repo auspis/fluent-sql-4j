@@ -9,53 +9,17 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * to the current row within the partition.
  *
  * <p>Example: LAG(salary, 1) OVER (ORDER BY hire_date)
+ *
+ * @param expression the expression to evaluate
+ * @param offset the number of rows back from the current row
+ * @param defaultValue the default value to return when the offset goes beyond the window (can be null)
+ * @param overClause the OVER clause specifying partitioning and ordering
  */
-public class Lag implements WindowFunction {
-
-    private final ScalarExpression expression;
-    private final int offset;
-    private final ScalarExpression defaultValue;
-    private OverClause overClause;
-
-    public Lag(ScalarExpression expression, int offset) {
-        this(expression, offset, null);
-    }
-
-    public Lag(ScalarExpression expression, int offset, ScalarExpression defaultValue) {
-        this.expression = expression;
-        this.offset = offset;
-        this.defaultValue = defaultValue;
-    }
+public record Lag(ScalarExpression expression, int offset, ScalarExpression defaultValue, OverClause overClause)
+        implements WindowFunction {
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
-    }
-
-    /**
-     * Specifies the OVER clause for this window function.
-     *
-     * @param overClause the OVER clause
-     * @return this Lag instance for method chaining
-     */
-    public Lag over(OverClause overClause) {
-        this.overClause = overClause;
-        return this;
-    }
-
-    public ScalarExpression getExpression() {
-        return expression;
-    }
-
-    public int getOffset() {
-        return offset;
-    }
-
-    public ScalarExpression getDefaultValue() {
-        return defaultValue;
-    }
-
-    public OverClause getOverClause() {
-        return overClause;
     }
 }

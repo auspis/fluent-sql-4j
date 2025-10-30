@@ -12,12 +12,11 @@ public class DefaultNtilePsStrategy implements NtilePsStrategy {
 
     @Override
     public PsDto handle(Ntile ntile, Visitor<PsDto> visitor, AstContext ctx) {
-        StringBuilder sql =
-                new StringBuilder("NTILE(").append(ntile.getBuckets()).append(")");
+        StringBuilder sql = new StringBuilder("NTILE(").append(ntile.buckets()).append(")");
         List<Object> parameters = new ArrayList<>();
 
-        if (ntile.getOverClause() != null) {
-            PsDto overResult = ntile.getOverClause().accept(visitor, ctx);
+        if (ntile.overClause() != null) {
+            PsDto overResult = ntile.overClause().accept(visitor, ctx);
             sql.append(" ").append(overResult.sql());
             parameters.addAll(overResult.parameters());
         }
