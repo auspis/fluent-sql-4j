@@ -15,8 +15,8 @@ public class DefaultRowNumberPsStrategy implements RowNumberPsStrategy {
         StringBuilder sql = new StringBuilder("ROW_NUMBER()");
         List<Object> parameters = new ArrayList<>();
 
-        if (rowNumber.getOverClause() != null) {
-            PsDto overResult = rowNumber.getOverClause().accept(visitor, ctx);
+        if (rowNumber.overClause() != null) {
+            PsDto overResult = rowNumber.overClause().accept(visitor, ctx);
             sql.append(" ").append(overResult.sql());
             parameters.addAll(overResult.parameters());
         }

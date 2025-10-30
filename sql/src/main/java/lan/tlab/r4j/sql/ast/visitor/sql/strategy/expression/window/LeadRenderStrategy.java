@@ -9,18 +9,18 @@ public class LeadRenderStrategy implements ExpressionRenderStrategy {
 
     public String render(Lead lead, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("LEAD(")
-                .append(lead.getExpression().accept(sqlRenderer, ctx))
+                .append(lead.expression().accept(sqlRenderer, ctx))
                 .append(", ")
-                .append(lead.getOffset());
+                .append(lead.offset());
 
-        if (lead.getDefaultValue() != null) {
-            sql.append(", ").append(lead.getDefaultValue().accept(sqlRenderer, ctx));
+        if (lead.defaultValue() != null) {
+            sql.append(", ").append(lead.defaultValue().accept(sqlRenderer, ctx));
         }
 
         sql.append(")");
 
-        if (lead.getOverClause() != null) {
-            sql.append(" ").append(lead.getOverClause().accept(sqlRenderer, ctx));
+        if (lead.overClause() != null) {
+            sql.append(" ").append(lead.overClause().accept(sqlRenderer, ctx));
         }
 
         return sql.toString();

@@ -15,8 +15,8 @@ public class DefaultRankPsStrategy implements RankPsStrategy {
         StringBuilder sql = new StringBuilder("RANK()");
         List<Object> parameters = new ArrayList<>();
 
-        if (rank.getOverClause() != null) {
-            PsDto overResult = rank.getOverClause().accept(visitor, ctx);
+        if (rank.overClause() != null) {
+            PsDto overResult = rank.overClause().accept(visitor, ctx);
             sql.append(" ").append(overResult.sql());
             parameters.addAll(overResult.parameters());
         }
