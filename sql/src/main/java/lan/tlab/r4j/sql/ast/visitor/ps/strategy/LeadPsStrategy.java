@@ -1,0 +1,10 @@
+package lan.tlab.r4j.sql.ast.visitor.ps.strategy;
+
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lead;
+import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.Visitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
+
+public interface LeadPsStrategy {
+    PsDto handle(Lead lead, Visitor<PsDto> visitor, AstContext ctx);
+}
