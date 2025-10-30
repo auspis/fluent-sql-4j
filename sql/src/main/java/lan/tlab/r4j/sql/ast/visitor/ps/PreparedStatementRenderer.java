@@ -40,6 +40,13 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.DenseRank;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lag;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lead;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Ntile;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.OverClause;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Rank;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.window.RowNumber;
 import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
 import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
@@ -107,6 +114,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DefaultConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DenseRankPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ExtractDatePartPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.FetchPsStrategy;
@@ -124,6 +132,8 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IntervalPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IsNotNullPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IsNullPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LagPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LeadPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LeftPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LengthPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LikePsStrategy;
@@ -132,17 +142,21 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ModPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NotNullConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NotPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NtilePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullPredicatePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullScalarExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.NullSetExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.OnJoinPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.OrderByClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.OverClausePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.PowerPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.PrimaryKeyPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.RankPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ReplacePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.RoundPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.RowNumberPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ScalarSubqueryPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.SelectClausePsStrategy;
@@ -183,6 +197,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDateArith
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDefaultConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDefaultValuesPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDeleteStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDenseRankPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultExceptExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultExtractDatePartPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultForeignKeyConstraintPsStrategy;
@@ -199,6 +214,8 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIntersect
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIntervalPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIsNotNullPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIsNullPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLagPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLeadPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLeftPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLengthPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLikePsStrategy;
@@ -207,18 +224,22 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultMergeStat
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultModPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNotNullConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNotPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNtilePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNullPredicatePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNullScalarExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNullSetExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultOnJoinPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultOrderByClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultOverClausePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultPaginationPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultParameterizedDataTypePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultPowerPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultPrimaryKeyPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultRankPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultReferencesItemPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultReplacePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultRoundPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultRowNumberPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultScalarExpressionProjectionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultScalarSubqueryPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultSelectClausePsStrategy;
@@ -495,6 +516,27 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Default
     private final MergeStatementPsStrategy mergeStatementStrategy = new DefaultMergeStatementPsStrategy();
+
+    @Default
+    private final RowNumberPsStrategy rowNumberStrategy = new DefaultRowNumberPsStrategy();
+
+    @Default
+    private final RankPsStrategy rankStrategy = new DefaultRankPsStrategy();
+
+    @Default
+    private final DenseRankPsStrategy denseRankStrategy = new DefaultDenseRankPsStrategy();
+
+    @Default
+    private final NtilePsStrategy ntileStrategy = new DefaultNtilePsStrategy();
+
+    @Default
+    private final LagPsStrategy lagStrategy = new DefaultLagPsStrategy();
+
+    @Default
+    private final LeadPsStrategy leadStrategy = new DefaultLeadPsStrategy();
+
+    @Default
+    private final OverClausePsStrategy overClauseStrategy = new DefaultOverClausePsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
@@ -914,5 +956,40 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Override
     public PsDto visit(IsNotNull expr, AstContext ctx) {
         return isNotNullStrategy.handle(expr, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(RowNumber functionCall, AstContext ctx) {
+        return rowNumberStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(Rank functionCall, AstContext ctx) {
+        return rankStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(DenseRank functionCall, AstContext ctx) {
+        return denseRankStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(Ntile functionCall, AstContext ctx) {
+        return ntileStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(Lag functionCall, AstContext ctx) {
+        return lagStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(Lead functionCall, AstContext ctx) {
+        return leadStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(OverClause overClause, AstContext ctx) {
+        return overClauseStrategy.handle(overClause, this, ctx);
     }
 }
