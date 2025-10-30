@@ -24,6 +24,9 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDate
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.DateArithmetic;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Mod;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Power;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Round;
@@ -123,6 +126,9 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IntersectRenderStrat
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IntervalRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IsNotNullRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IsNullRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonExistsRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonQueryRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonValueRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LeftRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LegthRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LikeRenderStrategy;
@@ -360,6 +366,15 @@ public class SqlRenderer implements Visitor<String> {
 
     @Default
     private final UnaryStringRenderStrategy unaryStringStrategy = new UnaryStringRenderStrategy();
+
+    @Default
+    private final JsonExistsRenderStrategy jsonExistsStrategy = JsonExistsRenderStrategy.standardSql2016();
+
+    @Default
+    private final JsonQueryRenderStrategy jsonQueryStrategy = JsonQueryRenderStrategy.standardSql2016();
+
+    @Default
+    private final JsonValueRenderStrategy jsonValueStrategy = JsonValueRenderStrategy.standardSql2016();
 
     // set expressions
     @Default
@@ -743,6 +758,21 @@ public class SqlRenderer implements Visitor<String> {
     @Override
     public String visit(UnaryString functionCall, AstContext ctx) {
         return unaryStringStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(JsonExists functionCall, AstContext ctx) {
+        return jsonExistsStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(JsonQuery functionCall, AstContext ctx) {
+        return jsonQueryStrategy.render(functionCall, this, ctx);
+    }
+
+    @Override
+    public String visit(JsonValue functionCall, AstContext ctx) {
+        return jsonValueStrategy.render(functionCall, this, ctx);
     }
 
     // set expressions

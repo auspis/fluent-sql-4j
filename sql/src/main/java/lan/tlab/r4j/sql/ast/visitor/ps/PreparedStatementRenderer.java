@@ -26,6 +26,9 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDate
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.DateArithmetic;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.ExtractDatePart;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Mod;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Power;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Round;
@@ -132,6 +135,9 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IntervalPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IsNotNullPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IsNullPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.JsonExistsPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.JsonQueryPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LagPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LeadPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.LeftPsStrategy;
@@ -214,6 +220,9 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIntersect
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIntervalPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIsNotNullPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIsNullPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultJsonExistsPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultJsonQueryPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultJsonValuePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLagPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLeadPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLeftPsStrategy;
@@ -476,6 +485,15 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Default
     private final UnaryStringPsStrategy unaryStringStrategy = new DefaultUnaryStringPsStrategy();
+
+    @Default
+    private final JsonExistsPsStrategy jsonExistsStrategy = new DefaultJsonExistsPsStrategy();
+
+    @Default
+    private final JsonQueryPsStrategy jsonQueryStrategy = new DefaultJsonQueryPsStrategy();
+
+    @Default
+    private final JsonValuePsStrategy jsonValueStrategy = new DefaultJsonValuePsStrategy();
 
     @Default
     private final ScalarSubqueryPsStrategy scalarSubqueryStrategy = new DefaultScalarSubqueryPsStrategy();
@@ -781,6 +799,21 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Override
     public PsDto visit(UnaryString functionCall, AstContext ctx) {
         return unaryStringStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(JsonExists functionCall, AstContext ctx) {
+        return jsonExistsStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(JsonQuery functionCall, AstContext ctx) {
+        return jsonQueryStrategy.handle(functionCall, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(JsonValue functionCall, AstContext ctx) {
+        return jsonValueStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
