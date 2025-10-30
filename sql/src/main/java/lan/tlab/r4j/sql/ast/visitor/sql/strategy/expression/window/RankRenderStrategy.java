@@ -10,8 +10,8 @@ public class RankRenderStrategy implements ExpressionRenderStrategy {
     public String render(Rank rank, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("RANK()");
 
-        if (rank.getOverClause() != null) {
-            sql.append(" ").append(rank.getOverClause().accept(sqlRenderer, ctx));
+        if (rank.overClause() != null) {
+            sql.append(" ").append(rank.overClause().accept(sqlRenderer, ctx));
         }
 
         return sql.toString();
