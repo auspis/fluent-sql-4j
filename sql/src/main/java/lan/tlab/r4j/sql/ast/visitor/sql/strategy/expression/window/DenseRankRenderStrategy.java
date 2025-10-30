@@ -10,8 +10,8 @@ public class DenseRankRenderStrategy implements ExpressionRenderStrategy {
     public String render(DenseRank denseRank, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("DENSE_RANK()");
 
-        if (denseRank.getOverClause() != null) {
-            sql.append(" ").append(denseRank.getOverClause().accept(sqlRenderer, ctx));
+        if (denseRank.overClause() != null) {
+            sql.append(" ").append(denseRank.overClause().accept(sqlRenderer, ctx));
         }
 
         return sql.toString();
