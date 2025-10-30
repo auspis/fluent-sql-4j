@@ -10,8 +10,8 @@ public class RowNumberRenderStrategy implements ExpressionRenderStrategy {
     public String render(RowNumber rowNumber, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("ROW_NUMBER()");
 
-        if (rowNumber.getOverClause() != null) {
-            sql.append(" ").append(rowNumber.getOverClause().accept(sqlRenderer, ctx));
+        if (rowNumber.overClause() != null) {
+            sql.append(" ").append(rowNumber.overClause().accept(sqlRenderer, ctx));
         }
 
         return sql.toString();

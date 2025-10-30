@@ -24,21 +24,19 @@ class WindowFunctionTest {
 
     @Test
     void rendersRowNumberWithOverClauseOrderBy() {
-        RowNumber rowNumber = WindowFunction.rowNumber()
-                .over(OverClause.builder()
-                        .orderBy(List.of(Sorting.asc(ColumnReference.of("Employee", "salary"))))
-                        .build());
+        RowNumber rowNumber = new RowNumber(OverClause.builder()
+                .orderBy(List.of(Sorting.asc(ColumnReference.of("Employee", "salary"))))
+                .build());
         String sql = rowNumber.accept(sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("ROW_NUMBER() OVER (ORDER BY \"Employee\".\"salary\" ASC)");
     }
 
     @Test
     void rendersRowNumberWithOverClausePartitionByAndOrderBy() {
-        RowNumber rowNumber = WindowFunction.rowNumber()
-                .over(OverClause.builder()
-                        .partitionBy(List.of(ColumnReference.of("Employee", "department")))
-                        .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
-                        .build());
+        RowNumber rowNumber = new RowNumber(OverClause.builder()
+                .partitionBy(List.of(ColumnReference.of("Employee", "department")))
+                .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
+                .build());
         String sql = rowNumber.accept(sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
@@ -47,21 +45,19 @@ class WindowFunctionTest {
 
     @Test
     void rendersRankWithOverClauseOrderBy() {
-        Rank rank = WindowFunction.rank()
-                .over(OverClause.builder()
-                        .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
-                        .build());
+        Rank rank = new Rank(OverClause.builder()
+                .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
+                .build());
         String sql = rank.accept(sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("RANK() OVER (ORDER BY \"Employee\".\"salary\" DESC)");
     }
 
     @Test
     void rendersRankWithPartitionByAndOrderBy() {
-        Rank rank = WindowFunction.rank()
-                .over(OverClause.builder()
-                        .partitionBy(List.of(ColumnReference.of("Employee", "department")))
-                        .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
-                        .build());
+        Rank rank = new Rank(OverClause.builder()
+                .partitionBy(List.of(ColumnReference.of("Employee", "department")))
+                .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
+                .build());
         String sql = rank.accept(sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
@@ -70,21 +66,19 @@ class WindowFunctionTest {
 
     @Test
     void rendersDenseRankWithOverClauseOrderBy() {
-        DenseRank denseRank = WindowFunction.denseRank()
-                .over(OverClause.builder()
-                        .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
-                        .build());
+        DenseRank denseRank = new DenseRank(OverClause.builder()
+                .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
+                .build());
         String sql = denseRank.accept(sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("DENSE_RANK() OVER (ORDER BY \"Employee\".\"salary\" DESC)");
     }
 
     @Test
     void rendersDenseRankWithPartitionByAndOrderBy() {
-        DenseRank denseRank = WindowFunction.denseRank()
-                .over(OverClause.builder()
-                        .partitionBy(List.of(ColumnReference.of("Employee", "department")))
-                        .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
-                        .build());
+        DenseRank denseRank = new DenseRank(OverClause.builder()
+                .partitionBy(List.of(ColumnReference.of("Employee", "department")))
+                .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
+                .build());
         String sql = denseRank.accept(sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
@@ -93,8 +87,9 @@ class WindowFunctionTest {
 
     @Test
     void rendersNtileWithOverClauseOrderBy() {
-        Ntile ntile = WindowFunction.ntile(4)
-                .over(OverClause.builder()
+        Ntile ntile = new Ntile(
+                4,
+                OverClause.builder()
                         .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
                         .build());
         String sql = ntile.accept(sqlRenderer, new AstContext());
@@ -103,8 +98,9 @@ class WindowFunctionTest {
 
     @Test
     void rendersNtileWithPartitionByAndOrderBy() {
-        Ntile ntile = WindowFunction.ntile(4)
-                .over(OverClause.builder()
+        Ntile ntile = new Ntile(
+                4,
+                OverClause.builder()
                         .partitionBy(List.of(ColumnReference.of("Employee", "department")))
                         .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
                         .build());
@@ -116,8 +112,11 @@ class WindowFunctionTest {
 
     @Test
     void rendersLagWithOverClauseOrderBy() {
-        Lag lag = WindowFunction.lag(ColumnReference.of("Employee", "salary"), 1)
-                .over(OverClause.builder()
+        Lag lag = new Lag(
+                ColumnReference.of("Employee", "salary"),
+                1,
+                null,
+                OverClause.builder()
                         .orderBy(List.of(Sorting.asc(ColumnReference.of("Employee", "hire_date"))))
                         .build());
         String sql = lag.accept(sqlRenderer, new AstContext());
@@ -126,8 +125,11 @@ class WindowFunctionTest {
 
     @Test
     void rendersLagWithDefaultValueAndOverClause() {
-        Lag lag = WindowFunction.lag(ColumnReference.of("Employee", "salary"), 1, Literal.of(0))
-                .over(OverClause.builder()
+        Lag lag = new Lag(
+                ColumnReference.of("Employee", "salary"),
+                1,
+                Literal.of(0),
+                OverClause.builder()
                         .orderBy(List.of(Sorting.asc(ColumnReference.of("Employee", "hire_date"))))
                         .build());
         String sql = lag.accept(sqlRenderer, new AstContext());
@@ -136,8 +138,11 @@ class WindowFunctionTest {
 
     @Test
     void rendersLeadWithOverClauseOrderBy() {
-        Lead lead = WindowFunction.lead(ColumnReference.of("Employee", "salary"), 1)
-                .over(OverClause.builder()
+        Lead lead = new Lead(
+                ColumnReference.of("Employee", "salary"),
+                1,
+                null,
+                OverClause.builder()
                         .orderBy(List.of(Sorting.asc(ColumnReference.of("Employee", "hire_date"))))
                         .build());
         String sql = lead.accept(sqlRenderer, new AstContext());
@@ -146,8 +151,11 @@ class WindowFunctionTest {
 
     @Test
     void rendersLeadWithDefaultValueAndOverClause() {
-        Lead lead = WindowFunction.lead(ColumnReference.of("Employee", "salary"), 1, Literal.of(0))
-                .over(OverClause.builder()
+        Lead lead = new Lead(
+                ColumnReference.of("Employee", "salary"),
+                1,
+                Literal.of(0),
+                OverClause.builder()
                         .orderBy(List.of(Sorting.asc(ColumnReference.of("Employee", "hire_date"))))
                         .build());
         String sql = lead.accept(sqlRenderer, new AstContext());
@@ -156,13 +164,11 @@ class WindowFunctionTest {
 
     @Test
     void rendersMultiplePartitionByColumns() {
-        RowNumber rowNumber = WindowFunction.rowNumber()
-                .over(OverClause.builder()
-                        .partitionBy(List.of(
-                                ColumnReference.of("Employee", "department"),
-                                ColumnReference.of("Employee", "location")))
-                        .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
-                        .build());
+        RowNumber rowNumber = new RowNumber(OverClause.builder()
+                .partitionBy(List.of(
+                        ColumnReference.of("Employee", "department"), ColumnReference.of("Employee", "location")))
+                .orderBy(List.of(Sorting.desc(ColumnReference.of("Employee", "salary"))))
+                .build());
         String sql = rowNumber.accept(sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
@@ -171,12 +177,11 @@ class WindowFunctionTest {
 
     @Test
     void rendersMultipleOrderByColumns() {
-        RowNumber rowNumber = WindowFunction.rowNumber()
-                .over(OverClause.builder()
-                        .orderBy(List.of(
-                                Sorting.desc(ColumnReference.of("Employee", "salary")),
-                                Sorting.asc(ColumnReference.of("Employee", "hire_date"))))
-                        .build());
+        RowNumber rowNumber = new RowNumber(OverClause.builder()
+                .orderBy(List.of(
+                        Sorting.desc(ColumnReference.of("Employee", "salary")),
+                        Sorting.asc(ColumnReference.of("Employee", "hire_date"))))
+                .build());
         String sql = rowNumber.accept(sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo("ROW_NUMBER() OVER (ORDER BY \"Employee\".\"salary\" DESC, \"Employee\".\"hire_date\" ASC)");

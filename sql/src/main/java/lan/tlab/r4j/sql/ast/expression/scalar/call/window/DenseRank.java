@@ -8,28 +8,13 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * result set. Rows with equal values receive the same rank, without gaps in the ranking sequence.
  *
  * <p>Example: DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC)
+ *
+ * @param overClause the OVER clause specifying partitioning and ordering
  */
-public class DenseRank implements WindowFunction {
-
-    private OverClause overClause;
+public record DenseRank(OverClause overClause) implements WindowFunction {
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
-    }
-
-    /**
-     * Specifies the OVER clause for this window function.
-     *
-     * @param overClause the OVER clause
-     * @return this DenseRank instance for method chaining
-     */
-    public DenseRank over(OverClause overClause) {
-        this.overClause = overClause;
-        return this;
-    }
-
-    public OverClause getOverClause() {
-        return overClause;
     }
 }

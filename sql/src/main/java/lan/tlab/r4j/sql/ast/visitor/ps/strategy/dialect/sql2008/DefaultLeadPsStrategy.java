@@ -13,22 +13,22 @@ public class DefaultLeadPsStrategy implements LeadPsStrategy {
     @Override
     public PsDto handle(Lead lead, Visitor<PsDto> visitor, AstContext ctx) {
         List<Object> parameters = new ArrayList<>();
-        PsDto exprResult = lead.getExpression().accept(visitor, ctx);
+        PsDto exprResult = lead.expression().accept(visitor, ctx);
         parameters.addAll(exprResult.parameters());
 
         StringBuilder sql =
-                new StringBuilder("LEAD(").append(exprResult.sql()).append(", ").append(lead.getOffset());
+                new StringBuilder("LEAD(").append(exprResult.sql()).append(", ").append(lead.offset());
 
-        if (lead.getDefaultValue() != null) {
-            PsDto defaultResult = lead.getDefaultValue().accept(visitor, ctx);
+        if (lead.defaultValue() != null) {
+            PsDto defaultResult = lead.defaultValue().accept(visitor, ctx);
             sql.append(", ").append(defaultResult.sql());
             parameters.addAll(defaultResult.parameters());
         }
 
         sql.append(")");
 
-        if (lead.getOverClause() != null) {
-            PsDto overResult = lead.getOverClause().accept(visitor, ctx);
+        if (lead.overClause() != null) {
+            PsDto overResult = lead.overClause().accept(visitor, ctx);
             sql.append(" ").append(overResult.sql());
             parameters.addAll(overResult.parameters());
         }
