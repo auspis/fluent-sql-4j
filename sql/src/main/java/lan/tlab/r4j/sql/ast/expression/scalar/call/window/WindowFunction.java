@@ -13,9 +13,9 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
  * <p>Examples:
  *
  * <ul>
- *   <li>ROW_NUMBER() OVER (ORDER BY salary DESC)
- *   <li>RANK() OVER (PARTITION BY department ORDER BY salary DESC)
- *   <li>LAG(salary, 1) OVER (ORDER BY hire_date)
+ *   <li>new RowNumber(overClause)
+ *   <li>new Rank(overClause)
+ *   <li>new Lag(expression, offset, defaultValue, overClause)
  * </ul>
  */
 public interface WindowFunction extends ScalarExpression {
@@ -23,38 +23,42 @@ public interface WindowFunction extends ScalarExpression {
     /**
      * Creates a ROW_NUMBER window function.
      *
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return a ROW_NUMBER window function
      */
-    static RowNumber rowNumber() {
-        return new RowNumber();
+    static RowNumber rowNumber(OverClause overClause) {
+        return new RowNumber(overClause);
     }
 
     /**
      * Creates a RANK window function.
      *
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return a RANK window function
      */
-    static Rank rank() {
-        return new Rank();
+    static Rank rank(OverClause overClause) {
+        return new Rank(overClause);
     }
 
     /**
      * Creates a DENSE_RANK window function.
      *
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return a DENSE_RANK window function
      */
-    static DenseRank denseRank() {
-        return new DenseRank();
+    static DenseRank denseRank(OverClause overClause) {
+        return new DenseRank(overClause);
     }
 
     /**
      * Creates an NTILE window function.
      *
      * @param buckets the number of buckets to divide the rows into
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return an NTILE window function
      */
-    static Ntile ntile(int buckets) {
-        return new Ntile(buckets);
+    static Ntile ntile(int buckets, OverClause overClause) {
+        return new Ntile(buckets, overClause);
     }
 
     /**
@@ -62,10 +66,11 @@ public interface WindowFunction extends ScalarExpression {
      *
      * @param expression the expression to evaluate
      * @param offset the number of rows back from the current row
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return a LAG window function
      */
-    static Lag lag(ScalarExpression expression, int offset) {
-        return new Lag(expression, offset);
+    static Lag lag(ScalarExpression expression, int offset, OverClause overClause) {
+        return new Lag(expression, offset, null, overClause);
     }
 
     /**
@@ -74,10 +79,11 @@ public interface WindowFunction extends ScalarExpression {
      * @param expression the expression to evaluate
      * @param offset the number of rows back from the current row
      * @param defaultValue the default value to return when the offset goes beyond the window
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return a LAG window function
      */
-    static Lag lag(ScalarExpression expression, int offset, ScalarExpression defaultValue) {
-        return new Lag(expression, offset, defaultValue);
+    static Lag lag(ScalarExpression expression, int offset, ScalarExpression defaultValue, OverClause overClause) {
+        return new Lag(expression, offset, defaultValue, overClause);
     }
 
     /**
@@ -85,10 +91,11 @@ public interface WindowFunction extends ScalarExpression {
      *
      * @param expression the expression to evaluate
      * @param offset the number of rows forward from the current row
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return a LEAD window function
      */
-    static Lead lead(ScalarExpression expression, int offset) {
-        return new Lead(expression, offset);
+    static Lead lead(ScalarExpression expression, int offset, OverClause overClause) {
+        return new Lead(expression, offset, null, overClause);
     }
 
     /**
@@ -97,9 +104,10 @@ public interface WindowFunction extends ScalarExpression {
      * @param expression the expression to evaluate
      * @param offset the number of rows forward from the current row
      * @param defaultValue the default value to return when the offset goes beyond the window
+     * @param overClause the OVER clause specifying partitioning and ordering
      * @return a LEAD window function
      */
-    static Lead lead(ScalarExpression expression, int offset, ScalarExpression defaultValue) {
-        return new Lead(expression, offset, defaultValue);
+    static Lead lead(ScalarExpression expression, int offset, ScalarExpression defaultValue, OverClause overClause) {
+        return new Lead(expression, offset, defaultValue, overClause);
     }
 }

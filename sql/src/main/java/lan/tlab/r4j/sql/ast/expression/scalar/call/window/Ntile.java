@@ -8,37 +8,14 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * specified number of approximately equal groups, or buckets.
  *
  * <p>Example: NTILE(4) OVER (ORDER BY salary DESC)
+ *
+ * @param buckets the number of buckets to divide the rows into
+ * @param overClause the OVER clause specifying partitioning and ordering
  */
-public class Ntile implements WindowFunction {
-
-    private final int buckets;
-    private OverClause overClause;
-
-    public Ntile(int buckets) {
-        this.buckets = buckets;
-    }
+public record Ntile(int buckets, OverClause overClause) implements WindowFunction {
 
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);
-    }
-
-    /**
-     * Specifies the OVER clause for this window function.
-     *
-     * @param overClause the OVER clause
-     * @return this Ntile instance for method chaining
-     */
-    public Ntile over(OverClause overClause) {
-        this.overClause = overClause;
-        return this;
-    }
-
-    public int getBuckets() {
-        return buckets;
-    }
-
-    public OverClause getOverClause() {
-        return overClause;
     }
 }
