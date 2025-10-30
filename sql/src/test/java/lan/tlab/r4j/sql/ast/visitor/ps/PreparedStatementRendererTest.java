@@ -62,7 +62,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import org.junit.jupiter.api.Test;
 
 class PreparedStatementRendererTest {
-
+    // TODO: remove User class
     static class User {
         public int id;
         public String name;
