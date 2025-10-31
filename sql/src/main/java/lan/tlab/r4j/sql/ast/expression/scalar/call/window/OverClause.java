@@ -1,6 +1,7 @@
 package lan.tlab.r4j.sql.ast.expression.scalar.call.window;
 
 import java.util.List;
+import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
@@ -34,9 +35,17 @@ public record OverClause(List<ScalarExpression> partitionBy, List<Sorting> order
         private List<ScalarExpression> partitionBy;
         private List<Sorting> orderBy;
 
+        public Builder partitionBy(ScalarExpression... partitionBy) {
+            return partitionBy(Stream.of(partitionBy).toList());
+        }
+
         public Builder partitionBy(List<ScalarExpression> partitionBy) {
             this.partitionBy = partitionBy;
             return this;
+        }
+
+        public Builder orderBy(Sorting... orderBy) {
+            return orderBy(Stream.of(orderBy).toList());
         }
 
         public Builder orderBy(List<Sorting> orderBy) {
