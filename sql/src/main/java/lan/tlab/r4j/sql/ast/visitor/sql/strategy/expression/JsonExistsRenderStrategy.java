@@ -15,8 +15,9 @@ public interface JsonExistsRenderStrategy extends ExpressionRenderStrategy {
             sql.append(", ");
             sql.append(functionCall.path().accept(sqlRenderer, ctx));
 
-            if (functionCall.onErrorBehavior() != null) {
-                sql.append(" ").append(functionCall.onErrorBehavior().toSql()).append(" ON ERROR");
+            if (functionCall.onErrorBehavior()
+                    != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
+                sql.append(" ").append(functionCall.onErrorBehavior().name()).append(" ON ERROR");
             }
 
             sql.append(")");

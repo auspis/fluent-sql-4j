@@ -28,24 +28,27 @@ public class DefaultJsonQueryPsStrategy implements JsonQueryPsStrategy {
             sql.append(" RETURNING ").append(jsonQuery.returningType());
         }
 
-        if (jsonQuery.wrapperBehavior() != null && jsonQuery.wrapperBehavior().hasClause()) {
-            sql.append(" ").append(jsonQuery.wrapperBehavior().toSql());
+        if (jsonQuery.wrapperBehavior()
+                != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior.NONE) {
+            sql.append(" ").append(jsonQuery.wrapperBehavior().name().replace("_", " "));
         }
 
-        if (jsonQuery.onEmptyBehavior() != null) {
+        if (jsonQuery.onEmptyBehavior()
+                != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
             sql.append(" ");
             if (jsonQuery.onEmptyBehavior()
                             == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
                     && jsonQuery.onEmptyDefault() != null) {
                 sql.append("DEFAULT ").append(jsonQuery.onEmptyDefault());
             } else {
-                sql.append(jsonQuery.onEmptyBehavior().toSql());
+                sql.append(jsonQuery.onEmptyBehavior().name());
             }
             sql.append(" ON EMPTY");
         }
 
-        if (jsonQuery.onErrorBehavior() != null) {
-            sql.append(" ").append(jsonQuery.onErrorBehavior().toSql()).append(" ON ERROR");
+        if (jsonQuery.onErrorBehavior()
+                != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
+            sql.append(" ").append(jsonQuery.onErrorBehavior().name()).append(" ON ERROR");
         }
 
         sql.append(")");
