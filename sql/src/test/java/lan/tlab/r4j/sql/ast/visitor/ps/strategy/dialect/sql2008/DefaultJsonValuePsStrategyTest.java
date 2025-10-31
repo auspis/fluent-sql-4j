@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
@@ -16,7 +17,7 @@ class DefaultJsonValuePsStrategyTest {
     void withBasicArguments() {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonValuePsStrategy strategy = new DefaultJsonValuePsStrategy();
-        JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonValue jsonValue = JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
         PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
 
@@ -29,7 +30,12 @@ class DefaultJsonValuePsStrategyTest {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonValuePsStrategy strategy = new DefaultJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(
-                ColumnReference.of("products", "data"), Literal.of("$.price"), "DECIMAL(10,2)", "DEFAULT 0.0", "NULL");
+                ColumnReference.of("products", "data"),
+                Literal.of("$.price"),
+                "DECIMAL(10,2)",
+                BehaviorKind.DEFAULT,
+                "0.0",
+                BehaviorKind.NULL);
 
         PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
 

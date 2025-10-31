@@ -9,13 +9,58 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * Represents the JSON_EXISTS function from SQL:2016 standard.
  * JSON_EXISTS checks whether a JSON path expression returns any data.
  *
- * Syntax: JSON_EXISTS(json_doc, path [ON ERROR behavior])
+ * <p>Syntax: JSON_EXISTS(json_doc, path [ON ERROR behavior])
+ *
+ * <p>Example usage:
+ * <pre>{@code
+ * // Basic usage with defaults
+ * JsonExists jsonExists = JsonExists.of(
+ *     ColumnReference.of("products", "data"),
+ *     Literal.of("$.price")
+ * );
+ *
+ * // With error behavior
+ * JsonExists withError = JsonExists.of(
+ *     ColumnReference.of("products", "data"),
+ *     Literal.of("$.price"),
+ *     BehaviorKind.ERROR
+ * );
+ * }</pre>
  */
-public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, String onErrorBehavior)
+public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, BehaviorKind onErrorBehavior)
         implements FunctionCall {
 
+    /**
+     * Creates a JsonExists with default behavior (NULL on error).
+     *
+     * @param jsonDocument the JSON document expression
+     * @param path the JSON path expression
+     */
     public JsonExists(ScalarExpression jsonDocument, ScalarExpression path) {
         this(jsonDocument, path, null);
+    }
+
+    /**
+     * Factory method to create a JsonExists with default behavior (NULL on error).
+     *
+     * @param jsonDocument the JSON document expression
+     * @param path the JSON path expression
+     * @return a new JsonExists instance
+     */
+    public static JsonExists of(ScalarExpression jsonDocument, ScalarExpression path) {
+        return new JsonExists(jsonDocument, path);
+    }
+
+    /**
+     * Factory method to create a JsonExists with specified error behavior.
+     *
+     * @param jsonDocument the JSON document expression
+     * @param path the JSON path expression
+     * @param onErrorBehavior the behavior to use when an error occurs
+     * @return a new JsonExists instance
+     */
+    public static JsonExists of(ScalarExpression jsonDocument, ScalarExpression path, BehaviorKind onErrorBehavior) {
+        return new JsonExists(jsonDocument, path, onErrorBehavior);
     }
 
     @Override
