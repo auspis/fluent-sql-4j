@@ -15,6 +15,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
@@ -244,7 +245,7 @@ class JsonFunctionsMySqlIntegrationTest {
                         JsonQuery.of(
                                 ColumnReference.of("products", "data"),
                                 Literal.of("$.tags"),
-                                lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior.WITH_WRAPPER),
+                                WrapperBehavior.WITH_WRAPPER),
                         "tags")))
                 .from(From.of(new TableIdentifier("products")))
                 .build();
