@@ -17,7 +17,7 @@ class DefaultJsonValuePsStrategyTest {
     void withBasicArguments() {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonValuePsStrategy strategy = new DefaultJsonValuePsStrategy();
-        JsonValue jsonValue = JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
         PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
 
@@ -39,8 +39,7 @@ class DefaultJsonValuePsStrategyTest {
 
         PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
 
-        assertThat(result.sql())
-                .isEqualTo("JSON_VALUE(\"data\", ? RETURNING DECIMAL(10,2) DEFAULT 0.0 ON EMPTY NULL ON ERROR)");
+        assertThat(result.sql()).isEqualTo("JSON_VALUE(\"data\", ? RETURNING DECIMAL(10,2) DEFAULT 0.0 ON EMPTY)");
         assertThat(result.parameters()).containsExactly("$.price");
     }
 }

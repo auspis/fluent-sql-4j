@@ -17,7 +17,7 @@ class JsonExistsRenderStrategyTest {
     void standardSql2016WithBasicArguments() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonExistsRenderStrategy strategy = JsonExistsRenderStrategy.standardSql2016();
-        JsonExists jsonExists = JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonExists, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_EXISTS(\"products\".\"data\", '$.price')");
     }
@@ -27,7 +27,7 @@ class JsonExistsRenderStrategyTest {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonExistsRenderStrategy strategy = JsonExistsRenderStrategy.standardSql2016();
         JsonExists jsonExists =
-                JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);
+                new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);
         String sql = strategy.render(jsonExists, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_EXISTS(\"products\".\"data\", '$.price' ERROR ON ERROR)");
     }
@@ -36,7 +36,7 @@ class JsonExistsRenderStrategyTest {
     void postgreSql() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonExistsRenderStrategy strategy = JsonExistsRenderStrategy.postgreSql();
-        JsonExists jsonExists = JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonExists, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_EXISTS(\"products\".\"data\", '$.price')");
     }
