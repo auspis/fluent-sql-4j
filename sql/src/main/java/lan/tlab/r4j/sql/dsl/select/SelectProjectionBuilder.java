@@ -7,6 +7,7 @@ import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 
@@ -28,6 +29,18 @@ public class SelectProjectionBuilder {
     public SelectProjectionBuilder column(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new ScalarExpressionProjection(ColumnReference.of(table, column));
+        return this;
+    }
+
+    public SelectProjectionBuilder expression(ScalarExpression expression) {
+        finalizePendingProjection();
+        pendingProjection = new ScalarExpressionProjection(expression);
+        return this;
+    }
+
+    public SelectProjectionBuilder expression(ScalarExpression expression, String alias) {
+        finalizePendingProjection();
+        pendingProjection = new ScalarExpressionProjection(expression, alias);
         return this;
     }
 
@@ -106,8 +119,7 @@ public class SelectProjectionBuilder {
         if (pendingProjection instanceof AggregateCallProjection aggProj) {
             pendingProjection = new AggregateCallProjection((AggregateCall) aggProj.expression(), alias);
         } else if (pendingProjection instanceof ScalarExpressionProjection scalarProj) {
-            pendingProjection = new ScalarExpressionProjection(
-                    (lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression) scalarProj.expression(), alias);
+            pendingProjection = new ScalarExpressionProjection((ScalarExpression) scalarProj.expression(), alias);
         }
 
         return this;
