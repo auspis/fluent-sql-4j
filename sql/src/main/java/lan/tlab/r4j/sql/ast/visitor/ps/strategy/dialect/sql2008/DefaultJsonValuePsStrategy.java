@@ -29,11 +29,19 @@ public class DefaultJsonValuePsStrategy implements JsonValuePsStrategy {
         }
 
         if (jsonValue.onEmptyBehavior() != null) {
-            sql.append(" ").append(jsonValue.onEmptyBehavior()).append(" ON EMPTY");
+            sql.append(" ");
+            if (jsonValue.onEmptyBehavior()
+                            == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
+                    && jsonValue.onEmptyDefault() != null) {
+                sql.append("DEFAULT ").append(jsonValue.onEmptyDefault());
+            } else {
+                sql.append(jsonValue.onEmptyBehavior().toSql());
+            }
+            sql.append(" ON EMPTY");
         }
 
         if (jsonValue.onErrorBehavior() != null) {
-            sql.append(" ").append(jsonValue.onErrorBehavior()).append(" ON ERROR");
+            sql.append(" ").append(jsonValue.onErrorBehavior().toSql()).append(" ON ERROR");
         }
 
         sql.append(")");

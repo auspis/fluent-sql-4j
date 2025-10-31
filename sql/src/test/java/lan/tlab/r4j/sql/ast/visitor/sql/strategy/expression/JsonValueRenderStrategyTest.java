@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -16,7 +17,7 @@ class JsonValueRenderStrategyTest {
     void standardSql2016WithBasicArguments() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonValueRenderStrategy strategy = JsonValueRenderStrategy.standardSql2016();
-        JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonValue jsonValue = JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price')");
     }
@@ -25,8 +26,8 @@ class JsonValueRenderStrategyTest {
     void standardSql2016WithReturningType() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonValueRenderStrategy strategy = JsonValueRenderStrategy.standardSql2016();
-        JsonValue jsonValue = new JsonValue(
-                ColumnReference.of("products", "data"), Literal.of("$.price"), "VARCHAR(100)", null, null);
+        JsonValue jsonValue =
+                JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"), "VARCHAR(100)");
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price' RETURNING VARCHAR(100))");
     }
@@ -36,7 +37,12 @@ class JsonValueRenderStrategyTest {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonValueRenderStrategy strategy = JsonValueRenderStrategy.standardSql2016();
         JsonValue jsonValue = new JsonValue(
-                ColumnReference.of("products", "data"), Literal.of("$.price"), "DECIMAL(10,2)", "DEFAULT 0.0", "NULL");
+                ColumnReference.of("products", "data"),
+                Literal.of("$.price"),
+                "DECIMAL(10,2)",
+                BehaviorKind.DEFAULT,
+                "0.0",
+                BehaviorKind.NULL);
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
@@ -47,7 +53,7 @@ class JsonValueRenderStrategyTest {
     void postgreSql() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonValueRenderStrategy strategy = JsonValueRenderStrategy.postgreSql();
-        JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonValue jsonValue = JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price')");
     }
