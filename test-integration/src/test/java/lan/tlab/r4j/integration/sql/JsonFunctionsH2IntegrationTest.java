@@ -3,7 +3,8 @@ package lan.tlab.r4j.integration.sql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.SQLException;
+import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
@@ -23,45 +24,31 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Integration tests for JSON functions with MySQL database.
+ * Integration tests for JSON functions with H2 database.
  * These tests validate SQL rendering and ensure JSON AST nodes work correctly.
  */
-@Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JsonFunctionsMySqlIntegrationTest {
-
-    @Container
-    @SuppressWarnings("resource")
-    private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
-            .withDatabaseName("testdb")
-            .withUsername("test")
-            .withPassword("test");
+class JsonFunctionsH2IntegrationTest {
 
     private Connection connection;
     private SqlRenderer renderer;
 
     @BeforeAll
-    void setUp() throws Exception {
-        mysql.start();
-        connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
-        renderer = TestDialectRendererFactory.mysql();
+    void setUp() throws SQLException {
+        connection = TestDatabaseUtil.createH2Connection();
+        renderer = TestDialectRendererFactory.standardSql2008();
 
-        // Use standard TestDatabaseUtil tables - note: these don't have JSON columns
-        // so we're validating SQL rendering rather than execution
-        connection.createStatement().execute("CREATE TABLE users (id INT, name VARCHAR(100), email VARCHAR(100))");
-        connection.createStatement().execute("CREATE TABLE products (id INT, name VARCHAR(100), price DECIMAL(10,2))");
+        // Use standard tables from TestDatabaseUtil
+        TestDatabaseUtil.createUsersTable(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.createProductsTable(connection);
     }
 
     @AfterAll
-    void tearDown() throws Exception {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+    void tearDown() throws SQLException {
+        TestDatabaseUtil.closeConnection(connection);
     }
 
     @Test
@@ -124,21 +111,20 @@ class JsonFunctionsMySqlIntegrationTest {
     @Test
     void jsonValueWithReturningTypeRendersCorrectSql() {
         // Test JSON_VALUE with RETURNING type
-        JsonValue jsonValue =
-                new JsonValue(ColumnReference.of("products", "price"), Literal.of("$.amount"), "DECIMAL(10,2)");
+        JsonValue jsonValue = new JsonValue(ColumnReference.of("users", "age"), Literal.of("$.years"), "INTEGER");
 
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(
-                        new ScalarExpressionProjection(ColumnReference.of("products", "name")),
-                        new ScalarExpressionProjection(jsonValue, "amount")))
-                .from(From.of(new TableIdentifier("products")))
+                        new ScalarExpressionProjection(ColumnReference.of("users", "name")),
+                        new ScalarExpressionProjection(jsonValue, "age_years")))
+                .from(From.of(new TableIdentifier("users")))
                 .build();
 
         String sql = query.accept(renderer, new AstContext());
 
         // Verify the SQL contains RETURNING clause
         assertThat(sql).contains("JSON_VALUE");
-        assertThat(sql).contains("RETURNING DECIMAL(10,2)");
+        assertThat(sql).contains("RETURNING INTEGER");
     }
 
     @Test
