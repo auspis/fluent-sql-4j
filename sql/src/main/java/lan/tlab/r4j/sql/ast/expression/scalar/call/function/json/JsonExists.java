@@ -14,13 +14,13 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * <p>Example usage:
  * <pre>{@code
  * // Basic usage with defaults
- * JsonExists jsonExists = JsonExists.of(
+ * JsonExists jsonExists = new JsonExists(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.price")
  * );
  *
  * // With error behavior
- * JsonExists withError = JsonExists.of(
+ * JsonExists withError = new JsonExists(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.price"),
  *     BehaviorKind.ERROR
@@ -31,6 +31,16 @@ public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, B
         implements FunctionCall {
 
     /**
+     * Compact constructor that sets default values for null parameters.
+     * The default error behavior is NULL.
+     */
+    public JsonExists {
+        if (onErrorBehavior == null) {
+            onErrorBehavior = BehaviorKind.NULL;
+        }
+    }
+
+    /**
      * Creates a JsonExists with default behavior (NULL on error).
      *
      * @param jsonDocument the JSON document expression
@@ -38,29 +48,6 @@ public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, B
      */
     public JsonExists(ScalarExpression jsonDocument, ScalarExpression path) {
         this(jsonDocument, path, null);
-    }
-
-    /**
-     * Factory method to create a JsonExists with default behavior (NULL on error).
-     *
-     * @param jsonDocument the JSON document expression
-     * @param path the JSON path expression
-     * @return a new JsonExists instance
-     */
-    public static JsonExists of(ScalarExpression jsonDocument, ScalarExpression path) {
-        return new JsonExists(jsonDocument, path);
-    }
-
-    /**
-     * Factory method to create a JsonExists with specified error behavior.
-     *
-     * @param jsonDocument the JSON document expression
-     * @param path the JSON path expression
-     * @param onErrorBehavior the behavior to use when an error occurs
-     * @return a new JsonExists instance
-     */
-    public static JsonExists of(ScalarExpression jsonDocument, ScalarExpression path, BehaviorKind onErrorBehavior) {
-        return new JsonExists(jsonDocument, path, onErrorBehavior);
     }
 
     @Override

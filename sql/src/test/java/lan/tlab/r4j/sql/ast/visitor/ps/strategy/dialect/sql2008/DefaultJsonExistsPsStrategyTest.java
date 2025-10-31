@@ -17,7 +17,7 @@ class DefaultJsonExistsPsStrategyTest {
     void withBasicArguments() {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonExistsPsStrategy strategy = new DefaultJsonExistsPsStrategy();
-        JsonExists jsonExists = JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
         PsDto result = strategy.handle(jsonExists, renderer, new AstContext());
 
@@ -30,7 +30,7 @@ class DefaultJsonExistsPsStrategyTest {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonExistsPsStrategy strategy = new DefaultJsonExistsPsStrategy();
         JsonExists jsonExists =
-                JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);
+                new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);
 
         PsDto result = strategy.handle(jsonExists, renderer, new AstContext());
 

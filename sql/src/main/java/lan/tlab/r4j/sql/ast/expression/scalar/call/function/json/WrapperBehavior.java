@@ -21,48 +21,24 @@ public enum WrapperBehavior {
      * No wrapping applied. Returns the JSON fragment as-is.
      * This is the default behavior when no wrapper clause is specified.
      */
-    NONE(null),
+    NONE,
 
     /**
      * Wraps the result in an array.
      * If the result is a scalar value, it will be wrapped in an array.
      * Guarantees that the result is always an array.
      */
-    WITH_WRAPPER("WITH WRAPPER"),
+    WITH_WRAPPER,
 
     /**
      * Explicitly specifies no array wrapping.
      * Returns the JSON fragment without any wrapper.
      */
-    WITHOUT_WRAPPER("WITHOUT WRAPPER"),
+    WITHOUT_WRAPPER,
 
     /**
      * Conditionally wraps the result based on whether it's a scalar or array.
      * Wraps only if necessary to maintain consistency.
      */
-    WITH_CONDITIONAL_WRAPPER("WITH CONDITIONAL WRAPPER");
-
-    private final String sqlClause;
-
-    WrapperBehavior(String sqlClause) {
-        this.sqlClause = sqlClause;
-    }
-
-    /**
-     * Returns the SQL clause representation of this wrapper behavior.
-     *
-     * @return the SQL clause string, or null if no clause should be emitted
-     */
-    public String toSql() {
-        return sqlClause;
-    }
-
-    /**
-     * Returns true if this wrapper behavior requires a SQL clause.
-     *
-     * @return true if a SQL clause should be emitted, false otherwise
-     */
-    public boolean hasClause() {
-        return sqlClause != null;
-    }
+    WITH_CONDITIONAL_WRAPPER
 }
