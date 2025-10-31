@@ -25,7 +25,7 @@ public class DefaultJsonExistsPsStrategy implements JsonExistsPsStrategy {
         sql.append(pathResult.sql());
 
         if (jsonExists.onErrorBehavior() != null) {
-            sql.append(" ").append(jsonExists.onErrorBehavior()).append(" ON ERROR");
+            sql.append(" ").append(jsonExists.onErrorBehavior().toSql()).append(" ON ERROR");
         }
 
         sql.append(")");

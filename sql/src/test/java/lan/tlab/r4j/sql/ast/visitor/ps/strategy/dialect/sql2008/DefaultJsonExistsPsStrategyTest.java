@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
@@ -16,7 +17,7 @@ class DefaultJsonExistsPsStrategyTest {
     void withBasicArguments() {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonExistsPsStrategy strategy = new DefaultJsonExistsPsStrategy();
-        JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonExists jsonExists = JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
         PsDto result = strategy.handle(jsonExists, renderer, new AstContext());
 
@@ -28,11 +29,12 @@ class DefaultJsonExistsPsStrategyTest {
     void withOnErrorBehavior() {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonExistsPsStrategy strategy = new DefaultJsonExistsPsStrategy();
-        JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), "FALSE");
+        JsonExists jsonExists =
+                JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);
 
         PsDto result = strategy.handle(jsonExists, renderer, new AstContext());
 
-        assertThat(result.sql()).isEqualTo("JSON_EXISTS(\"data\", ? FALSE ON ERROR)");
+        assertThat(result.sql()).isEqualTo("JSON_EXISTS(\"data\", ? ERROR ON ERROR)");
         assertThat(result.parameters()).containsExactly("$.price");
     }
 }

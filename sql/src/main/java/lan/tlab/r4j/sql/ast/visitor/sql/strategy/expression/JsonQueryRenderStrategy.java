@@ -19,16 +19,25 @@ public interface JsonQueryRenderStrategy extends ExpressionRenderStrategy {
                 sql.append(" RETURNING ").append(functionCall.returningType());
             }
 
-            if (functionCall.wrapperBehavior() != null) {
-                sql.append(" ").append(functionCall.wrapperBehavior());
+            if (functionCall.wrapperBehavior() != null
+                    && functionCall.wrapperBehavior().hasClause()) {
+                sql.append(" ").append(functionCall.wrapperBehavior().toSql());
             }
 
             if (functionCall.onEmptyBehavior() != null) {
-                sql.append(" ").append(functionCall.onEmptyBehavior()).append(" ON EMPTY");
+                sql.append(" ");
+                if (functionCall.onEmptyBehavior()
+                                == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
+                        && functionCall.onEmptyDefault() != null) {
+                    sql.append("DEFAULT ").append(functionCall.onEmptyDefault());
+                } else {
+                    sql.append(functionCall.onEmptyBehavior().toSql());
+                }
+                sql.append(" ON EMPTY");
             }
 
             if (functionCall.onErrorBehavior() != null) {
-                sql.append(" ").append(functionCall.onErrorBehavior()).append(" ON ERROR");
+                sql.append(" ").append(functionCall.onErrorBehavior().toSql()).append(" ON ERROR");
             }
 
             sql.append(")");
