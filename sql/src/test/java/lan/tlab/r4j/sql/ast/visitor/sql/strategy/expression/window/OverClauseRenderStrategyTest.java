@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.window.OverClause;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -70,8 +71,10 @@ class OverClauseRenderStrategyTest {
 
     @Test
     void rendersOverClauseWithNullPartitionByAndOrderBy() {
+        List<ScalarExpression> partitionBy = null;
+        List<Sorting> orderBy = null;
         OverClause overClause =
-                OverClause.builder().partitionBy(null).orderBy(null).build();
+                OverClause.builder().partitionBy(partitionBy).orderBy(orderBy).build();
 
         String sql = strategy.render(overClause, sqlRenderer, new AstContext());
 
