@@ -28,16 +28,24 @@ public class DefaultJsonQueryPsStrategy implements JsonQueryPsStrategy {
             sql.append(" RETURNING ").append(jsonQuery.returningType());
         }
 
-        if (jsonQuery.wrapperBehavior() != null) {
-            sql.append(" ").append(jsonQuery.wrapperBehavior());
+        if (jsonQuery.wrapperBehavior() != null && jsonQuery.wrapperBehavior().hasClause()) {
+            sql.append(" ").append(jsonQuery.wrapperBehavior().toSql());
         }
 
         if (jsonQuery.onEmptyBehavior() != null) {
-            sql.append(" ").append(jsonQuery.onEmptyBehavior()).append(" ON EMPTY");
+            sql.append(" ");
+            if (jsonQuery.onEmptyBehavior()
+                            == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
+                    && jsonQuery.onEmptyDefault() != null) {
+                sql.append("DEFAULT ").append(jsonQuery.onEmptyDefault());
+            } else {
+                sql.append(jsonQuery.onEmptyBehavior().toSql());
+            }
+            sql.append(" ON EMPTY");
         }
 
         if (jsonQuery.onErrorBehavior() != null) {
-            sql.append(" ").append(jsonQuery.onErrorBehavior()).append(" ON ERROR");
+            sql.append(" ").append(jsonQuery.onErrorBehavior().toSql()).append(" ON ERROR");
         }
 
         sql.append(")");
