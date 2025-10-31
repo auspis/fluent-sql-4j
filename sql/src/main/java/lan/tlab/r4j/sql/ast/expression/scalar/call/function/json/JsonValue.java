@@ -14,13 +14,13 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * <p>Example usage:
  * <pre>{@code
  * // Basic usage with defaults
- * JsonValue jsonValue = JsonValue.of(
+ * JsonValue jsonValue = new JsonValue(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.price")
  * );
  *
  * // With returning type
- * JsonValue withType = JsonValue.of(
+ * JsonValue withType = new JsonValue(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.price"),
  *     "DECIMAL(10,2)"
@@ -47,6 +47,19 @@ public record JsonValue(
         implements FunctionCall {
 
     /**
+     * Compact constructor that sets default values for null parameters.
+     * Default behaviors are NULL for both empty and error conditions.
+     */
+    public JsonValue {
+        if (onEmptyBehavior == null) {
+            onEmptyBehavior = BehaviorKind.NULL;
+        }
+        if (onErrorBehavior == null) {
+            onErrorBehavior = BehaviorKind.NULL;
+        }
+    }
+
+    /**
      * Creates a JsonValue with default behaviors (NULL on empty and error).
      *
      * @param jsonDocument the JSON document expression
@@ -57,26 +70,14 @@ public record JsonValue(
     }
 
     /**
-     * Factory method to create a JsonValue with default behaviors.
-     *
-     * @param jsonDocument the JSON document expression
-     * @param path the JSON path expression
-     * @return a new JsonValue instance
-     */
-    public static JsonValue of(ScalarExpression jsonDocument, ScalarExpression path) {
-        return new JsonValue(jsonDocument, path);
-    }
-
-    /**
-     * Factory method to create a JsonValue with a returning type.
+     * Creates a JsonValue with a returning type and default behaviors.
      *
      * @param jsonDocument the JSON document expression
      * @param path the JSON path expression
      * @param returningType the data type to return
-     * @return a new JsonValue instance
      */
-    public static JsonValue of(ScalarExpression jsonDocument, ScalarExpression path, String returningType) {
-        return new JsonValue(jsonDocument, path, returningType, null, null, null);
+    public JsonValue(ScalarExpression jsonDocument, ScalarExpression path, String returningType) {
+        this(jsonDocument, path, returningType, null, null, null);
     }
 
     @Override
