@@ -17,7 +17,7 @@ class JsonValueRenderStrategyTest {
     void standardSql2016WithBasicArguments() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonValueRenderStrategy strategy = JsonValueRenderStrategy.standardSql2016();
-        JsonValue jsonValue = JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price')");
     }
@@ -27,7 +27,7 @@ class JsonValueRenderStrategyTest {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonValueRenderStrategy strategy = JsonValueRenderStrategy.standardSql2016();
         JsonValue jsonValue =
-                JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"), "VARCHAR(100)");
+                new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"), "VARCHAR(100)");
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price' RETURNING VARCHAR(100))");
     }
@@ -45,15 +45,14 @@ class JsonValueRenderStrategyTest {
                 BehaviorKind.NULL);
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql)
-                .isEqualTo(
-                        "JSON_VALUE(\"products\".\"data\", '$.price' RETURNING DECIMAL(10,2) DEFAULT 0.0 ON EMPTY NULL ON ERROR)");
+                .isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price' RETURNING DECIMAL(10,2) DEFAULT 0.0 ON EMPTY)");
     }
 
     @Test
     void postgreSql() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonValueRenderStrategy strategy = JsonValueRenderStrategy.postgreSql();
-        JsonValue jsonValue = JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"));
+        JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price')");
     }

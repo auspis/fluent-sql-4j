@@ -18,7 +18,7 @@ class JsonQueryRenderStrategyTest {
     void standardSql2016WithBasicArguments() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonQueryRenderStrategy strategy = JsonQueryRenderStrategy.standardSql2016();
-        JsonQuery jsonQuery = JsonQuery.of(ColumnReference.of("products", "data"), Literal.of("$.tags"));
+        JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_QUERY(\"products\".\"data\", '$.tags')");
     }
@@ -48,14 +48,14 @@ class JsonQueryRenderStrategyTest {
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(
-                        "JSON_QUERY(\"products\".\"data\", '$.tags' RETURNING JSON WITH WRAPPER DEFAULT EMPTY ARRAY ON EMPTY NULL ON ERROR)");
+                        "JSON_QUERY(\"products\".\"data\", '$.tags' RETURNING JSON WITH WRAPPER DEFAULT EMPTY ARRAY ON EMPTY)");
     }
 
     @Test
     void postgreSql() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         JsonQueryRenderStrategy strategy = JsonQueryRenderStrategy.postgreSql();
-        JsonQuery jsonQuery = JsonQuery.of(ColumnReference.of("products", "data"), Literal.of("$.tags"));
+        JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_QUERY(\"products\".\"data\", '$.tags')");
     }
