@@ -25,6 +25,7 @@
     <maven.versions.plugin.version>2.19.1</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
     <maven.rewrite.plugin.version>6.22.1</maven.rewrite.plugin.version>
+    <maven.jacoco.plugin.version>0.8.12</maven.jacoco.plugin.version>
 
     <dep.lombok.version>1.18.42</dep.lombok.version>
     <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
@@ -284,14 +285,6 @@
             </execution>
           </executions>
         </plugin>
-        <!-- <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven.surefire.plugin.version}</version>
-          <configuration>
-            <argLine>-javaagent:${project.build.directory}/agents/byte-buddy-agent-${dep.byte-buddy.version}.jar</argLine>
-          </configuration>
-        </plugin> -->
       </plugins>
     </pluginManagement>
     <plugins>
@@ -342,6 +335,24 @@
                 <argument>.git/hooks/pre-commit</argument>
               </arguments>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${maven.jacoco.plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
