@@ -27,6 +27,11 @@
   - [CI/CD Pipeline](#cicd-pipeline)
   - [Writing Tests](#writing-tests)
   - [Test Annotations](#test-annotations)
+- [Code Coverage](#code-coverage)
+  - [Generating Coverage Reports](#generating-coverage-reports)
+  - [Viewing Reports](#viewing-reports)
+  - [Coverage Metrics](#coverage-metrics)
+  - [Configuration](#configuration)
 - [Install GIT hook](#install-git-hook)
 - [Manually format code](#manually-format-code)
 - [Check updates](#check-updates)
@@ -750,6 +755,65 @@ Custom test annotations are located in `lan.tlab.r4j.sql.util.annotation`:
 - `@E2ETest` - Marks end-to-end tests (tagged with `e2e`)
 
 Both annotations include JUnit tags for Maven filtering. Apply them at the **class level** only.
+
+## Code Coverage
+
+This project uses [JaCoCo](https://www.jacoco.org/jacoco/) for code coverage analysis. JaCoCo is configured centrally in the root `pom.xml` and inherited by all modules.
+
+### Generating Coverage Reports
+
+#### Unit Tests Only
+
+To generate coverage reports for unit tests only (fast feedback):
+
+```bash
+./mvnw clean test jacoco:report
+```
+
+#### Full Verification (Unit + Integration + E2E)
+
+To generate coverage reports after running all tests:
+
+```bash
+./mvnw clean verify jacoco:report
+```
+
+#### Module-Specific Coverage
+
+To generate coverage for a specific module and its dependencies:
+
+```bash
+./mvnw clean test -pl <module> -am jacoco:report
+./mvnw clean verify -pl <module> -am jacoco:report
+```
+
+### Viewing Reports
+
+Coverage reports are generated as HTML files in each module's `target/site/jacoco/` directory:
+
+- **SQL Module**: `sql/target/site/jacoco/index.html`
+- **Test Integration Module**: `test-integration/target/site/jacoco/index.html`
+
+Open the `index.html` file in your browser to view detailed coverage information including:
+- Overall coverage percentages (instructions, branches, lines, methods, classes)
+- Coverage breakdown by package and class
+- Source code highlighting showing covered/uncovered lines
+
+### Coverage Metrics
+
+- **Instructions**: Bytecode instructions executed
+- **Branches**: Decision points (if/else, loops) covered
+- **Lines**: Source code lines executed
+- **Methods**: Methods called during tests
+- **Classes**: Classes instantiated during tests
+
+### Configuration
+
+JaCoCo is configured in the root `pom.xml` under the `<plugins>` section, ensuring consistent coverage settings across all modules. The configuration includes:
+
+- Coverage data collection during test execution
+- HTML report generation
+- Exclusion of generated code from coverage analysis
 
 ## Install GIT hook
 
