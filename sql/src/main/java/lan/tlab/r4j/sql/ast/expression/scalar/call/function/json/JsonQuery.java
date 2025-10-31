@@ -14,15 +14,16 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * <p>Example usage:
  * <pre>{@code
  * // Basic usage with defaults
- * JsonQuery jsonQuery = JsonQuery.of(
+ * JsonQuery jsonQuery = new JsonQuery(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.items")
  * );
  *
  * // With wrapper behavior
- * JsonQuery withWrapper = JsonQuery.of(
+ * JsonQuery withWrapper = new JsonQuery(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.items"),
+ *     null,
  *     WrapperBehavior.WITH_WRAPPER
  * );
  *
@@ -49,6 +50,22 @@ public record JsonQuery(
         implements FunctionCall {
 
     /**
+     * Compact constructor that sets default values for null parameters.
+     * Default wrapper behavior is NONE, and default behaviors for empty/error are NULL.
+     */
+    public JsonQuery {
+        if (wrapperBehavior == null) {
+            wrapperBehavior = WrapperBehavior.NONE;
+        }
+        if (onEmptyBehavior == null) {
+            onEmptyBehavior = BehaviorKind.NULL;
+        }
+        if (onErrorBehavior == null) {
+            onErrorBehavior = BehaviorKind.NULL;
+        }
+    }
+
+    /**
      * Creates a JsonQuery with default behaviors (no wrapper, NULL on empty and error).
      *
      * @param jsonDocument the JSON document expression
@@ -59,26 +76,19 @@ public record JsonQuery(
     }
 
     /**
-     * Factory method to create a JsonQuery with default behaviors.
+     * Creates a JsonQuery with wrapper behavior and other defaults.
      *
      * @param jsonDocument the JSON document expression
      * @param path the JSON path expression
-     * @return a new JsonQuery instance
-     */
-    public static JsonQuery of(ScalarExpression jsonDocument, ScalarExpression path) {
-        return new JsonQuery(jsonDocument, path);
-    }
-
-    /**
-     * Factory method to create a JsonQuery with wrapper behavior.
-     *
-     * @param jsonDocument the JSON document expression
-     * @param path the JSON path expression
+     * @param returningType the data type to return
      * @param wrapperBehavior the wrapper behavior to apply
-     * @return a new JsonQuery instance
      */
-    public static JsonQuery of(ScalarExpression jsonDocument, ScalarExpression path, WrapperBehavior wrapperBehavior) {
-        return new JsonQuery(jsonDocument, path, null, wrapperBehavior, null, null, null);
+    public JsonQuery(
+            ScalarExpression jsonDocument,
+            ScalarExpression path,
+            String returningType,
+            WrapperBehavior wrapperBehavior) {
+        this(jsonDocument, path, returningType, wrapperBehavior, null, null, null);
     }
 
     @Override
