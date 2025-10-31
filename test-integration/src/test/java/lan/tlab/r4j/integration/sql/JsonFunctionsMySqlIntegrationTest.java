@@ -104,7 +104,7 @@ class JsonFunctionsMySqlIntegrationTest {
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                         new ScalarExpressionProjection(
-                                JsonExists.of(ColumnReference.of("products", "data"), Literal.of("$.price")),
+                                new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price")),
                                 "has_price")))
                 .from(From.of(new TableIdentifier("products")))
                 .build();
@@ -122,7 +122,7 @@ class JsonFunctionsMySqlIntegrationTest {
         // Test JSON_EXISTS with error behavior
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
-                        JsonExists.of(
+                        new JsonExists(
                                 ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR),
                         "has_price")))
                 .from(From.of(new TableIdentifier("products")))
@@ -142,7 +142,7 @@ class JsonFunctionsMySqlIntegrationTest {
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                         new ScalarExpressionProjection(
-                                JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price")), "price")))
+                                new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price")), "price")))
                 .from(From.of(new TableIdentifier("products")))
                 .build();
 
@@ -176,7 +176,7 @@ class JsonFunctionsMySqlIntegrationTest {
     void jsonValueWithReturningTypeRendersCorrectSql() {
         // Test JSON_VALUE with RETURNING type
         JsonValue jsonValue =
-                JsonValue.of(ColumnReference.of("products", "data"), Literal.of("$.price"), "DECIMAL(10,2)");
+                new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"), "DECIMAL(10,2)");
 
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(
@@ -225,7 +225,7 @@ class JsonFunctionsMySqlIntegrationTest {
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                         new ScalarExpressionProjection(
-                                JsonQuery.of(ColumnReference.of("products", "data"), Literal.of("$.tags")), "tags")))
+                                new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags")), "tags")))
                 .from(From.of(new TableIdentifier("products")))
                 .build();
 
@@ -242,7 +242,7 @@ class JsonFunctionsMySqlIntegrationTest {
         // Test JSON_QUERY with wrapper behavior
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
-                        JsonQuery.of(
+                        new JsonQuery(
                                 ColumnReference.of("products", "data"),
                                 Literal.of("$.tags"),
                                 WrapperBehavior.WITH_WRAPPER),

@@ -28,20 +28,22 @@ public class DefaultJsonValuePsStrategy implements JsonValuePsStrategy {
             sql.append(" RETURNING ").append(jsonValue.returningType());
         }
 
-        if (jsonValue.onEmptyBehavior() != null) {
+        if (jsonValue.onEmptyBehavior()
+                != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
             sql.append(" ");
             if (jsonValue.onEmptyBehavior()
                             == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
                     && jsonValue.onEmptyDefault() != null) {
                 sql.append("DEFAULT ").append(jsonValue.onEmptyDefault());
             } else {
-                sql.append(jsonValue.onEmptyBehavior().toSql());
+                sql.append(jsonValue.onEmptyBehavior().name());
             }
             sql.append(" ON EMPTY");
         }
 
-        if (jsonValue.onErrorBehavior() != null) {
-            sql.append(" ").append(jsonValue.onErrorBehavior().toSql()).append(" ON ERROR");
+        if (jsonValue.onErrorBehavior()
+                != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
+            sql.append(" ").append(jsonValue.onErrorBehavior().name()).append(" ON ERROR");
         }
 
         sql.append(")");

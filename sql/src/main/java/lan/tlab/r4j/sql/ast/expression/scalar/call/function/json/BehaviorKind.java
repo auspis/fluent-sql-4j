@@ -20,32 +20,17 @@ public enum BehaviorKind {
      * Returns NULL when the condition (empty or error) occurs.
      * This is typically the default behavior for most JSON functions.
      */
-    NULL("NULL"),
+    NULL,
 
     /**
      * Raises an error when the condition (empty or error) occurs.
      * This behavior causes the query to fail if the condition is met.
      */
-    ERROR("ERROR"),
+    ERROR,
 
     /**
      * Returns a default value when the condition (empty or error) occurs.
      * When using this behavior, a default value expression must be provided.
      */
-    DEFAULT("DEFAULT");
-
-    private final String sqlKeyword;
-
-    BehaviorKind(String sqlKeyword) {
-        this.sqlKeyword = sqlKeyword;
-    }
-
-    /**
-     * Returns the SQL keyword representation of this behavior.
-     *
-     * @return the SQL keyword string
-     */
-    public String toSql() {
-        return sqlKeyword;
-    }
+    DEFAULT
 }

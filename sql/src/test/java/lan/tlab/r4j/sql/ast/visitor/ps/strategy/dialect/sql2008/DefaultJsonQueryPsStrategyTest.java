@@ -18,7 +18,7 @@ class DefaultJsonQueryPsStrategyTest {
     void withBasicArguments() {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonQueryPsStrategy strategy = new DefaultJsonQueryPsStrategy();
-        JsonQuery jsonQuery = JsonQuery.of(ColumnReference.of("products", "data"), Literal.of("$.tags"));
+        JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
 
         PsDto result = strategy.handle(jsonQuery, renderer, new AstContext());
 
@@ -42,8 +42,7 @@ class DefaultJsonQueryPsStrategyTest {
         PsDto result = strategy.handle(jsonQuery, renderer, new AstContext());
 
         assertThat(result.sql())
-                .isEqualTo(
-                        "JSON_QUERY(\"data\", ? RETURNING JSON WITH WRAPPER DEFAULT EMPTY ARRAY ON EMPTY NULL ON ERROR)");
+                .isEqualTo("JSON_QUERY(\"data\", ? RETURNING JSON WITH WRAPPER DEFAULT EMPTY ARRAY ON EMPTY)");
         assertThat(result.parameters()).containsExactly("$.tags");
     }
 }
