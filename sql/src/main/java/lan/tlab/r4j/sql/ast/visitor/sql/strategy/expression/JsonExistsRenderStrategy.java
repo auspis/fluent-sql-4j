@@ -16,7 +16,7 @@ public interface JsonExistsRenderStrategy extends ExpressionRenderStrategy {
             sql.append(functionCall.path().accept(sqlRenderer, ctx));
 
             if (functionCall.onErrorBehavior() != null) {
-                sql.append(" ").append(functionCall.onErrorBehavior()).append(" ON ERROR");
+                sql.append(" ").append(functionCall.onErrorBehavior().toSql()).append(" ON ERROR");
             }
 
             sql.append(")");
