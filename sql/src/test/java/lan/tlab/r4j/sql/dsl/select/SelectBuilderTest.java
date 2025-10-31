@@ -603,6 +603,151 @@ class SelectBuilderTest {
                 .hasMessage("Column name cannot be null or empty");
     }
 
+    // Additional HAVING tests for better HavingConditionBuilder coverage
+
+    @Test
+    void havingStringComparisons() {
+        // Test all string comparison operators
+        String sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .groupBy("category")
+                .having("category")
+                .eq("electronics")
+                .build();
+
+        assertThat(sql).contains("HAVING \"products\".\"category\" = 'electronics'");
+
+        sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .groupBy("category")
+                .having("category")
+                .ne("books")
+                .build();
+
+        assertThat(sql).contains("HAVING \"products\".\"category\" != 'books'");
+    }
+
+    @Test
+    void havingNumberComparisons() {
+        // Test additional number comparison operators
+        String sql = new SelectBuilder(renderer, "*")
+                .from("orders")
+                .groupBy("total")
+                .having("total")
+                .gte(100.0)
+                .build();
+
+        assertThat(sql).contains("HAVING \"orders\".\"total\" >= 100.0");
+
+        sql = new SelectBuilder(renderer, "*")
+                .from("orders")
+                .groupBy("total")
+                .having("total")
+                .lte(500)
+                .build();
+
+        assertThat(sql).contains("HAVING \"orders\".\"total\" <= 500");
+    }
+
+    @Test
+    void havingBooleanComparisons() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .groupBy("active")
+                .having("active")
+                .eq(true)
+                .build();
+
+        assertThat(sql).contains("HAVING \"users\".\"active\" = true");
+
+        sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .groupBy("active")
+                .having("active")
+                .ne(false)
+                .build();
+
+        assertThat(sql).contains("HAVING \"users\".\"active\" != false");
+    }
+
+    @Test
+    void havingNullChecks() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .groupBy("email")
+                .having("email")
+                .isNull()
+                .build();
+
+        assertThat(sql).contains("HAVING \"users\".\"email\" IS NULL");
+
+        sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .groupBy("email")
+                .having("email")
+                .isNotNull()
+                .build();
+
+        assertThat(sql).contains("HAVING \"users\".\"email\" IS NOT NULL");
+    }
+
+    @Test
+    void havingBetweenNumbers() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .groupBy("price")
+                .having("price")
+                .between(10.0, 100.0)
+                .build();
+
+        assertThat(sql).contains("HAVING (\"products\".\"price\" >= 10.0) AND (\"products\".\"price\" <= 100.0)");
+    }
+
+    @Test
+    void havingBetweenDates() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("orders")
+                .groupBy("order_date")
+                .having("order_date")
+                .between(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
+                .build();
+
+        assertThat(sql)
+                .contains(
+                        "HAVING (\"orders\".\"order_date\" >= '2023-01-01') AND (\"orders\".\"order_date\" <= '2023-12-31')");
+    }
+
+    @Test
+    void havingSubqueryComparison() {
+        // Create a simple subquery without aggregate functions
+        SelectBuilder subquery = new SelectBuilder(renderer, "budget")
+                .from("departments")
+                .where("active")
+                .eq(true);
+
+        String sql = new SelectBuilder(renderer, "*")
+                .from("departments")
+                .groupBy("budget")
+                .having("budget")
+                .gt(subquery)
+                .build();
+
+        assertThat(sql)
+                .contains(
+                        "HAVING \"departments\".\"budget\" > (SELECT \"departments\".\"budget\" FROM \"departments\" WHERE \"departments\".\"active\" = true)");
+    }
+
+    @Test
+    void havingWithNullSubquery_throwsException() {
+        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+                        .from("users")
+                        .groupBy("age")
+                        .having("age")
+                        .eq((SelectBuilder) null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Subquery cannot be null");
+    }
+
     @Test
     void countStar() {
         String result =
