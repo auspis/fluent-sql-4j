@@ -23,20 +23,20 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * JsonExists withError = new JsonExists(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.price"),
- *     BehaviorKind.ERROR
+ *     OnErrorBehavior.error()
  * );
  * }</pre>
  */
-public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, BehaviorKind onErrorBehavior)
+public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, OnErrorBehavior onErrorBehavior)
         implements FunctionCall {
 
     /**
      * Compact constructor that sets default values for null parameters.
-     * The default error behavior is NULL.
+     * The default error behavior returns NULL.
      */
     public JsonExists {
         if (onErrorBehavior == null) {
-            onErrorBehavior = BehaviorKind.NULL;
+            onErrorBehavior = OnErrorBehavior.returnNull();
         }
     }
 
