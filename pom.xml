@@ -28,7 +28,7 @@
     <maven.jacoco.plugin.version>0.8.14</maven.jacoco.plugin.version>
 
     <dep.lombok.version>1.18.42</dep.lombok.version>
-    <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
+    <dep.jackson-core.version>2.20.1</dep.jackson-core.version>
     <dep.semver4j.version>3.1.0</dep.semver4j.version>
     <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
