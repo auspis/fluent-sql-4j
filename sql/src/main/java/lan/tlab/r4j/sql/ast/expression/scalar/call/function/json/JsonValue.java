@@ -31,9 +31,8 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.price"),
  *     "DECIMAL(10,2)",
- *     BehaviorKind.DEFAULT,
- *     "0.0",
- *     BehaviorKind.NULL
+ *     OnEmptyBehavior.defaultValue("0.0"),
+ *     OnErrorBehavior.returnNull()
  * );
  * }</pre>
  */
@@ -41,21 +40,20 @@ public record JsonValue(
         ScalarExpression jsonDocument,
         ScalarExpression path,
         String returningType,
-        BehaviorKind onEmptyBehavior,
-        String onEmptyDefault,
-        BehaviorKind onErrorBehavior)
+        OnEmptyBehavior onEmptyBehavior,
+        OnErrorBehavior onErrorBehavior)
         implements FunctionCall {
 
     /**
      * Compact constructor that sets default values for null parameters.
-     * Default behaviors are NULL for both empty and error conditions.
+     * Default behaviors return NULL for both empty and error conditions.
      */
     public JsonValue {
         if (onEmptyBehavior == null) {
-            onEmptyBehavior = BehaviorKind.NULL;
+            onEmptyBehavior = OnEmptyBehavior.returnNull();
         }
         if (onErrorBehavior == null) {
-            onErrorBehavior = BehaviorKind.NULL;
+            onErrorBehavior = OnErrorBehavior.returnNull();
         }
     }
 
@@ -66,7 +64,7 @@ public record JsonValue(
      * @param path the JSON path expression
      */
     public JsonValue(ScalarExpression jsonDocument, ScalarExpression path) {
-        this(jsonDocument, path, null, null, null, null);
+        this(jsonDocument, path, null, null, null);
     }
 
     /**
@@ -77,7 +75,7 @@ public record JsonValue(
      * @param returningType the data type to return
      */
     public JsonValue(ScalarExpression jsonDocument, ScalarExpression path, String returningType) {
-        this(jsonDocument, path, returningType, null, null, null);
+        this(jsonDocument, path, returningType, null, null);
     }
 
     @Override

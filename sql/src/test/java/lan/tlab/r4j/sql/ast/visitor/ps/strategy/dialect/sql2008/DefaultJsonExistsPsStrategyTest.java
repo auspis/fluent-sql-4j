@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnErrorBehavior;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -30,7 +30,7 @@ class DefaultJsonExistsPsStrategyTest {
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
         DefaultJsonExistsPsStrategy strategy = new DefaultJsonExistsPsStrategy();
         JsonExists jsonExists =
-                new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);
+                new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), OnErrorBehavior.error());
 
         PsDto result = strategy.handle(jsonExists, renderer, new AstContext());
 
