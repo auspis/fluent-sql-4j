@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnErrorBehavior;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
@@ -35,9 +36,8 @@ class DefaultJsonQueryPsStrategyTest {
                 Literal.of("$.tags"),
                 "JSON",
                 WrapperBehavior.WITH_WRAPPER,
-                BehaviorKind.DEFAULT,
-                "EMPTY ARRAY",
-                BehaviorKind.NULL);
+                OnEmptyBehavior.defaultValue("EMPTY ARRAY"),
+                OnErrorBehavior.returnNull());
 
         PsDto result = strategy.handle(jsonQuery, renderer, new AstContext());
 
