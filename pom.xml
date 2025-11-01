@@ -30,7 +30,7 @@
     <dep.lombok.version>1.18.42</dep.lombok.version>
     <dep.jackson-core.version>2.20.0</dep.jackson-core.version>
     <dep.semver4j.version>3.1.0</dep.semver4j.version>
-    <dep.slf4j.version>2.0.16</dep.slf4j.version>
+    <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
     <dep.h2.version>2.4.240</dep.h2.version>
     <dep.mysql-connector-java.version>9.5.0</dep.mysql-connector-java.version>
