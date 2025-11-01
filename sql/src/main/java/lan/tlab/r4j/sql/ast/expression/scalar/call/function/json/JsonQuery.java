@@ -33,9 +33,8 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  *     Literal.of("$.items"),
  *     "JSON",
  *     WrapperBehavior.WITH_WRAPPER,
- *     BehaviorKind.NULL,
- *     null,
- *     BehaviorKind.ERROR
+ *     OnEmptyBehavior.defaultValue("EMPTY ARRAY"),
+ *     OnErrorBehavior.error()
  * );
  * }</pre>
  */
@@ -44,24 +43,23 @@ public record JsonQuery(
         ScalarExpression path,
         String returningType,
         WrapperBehavior wrapperBehavior,
-        BehaviorKind onEmptyBehavior,
-        String onEmptyDefault,
-        BehaviorKind onErrorBehavior)
+        OnEmptyBehavior onEmptyBehavior,
+        OnErrorBehavior onErrorBehavior)
         implements FunctionCall {
 
     /**
      * Compact constructor that sets default values for null parameters.
-     * Default wrapper behavior is NONE, and default behaviors for empty/error are NULL.
+     * Default wrapper behavior is NONE, and default behaviors for empty/error return NULL.
      */
     public JsonQuery {
         if (wrapperBehavior == null) {
             wrapperBehavior = WrapperBehavior.NONE;
         }
         if (onEmptyBehavior == null) {
-            onEmptyBehavior = BehaviorKind.NULL;
+            onEmptyBehavior = OnEmptyBehavior.returnNull();
         }
         if (onErrorBehavior == null) {
-            onErrorBehavior = BehaviorKind.NULL;
+            onErrorBehavior = OnErrorBehavior.returnNull();
         }
     }
 
@@ -72,7 +70,7 @@ public record JsonQuery(
      * @param path the JSON path expression
      */
     public JsonQuery(ScalarExpression jsonDocument, ScalarExpression path) {
-        this(jsonDocument, path, null, null, null, null, null);
+        this(jsonDocument, path, null, null, null, null);
     }
 
     /**
@@ -88,7 +86,7 @@ public record JsonQuery(
             ScalarExpression path,
             String returningType,
             WrapperBehavior wrapperBehavior) {
-        this(jsonDocument, path, returningType, wrapperBehavior, null, null, null);
+        this(jsonDocument, path, returningType, wrapperBehavior, null, null);
     }
 
     @Override
