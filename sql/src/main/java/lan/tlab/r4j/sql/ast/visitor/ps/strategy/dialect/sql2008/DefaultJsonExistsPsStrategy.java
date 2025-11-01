@@ -24,9 +24,9 @@ public class DefaultJsonExistsPsStrategy implements JsonExistsPsStrategy {
         sql.append(", ");
         sql.append(pathResult.sql());
 
-        if (jsonExists.onErrorBehavior()
+        if (jsonExists.onErrorBehavior().kind()
                 != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
-            sql.append(" ").append(jsonExists.onErrorBehavior().name()).append(" ON ERROR");
+            sql.append(" ").append(jsonExists.onErrorBehavior().kind().name()).append(" ON ERROR");
         }
 
         sql.append(")");

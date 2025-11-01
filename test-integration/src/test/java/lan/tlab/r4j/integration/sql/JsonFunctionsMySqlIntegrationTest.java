@@ -4,15 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnErrorBehavior;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
@@ -51,17 +53,14 @@ class JsonFunctionsMySqlIntegrationTest {
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
         renderer = TestDialectRendererFactory.mysql();
 
-        // Use standard TestDatabaseUtil tables - note: these don't have JSON columns
-        // so we're validating SQL rendering rather than execution
+        // Use standard tables from TestDatabaseUtil
         connection.createStatement().execute("CREATE TABLE users (id INT, name VARCHAR(100), email VARCHAR(100))");
         connection.createStatement().execute("CREATE TABLE products (id INT, name VARCHAR(100), price DECIMAL(10,2))");
     }
 
     @AfterAll
     void tearDown() throws Exception {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        TestDatabaseUtil.closeConnection(connection);
     }
 
     @Test
@@ -90,7 +89,7 @@ class JsonFunctionsMySqlIntegrationTest {
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         new JsonExists(
-                                ColumnReference.of("users", "email"), Literal.of("$.domain"), BehaviorKind.ERROR),
+                                ColumnReference.of("users", "email"), Literal.of("$.domain"), OnErrorBehavior.error()),
                         "has_domain")))
                 .from(From.of(new TableIdentifier("users")))
                 .build();
@@ -148,9 +147,8 @@ class JsonFunctionsMySqlIntegrationTest {
                 ColumnReference.of("products", "price"),
                 Literal.of("$.discount"),
                 "DECIMAL(10,2)",
-                BehaviorKind.DEFAULT,
-                "0.00",
-                BehaviorKind.NULL);
+                OnEmptyBehavior.defaultValue("0.00"),
+                OnErrorBehavior.returnNull());
 
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(
@@ -215,11 +213,11 @@ class JsonFunctionsMySqlIntegrationTest {
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("users", "email"), Literal.of("$.history"));
 
         // Verify defaults are set
-        assertThat(jsonExists.onErrorBehavior()).isEqualTo(BehaviorKind.NULL);
-        assertThat(jsonValue.onEmptyBehavior()).isEqualTo(BehaviorKind.NULL);
-        assertThat(jsonValue.onErrorBehavior()).isEqualTo(BehaviorKind.NULL);
+        assertThat(jsonExists.onErrorBehavior()).isEqualTo(OnErrorBehavior.returnNull());
+        assertThat(jsonValue.onEmptyBehavior()).isEqualTo(OnEmptyBehavior.returnNull());
+        assertThat(jsonValue.onErrorBehavior()).isEqualTo(OnErrorBehavior.returnNull());
         assertThat(jsonQuery.wrapperBehavior()).isEqualTo(WrapperBehavior.NONE);
-        assertThat(jsonQuery.onEmptyBehavior()).isEqualTo(BehaviorKind.NULL);
-        assertThat(jsonQuery.onErrorBehavior()).isEqualTo(BehaviorKind.NULL);
+        assertThat(jsonQuery.onEmptyBehavior()).isEqualTo(OnEmptyBehavior.returnNull());
+        assertThat(jsonQuery.onErrorBehavior()).isEqualTo(OnErrorBehavior.returnNull());
     }
 }
