@@ -19,22 +19,24 @@ public interface JsonValueRenderStrategy extends ExpressionRenderStrategy {
                 sql.append(" RETURNING ").append(functionCall.returningType());
             }
 
-            if (functionCall.onEmptyBehavior()
+            if (functionCall.onEmptyBehavior().kind()
                     != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
                 sql.append(" ");
-                if (functionCall.onEmptyBehavior()
+                if (functionCall.onEmptyBehavior().kind()
                                 == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
-                        && functionCall.onEmptyDefault() != null) {
-                    sql.append("DEFAULT ").append(functionCall.onEmptyDefault());
+                        && functionCall.onEmptyBehavior().defaultValue() != null) {
+                    sql.append("DEFAULT ").append(functionCall.onEmptyBehavior().defaultValue());
                 } else {
-                    sql.append(functionCall.onEmptyBehavior().name());
+                    sql.append(functionCall.onEmptyBehavior().kind().name());
                 }
                 sql.append(" ON EMPTY");
             }
 
-            if (functionCall.onErrorBehavior()
+            if (functionCall.onErrorBehavior().kind()
                     != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
-                sql.append(" ").append(functionCall.onErrorBehavior().name()).append(" ON ERROR");
+                sql.append(" ")
+                        .append(functionCall.onErrorBehavior().kind().name())
+                        .append(" ON ERROR");
             }
 
             sql.append(")");

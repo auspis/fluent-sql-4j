@@ -28,22 +28,22 @@ public class DefaultJsonValuePsStrategy implements JsonValuePsStrategy {
             sql.append(" RETURNING ").append(jsonValue.returningType());
         }
 
-        if (jsonValue.onEmptyBehavior()
+        if (jsonValue.onEmptyBehavior().kind()
                 != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
             sql.append(" ");
-            if (jsonValue.onEmptyBehavior()
+            if (jsonValue.onEmptyBehavior().kind()
                             == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
-                    && jsonValue.onEmptyDefault() != null) {
-                sql.append("DEFAULT ").append(jsonValue.onEmptyDefault());
+                    && jsonValue.onEmptyBehavior().defaultValue() != null) {
+                sql.append("DEFAULT ").append(jsonValue.onEmptyBehavior().defaultValue());
             } else {
-                sql.append(jsonValue.onEmptyBehavior().name());
+                sql.append(jsonValue.onEmptyBehavior().kind().name());
             }
             sql.append(" ON EMPTY");
         }
 
-        if (jsonValue.onErrorBehavior()
+        if (jsonValue.onErrorBehavior().kind()
                 != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
-            sql.append(" ").append(jsonValue.onErrorBehavior().name()).append(" ON ERROR");
+            sql.append(" ").append(jsonValue.onErrorBehavior().kind().name()).append(" ON ERROR");
         }
 
         sql.append(")");

@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnErrorBehavior;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
@@ -40,9 +41,8 @@ class JsonValueRenderStrategyTest {
                 ColumnReference.of("products", "data"),
                 Literal.of("$.price"),
                 "DECIMAL(10,2)",
-                BehaviorKind.DEFAULT,
-                "0.0",
-                BehaviorKind.NULL);
+                OnEmptyBehavior.defaultValue("0.0"),
+                OnErrorBehavior.returnNull());
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo("JSON_VALUE(\"products\".\"data\", '$.price' RETURNING DECIMAL(10,2) DEFAULT 0.0 ON EMPTY)");
