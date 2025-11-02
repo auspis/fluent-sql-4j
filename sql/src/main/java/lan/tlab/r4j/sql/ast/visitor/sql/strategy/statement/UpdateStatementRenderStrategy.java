@@ -1,21 +1,9 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement;
 
-import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class UpdateStatementRenderStrategy implements StatementRenderStrategy {
-
-    public String render(UpdateStatement statement, SqlRenderer sqlRenderer, AstContext ctx) {
-        String setList = statement.set().stream()
-                .map(item -> sqlRenderer.visit(item, ctx))
-                .collect(Collectors.joining(", "));
-        return String.format(
-                        "UPDATE %s SET %s %s",
-                        statement.table().accept(sqlRenderer, ctx),
-                        setList,
-                        statement.where().accept(sqlRenderer, ctx))
-                .trim();
-    }
+public interface UpdateStatementRenderStrategy extends StatementRenderStrategy {
+    String render(UpdateStatement statement, SqlRenderer sqlRenderer, AstContext ctx);
 }
