@@ -1,17 +1,10 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause;
 
-import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.clause.from.From;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class FromRenderStrategy implements ClauseRenderStrategy {
+public interface FromRenderStrategy extends ClauseRenderStrategy {
 
-    public String render(From clause, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format(
-                "FROM %s",
-                clause.sources().stream()
-                        .map(src -> src.accept(sqlRenderer, ctx))
-                        .collect(Collectors.joining(", ")));
-    }
+    String render(From clause, SqlRenderer sqlRenderer, AstContext ctx);
 }
