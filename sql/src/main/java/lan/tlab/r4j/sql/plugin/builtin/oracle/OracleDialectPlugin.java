@@ -3,7 +3,6 @@ package lan.tlab.r4j.sql.plugin.builtin.oracle;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateTimeRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 
@@ -119,7 +118,7 @@ public final class OracleDialectPlugin {
      */
     private static DialectRenderer createOracleRenderer() {
         SqlRenderer sqlRenderer = SqlRenderer.builder()
-                .currentDateTimeStrategy(CurrentDateTimeRenderStrategy.oracle())
+                .currentDateTimeStrategy((functionCall, sqlRenderer1, ctx) -> "SYSDATE()")
                 .exceptStrategy(ExceptRenderStrategy.oracle())
                 .build();
 
