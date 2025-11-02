@@ -191,12 +191,18 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.S
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSelectRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSortingRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlWhereRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarSqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCastRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCharLengthRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCharacterLengthRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlConcatRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateTimeRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlExceptRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlJsonExistsRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlJsonValueRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLegthRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarsSqlJsonQueryRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlCreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlDeleteStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlInsertStatementRenderStrategy;
@@ -343,7 +349,7 @@ public class SqlRenderer implements Visitor<String> {
             new StandardSqlCurrentDateTimeRenderStrategy();
 
     @Default
-    private final DateArithmeticRenderStrategy dateArithmeticStrategy = DateArithmeticRenderStrategy.standardSql2008();
+    private final DateArithmeticRenderStrategy dateArithmeticStrategy = new StandarSqlDateArithmeticRenderStrategy();
 
     @Default
     private final StandardSqlExtractDatePartRenderStrategy extractDatePartStrategy =
@@ -353,7 +359,7 @@ public class SqlRenderer implements Visitor<String> {
     private final StandardSqlLeftRenderStrategy leftStrategy = new StandardSqlLeftRenderStrategy();
 
     @Default
-    private final LegthRenderStrategy lengthStrategy = LegthRenderStrategy.standardSql2008();
+    private final LegthRenderStrategy lengthStrategy = new StandardSqlLegthRenderStrategy();
 
     @Default
     private final CharLengthRenderStrategy charLengthStrategy = new StandardSqlCharLengthRenderStrategy();
@@ -391,13 +397,13 @@ public class SqlRenderer implements Visitor<String> {
     private final UnaryStringRenderStrategy unaryStringStrategy = new UnaryStringRenderStrategy();
 
     @Default
-    private final JsonExistsRenderStrategy jsonExistsStrategy = JsonExistsRenderStrategy.standardSql2016();
+    private final JsonExistsRenderStrategy jsonExistsStrategy = new StandardSqlJsonExistsRenderStrategy();
 
     @Default
-    private final JsonQueryRenderStrategy jsonQueryStrategy = JsonQueryRenderStrategy.standardSql2016();
+    private final JsonQueryRenderStrategy jsonQueryStrategy = new StandarsSqlJsonQueryRenderStrategy();
 
     @Default
-    private final JsonValueRenderStrategy jsonValueStrategy = JsonValueRenderStrategy.standardSql2016();
+    private final JsonValueRenderStrategy jsonValueStrategy = new StandardSqlJsonValueRenderStrategy();
 
     // set expressions
     @Default
@@ -405,7 +411,7 @@ public class SqlRenderer implements Visitor<String> {
             new StandardSqlNullSetExpressionRenderStrategy();
 
     @Default
-    private final ExceptRenderStrategy exceptStrategy = ExceptRenderStrategy.standardSql2008();
+    private final ExceptRenderStrategy exceptStrategy = new StandardSqlExceptRenderStrategy();
 
     @Default
     private final StandardSqlIntersectRenderStrategy intersectStrategy = new StandardSqlIntersectRenderStrategy();
