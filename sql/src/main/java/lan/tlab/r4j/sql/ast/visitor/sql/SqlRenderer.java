@@ -178,12 +178,17 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.ForeignKeyC
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.NotNullConstraintRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.PrimaryKeyRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.UniqueConstraintRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.CreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.DeleteStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.InsertStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.SelectStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.UpdateStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlCreateTableStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlDeleteStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlInsertStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlMergeStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlSelectStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlUpdateStatementRenderStrategy;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -195,25 +200,28 @@ public class SqlRenderer implements Visitor<String> {
     @Default
     private final EscapeStrategy escapeStrategy = EscapeStrategy.standard();
 
-    // statements
     @Default
-    private final SelectStatementRenderStrategy selectStatementStrategy = new SelectStatementRenderStrategy();
+    private final SelectStatementRenderStrategy selectStatementStrategy =
+            new StandardSqlSelectStatementRenderStrategy();
 
     @Default
-    private final InsertStatementRenderStrategy insertStatementStrategy = new InsertStatementRenderStrategy();
+    private final InsertStatementRenderStrategy insertStatementStrategy =
+            new StandardSqlInsertStatementRenderStrategy();
 
     @Default
-    private final UpdateStatementRenderStrategy updateStatementStrategy = new UpdateStatementRenderStrategy();
+    private final UpdateStatementRenderStrategy updateStatementStrategy =
+            new StandardSqlUpdateStatementRenderStrategy();
 
     @Default
-    private final DeleteStatementRenderStrategy deleteStatementStrategy = new DeleteStatementRenderStrategy();
+    private final DeleteStatementRenderStrategy deleteStatementStrategy =
+            new StandardSqlDeleteStatementRenderStrategy();
 
     @Default
-    private final MergeStatementRenderStrategy mergeStatementStrategy = MergeStatementRenderStrategy.standardSql2008();
+    private final MergeStatementRenderStrategy mergeStatementStrategy = new StandardSqlMergeStatementRenderStrategy();
 
     @Default
-    private final CreateTableStatementRenderStrategy createTableStatementStrategy =
-            new CreateTableStatementRenderStrategy();
+    private final StandardSqlCreateTableStatementRenderStrategy createTableStatementStrategy =
+            new StandardSqlCreateTableStatementRenderStrategy();
 
     // clause
     @Default
