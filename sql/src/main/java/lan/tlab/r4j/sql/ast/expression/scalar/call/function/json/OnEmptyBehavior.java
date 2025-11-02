@@ -17,7 +17,7 @@ public record OnEmptyBehavior(BehaviorKind kind, String defaultValue) {
      */
     public OnEmptyBehavior {
         if (kind == null) {
-            kind = BehaviorKind.NULL;
+            kind = BehaviorKind.NONE;
         }
     }
 
@@ -27,7 +27,7 @@ public record OnEmptyBehavior(BehaviorKind kind, String defaultValue) {
      * @return OnEmptyBehavior with NULL kind
      */
     public static OnEmptyBehavior returnNull() {
-        return new OnEmptyBehavior(BehaviorKind.NULL, null);
+        return new OnEmptyBehavior(BehaviorKind.NONE, null);
     }
 
     /**
