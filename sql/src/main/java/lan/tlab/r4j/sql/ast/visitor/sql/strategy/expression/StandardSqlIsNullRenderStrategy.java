@@ -1,0 +1,12 @@
+package lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression;
+
+import lan.tlab.r4j.sql.ast.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+
+public class StandardSqlIsNullRenderStrategy implements ExpressionRenderStrategy {
+
+    public String render(IsNull expression, SqlRenderer sqlRenderer, AstContext ctx) {
+        return String.format("%s IS NULL", expression.expression().accept(sqlRenderer, ctx));
+    }
+}
