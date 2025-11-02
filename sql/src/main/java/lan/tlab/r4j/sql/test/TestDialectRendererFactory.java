@@ -6,8 +6,8 @@ import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.oracle.OracleDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.sqlserver.SqlServerDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
 
 /**
  * Test utility factory for creating SQL renderers via the plugin system.
