@@ -24,10 +24,6 @@ public record Cast(ScalarExpression expression, String dataType) implements Func
         return new Cast(expression, dataType);
     }
 
-    public static Cast sqlServer(ScalarExpression expression, String dataType) {
-        return new Cast(expression, dataType);
-    }
-
     @Override
     public <T> T accept(Visitor<T> visitor, AstContext ctx) {
         return visitor.visit(this, ctx);

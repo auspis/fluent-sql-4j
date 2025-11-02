@@ -7,7 +7,6 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.oracle.OracleDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.sqlserver.SqlServerDialectPlugin;
 
 /**
  * Test utility factory for creating SQL renderers via the plugin system.
@@ -74,18 +73,6 @@ public final class TestDialectRendererFactory {
     }
 
     /**
-     * Creates a {@link SqlRenderer} for SQL Server dialect.
-     *
-     * @return SqlRenderer configured for SQL Server 2019+
-     * @throws IllegalArgumentException if the SQL Server plugin is not available
-     */
-    public static SqlRenderer sqlServer() {
-        return REGISTRY.getDialectRenderer(SqlServerDialectPlugin.DIALECT_NAME, SqlServerDialectPlugin.DIALECT_VERSION)
-                .orElseThrow()
-                .sqlRenderer();
-    }
-
-    /**
      * Creates a {@link SqlRenderer} for Oracle Database dialect.
      *
      * @return SqlRenderer configured for Oracle 19c+
@@ -117,17 +104,6 @@ public final class TestDialectRendererFactory {
      */
     public static DialectRenderer dialectRendererMysql() {
         return REGISTRY.getDialectRenderer(MySQLDialectPlugin.DIALECT_NAME, MySQLDialectPlugin.DIALECT_VERSION)
-                .orElseThrow();
-    }
-
-    /**
-     * Creates a complete {@link DialectRenderer} (SQL + PreparedStatement) for SQL Server.
-     *
-     * @return DialectRenderer configured for SQL Server 2019+
-     * @throws IllegalArgumentException if the SQL Server plugin is not available
-     */
-    public static DialectRenderer dialectRendererSqlServer() {
-        return REGISTRY.getDialectRenderer(SqlServerDialectPlugin.DIALECT_NAME, SqlServerDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }
 

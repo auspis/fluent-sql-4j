@@ -17,15 +17,6 @@ public interface DateArithmeticRenderStrategy extends ExpressionRenderStrategy {
                 functionCall.interval().accept(sqlRenderer, ctx));
     }
 
-    public static DateArithmeticRenderStrategy sqlServer() {
-        return (functionCall, sqlRenderer, ctx) -> String.format(
-                "DATEADD(%s, %s%s, %s)",
-                functionCall.interval().unit(),
-                functionCall.isAddition() ? "" : "-",
-                functionCall.interval().value().accept(sqlRenderer, ctx),
-                functionCall.dateExpression().accept(sqlRenderer, ctx));
-    }
-
     public static DateArithmeticRenderStrategy mysql() {
         return (functionCall, sqlRenderer, ctx) -> String.format(
                 "%s(%s, INTERVAL %s %s)",
