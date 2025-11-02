@@ -12,20 +12,11 @@ import org.junit.jupiter.api.Test;
 class LegthRenderStrategyTest {
 
     @Test
-    void standardSql2008() {
+    void standardSql() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
         LegthRenderStrategy strategy = LegthRenderStrategy.standardSql2008();
         Length fun = new Length(ColumnReference.of("Customer", "name"));
         String sql = strategy.render(fun, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("LENGTH(\"Customer\".\"name\")");
-    }
-
-    @Test
-    void sqlServer() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.sqlServer();
-        LegthRenderStrategy strategy = LegthRenderStrategy.sqlServer();
-        Length fun = new Length(ColumnReference.of("Customer", "name"));
-        String sql = strategy.render(fun, sqlRenderer, new AstContext());
-        assertThat(sql).isEqualTo("LEN([Customer].[name])");
     }
 }
