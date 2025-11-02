@@ -93,6 +93,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.FetchRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.FromRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.FromSubqueryRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.GroupByRenderStrategy;
@@ -102,7 +103,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.OrderByRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.SelectRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.SortingRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.WhereRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.fetch.FetchRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.AggregateCallProjectionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.AggregateCallRenderStrategy;
@@ -183,6 +183,16 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.InsertStatementRender
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.SelectStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.UpdateStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.SdandardSqlFromRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFetchRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFromSubqueryRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlGroupByRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlHavingRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlOnJoinStrategyRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlOrderByRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSelectRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSortingRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlWhereRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlCreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlDeleteStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlInsertStatementRenderStrategy;
@@ -225,7 +235,7 @@ public class SqlRenderer implements Visitor<String> {
 
     // clause
     @Default
-    private final SelectRenderStrategy selectStrategy = new SelectRenderStrategy();
+    private final SelectRenderStrategy selectStrategy = new StandardSqlSelectRenderStrategy();
 
     @Default
     private final AggregateCallProjectionRenderStrategy aggregateCallProjectionStrategy =
@@ -236,31 +246,31 @@ public class SqlRenderer implements Visitor<String> {
             new ScalarExpressionProjectionRenderStrategy();
 
     @Default
-    private final FromRenderStrategy fromStrategy = new FromRenderStrategy();
+    private final FromRenderStrategy fromStrategy = new SdandardSqlFromRenderStrategy();
 
     @Default
-    private final OnJoinStrategyRenderStrategy onJoinStrategy = new OnJoinStrategyRenderStrategy();
+    private final OnJoinStrategyRenderStrategy onJoinStrategy = new StandardSqlOnJoinStrategyRenderStrategy();
 
     @Default
-    private final FromSubqueryRenderStrategy fromSubqueryStrategy = new FromSubqueryRenderStrategy();
+    private final FromSubqueryRenderStrategy fromSubqueryStrategy = new StandardSqlFromSubqueryRenderStrategy();
 
     @Default
-    private final WhereRenderStrategy whereStrategy = new WhereRenderStrategy();
+    private final WhereRenderStrategy whereStrategy = new StandardSqlWhereRenderStrategy();
 
     @Default
-    private final GroupByRenderStrategy groupByStrategy = new GroupByRenderStrategy();
+    private final GroupByRenderStrategy groupByStrategy = new StandardSqlGroupByRenderStrategy();
 
     @Default
-    private final HavingRenderStrategy havingStrategy = new HavingRenderStrategy();
+    private final HavingRenderStrategy havingStrategy = new StandardSqlHavingRenderStrategy();
 
     @Default
-    private final OrderByRenderStrategy orderByStrategy = new OrderByRenderStrategy();
+    private final OrderByRenderStrategy orderByStrategy = new StandardSqlOrderByRenderStrategy();
 
     @Default
-    private final SortingRenderStrategy sortingStrategy = new SortingRenderStrategy();
+    private final SortingRenderStrategy sortingStrategy = new StandardSqlSortingRenderStrategy();
 
     @Default
-    private final FetchRenderStrategy paginationStrategy = FetchRenderStrategy.standardSql2008();
+    private final FetchRenderStrategy paginationStrategy = new StandardSqlFetchRenderStrategy();
 
     // boolean expressions
     @Default
@@ -342,7 +352,7 @@ public class SqlRenderer implements Visitor<String> {
 
     @Default
     private final CharacterLengthRenderStrategy characterLengthStrategy =
-            CharacterLengthRenderStrategy.standardSql2008();
+            CharacterLengthRenderStrategy.standardSql2016();
 
     @Default
     private final DataLengthRenderStrategy dataLengthStrategy = DataLengthRenderStrategy.standardSql2008();

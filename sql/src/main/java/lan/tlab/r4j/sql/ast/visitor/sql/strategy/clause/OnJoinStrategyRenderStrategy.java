@@ -4,21 +4,7 @@ import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class OnJoinStrategyRenderStrategy implements ClauseRenderStrategy {
+public interface OnJoinStrategyRenderStrategy extends ClauseRenderStrategy {
 
-    public String render(OnJoin onJoin, SqlRenderer sqlRenderer, AstContext ctx) {
-        if (onJoin.onCondition() == null) {
-            return String.format(
-                    "%s %s JOIN %s",
-                    onJoin.left().accept(sqlRenderer, ctx),
-                    onJoin.type().name(),
-                    onJoin.right().accept(sqlRenderer, ctx));
-        }
-        return String.format(
-                "%s %s JOIN %s ON %s",
-                onJoin.left().accept(sqlRenderer, ctx),
-                onJoin.type().name(),
-                onJoin.right().accept(sqlRenderer, ctx),
-                onJoin.onCondition().accept(sqlRenderer, ctx));
-    }
+    String render(OnJoin onJoin, SqlRenderer sqlRenderer, AstContext ctx);
 }
