@@ -7,15 +7,4 @@ import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 public interface CharacterLengthRenderStrategy extends ExpressionRenderStrategy {
 
     public String render(CharacterLength functionCall, SqlRenderer sqlRenderer, AstContext ctx);
-
-    public static CharacterLengthRenderStrategy standardSql2016() {
-        return (functionCall, sqlRenderer, ctx) ->
-                String.format("CHARACTER_LENGTH(%s)", functionCall.expression().accept(sqlRenderer, ctx));
-    }
-
-    public static CharacterLengthRenderStrategy sqlServer() {
-        return (functionCall, sqlRenderer, ctx) -> {
-            throw new UnsupportedOperationException("SQL Server does not support CHARACTER_LENGTH funcion call");
-        };
-    }
 }
