@@ -34,7 +34,6 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Concat;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.DataLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
@@ -110,7 +109,6 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CharacterLengthRende
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateTimeRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DataLengthRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonExistsRenderStrategy;
@@ -196,6 +194,9 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.S
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCastRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCharLengthRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCharacterLengthRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlConcatRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateTimeRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlCreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlDeleteStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlInsertStatementRenderStrategy;
@@ -332,14 +333,14 @@ public class SqlRenderer implements Visitor<String> {
     private final CastRenderStrategy castStrategy = new StandardSqlCastRenderStrategy();
 
     @Default
-    private final ConcatRenderStrategy concatStrategy = ConcatRenderStrategy.standardSql2008();
+    private final ConcatRenderStrategy concatStrategy = new StandardSqlConcatRenderStrategy();
 
     @Default
-    private final CurrentDateRenderStrategy currentDateStrategy = CurrentDateRenderStrategy.standardSql2008();
+    private final CurrentDateRenderStrategy currentDateStrategy = new StandardSqlCurrentDateRenderStrategy();
 
     @Default
     private final CurrentDateTimeRenderStrategy currentDateTimeStrategy =
-            CurrentDateTimeRenderStrategy.standardSql2008();
+            new StandardSqlCurrentDateTimeRenderStrategy();
 
     @Default
     private final DateArithmeticRenderStrategy dateArithmeticStrategy = DateArithmeticRenderStrategy.standardSql2008();
@@ -360,9 +361,6 @@ public class SqlRenderer implements Visitor<String> {
     @Default
     private final CharacterLengthRenderStrategy characterLengthStrategy =
             new StandardSqlCharacterLengthRenderStrategy();
-
-    @Default
-    private final DataLengthRenderStrategy dataLengthStrategy = DataLengthRenderStrategy.standardSql2008();
 
     @Default
     private final StandardSqlModRenderStrategy modStrategy = new StandardSqlModRenderStrategy();
@@ -734,11 +732,6 @@ public class SqlRenderer implements Visitor<String> {
     @Override
     public String visit(CharacterLength functionCall, AstContext ctx) {
         return characterLengthStrategy.render(functionCall, this, ctx);
-    }
-
-    @Override
-    public String visit(DataLength functionCall, AstContext ctx) {
-        return dataLengthStrategy.render(functionCall, this, ctx);
     }
 
     @Override

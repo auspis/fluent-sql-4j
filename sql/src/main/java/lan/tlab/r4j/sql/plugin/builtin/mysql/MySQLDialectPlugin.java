@@ -4,12 +4,9 @@ import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateTimeRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DataLengthRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.myqsl.ast.visitor.sql.strategy.expression.MySqlConcatRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.clasue.MySqlFetchRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.statement.MySqlMergeStatementRenderStrategy;
 
@@ -166,11 +163,10 @@ public final class MySQLDialectPlugin {
         SqlRenderer sqlRenderer = SqlRenderer.builder()
                 .escapeStrategy(EscapeStrategy.mysql())
                 .paginationStrategy(new MySqlFetchRenderStrategy())
-                .currentDateStrategy(CurrentDateRenderStrategy.mysql())
-                .currentDateTimeStrategy(CurrentDateTimeRenderStrategy.mysql())
+                .currentDateStrategy((functionCall1, sqlRenderer1, ctx1) -> "CURDATE()")
+                .currentDateTimeStrategy((functionCall1, sqlRenderer1, ctx1) -> "NOW()")
                 .dateArithmeticStrategy(DateArithmeticRenderStrategy.mysql())
-                .concatStrategy(ConcatRenderStrategy.mysql())
-                .dataLengthStrategy(DataLengthRenderStrategy.mysql())
+                .concatStrategy(new MySqlConcatRenderStrategy())
                 .mergeStatementStrategy(new MySqlMergeStatementRenderStrategy())
                 .build();
 
