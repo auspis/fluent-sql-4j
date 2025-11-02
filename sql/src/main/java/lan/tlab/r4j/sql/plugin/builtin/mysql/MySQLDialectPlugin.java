@@ -3,7 +3,6 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.fetch.FetchRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateRenderStrategy;
@@ -11,6 +10,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateTimeRende
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DataLengthRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.clasue.MySqlFetchRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.statement.MySqlMergeStatementRenderStrategy;
 
 /**
@@ -165,7 +165,7 @@ public final class MySQLDialectPlugin {
     private static DialectRenderer createMySqlRenderer() {
         SqlRenderer sqlRenderer = SqlRenderer.builder()
                 .escapeStrategy(EscapeStrategy.mysql())
-                .paginationStrategy(FetchRenderStrategy.mysql())
+                .paginationStrategy(new MySqlFetchRenderStrategy())
                 .currentDateStrategy(CurrentDateRenderStrategy.mysql())
                 .currentDateTimeStrategy(CurrentDateTimeRenderStrategy.mysql())
                 .dateArithmeticStrategy(DateArithmeticRenderStrategy.mysql())
