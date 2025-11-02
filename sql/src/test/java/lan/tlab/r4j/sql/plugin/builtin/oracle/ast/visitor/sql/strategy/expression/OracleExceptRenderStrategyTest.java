@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression;
+package lan.tlab.r4j.sql.plugin.builtin.oracle.ast.visitor.sql.strategy.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,19 +10,20 @@ import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ExceptRenderStrategyTest {
+class OracleExceptRenderStrategyTest {
 
     private ExceptRenderStrategy strategy;
     private SqlRenderer sqlRenderer;
 
     @BeforeEach
     public void setUp() {
-        strategy = ExceptRenderStrategy.standardSql2008();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        strategy = new OracleExceptRenderStrategy();
+        sqlRenderer = TestDialectRendererFactory.oracle();
     }
 
     @Test
@@ -46,7 +47,7 @@ class ExceptRenderStrategyTest {
                 .isEqualTo(
                         """
 			((SELECT \"Customer\".\"email\" FROM \"Customer\") \
-			EXCEPT \
+			MINUS \
 			(SELECT \"Account\".\"email\" FROM \"Account\"))\
 			""");
     }
@@ -72,7 +73,7 @@ class ExceptRenderStrategyTest {
                 .isEqualTo(
                         """
 			((SELECT \"Customer\".\"email\" FROM \"Customer\") \
-			EXCEPT ALL \
+			MINUS \
 			(SELECT \"Account\".\"email\" FROM \"Account\"))\
 			""");
     }

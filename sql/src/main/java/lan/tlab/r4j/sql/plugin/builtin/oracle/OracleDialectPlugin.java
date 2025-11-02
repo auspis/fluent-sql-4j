@@ -3,8 +3,8 @@ package lan.tlab.r4j.sql.plugin.builtin.oracle;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.oracle.ast.visitor.sql.strategy.expression.OracleExceptRenderStrategy;
 
 /**
  * Built-in plugin for the Oracle Database dialect.
@@ -119,7 +119,7 @@ public final class OracleDialectPlugin {
     private static DialectRenderer createOracleRenderer() {
         SqlRenderer sqlRenderer = SqlRenderer.builder()
                 .currentDateTimeStrategy((functionCall, sqlRenderer1, ctx) -> "SYSDATE()")
-                .exceptStrategy(ExceptRenderStrategy.oracle())
+                .exceptStrategy(new OracleExceptRenderStrategy())
                 .build();
 
         PreparedStatementRenderer psRenderer =
