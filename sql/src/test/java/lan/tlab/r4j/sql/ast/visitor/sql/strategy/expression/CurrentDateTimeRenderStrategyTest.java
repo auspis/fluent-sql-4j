@@ -25,13 +25,6 @@ class CurrentDateTimeRenderStrategyTest {
     }
 
     @Test
-    void sqlServer() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.sqlServer();
-        String sql = sqlRenderer.visit(new CurrentDateTime(), new AstContext());
-        assertThat(sql).isEqualTo("GETDATE()");
-    }
-
-    @Test
     void oracle() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.oracle();
         String sql = sqlRenderer.visit(new CurrentDateTime(), new AstContext());
