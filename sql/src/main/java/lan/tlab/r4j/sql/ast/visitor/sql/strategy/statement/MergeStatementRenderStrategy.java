@@ -5,10 +5,5 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
 public interface MergeStatementRenderStrategy extends StatementRenderStrategy {
-
     String render(MergeStatement statement, SqlRenderer sqlRenderer, AstContext ctx);
-
-    static MergeStatementRenderStrategy standardSql2008() {
-        return new StandardSqlMergeStatementRenderStrategy();
-    }
 }
