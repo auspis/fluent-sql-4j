@@ -23,11 +23,11 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  * JsonExists withError = new JsonExists(
  *     ColumnReference.of("products", "data"),
  *     Literal.of("$.price"),
- *     OnErrorBehavior.error()
+ *     BehaviorKind.ERROR
  * );
  * }</pre>
  */
-public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, OnErrorBehavior onErrorBehavior)
+public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, BehaviorKind onErrorBehavior)
         implements FunctionCall {
 
     /**
@@ -36,7 +36,7 @@ public record JsonExists(ScalarExpression jsonDocument, ScalarExpression path, O
      */
     public JsonExists {
         if (onErrorBehavior == null) {
-            onErrorBehavior = OnErrorBehavior.returnNull();
+            onErrorBehavior = BehaviorKind.NONE;
         }
     }
 

@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnEmptyBehavior;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnErrorBehavior;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -44,7 +44,7 @@ class JsonQueryRenderStrategyTest {
                 "JSON",
                 WrapperBehavior.WITH_WRAPPER,
                 OnEmptyBehavior.defaultValue("EMPTY ARRAY"),
-                OnErrorBehavior.returnNull());
+                BehaviorKind.NONE);
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
         assertThat(sql)
                 .isEqualTo(

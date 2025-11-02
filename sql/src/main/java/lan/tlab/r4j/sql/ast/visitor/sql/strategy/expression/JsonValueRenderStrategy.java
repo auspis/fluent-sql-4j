@@ -1,5 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression;
 
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -19,11 +20,9 @@ public interface JsonValueRenderStrategy extends ExpressionRenderStrategy {
                 sql.append(" RETURNING ").append(functionCall.returningType());
             }
 
-            if (functionCall.onEmptyBehavior().kind()
-                    != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
+            if (functionCall.onEmptyBehavior().kind() != BehaviorKind.NONE) {
                 sql.append(" ");
-                if (functionCall.onEmptyBehavior().kind()
-                                == lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.DEFAULT
+                if (functionCall.onEmptyBehavior().kind() == BehaviorKind.DEFAULT
                         && functionCall.onEmptyBehavior().defaultValue() != null) {
                     sql.append("DEFAULT ").append(functionCall.onEmptyBehavior().defaultValue());
                 } else {
@@ -32,11 +31,8 @@ public interface JsonValueRenderStrategy extends ExpressionRenderStrategy {
                 sql.append(" ON EMPTY");
             }
 
-            if (functionCall.onErrorBehavior().kind()
-                    != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
-                sql.append(" ")
-                        .append(functionCall.onErrorBehavior().kind().name())
-                        .append(" ON ERROR");
+            if (functionCall.onErrorBehavior() != BehaviorKind.NONE) {
+                sql.append(" ").append(functionCall.onErrorBehavior().name()).append(" ON ERROR");
             }
 
             sql.append(")");
