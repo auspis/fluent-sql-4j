@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression;
+package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,15 +10,16 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnEmptyBehavior
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonQueryRenderStrategy;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.Test;
 
-class JsonQueryRenderStrategyTest {
+class StandarsSqlJsonQueryRenderStrategyTest {
 
     @Test
     void standardSql2016WithBasicArguments() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
-        JsonQueryRenderStrategy strategy = JsonQueryRenderStrategy.standardSql2016();
+        JsonQueryRenderStrategy strategy = new StandarsSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
         assertThat(sql).isEqualTo("JSON_QUERY(\"products\".\"data\", '$.tags')");
@@ -27,7 +28,7 @@ class JsonQueryRenderStrategyTest {
     @Test
     void standardSql2016WithReturningType() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
-        JsonQueryRenderStrategy strategy = JsonQueryRenderStrategy.standardSql2016();
+        JsonQueryRenderStrategy strategy = new StandarsSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery =
                 new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"), "JSON", null, null, null);
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
@@ -37,7 +38,7 @@ class JsonQueryRenderStrategyTest {
     @Test
     void standardSql2016WithAllOptions() {
         SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
-        JsonQueryRenderStrategy strategy = JsonQueryRenderStrategy.standardSql2016();
+        JsonQueryRenderStrategy strategy = new StandarsSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery = new JsonQuery(
                 ColumnReference.of("products", "data"),
                 Literal.of("$.tags"),
@@ -49,14 +50,5 @@ class JsonQueryRenderStrategyTest {
         assertThat(sql)
                 .isEqualTo(
                         "JSON_QUERY(\"products\".\"data\", '$.tags' RETURNING JSON WITH WRAPPER DEFAULT EMPTY ARRAY ON EMPTY)");
-    }
-
-    @Test
-    void postgreSql() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
-        JsonQueryRenderStrategy strategy = JsonQueryRenderStrategy.postgreSql();
-        JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
-        String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
-        assertThat(sql).isEqualTo("JSON_QUERY(\"products\".\"data\", '$.tags')");
     }
 }

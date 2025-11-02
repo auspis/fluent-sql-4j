@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.plugin.builtin.myqsl.ast.visitor.sql.strategy.expression;
+package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression;
 
 import java.util.ArrayList;
 import java.util.List;
