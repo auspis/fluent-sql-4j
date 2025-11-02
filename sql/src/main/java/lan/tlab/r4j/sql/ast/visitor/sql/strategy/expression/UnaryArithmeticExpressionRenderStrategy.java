@@ -4,10 +4,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression.UnaryArithmet
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class UnaryArithmeticExpressionRenderStrategy implements ExpressionRenderStrategy {
+public interface UnaryArithmeticExpressionRenderStrategy extends ExpressionRenderStrategy {
 
-    public String render(UnaryArithmeticExpression expression, SqlRenderer sqlRenderer, AstContext ctx) {
-        return String.format(
-                "(%s%s)", expression.operator(), expression.expression().accept(sqlRenderer, ctx));
-    }
+    String render(UnaryArithmeticExpression expression, SqlRenderer sqlRenderer, AstContext ctx);
 }
