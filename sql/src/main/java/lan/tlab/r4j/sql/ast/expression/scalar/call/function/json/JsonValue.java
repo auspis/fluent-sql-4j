@@ -32,7 +32,7 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  *     Literal.of("$.price"),
  *     "DECIMAL(10,2)",
  *     OnEmptyBehavior.defaultValue("0.0"),
- *     OnErrorBehavior.returnNull()
+ *     BehaviorKind.NULL
  * );
  * }</pre>
  */
@@ -41,7 +41,7 @@ public record JsonValue(
         ScalarExpression path,
         String returningType,
         OnEmptyBehavior onEmptyBehavior,
-        OnErrorBehavior onErrorBehavior)
+        BehaviorKind onErrorBehavior)
         implements FunctionCall {
 
     /**
@@ -53,7 +53,7 @@ public record JsonValue(
             onEmptyBehavior = OnEmptyBehavior.returnNull();
         }
         if (onErrorBehavior == null) {
-            onErrorBehavior = OnErrorBehavior.returnNull();
+            onErrorBehavior = BehaviorKind.NONE;
         }
     }
 

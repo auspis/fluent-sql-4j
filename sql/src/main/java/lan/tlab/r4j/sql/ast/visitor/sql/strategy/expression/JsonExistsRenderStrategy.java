@@ -1,5 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression;
 
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
@@ -15,11 +16,8 @@ public interface JsonExistsRenderStrategy extends ExpressionRenderStrategy {
             sql.append(", ");
             sql.append(functionCall.path().accept(sqlRenderer, ctx));
 
-            if (functionCall.onErrorBehavior().kind()
-                    != lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind.NULL) {
-                sql.append(" ")
-                        .append(functionCall.onErrorBehavior().kind().name())
-                        .append(" ON ERROR");
+            if (functionCall.onErrorBehavior() != BehaviorKind.NONE) {
+                sql.append(" ").append(functionCall.onErrorBehavior().name()).append(" ON ERROR");
             }
 
             sql.append(")");

@@ -181,92 +181,92 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UniqueConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.WhereClausePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultAggregateCallPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultAggregationFunctionProjectionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultAndOrPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultAsPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultBetweenPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultBinaryArithmeticExpressionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultCastPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultCharLengthPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultCharacterLengthPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultCheckConstraintPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultColumnDefinitionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultColumnReferencePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultComparisonPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultConcatPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultCreateTableStatementPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultCurrentDatePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultCurrentDateTimePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDataLengthPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDateArithmeticPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDefaultConstraintPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDefaultValuesPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDeleteStatementPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultDenseRankPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultExceptExpressionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultExtractDatePartPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultForeignKeyConstraintPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultFromClausePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultFromSubqueryPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultGroupByClausePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultHavingClausePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultInPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIndexDefinitionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultInsertSourcePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultInsertStatementPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultInsertValuesPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIntersectExpressionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIntervalPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIsNotNullPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultIsNullPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultJsonExistsPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultJsonQueryPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultJsonValuePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLagPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLeadPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLeftPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLengthPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLikePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultLiteralPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultMergeStatementPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultModPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNotNullConstraintPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNotPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNtilePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNullPredicatePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNullScalarExpressionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultNullSetExpressionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultOnJoinPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultOrderByClausePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultOverClausePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultPaginationPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultParameterizedDataTypePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultPowerPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultPrimaryKeyPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultRankPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultReferencesItemPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultReplacePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultRoundPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultRowNumberPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultScalarExpressionProjectionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultScalarSubqueryPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultSelectClausePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultSelectStatementPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultSimpleDataTypePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultSortingPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultSubstringPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultTableDefinitionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultTablePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultTrimPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUnaryArithmeticExpressionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUnaryNumericPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUnaryStringPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUnionExpressionPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUniqueConstraintPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUpdateItemPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultUpdateStatementPsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.DefaultWhereClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlAggregateCallPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlAggregationFunctionProjectionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlAndOrPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlAsPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlBetweenPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlBinaryArithmeticExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlCastPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlCharLengthPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlCharacterLengthPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlCheckConstraintPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlColumnDefinitionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlColumnReferencePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlComparisonPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlConcatPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlCreateTableStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlCurrentDatePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlCurrentDateTimePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlDataLengthPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlDateArithmeticPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlDefaultConstraintPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlDefaultValuesPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlDeleteStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlDenseRankPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlExceptExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlExtractDatePartPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlForeignKeyConstraintPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlFromClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlFromSubqueryPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlGroupByClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlHavingClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlInPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlIndexDefinitionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlInsertSourcePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlInsertStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlInsertValuesPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlIntersectExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlIntervalPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlIsNotNullPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlIsNullPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlJsonExistsPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlJsonQueryPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlJsonValuePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlLagPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlLeadPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlLeftPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlLengthPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlLikePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlLiteralPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlMergeStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlModPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlNotNullConstraintPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlNotPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlNtilePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlNullPredicatePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlNullScalarExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlNullSetExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlOnJoinPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlOrderByClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlOverClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlPaginationPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlParameterizedDataTypePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlPowerPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlPrimaryKeyPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlRankPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlReferencesItemPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlReplacePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlRoundPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlRowNumberPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlScalarExpressionProjectionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlScalarSubqueryPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlSelectClausePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlSelectStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlSimpleDataTypePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlSortingPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlSubstringPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlTableDefinitionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlTablePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlTrimPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlUnaryArithmeticExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlUnaryNumericPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlUnaryStringPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlUnionExpressionPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlUniqueConstraintPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlUpdateItemPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlUpdateStatementPsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2008.StandardSqlWhereClausePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lombok.AccessLevel;
@@ -289,272 +289,272 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     private final SqlRenderer sqlRenderer = SqlRenderer.builder().build();
 
     @Default
-    private final SelectClausePsStrategy selectClauseStrategy = new DefaultSelectClausePsStrategy();
+    private final SelectClausePsStrategy selectClauseStrategy = new StandardSqlSelectClausePsStrategy();
 
     @Default
-    private final FromClausePsStrategy fromClauseStrategy = new DefaultFromClausePsStrategy();
+    private final FromClausePsStrategy fromClauseStrategy = new StandardSqlFromClausePsStrategy();
 
     @Default
-    private final WhereClausePsStrategy whereClauseStrategy = new DefaultWhereClausePsStrategy();
+    private final WhereClausePsStrategy whereClauseStrategy = new StandardSqlWhereClausePsStrategy();
 
     @Default
-    private final GroupByClausePsStrategy groupByClauseStrategy = new DefaultGroupByClausePsStrategy();
+    private final GroupByClausePsStrategy groupByClauseStrategy = new StandardSqlGroupByClausePsStrategy();
 
     @Default
-    private final HavingClausePsStrategy havingClauseStrategy = new DefaultHavingClausePsStrategy();
+    private final HavingClausePsStrategy havingClauseStrategy = new StandardSqlHavingClausePsStrategy();
 
     @Default
-    private final OrderByClausePsStrategy orderByClauseStrategy = new DefaultOrderByClausePsStrategy();
+    private final OrderByClausePsStrategy orderByClauseStrategy = new StandardSqlOrderByClausePsStrategy();
 
     @Default
-    private final TablePsStrategy tableStrategy = new DefaultTablePsStrategy();
+    private final TablePsStrategy tableStrategy = new StandardSqlTablePsStrategy();
 
     @Default
-    private final ColumnReferencePsStrategy columnReferenceStrategy = new DefaultColumnReferencePsStrategy();
+    private final ColumnReferencePsStrategy columnReferenceStrategy = new StandardSqlColumnReferencePsStrategy();
 
     @Default
-    private final ComparisonPsStrategy comparisonStrategy = new DefaultComparisonPsStrategy();
+    private final ComparisonPsStrategy comparisonStrategy = new StandardSqlComparisonPsStrategy();
 
     @Default
-    private final LiteralPsStrategy literalStrategy = new DefaultLiteralPsStrategy();
+    private final LiteralPsStrategy literalStrategy = new StandardSqlLiteralPsStrategy();
 
     @Default
-    private final SortingPsStrategy sortingStrategy = new DefaultSortingPsStrategy();
+    private final SortingPsStrategy sortingStrategy = new StandardSqlSortingPsStrategy();
 
     @Default
-    private final OnJoinPsStrategy onJoinStrategy = new DefaultOnJoinPsStrategy();
+    private final OnJoinPsStrategy onJoinStrategy = new StandardSqlOnJoinPsStrategy();
 
     @Default
-    private final AndOrPsStrategy andOrStrategy = new DefaultAndOrPsStrategy();
+    private final AndOrPsStrategy andOrStrategy = new StandardSqlAndOrPsStrategy();
 
     @Default
-    private final NotPsStrategy notStrategy = new DefaultNotPsStrategy();
+    private final NotPsStrategy notStrategy = new StandardSqlNotPsStrategy();
 
     @Default
     private final AggregationFunctionProjectionPsStrategy aggregationFunctionProjectionStrategy =
-            new DefaultAggregationFunctionProjectionPsStrategy();
+            new StandardSqlAggregationFunctionProjectionPsStrategy();
 
     @Default
     private final ScalarExpressionProjectionPsStrategy scalarExpressionProjectionStrategy =
-            new DefaultScalarExpressionProjectionPsStrategy();
+            new StandardSqlScalarExpressionProjectionPsStrategy();
 
     @Default
-    private final AggregateCallPsStrategy aggregateCallStrategy = new DefaultAggregateCallPsStrategy();
+    private final AggregateCallPsStrategy aggregateCallStrategy = new StandardSqlAggregateCallPsStrategy();
 
     @Default
-    private final InsertValuesPsStrategy insertValuesStrategy = new DefaultInsertValuesPsStrategy();
+    private final InsertValuesPsStrategy insertValuesStrategy = new StandardSqlInsertValuesPsStrategy();
 
     @Default
-    private final InsertSourcePsStrategy insertSourceStrategy = new DefaultInsertSourcePsStrategy();
+    private final InsertSourcePsStrategy insertSourceStrategy = new StandardSqlInsertSourcePsStrategy();
 
     @Default
-    private final DefaultValuesPsStrategy defaultValuesStrategy = new DefaultDefaultValuesPsStrategy();
+    private final DefaultValuesPsStrategy defaultValuesStrategy = new StandardSqlDefaultValuesPsStrategy();
 
     @Default
-    private final IsNullPsStrategy isNullStrategy = new DefaultIsNullPsStrategy();
+    private final IsNullPsStrategy isNullStrategy = new StandardSqlIsNullPsStrategy();
 
     @Default
-    private final IsNotNullPsStrategy isNotNullStrategy = new DefaultIsNotNullPsStrategy();
+    private final IsNotNullPsStrategy isNotNullStrategy = new StandardSqlIsNotNullPsStrategy();
 
     @Default
-    private final InsertStatementPsStrategy insertStatementStrategy = new DefaultInsertStatementPsStrategy();
+    private final InsertStatementPsStrategy insertStatementStrategy = new StandardSqlInsertStatementPsStrategy();
 
     @Default
-    private final SelectStatementPsStrategy selectStatementStrategy = new DefaultSelectStatementPsStrategy();
+    private final SelectStatementPsStrategy selectStatementStrategy = new StandardSqlSelectStatementPsStrategy();
 
     @Default
-    private final FetchPsStrategy paginationStrategy = new DefaultPaginationPsStrategy();
+    private final FetchPsStrategy paginationStrategy = new StandardSqlPaginationPsStrategy();
 
     @Default
-    private final LikePsStrategy likeStrategy = new DefaultLikePsStrategy();
+    private final LikePsStrategy likeStrategy = new StandardSqlLikePsStrategy();
 
     @Default
-    private final UnionExpressionPsStrategy unionExpressionStrategy = new DefaultUnionExpressionPsStrategy();
+    private final UnionExpressionPsStrategy unionExpressionStrategy = new StandardSqlUnionExpressionPsStrategy();
 
     @Default
-    private final BetweenPsStrategy betweenStrategy = new DefaultBetweenPsStrategy();
+    private final BetweenPsStrategy betweenStrategy = new StandardSqlBetweenPsStrategy();
 
     @Default
     private final BinaryArithmeticExpressionPsStrategy binaryArithmeticExpressionStrategy =
-            new DefaultBinaryArithmeticExpressionPsStrategy();
+            new StandardSqlBinaryArithmeticExpressionPsStrategy();
 
     @Default
     private final UnaryArithmeticExpressionPsStrategy unaryArithmeticExpressionStrategy =
-            new DefaultUnaryArithmeticExpressionPsStrategy();
+            new StandardSqlUnaryArithmeticExpressionPsStrategy();
 
     @Default
-    private final CastPsStrategy castStrategy = new DefaultCastPsStrategy();
+    private final CastPsStrategy castStrategy = new StandardSqlCastPsStrategy();
 
     @Default
-    private final ConcatPsStrategy concatStrategy = new DefaultConcatPsStrategy();
+    private final ConcatPsStrategy concatStrategy = new StandardSqlConcatPsStrategy();
 
     @Default
-    private final CurrentDatePsStrategy currentDateStrategy = new DefaultCurrentDatePsStrategy();
+    private final CurrentDatePsStrategy currentDateStrategy = new StandardSqlCurrentDatePsStrategy();
 
     @Default
-    private final CurrentDateTimePsStrategy currentDateTimeStrategy = new DefaultCurrentDateTimePsStrategy();
+    private final CurrentDateTimePsStrategy currentDateTimeStrategy = new StandardSqlCurrentDateTimePsStrategy();
 
     @Default
-    private final DateArithmeticPsStrategy dateArithmeticStrategy = new DefaultDateArithmeticPsStrategy();
+    private final DateArithmeticPsStrategy dateArithmeticStrategy = new StandardSqlDateArithmeticPsStrategy();
 
     @Default
-    private final ExceptExpressionPsStrategy exceptExpressionStrategy = new DefaultExceptExpressionPsStrategy();
+    private final ExceptExpressionPsStrategy exceptExpressionStrategy = new StandardSqlExceptExpressionPsStrategy();
 
     @Default
-    private final ExtractDatePartPsStrategy extractDatePartStrategy = new DefaultExtractDatePartPsStrategy();
+    private final ExtractDatePartPsStrategy extractDatePartStrategy = new StandardSqlExtractDatePartPsStrategy();
 
     @Default
     private final IntersectExpressionPsStrategy intersectExpressionStrategy =
-            new DefaultIntersectExpressionPsStrategy();
+            new StandardSqlIntersectExpressionPsStrategy();
 
     @Default
-    private final IntervalPsStrategy intervalStrategy = new DefaultIntervalPsStrategy();
+    private final IntervalPsStrategy intervalStrategy = new StandardSqlIntervalPsStrategy();
 
     @Default
-    private final LeftPsStrategy leftStrategy = new DefaultLeftPsStrategy();
+    private final LeftPsStrategy leftStrategy = new StandardSqlLeftPsStrategy();
 
     @Default
-    private final LengthPsStrategy lengthStrategy = new DefaultLengthPsStrategy();
+    private final LengthPsStrategy lengthStrategy = new StandardSqlLengthPsStrategy();
 
     @Default
-    private final ModPsStrategy modStrategy = new DefaultModPsStrategy();
+    private final ModPsStrategy modStrategy = new StandardSqlModPsStrategy();
 
     @Default
     private final NullScalarExpressionPsStrategy nullScalarExpressionStrategy =
-            new DefaultNullScalarExpressionPsStrategy();
+            new StandardSqlNullScalarExpressionPsStrategy();
 
     @Default
-    private final NullSetExpressionPsStrategy nullSetExpressionStrategy = new DefaultNullSetExpressionPsStrategy();
+    private final NullSetExpressionPsStrategy nullSetExpressionStrategy = new StandardSqlNullSetExpressionPsStrategy();
 
     @Default
-    private final PowerPsStrategy powerStrategy = new DefaultPowerPsStrategy();
+    private final PowerPsStrategy powerStrategy = new StandardSqlPowerPsStrategy();
 
     @Default
-    private final ReplacePsStrategy replaceStrategy = new DefaultReplacePsStrategy();
+    private final ReplacePsStrategy replaceStrategy = new StandardSqlReplacePsStrategy();
 
     @Default
-    private final ReferencesItemPsStrategy referencesItemStrategy = new DefaultReferencesItemPsStrategy();
+    private final ReferencesItemPsStrategy referencesItemStrategy = new StandardSqlReferencesItemPsStrategy();
 
     @Default
-    private final TableDefinitionPsStrategy tableDefinitionStrategy = new DefaultTableDefinitionPsStrategy();
+    private final TableDefinitionPsStrategy tableDefinitionStrategy = new StandardSqlTableDefinitionPsStrategy();
 
     @Default
-    private final ColumnDefinitionPsStrategy columnDefinitionStrategy = new DefaultColumnDefinitionPsStrategy();
+    private final ColumnDefinitionPsStrategy columnDefinitionStrategy = new StandardSqlColumnDefinitionPsStrategy();
 
     @Default
-    private final SimpleDataTypePsStrategy simpleDataTypeStrategy = new DefaultSimpleDataTypePsStrategy();
+    private final SimpleDataTypePsStrategy simpleDataTypeStrategy = new StandardSqlSimpleDataTypePsStrategy();
 
     @Default
     private final ParameterizedDataTypePsStrategy parameterizedDataTypeStrategy =
-            new DefaultParameterizedDataTypePsStrategy();
+            new StandardSqlParameterizedDataTypePsStrategy();
 
     @Default
-    private final PrimaryKeyPsStrategy primaryKeyDefinitionStrategy = new DefaultPrimaryKeyPsStrategy();
+    private final PrimaryKeyPsStrategy primaryKeyDefinitionStrategy = new StandardSqlPrimaryKeyPsStrategy();
 
     @Default
-    private final IndexDefinitionPsStrategy indexDefinitionStrategy = new DefaultIndexDefinitionPsStrategy();
+    private final IndexDefinitionPsStrategy indexDefinitionStrategy = new StandardSqlIndexDefinitionPsStrategy();
 
     @Default
     private final NotNullConstraintPsStrategy notNullConstraintDefinitionStrategy =
-            new DefaultNotNullConstraintPsStrategy();
+            new StandardSqlNotNullConstraintPsStrategy();
 
     @Default
-    private final UniqueConstraintPsStrategy uniqueConstraintStrategy = new DefaultUniqueConstraintPsStrategy();
+    private final UniqueConstraintPsStrategy uniqueConstraintStrategy = new StandardSqlUniqueConstraintPsStrategy();
 
     @Default
     private final ForeignKeyConstraintPsStrategy foreignKeyConstraintStrategy =
-            new DefaultForeignKeyConstraintPsStrategy();
+            new StandardSqlForeignKeyConstraintPsStrategy();
 
     @Default
-    private final CheckConstraintPsStrategy checkConstraintStrategy = new DefaultCheckConstraintPsStrategy();
+    private final CheckConstraintPsStrategy checkConstraintStrategy = new StandardSqlCheckConstraintPsStrategy();
 
     @Default
-    private final DefaultConstraintPsStrategy defaultConstraintStrategy = new DefaultDefaultConstraintPsStrategy();
+    private final DefaultConstraintPsStrategy defaultConstraintStrategy = new StandardSqlDefaultConstraintPsStrategy();
 
     @Default
-    private final RoundPsStrategy roundStrategy = new DefaultRoundPsStrategy();
+    private final RoundPsStrategy roundStrategy = new StandardSqlRoundPsStrategy();
 
     @Default
-    private final SubstringPsStrategy substringStrategy = new DefaultSubstringPsStrategy();
+    private final SubstringPsStrategy substringStrategy = new StandardSqlSubstringPsStrategy();
 
     @Default
-    private final TrimPsStrategy trimStrategy = new DefaultTrimPsStrategy();
+    private final TrimPsStrategy trimStrategy = new StandardSqlTrimPsStrategy();
 
     @Default
-    private final UnaryNumericPsStrategy unaryNumericStrategy = new DefaultUnaryNumericPsStrategy();
+    private final UnaryNumericPsStrategy unaryNumericStrategy = new StandardSqlUnaryNumericPsStrategy();
 
     @Default
-    private final UnaryStringPsStrategy unaryStringStrategy = new DefaultUnaryStringPsStrategy();
+    private final UnaryStringPsStrategy unaryStringStrategy = new StandardSqlUnaryStringPsStrategy();
 
     @Default
-    private final JsonExistsPsStrategy jsonExistsStrategy = new DefaultJsonExistsPsStrategy();
+    private final JsonExistsPsStrategy jsonExistsStrategy = new StandardSqlJsonExistsPsStrategy();
 
     @Default
-    private final JsonQueryPsStrategy jsonQueryStrategy = new DefaultJsonQueryPsStrategy();
+    private final JsonQueryPsStrategy jsonQueryStrategy = new StandardSqlJsonQueryPsStrategy();
 
     @Default
-    private final JsonValuePsStrategy jsonValueStrategy = new DefaultJsonValuePsStrategy();
+    private final JsonValuePsStrategy jsonValueStrategy = new StandardSqlJsonValuePsStrategy();
 
     @Default
-    private final ScalarSubqueryPsStrategy scalarSubqueryStrategy = new DefaultScalarSubqueryPsStrategy();
+    private final ScalarSubqueryPsStrategy scalarSubqueryStrategy = new StandardSqlScalarSubqueryPsStrategy();
 
     @Default
     private final CreateTableStatementPsStrategy createTableStatementStrategy =
-            new DefaultCreateTableStatementPsStrategy();
+            new StandardSqlCreateTableStatementPsStrategy();
 
     @Default
-    private final CharLengthPsStrategy charLengthStrategy = new DefaultCharLengthPsStrategy();
+    private final CharLengthPsStrategy charLengthStrategy = new StandardSqlCharLengthPsStrategy();
 
     @Default
-    private final CharacterLengthPsStrategy characterLengthStrategy = new DefaultCharacterLengthPsStrategy();
+    private final CharacterLengthPsStrategy characterLengthStrategy = new StandardSqlCharacterLengthPsStrategy();
 
     @Default
-    private final DataLengthPsStrategy dataLengthStrategy = new DefaultDataLengthPsStrategy();
+    private final DataLengthPsStrategy dataLengthStrategy = new StandardSqlDataLengthPsStrategy();
 
     @Default
-    private final InPsStrategy inStrategy = new DefaultInPsStrategy();
+    private final InPsStrategy inStrategy = new StandardSqlInPsStrategy();
 
     @Default
-    private final AsPsStrategy asStrategy = new DefaultAsPsStrategy();
+    private final AsPsStrategy asStrategy = new StandardSqlAsPsStrategy();
 
     @Default
-    private final FromSubqueryPsStrategy fromSubqueryStrategy = new DefaultFromSubqueryPsStrategy();
+    private final FromSubqueryPsStrategy fromSubqueryStrategy = new StandardSqlFromSubqueryPsStrategy();
 
     @Default
-    private final NullPredicatePsStrategy nullPredicateStrategy = new DefaultNullPredicatePsStrategy();
+    private final NullPredicatePsStrategy nullPredicateStrategy = new StandardSqlNullPredicatePsStrategy();
 
     @Default
-    private final UpdateItemPsStrategy updateItemStrategy = new DefaultUpdateItemPsStrategy();
+    private final UpdateItemPsStrategy updateItemStrategy = new StandardSqlUpdateItemPsStrategy();
 
     @Default
-    private final UpdateStatementPsStrategy updateStatementStrategy = new DefaultUpdateStatementPsStrategy();
+    private final UpdateStatementPsStrategy updateStatementStrategy = new StandardSqlUpdateStatementPsStrategy();
 
     @Default
-    private final DeleteStatementPsStrategy deleteStatementStrategy = new DefaultDeleteStatementPsStrategy();
+    private final DeleteStatementPsStrategy deleteStatementStrategy = new StandardSqlDeleteStatementPsStrategy();
 
     @Default
-    private final MergeStatementPsStrategy mergeStatementStrategy = new DefaultMergeStatementPsStrategy();
+    private final MergeStatementPsStrategy mergeStatementStrategy = new StandardSqlMergeStatementPsStrategy();
 
     @Default
-    private final RowNumberPsStrategy rowNumberStrategy = new DefaultRowNumberPsStrategy();
+    private final RowNumberPsStrategy rowNumberStrategy = new StandardSqlRowNumberPsStrategy();
 
     @Default
-    private final RankPsStrategy rankStrategy = new DefaultRankPsStrategy();
+    private final RankPsStrategy rankStrategy = new StandardSqlRankPsStrategy();
 
     @Default
-    private final DenseRankPsStrategy denseRankStrategy = new DefaultDenseRankPsStrategy();
+    private final DenseRankPsStrategy denseRankStrategy = new StandardSqlDenseRankPsStrategy();
 
     @Default
-    private final NtilePsStrategy ntileStrategy = new DefaultNtilePsStrategy();
+    private final NtilePsStrategy ntileStrategy = new StandardSqlNtilePsStrategy();
 
     @Default
-    private final LagPsStrategy lagStrategy = new DefaultLagPsStrategy();
+    private final LagPsStrategy lagStrategy = new StandardSqlLagPsStrategy();
 
     @Default
-    private final LeadPsStrategy leadStrategy = new DefaultLeadPsStrategy();
+    private final LeadPsStrategy leadStrategy = new StandardSqlLeadPsStrategy();
 
     @Default
-    private final OverClausePsStrategy overClauseStrategy = new DefaultOverClausePsStrategy();
+    private final OverClausePsStrategy overClauseStrategy = new StandardSqlOverClausePsStrategy();
 
     @Override
     public PsDto visit(InsertStatement stmt, AstContext ctx) {
