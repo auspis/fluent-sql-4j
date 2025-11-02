@@ -103,43 +103,42 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.SelectRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.SortingRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.WhereRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.AggregateCallProjectionRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.AggregateCallRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.AndOrRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.BetweenRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CastRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CharLengthRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CharacterLengthRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ColumnReferenceRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ComparisonRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateTimeRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExtractDatePartRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.InRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IntersectRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IntervalRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IsNotNullRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.IsNullRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonExistsRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonQueryRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonValueRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LeftRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LegthRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlAggregateCallProjectionRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlAggregateCallRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlAndOrRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlBetweenRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlBinaryArithmeticExpressionRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlColumnReferenceRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlComparisonRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlExtractDatePartRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlInRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlIntersectRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlIntervalRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlIsNotNullRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlIsNullRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlLeftRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlLikeRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlLiteralRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlModRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlNotRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlNullScalarExpressionRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlNullSetExpressionRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlPowerRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlReplaceRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlRoundRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlScalarExpressionProjectionRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.StandardSqlScalarSubqueryRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LikeRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LiteralRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ModRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.NotRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.NullScalarExpressionRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.NullSetExpressionRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.PowerRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ReplaceRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.RoundRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ScalarExpressionProjectionRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ScalarSubqueryRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.SubstringRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.TrimRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.UnaryArithmeticExpressionRenderStrategy;
@@ -191,17 +190,49 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.S
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSelectRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSortingRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlWhereRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.BinaryArithmeticExpressionRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarSqlDateArithmeticRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlAggregateCallProjectionRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlAggregateCallRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlAndOrRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlBetweenRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlBinaryArithmeticExpressionRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCastRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCharLengthRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCharacterLengthRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlColumnReferenceRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlComparisonRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlConcatRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateTimeRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlExceptRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlExtractDatePartRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlInRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlIntersectRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlIntervalRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlIsNotNullRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlIsNullRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlJsonExistsRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlJsonValueRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLeftRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLegthRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLikeRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLiteralRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlModRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlNotRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlNullScalarExpressionRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlNullSetExpressionRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlPowerRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlReplaceRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlRoundRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlScalarExpressionProjectionRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlScalarSubqueryRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlSubstringRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlTrimRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnaryArithmeticExpressionRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnaryNumericRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnaryStringRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnionRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarsSqlJsonQueryRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlCreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlDeleteStatementRenderStrategy;
@@ -248,11 +279,11 @@ public class SqlRenderer implements Visitor<String> {
     private final SelectRenderStrategy selectStrategy = new StandardSqlSelectRenderStrategy();
 
     @Default
-    private final StandardSqlAggregateCallProjectionRenderStrategy aggregateCallProjectionStrategy =
+    private final AggregateCallProjectionRenderStrategy aggregateCallProjectionStrategy =
             new StandardSqlAggregateCallProjectionRenderStrategy();
 
     @Default
-    private final StandardSqlScalarExpressionProjectionRenderStrategy scalarExpressionProjectionStrategy =
+    private final ScalarExpressionProjectionRenderStrategy scalarExpressionProjectionStrategy =
             new StandardSqlScalarExpressionProjectionRenderStrategy();
 
     @Default
@@ -284,55 +315,53 @@ public class SqlRenderer implements Visitor<String> {
 
     // boolean expressions
     @Default
-    private final StandardSqlBetweenRenderStrategy betweenStrategy = new StandardSqlBetweenRenderStrategy();
+    private final BetweenRenderStrategy betweenStrategy = new StandardSqlBetweenRenderStrategy();
 
     @Default
-    private final StandardSqlComparisonRenderStrategy comparisonStrategy = new StandardSqlComparisonRenderStrategy();
+    private final ComparisonRenderStrategy comparisonStrategy = new StandardSqlComparisonRenderStrategy();
 
     @Default
-    private final StandardSqlInRenderStrategy inStrategy = new StandardSqlInRenderStrategy();
+    private final InRenderStrategy inStrategy = new StandardSqlInRenderStrategy();
 
     @Default
-    private final StandardSqlIsNotNullRenderStrategy isNotNullStrategy = new StandardSqlIsNotNullRenderStrategy();
+    private final IsNotNullRenderStrategy isNotNullStrategy = new StandardSqlIsNotNullRenderStrategy();
 
     @Default
-    private final StandardSqlIsNullRenderStrategy isNullStrategy = new StandardSqlIsNullRenderStrategy();
+    private final IsNullRenderStrategy isNullStrategy = new StandardSqlIsNullRenderStrategy();
 
     @Default
-    private final StandardSqlLikeRenderStrategy likeStrategy = new StandardSqlLikeRenderStrategy();
+    private final LikeRenderStrategy likeStrategy = new StandardSqlLikeRenderStrategy();
 
     @Default
-    private final StandardSqlAndOrRenderStrategy andOrStrategy = new StandardSqlAndOrRenderStrategy();
+    private final AndOrRenderStrategy andOrStrategy = new StandardSqlAndOrRenderStrategy();
 
     @Default
-    private final StandardSqlNotRenderStrategy notStrategy = new StandardSqlNotRenderStrategy();
+    private final NotRenderStrategy notStrategy = new StandardSqlNotRenderStrategy();
 
     // scalar expressions
     @Default
-    private final StandardSqlAggregateCallRenderStrategy aggregateCallStrategy =
-            new StandardSqlAggregateCallRenderStrategy();
+    private final AggregateCallRenderStrategy aggregateCallStrategy = new StandardSqlAggregateCallRenderStrategy();
 
     @Default
-    private final StandardSqlColumnReferenceRenderStrategy columnReferenceStrategy =
+    private final ColumnReferenceRenderStrategy columnReferenceStrategy =
             new StandardSqlColumnReferenceRenderStrategy();
 
     @Default
-    private final StandardSqlIntervalRenderStrategy intervalStrategy = new StandardSqlIntervalRenderStrategy();
+    private final IntervalRenderStrategy intervalStrategy = new StandardSqlIntervalRenderStrategy();
 
     @Default
-    private final StandardSqlLiteralRenderStrategy literalStrategy = new StandardSqlLiteralRenderStrategy();
+    private final LiteralRenderStrategy literalStrategy = new StandardSqlLiteralRenderStrategy();
 
     @Default
-    private final StandardSqlScalarSubqueryRenderStrategy scalarSubqueryStrategy =
-            new StandardSqlScalarSubqueryRenderStrategy();
+    private final ScalarSubqueryRenderStrategy scalarSubqueryStrategy = new StandardSqlScalarSubqueryRenderStrategy();
 
     @Default
-    private final StandardSqlBinaryArithmeticExpressionRenderStrategy binaryArithmeticExpressionStrategy =
+    private final BinaryArithmeticExpressionRenderStrategy binaryArithmeticExpressionStrategy =
             new StandardSqlBinaryArithmeticExpressionRenderStrategy();
 
     @Default
     private final UnaryArithmeticExpressionRenderStrategy unaryArithmeticExpressionStrategy =
-            new UnaryArithmeticExpressionRenderStrategy();
+            new StandardSqlUnaryArithmeticExpressionRenderStrategy();
 
     // scalar expressions - function calls
     @Default
@@ -352,11 +381,11 @@ public class SqlRenderer implements Visitor<String> {
     private final DateArithmeticRenderStrategy dateArithmeticStrategy = new StandarSqlDateArithmeticRenderStrategy();
 
     @Default
-    private final StandardSqlExtractDatePartRenderStrategy extractDatePartStrategy =
+    private final ExtractDatePartRenderStrategy extractDatePartStrategy =
             new StandardSqlExtractDatePartRenderStrategy();
 
     @Default
-    private final StandardSqlLeftRenderStrategy leftStrategy = new StandardSqlLeftRenderStrategy();
+    private final LeftRenderStrategy leftStrategy = new StandardSqlLeftRenderStrategy();
 
     @Default
     private final LegthRenderStrategy lengthStrategy = new StandardSqlLegthRenderStrategy();
@@ -369,32 +398,32 @@ public class SqlRenderer implements Visitor<String> {
             new StandardSqlCharacterLengthRenderStrategy();
 
     @Default
-    private final StandardSqlModRenderStrategy modStrategy = new StandardSqlModRenderStrategy();
+    private final ModRenderStrategy modStrategy = new StandardSqlModRenderStrategy();
 
     @Default
-    private final StandardSqlNullScalarExpressionRenderStrategy nullScalarExpressionStrategy =
+    private final NullScalarExpressionRenderStrategy nullScalarExpressionStrategy =
             new StandardSqlNullScalarExpressionRenderStrategy();
 
     @Default
-    private final StandardSqlPowerRenderStrategy powerStrategy = new StandardSqlPowerRenderStrategy();
+    private final PowerRenderStrategy powerStrategy = new StandardSqlPowerRenderStrategy();
 
     @Default
-    private final StandardSqlReplaceRenderStrategy replaceStrategy = new StandardSqlReplaceRenderStrategy();
+    private final ReplaceRenderStrategy replaceStrategy = new StandardSqlReplaceRenderStrategy();
 
     @Default
-    private final StandardSqlRoundRenderStrategy roundStrategy = new StandardSqlRoundRenderStrategy();
+    private final RoundRenderStrategy roundStrategy = new StandardSqlRoundRenderStrategy();
 
     @Default
-    private final SubstringRenderStrategy substringStrategy = new SubstringRenderStrategy();
+    private final SubstringRenderStrategy substringStrategy = new StandardSqlSubstringRenderStrategy();
 
     @Default
-    private final TrimRenderStrategy trimStrategy = new TrimRenderStrategy();
+    private final TrimRenderStrategy trimStrategy = new StandardSqlTrimRenderStrategy();
 
     @Default
-    private final UnaryNumericRenderStrategy unaryNumericStrategy = new UnaryNumericRenderStrategy();
+    private final UnaryNumericRenderStrategy unaryNumericStrategy = new StandardSqlUnaryNumericRenderStrategy();
 
     @Default
-    private final UnaryStringRenderStrategy unaryStringStrategy = new UnaryStringRenderStrategy();
+    private final UnaryStringRenderStrategy unaryStringStrategy = new StandardSqlUnaryStringRenderStrategy();
 
     @Default
     private final JsonExistsRenderStrategy jsonExistsStrategy = new StandardSqlJsonExistsRenderStrategy();
@@ -407,17 +436,17 @@ public class SqlRenderer implements Visitor<String> {
 
     // set expressions
     @Default
-    private final StandardSqlNullSetExpressionRenderStrategy nullSetExpressionStrategy =
+    private final NullSetExpressionRenderStrategy nullSetExpressionStrategy =
             new StandardSqlNullSetExpressionRenderStrategy();
 
     @Default
     private final ExceptRenderStrategy exceptStrategy = new StandardSqlExceptRenderStrategy();
 
     @Default
-    private final StandardSqlIntersectRenderStrategy intersectStrategy = new StandardSqlIntersectRenderStrategy();
+    private final IntersectRenderStrategy intersectStrategy = new StandardSqlIntersectRenderStrategy();
 
     @Default
-    private final UnionRenderStrategy unionStrategy = new UnionRenderStrategy();
+    private final UnionRenderStrategy unionStrategy = new StandardSqlUnionRenderStrategy();
 
     // sql items
     @Default
