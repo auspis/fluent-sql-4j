@@ -10,11 +10,11 @@ import lan.tlab.r4j.sql.ast.clause.selection.Select;
 import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.BehaviorKind;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnEmptyBehavior;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.OnErrorBehavior;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.WrapperBehavior;
 import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
@@ -78,7 +78,7 @@ class JsonFunctionsH2IntegrationTest {
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(
                         new JsonExists(
-                                ColumnReference.of("users", "email"), Literal.of("$.domain"), OnErrorBehavior.error()),
+                                ColumnReference.of("users", "email"), Literal.of("$.domain"), BehaviorKind.ERROR),
                         "has_domain")))
                 .from(From.of(new TableIdentifier("users")))
                 .build();
@@ -136,7 +136,7 @@ class JsonFunctionsH2IntegrationTest {
                 Literal.of("$.discount"),
                 "DECIMAL(10,2)",
                 OnEmptyBehavior.defaultValue("0.00"),
-                OnErrorBehavior.returnNull());
+                BehaviorKind.NONE);
 
         SelectStatement query = SelectStatement.builder()
                 .select(Select.of(
@@ -201,11 +201,11 @@ class JsonFunctionsH2IntegrationTest {
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("users", "email"), Literal.of("$.history"));
 
         // Verify defaults are set
-        assertThat(jsonExists.onErrorBehavior()).isEqualTo(OnErrorBehavior.returnNull());
+        assertThat(jsonExists.onErrorBehavior()).isEqualTo(BehaviorKind.NONE);
         assertThat(jsonValue.onEmptyBehavior()).isEqualTo(OnEmptyBehavior.returnNull());
-        assertThat(jsonValue.onErrorBehavior()).isEqualTo(OnErrorBehavior.returnNull());
+        assertThat(jsonValue.onErrorBehavior()).isEqualTo(BehaviorKind.NONE);
         assertThat(jsonQuery.wrapperBehavior()).isEqualTo(WrapperBehavior.NONE);
         assertThat(jsonQuery.onEmptyBehavior()).isEqualTo(OnEmptyBehavior.returnNull());
-        assertThat(jsonQuery.onErrorBehavior()).isEqualTo(OnErrorBehavior.returnNull());
+        assertThat(jsonQuery.onErrorBehavior()).isEqualTo(BehaviorKind.NONE);
     }
 }

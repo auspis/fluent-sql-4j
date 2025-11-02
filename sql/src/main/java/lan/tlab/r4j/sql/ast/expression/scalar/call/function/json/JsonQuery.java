@@ -34,7 +34,7 @@ import lan.tlab.r4j.sql.ast.visitor.Visitor;
  *     "JSON",
  *     WrapperBehavior.WITH_WRAPPER,
  *     OnEmptyBehavior.defaultValue("EMPTY ARRAY"),
- *     OnErrorBehavior.error()
+ *     BehaviorKind.ERROR
  * );
  * }</pre>
  */
@@ -44,7 +44,7 @@ public record JsonQuery(
         String returningType,
         WrapperBehavior wrapperBehavior,
         OnEmptyBehavior onEmptyBehavior,
-        OnErrorBehavior onErrorBehavior)
+        BehaviorKind onErrorBehavior)
         implements FunctionCall {
 
     /**
@@ -59,7 +59,7 @@ public record JsonQuery(
             onEmptyBehavior = OnEmptyBehavior.returnNull();
         }
         if (onErrorBehavior == null) {
-            onErrorBehavior = OnErrorBehavior.returnNull();
+            onErrorBehavior = BehaviorKind.NONE;
         }
     }
 

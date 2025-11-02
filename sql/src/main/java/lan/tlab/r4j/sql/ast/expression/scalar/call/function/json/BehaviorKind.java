@@ -8,7 +8,7 @@ package lan.tlab.r4j.sql.ast.expression.scalar.call.function.json;
  * <p>
  * According to SQL:2016 standard:
  * <ul>
- *   <li>{@link #NULL} - Returns NULL when the condition occurs</li>
+ *   <li>{@link #NONE} - Returns NONE when the condition occurs</li>
  *   <li>{@link #ERROR} - Raises an error when the condition occurs</li>
  *   <li>{@link #DEFAULT} - Returns a default value when the condition occurs (requires a value)</li>
  * </ul>
@@ -17,10 +17,10 @@ package lan.tlab.r4j.sql.ast.expression.scalar.call.function.json;
  */
 public enum BehaviorKind {
     /**
-     * Returns NULL when the condition (empty or error) occurs.
+     * Returns NONE when the condition (empty or error) occurs.
      * This is typically the default behavior for most JSON functions.
      */
-    NULL,
+    NONE,
 
     /**
      * Raises an error when the condition (empty or error) occurs.
