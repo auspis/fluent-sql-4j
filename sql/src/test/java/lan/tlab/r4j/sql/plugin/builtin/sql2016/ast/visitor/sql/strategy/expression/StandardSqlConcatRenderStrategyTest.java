@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression;
+package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,18 +8,19 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Concat;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ConcatRenderStrategyTest {
+class StandardSqlConcatRenderStrategyTest {
 
     private ConcatRenderStrategy strategy;
     private SqlRenderer sqlRenderer;
 
     @BeforeEach
     public void setUp() {
-        strategy = ConcatRenderStrategy.standardSql2008();
+        strategy = new StandardSqlConcatRenderStrategy();
         sqlRenderer = TestDialectRendererFactory.standardSql2008();
     }
 

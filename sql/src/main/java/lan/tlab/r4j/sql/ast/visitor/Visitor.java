@@ -34,7 +34,6 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Concat;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.DataLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
@@ -191,8 +190,6 @@ public interface Visitor<T> {
     T visit(CharLength functionCall, AstContext ctx);
 
     T visit(CharacterLength functionCall, AstContext ctx);
-
-    T visit(DataLength functionCall, AstContext ctx);
 
     T visit(Mod functionCall, AstContext ctx);
 

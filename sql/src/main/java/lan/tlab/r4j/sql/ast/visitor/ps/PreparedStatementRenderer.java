@@ -36,7 +36,6 @@ import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharacterLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Concat;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.DataLength;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Left;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Length;
 import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
@@ -112,7 +111,6 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ConcatPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CreateTableStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CurrentDatePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CurrentDateTimePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DataLengthPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DefaultConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
@@ -198,7 +196,6 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlConca
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlCreateTableStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlCurrentDatePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlCurrentDateTimePsStrategy;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlDataLengthPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlDateArithmeticPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlDefaultConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016.StandardSqlDefaultValuesPsStrategy;
@@ -509,9 +506,6 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     private final CharacterLengthPsStrategy characterLengthStrategy = new StandardSqlCharacterLengthPsStrategy();
 
     @Default
-    private final DataLengthPsStrategy dataLengthStrategy = new StandardSqlDataLengthPsStrategy();
-
-    @Default
     private final InPsStrategy inStrategy = new StandardSqlInPsStrategy();
 
     @Default
@@ -749,11 +743,6 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Override
     public PsDto visit(CharacterLength functionCall, AstContext ctx) {
         return characterLengthStrategy.handle(functionCall, this, ctx);
-    }
-
-    @Override
-    public PsDto visit(DataLength functionCall, AstContext ctx) {
-        return dataLengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
