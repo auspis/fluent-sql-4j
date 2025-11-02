@@ -3,8 +3,8 @@ package lan.tlab.r4j.sql.plugin.builtin;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPluginProvider;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPluginProvider;
 import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginProviderTest {

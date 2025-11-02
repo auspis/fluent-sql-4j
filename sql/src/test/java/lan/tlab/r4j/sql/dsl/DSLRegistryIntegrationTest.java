@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.standardsql2008.StandardSQLDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
