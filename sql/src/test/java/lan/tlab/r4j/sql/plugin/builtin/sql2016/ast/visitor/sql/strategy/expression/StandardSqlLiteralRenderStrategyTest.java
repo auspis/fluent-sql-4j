@@ -17,7 +17,7 @@ class StandardSqlLiteralRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlLiteralRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

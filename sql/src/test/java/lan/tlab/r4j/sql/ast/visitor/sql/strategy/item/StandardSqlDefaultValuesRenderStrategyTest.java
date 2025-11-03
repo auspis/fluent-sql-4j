@@ -9,15 +9,15 @@ import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class DefaultValuesRenderStrategyTest {
+class StandardSqlDefaultValuesRenderStrategyTest {
 
-    private DefaultValuesRenderStrategy strategy;
+    private StandardSqlDefaultValuesRenderStrategy strategy;
     private SqlRenderer renderer;
 
     @BeforeEach
     public void setUp() {
-        strategy = new DefaultValuesRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        strategy = new StandardSqlDefaultValuesRenderStrategy();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

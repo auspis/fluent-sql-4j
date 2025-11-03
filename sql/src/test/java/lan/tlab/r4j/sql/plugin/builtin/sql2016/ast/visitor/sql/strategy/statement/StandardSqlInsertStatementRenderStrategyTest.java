@@ -31,7 +31,7 @@ class StandardSqlInsertStatementRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlInsertStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

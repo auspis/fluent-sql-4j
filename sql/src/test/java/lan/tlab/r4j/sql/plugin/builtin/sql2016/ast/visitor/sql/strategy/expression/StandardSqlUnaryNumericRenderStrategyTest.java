@@ -21,7 +21,7 @@ class StandardSqlUnaryNumericRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlUnaryNumericRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

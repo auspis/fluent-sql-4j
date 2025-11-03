@@ -16,7 +16,7 @@ class StandardSqlJsonExistsRenderStrategyTest {
 
     @Test
     void basicArguments() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonExistsRenderStrategy strategy = new StandardSqlJsonExistsRenderStrategy();
         JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonExists, sqlRenderer, new AstContext());
@@ -25,7 +25,7 @@ class StandardSqlJsonExistsRenderStrategyTest {
 
     @Test
     void onErrorBehavior() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonExistsRenderStrategy strategy = new StandardSqlJsonExistsRenderStrategy();
         JsonExists jsonExists =
                 new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);

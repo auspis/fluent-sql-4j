@@ -4,7 +4,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class MergeUsingRenderStrategy {
+public class StandardSqlMergeUsingRenderStrategy {
 
     public String render(MergeUsing using, SqlRenderer sqlRenderer, AstContext ctx) {
         // Delegate to the TableExpression's rendering

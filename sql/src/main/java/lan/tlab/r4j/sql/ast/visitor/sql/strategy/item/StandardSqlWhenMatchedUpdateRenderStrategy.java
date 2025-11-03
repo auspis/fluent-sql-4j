@@ -5,7 +5,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class WhenMatchedUpdateRenderStrategy {
+public class StandardSqlWhenMatchedUpdateRenderStrategy {
 
     public String render(WhenMatchedUpdate action, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("WHEN MATCHED");

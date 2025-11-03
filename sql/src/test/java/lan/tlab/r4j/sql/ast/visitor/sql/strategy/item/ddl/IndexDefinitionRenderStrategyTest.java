@@ -16,7 +16,7 @@ class IndexDefinitionRenderStrategyTest {
 
     @BeforeEach
     void setUp() {
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
         strategy = new IndexDefinitionRenderStrategy();
     }
 

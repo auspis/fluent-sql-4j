@@ -19,7 +19,7 @@ class StandardSqlGroupByRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlGroupByRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

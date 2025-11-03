@@ -23,7 +23,7 @@ class StandardSqlExceptRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlExceptRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test
