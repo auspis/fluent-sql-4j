@@ -20,7 +20,7 @@ class StandardSqlScalarExpressionProjectionRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlScalarExpressionProjectionRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

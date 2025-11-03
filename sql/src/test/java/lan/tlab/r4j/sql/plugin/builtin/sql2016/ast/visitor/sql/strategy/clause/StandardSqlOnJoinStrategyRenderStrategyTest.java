@@ -16,12 +16,12 @@ import org.junit.jupiter.api.Test;
 class StandardSqlOnJoinStrategyRenderStrategyTest {
 
     private StandardSqlOnJoinStrategyRenderStrategy strategy = new StandardSqlOnJoinStrategyRenderStrategy();
-    private SqlRenderer standardSql2008 = TestDialectRendererFactory.standardSql2008();
+    private SqlRenderer standardSql2008 = TestDialectRendererFactory.standardSql();
 
     @BeforeEach
     public void SsetUp() {
         strategy = new StandardSqlOnJoinStrategyRenderStrategy();
-        standardSql2008 = TestDialectRendererFactory.standardSql2008();
+        standardSql2008 = TestDialectRendererFactory.standardSql();
     }
 
     @Test

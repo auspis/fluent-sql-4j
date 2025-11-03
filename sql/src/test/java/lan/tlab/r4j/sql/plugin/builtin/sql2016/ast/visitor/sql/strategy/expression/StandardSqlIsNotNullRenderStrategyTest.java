@@ -18,7 +18,7 @@ class StandardSqlIsNotNullRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlIsNotNullRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

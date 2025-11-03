@@ -17,7 +17,7 @@ class StandardSqlNullScalarExpressionRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlNullScalarExpressionRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

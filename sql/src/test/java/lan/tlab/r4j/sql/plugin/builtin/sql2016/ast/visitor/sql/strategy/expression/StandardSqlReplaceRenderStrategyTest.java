@@ -19,7 +19,7 @@ class StandardSqlReplaceRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlReplaceRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

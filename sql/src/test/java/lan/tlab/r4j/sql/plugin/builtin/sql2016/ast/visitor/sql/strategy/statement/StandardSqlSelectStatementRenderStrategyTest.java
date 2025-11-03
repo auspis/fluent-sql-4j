@@ -30,7 +30,7 @@ class StandardSqlSelectStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlSelectStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

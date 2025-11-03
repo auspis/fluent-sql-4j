@@ -24,7 +24,7 @@ class StandardSqlSelectRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlSelectRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test
