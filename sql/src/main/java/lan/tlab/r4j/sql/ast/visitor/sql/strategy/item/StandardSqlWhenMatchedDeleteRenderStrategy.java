@@ -4,7 +4,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedDelete;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class WhenMatchedDeleteRenderStrategy {
+public class StandardSqlWhenMatchedDeleteRenderStrategy {
 
     public String render(WhenMatchedDelete action, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("WHEN MATCHED");

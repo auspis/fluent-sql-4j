@@ -16,7 +16,7 @@ class PostgreJsonValueRenderStrategyTest {
     // TODO: use postgre sql renderer
     @Test
     void ok() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonValueRenderStrategy strategy = new PostgreJsonValueRenderStrategy();
         JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());

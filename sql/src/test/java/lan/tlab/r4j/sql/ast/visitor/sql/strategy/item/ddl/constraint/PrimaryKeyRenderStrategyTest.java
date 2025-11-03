@@ -17,7 +17,7 @@ class PrimaryKeyRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new PrimaryKeyRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

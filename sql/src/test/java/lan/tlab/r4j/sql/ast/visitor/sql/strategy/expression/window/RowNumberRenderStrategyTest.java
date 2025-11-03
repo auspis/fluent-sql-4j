@@ -20,7 +20,7 @@ class RowNumberRenderStrategyTest {
 
     @BeforeEach
     public void setUp() {
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
         strategy = new RowNumberRenderStrategy();
     }
 

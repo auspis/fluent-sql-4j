@@ -12,7 +12,7 @@ public class StandardSqlAggregationFunctionProjectionPsStrategy implements Aggre
     @Override
     public PsDto handle(
             AggregateCallProjection aggregationFunctionProjection, Visitor<PsDto> renderer, AstContext ctx) {
-        EscapeStrategy escapeStrategy = EscapeStrategy.standard();
+        EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
         if (renderer instanceof PreparedStatementRenderer psRenderer) {
             escapeStrategy = psRenderer.getEscapeStrategy();
         }

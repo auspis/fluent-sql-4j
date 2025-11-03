@@ -18,7 +18,7 @@ class ReferencesItemRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new ReferencesItemRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

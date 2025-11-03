@@ -19,7 +19,7 @@ class ForeignKeyConstraintRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new ForeignKeyConstraintRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

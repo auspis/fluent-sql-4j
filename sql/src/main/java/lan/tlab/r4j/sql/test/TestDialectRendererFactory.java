@@ -53,7 +53,7 @@ public final class TestDialectRendererFactory {
      * @return SqlRenderer configured for Standard SQL:2008
      * @throws IllegalArgumentException if the StandardSQL plugin is not available
      */
-    public static SqlRenderer standardSql2008() {
+    public static SqlRenderer standardSql() {
         return REGISTRY.getDialectRenderer(
                         StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
                 .orElseThrow()

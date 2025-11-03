@@ -22,7 +22,7 @@ class StandardSqlDeleteStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlDeleteStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

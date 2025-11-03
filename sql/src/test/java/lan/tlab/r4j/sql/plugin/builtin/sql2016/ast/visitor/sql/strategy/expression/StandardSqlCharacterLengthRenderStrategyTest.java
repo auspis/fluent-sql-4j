@@ -14,7 +14,7 @@ class StandardSqlCharacterLengthRenderStrategyTest {
 
     @Test
     void ok() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         CharacterLengthRenderStrategy strategy = new StandardSqlCharacterLengthRenderStrategy();
         CharacterLength fun = new CharacterLength(ColumnReference.of("Customer", "name"));
         String sql = strategy.render(fun, sqlRenderer, new AstContext());

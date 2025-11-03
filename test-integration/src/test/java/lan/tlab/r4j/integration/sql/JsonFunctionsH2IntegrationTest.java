@@ -39,7 +39,7 @@ class JsonFunctionsH2IntegrationTest {
     @BeforeAll
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
 
         // Use standard tables from TestDatabaseUtil
         TestDatabaseUtil.createUsersTable(connection);
