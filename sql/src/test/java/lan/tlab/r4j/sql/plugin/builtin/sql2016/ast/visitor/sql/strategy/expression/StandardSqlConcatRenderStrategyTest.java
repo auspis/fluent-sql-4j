@@ -21,7 +21,7 @@ class StandardSqlConcatRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlConcatRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

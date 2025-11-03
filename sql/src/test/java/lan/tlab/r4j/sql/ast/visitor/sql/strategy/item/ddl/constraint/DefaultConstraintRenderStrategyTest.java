@@ -18,7 +18,7 @@ class DefaultConstraintRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new DefaultConstraintRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

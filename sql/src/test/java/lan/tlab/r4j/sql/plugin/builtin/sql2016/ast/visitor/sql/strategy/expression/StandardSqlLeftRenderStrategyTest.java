@@ -21,7 +21,7 @@ class StandardSqlLeftRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlLeftRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

@@ -22,7 +22,7 @@ class StandardSqlSubstringRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlSubstringRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

@@ -22,7 +22,7 @@ class StandardSqlUnionRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlUnionRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

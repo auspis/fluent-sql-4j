@@ -4,10 +4,7 @@ import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class AsRenderStrategy implements SqlItemRenderStrategy {
+public interface AsRenderStrategy extends SqlItemRenderStrategy {
 
-    public String render(Alias as, SqlRenderer sqlRenderer, AstContext ctx) {
-        String name = as.name();
-        return name.isBlank() ? "" : String.format("AS %s", name);
-    }
+    String render(Alias as, SqlRenderer sqlRenderer, AstContext ctx);
 }

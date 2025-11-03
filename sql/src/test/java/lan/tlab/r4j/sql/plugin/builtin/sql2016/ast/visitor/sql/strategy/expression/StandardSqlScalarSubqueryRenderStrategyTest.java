@@ -23,7 +23,7 @@ class StandardSqlScalarSubqueryRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlScalarSubqueryRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

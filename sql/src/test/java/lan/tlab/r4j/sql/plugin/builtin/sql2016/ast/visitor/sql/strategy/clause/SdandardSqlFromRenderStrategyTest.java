@@ -27,7 +27,7 @@ class SdandardSqlFromRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new SdandardSqlFromRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

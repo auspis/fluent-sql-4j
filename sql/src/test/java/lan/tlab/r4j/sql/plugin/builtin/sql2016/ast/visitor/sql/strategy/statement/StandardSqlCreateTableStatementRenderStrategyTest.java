@@ -29,7 +29,7 @@ class StandardSqlCreateTableStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlCreateTableStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

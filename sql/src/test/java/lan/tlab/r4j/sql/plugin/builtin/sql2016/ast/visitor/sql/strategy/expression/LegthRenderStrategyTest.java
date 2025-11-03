@@ -14,7 +14,7 @@ class LegthRenderStrategyTest {
 
     @Test
     void standardSql() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         LegthRenderStrategy strategy = new StandardSqlLegthRenderStrategy();
         Length fun = new Length(ColumnReference.of("Customer", "name"));
         String sql = strategy.render(fun, sqlRenderer, new AstContext());

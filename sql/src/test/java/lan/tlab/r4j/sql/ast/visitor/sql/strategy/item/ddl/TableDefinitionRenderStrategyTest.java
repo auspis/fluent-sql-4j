@@ -28,7 +28,7 @@ class TableDefinitionRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new TableDefinitionRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test
