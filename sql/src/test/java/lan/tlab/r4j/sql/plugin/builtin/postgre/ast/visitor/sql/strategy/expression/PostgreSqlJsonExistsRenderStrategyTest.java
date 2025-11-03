@@ -16,7 +16,7 @@ class PostgreSqlJsonExistsRenderStrategyTest {
     // TODO: use postgre sql renderer
     @Test
     void ok() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonExistsRenderStrategy strategy = new PostgreJsonExistsRenderStrategy();
         JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonExists, sqlRenderer, new AstContext());

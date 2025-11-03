@@ -27,7 +27,7 @@ class Standard2008SqlRendererTest {
 
     @BeforeEach
     void setUp() {
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

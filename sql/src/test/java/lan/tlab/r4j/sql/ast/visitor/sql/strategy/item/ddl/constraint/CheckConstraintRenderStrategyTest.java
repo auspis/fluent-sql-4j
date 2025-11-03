@@ -20,7 +20,7 @@ class CheckConstraintRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new CheckConstraintRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

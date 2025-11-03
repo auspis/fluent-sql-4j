@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 class StandardSqlComparisonRenderStrategyTest {
 
     private final StandardSqlComparisonRenderStrategy strategy = new StandardSqlComparisonRenderStrategy();
-    private final SqlRenderer standardSql2008 = TestDialectRendererFactory.standardSql2008();
+    private final SqlRenderer standardSql2008 = TestDialectRendererFactory.standardSql();
 
     @Test
     void eq() {

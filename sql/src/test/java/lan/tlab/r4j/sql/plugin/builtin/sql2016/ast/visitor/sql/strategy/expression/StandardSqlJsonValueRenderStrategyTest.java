@@ -15,7 +15,7 @@ class StandardSqlJsonValueRenderStrategyTest {
 
     @Test
     void basicArguments() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonValueRenderStrategy strategy = new StandardSqlJsonValueRenderStrategy();
         JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonValue, sqlRenderer, new AstContext());
@@ -24,7 +24,7 @@ class StandardSqlJsonValueRenderStrategyTest {
 
     @Test
     void returningType() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonValueRenderStrategy strategy = new StandardSqlJsonValueRenderStrategy();
         JsonValue jsonValue =
                 new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"), "VARCHAR(100)");

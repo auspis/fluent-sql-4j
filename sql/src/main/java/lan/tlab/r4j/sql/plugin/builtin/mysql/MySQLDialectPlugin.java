@@ -3,12 +3,12 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.clasue.MySqlFetchRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MySqlConcatRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MysqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.statement.MySqlMergeStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 
 /**
  * Built-in plugin for the MySQL dialect.
@@ -161,7 +161,7 @@ public final class MySQLDialectPlugin {
      */
     private static DialectRenderer createMySqlRenderer() {
         SqlRenderer sqlRenderer = SqlRenderer.builder()
-                .escapeStrategy(EscapeStrategy.mysql())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .paginationStrategy(new MySqlFetchRenderStrategy())
                 .currentDateStrategy((functionCall1, sqlRenderer1, ctx1) -> "CURDATE()")
                 .currentDateTimeStrategy((functionCall1, sqlRenderer1, ctx1) -> "NOW()")

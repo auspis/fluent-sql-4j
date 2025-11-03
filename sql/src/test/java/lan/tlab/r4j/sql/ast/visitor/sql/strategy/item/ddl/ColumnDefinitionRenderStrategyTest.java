@@ -21,7 +21,7 @@ class ColumnDefinitionRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new ColumnDefinitionRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

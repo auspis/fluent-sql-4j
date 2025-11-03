@@ -16,15 +16,15 @@ import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class InsertSourceRenderStrategyTest {
+class StandardSqlInsertSourceRenderStrategyTest {
 
-    private InsertSourceRenderStrategy strategy;
+    private StandardSqlInsertSourceRenderStrategy strategy;
     private SqlRenderer renderer;
 
     @BeforeEach
     public void setUp() {
-        strategy = new InsertSourceRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        strategy = new StandardSqlInsertSourceRenderStrategy();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

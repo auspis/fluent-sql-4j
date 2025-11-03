@@ -12,7 +12,7 @@ class CurrentDateTimeRenderStrategyTest {
 
     @Test
     void standardSql() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         String sql = sqlRenderer.visit(new CurrentDateTime(), new AstContext());
         assertThat(sql).isEqualTo("CURRENT_TIMESTAMP()");
     }

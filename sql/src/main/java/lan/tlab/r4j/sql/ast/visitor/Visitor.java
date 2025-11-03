@@ -90,9 +90,11 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
 import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
 import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 
 public interface Visitor<T> {
 
+    EscapeStrategy getEscapeStrategy();
     // statements
     T visit(SelectStatement clause, AstContext ctx);
 

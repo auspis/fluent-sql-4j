@@ -21,7 +21,7 @@ class StandardSqlExtractDatePartRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlExtractDatePartRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

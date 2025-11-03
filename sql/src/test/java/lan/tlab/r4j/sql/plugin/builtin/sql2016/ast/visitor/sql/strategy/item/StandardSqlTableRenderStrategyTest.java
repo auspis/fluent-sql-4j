@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item;
+package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,15 +9,15 @@ import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class TableRenderStrategyTest {
+class StandardSqlTableRenderStrategyTest {
 
-    private TableRenderStrategy strategy;
+    private StandardSqlTableRenderStrategy strategy;
     private SqlRenderer renderer;
 
     @BeforeEach
     public void setUp() {
-        strategy = new TableRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        strategy = new StandardSqlTableRenderStrategy();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

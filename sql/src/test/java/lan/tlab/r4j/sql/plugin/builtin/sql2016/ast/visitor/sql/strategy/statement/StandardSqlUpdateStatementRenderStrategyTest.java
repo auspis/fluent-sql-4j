@@ -25,7 +25,7 @@ class StandardSqlUpdateStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlUpdateStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

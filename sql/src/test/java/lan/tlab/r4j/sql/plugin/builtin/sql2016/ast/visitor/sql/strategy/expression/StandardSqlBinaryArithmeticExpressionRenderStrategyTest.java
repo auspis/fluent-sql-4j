@@ -26,7 +26,7 @@ class StandardSqlBinaryArithmeticExpressionRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlBinaryArithmeticExpressionRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

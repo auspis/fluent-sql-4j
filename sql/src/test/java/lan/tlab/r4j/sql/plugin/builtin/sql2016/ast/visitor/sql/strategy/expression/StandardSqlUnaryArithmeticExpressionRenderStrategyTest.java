@@ -26,7 +26,7 @@ class StandardSqlUnaryArithmeticExpressionRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlUnaryArithmeticExpressionRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test
