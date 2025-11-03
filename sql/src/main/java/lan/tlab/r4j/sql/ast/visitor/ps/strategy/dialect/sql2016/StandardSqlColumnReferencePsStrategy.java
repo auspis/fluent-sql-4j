@@ -12,7 +12,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsStrategy {
     @Override
     public PsDto handle(ColumnReference col, Visitor<PsDto> renderer, AstContext ctx) {
-        EscapeStrategy escapeStrategy = EscapeStrategy.standard();
+        EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
         if (renderer instanceof PreparedStatementRenderer psRenderer) {
             escapeStrategy = psRenderer.getEscapeStrategy();
         }

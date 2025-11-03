@@ -23,7 +23,7 @@ class StandarSqlDateArithmeticRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandarSqlDateArithmeticRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

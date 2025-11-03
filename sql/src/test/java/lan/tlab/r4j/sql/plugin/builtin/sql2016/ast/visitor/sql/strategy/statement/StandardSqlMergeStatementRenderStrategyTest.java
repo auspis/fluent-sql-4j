@@ -27,7 +27,7 @@ class StandardSqlMergeStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlMergeStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

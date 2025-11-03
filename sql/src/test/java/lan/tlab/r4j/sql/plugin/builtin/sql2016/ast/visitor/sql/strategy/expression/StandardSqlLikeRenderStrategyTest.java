@@ -18,7 +18,7 @@ class StandardSqlLikeRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlLikeRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test
