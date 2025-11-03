@@ -17,7 +17,7 @@ class NotNullConstraintRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new NotNullConstraintRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

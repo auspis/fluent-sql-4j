@@ -154,15 +154,15 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.OverClauseRen
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.RankRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.window.RowNumberRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.AsRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.DefaultValuesRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.InsertSourceRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.InsertValueRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.MergeUsingRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.StandardSqlDefaultValuesRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.StandardSqlInsertSourceRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.StandardSqlMergeUsingRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.StandardSqlWhenMatchedDeleteRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.StandardSqlWhenMatchedUpdateRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.StandardSqlWhenNotMatchedInsertRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.TableRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.UpdateItemRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.WhenMatchedDeleteRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.WhenMatchedUpdateRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.WhenNotMatchedInsertRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.ColumnDefinitionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.IndexDefinitionRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.ParameterizedDataTypeRenderStrategy;
@@ -175,6 +175,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.ForeignKeyC
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.NotNullConstraintRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.PrimaryKeyRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.ddl.constraint.UniqueConstraintRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.CreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.DeleteStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.InsertStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy;
@@ -190,6 +191,7 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.S
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSelectRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSortingRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlWhereRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.BinaryArithmeticExpressionRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarSqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlAggregateCallProjectionRenderStrategy;
@@ -234,6 +236,10 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expressi
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnaryStringRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnionRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarsSqlJsonQueryRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.StandardSqlAsRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.StandardSqlInsertValueRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.StandardSqlTableRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.StandardSqlUpdateItemRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlCreateTableStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlDeleteStatementRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlInsertStatementRenderStrategy;
@@ -249,7 +255,7 @@ public class SqlRenderer implements Visitor<String> {
 
     @Getter
     @Default
-    private final EscapeStrategy escapeStrategy = EscapeStrategy.standard();
+    private final EscapeStrategy escapeStrategy = new StandardSqlEscapeStrategy();
 
     @Default
     private final SelectStatementRenderStrategy selectStatementStrategy =
@@ -271,7 +277,7 @@ public class SqlRenderer implements Visitor<String> {
     private final MergeStatementRenderStrategy mergeStatementStrategy = new StandardSqlMergeStatementRenderStrategy();
 
     @Default
-    private final StandardSqlCreateTableStatementRenderStrategy createTableStatementStrategy =
+    private final CreateTableStatementRenderStrategy createTableStatementStrategy =
             new StandardSqlCreateTableStatementRenderStrategy();
 
     // clause
@@ -450,39 +456,43 @@ public class SqlRenderer implements Visitor<String> {
 
     // sql items
     @Default
-    private final TableRenderStrategy tableStrategy = new TableRenderStrategy();
+    private final TableRenderStrategy tableStrategy = new StandardSqlTableRenderStrategy();
 
     @Default
-    private final AsRenderStrategy asStrategy = new AsRenderStrategy();
+    private final AsRenderStrategy asStrategy = new StandardSqlAsRenderStrategy();
 
     @Default
-    private final UpdateItemRenderStrategy updateItemStrategy = new UpdateItemRenderStrategy();
+    private final UpdateItemRenderStrategy updateItemStrategy = new StandardSqlUpdateItemRenderStrategy();
 
     @Default
-    private final InsertValueRenderStrategy insertValueStrategy = new InsertValueRenderStrategy();
+    private final InsertValueRenderStrategy insertValueStrategy = new StandardSqlInsertValueRenderStrategy();
 
     @Default
-    private final InsertSourceRenderStrategy insertSourceStrategy = new InsertSourceRenderStrategy();
+    private final StandardSqlInsertSourceRenderStrategy insertSourceStrategy =
+            new StandardSqlInsertSourceRenderStrategy();
 
     @Default
-    private final DefaultValuesRenderStrategy defaultValuesStrategy = new DefaultValuesRenderStrategy();
+    private final StandardSqlDefaultValuesRenderStrategy defaultValuesStrategy =
+            new StandardSqlDefaultValuesRenderStrategy();
 
     @Default
     private final AliasedTableExpressionRenderStrategy aliasedTableExpressionStrategy =
             new AliasedTableExpressionRenderStrategy();
 
     @Default
-    private final MergeUsingRenderStrategy mergeUsingStrategy = new MergeUsingRenderStrategy();
+    private final StandardSqlMergeUsingRenderStrategy mergeUsingStrategy = new StandardSqlMergeUsingRenderStrategy();
 
     @Default
-    private final WhenMatchedUpdateRenderStrategy whenMatchedUpdateStrategy = new WhenMatchedUpdateRenderStrategy();
+    private final StandardSqlWhenMatchedUpdateRenderStrategy whenMatchedUpdateStrategy =
+            new StandardSqlWhenMatchedUpdateRenderStrategy();
 
     @Default
-    private final WhenMatchedDeleteRenderStrategy whenMatchedDeleteStrategy = new WhenMatchedDeleteRenderStrategy();
+    private final StandardSqlWhenMatchedDeleteRenderStrategy whenMatchedDeleteStrategy =
+            new StandardSqlWhenMatchedDeleteRenderStrategy();
 
     @Default
-    private final WhenNotMatchedInsertRenderStrategy whenNotMatchedInsertStrategy =
-            new WhenNotMatchedInsertRenderStrategy();
+    private final StandardSqlWhenNotMatchedInsertRenderStrategy whenNotMatchedInsertStrategy =
+            new StandardSqlWhenNotMatchedInsertRenderStrategy();
 
     @Default
     private final ReferencesItemRenderStrategy referencesItemStrategy = new ReferencesItemRenderStrategy();

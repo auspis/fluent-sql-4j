@@ -18,7 +18,7 @@ class StandardSqlAggregateCallRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlAggregateCallRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

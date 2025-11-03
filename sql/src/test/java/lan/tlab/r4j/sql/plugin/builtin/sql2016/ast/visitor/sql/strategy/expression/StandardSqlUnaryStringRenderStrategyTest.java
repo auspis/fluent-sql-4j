@@ -20,7 +20,7 @@ class StandardSqlUnaryStringRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlUnaryStringRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

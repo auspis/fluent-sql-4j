@@ -18,7 +18,7 @@ class StandarsSqlJsonQueryRenderStrategyTest {
 
     @Test
     void standardSql2016WithBasicArguments() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonQueryRenderStrategy strategy = new StandarsSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
@@ -27,7 +27,7 @@ class StandarsSqlJsonQueryRenderStrategyTest {
 
     @Test
     void standardSql2016WithReturningType() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonQueryRenderStrategy strategy = new StandarsSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery =
                 new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"), "JSON", null, null, null);
@@ -37,7 +37,7 @@ class StandarsSqlJsonQueryRenderStrategyTest {
 
     @Test
     void standardSql2016WithAllOptions() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
         JsonQueryRenderStrategy strategy = new StandarsSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery = new JsonQuery(
                 ColumnReference.of("products", "data"),

@@ -20,7 +20,7 @@ class StandardSqlBetweenRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlBetweenRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

@@ -8,6 +8,7 @@ import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.sql.ast.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 class StandardSqlScalarExpressionProjectionPsStrategyTest {
 
     private StandardSqlScalarExpressionProjectionPsStrategy strategy;
+    private PreparedStatementRenderer renderer;
 
     static record StubScalarExpression(PsDto result) implements ScalarExpression {
 
@@ -28,13 +30,14 @@ class StandardSqlScalarExpressionProjectionPsStrategyTest {
     @BeforeEach
     public void beforeEach() {
         strategy = new StandardSqlScalarExpressionProjectionPsStrategy();
+        renderer = new PreparedStatementRenderer();
     }
 
     @Test
     void noAlias() {
         ScalarExpression expr = new StubScalarExpression(new PsDto("foo", List.of(1)));
         ScalarExpressionProjection projection = new ScalarExpressionProjection(expr);
-        PsDto dto = strategy.handle(projection, null, new AstContext());
+        PsDto dto = strategy.handle(projection, renderer, new AstContext());
         assertThat(dto.sql()).isEqualTo("foo");
         assertThat(dto.parameters()).containsExactly(1);
     }
@@ -43,7 +46,7 @@ class StandardSqlScalarExpressionProjectionPsStrategyTest {
     void alias() {
         ScalarExpression expr = new StubScalarExpression(new PsDto("bar", List.of()));
         ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new Alias("aliasName"));
-        PsDto dto = strategy.handle(projection, null, new AstContext());
+        PsDto dto = strategy.handle(projection, renderer, new AstContext());
         assertThat(dto.sql()).isEqualTo("bar AS \"aliasName\"");
         assertThat(dto.parameters()).isEmpty();
     }
@@ -52,7 +55,7 @@ class StandardSqlScalarExpressionProjectionPsStrategyTest {
     void doesNotAddAliasIfAliasIsBlank() {
         ScalarExpression expr = new StubScalarExpression(new PsDto("baz", List.of("x")));
         ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new Alias("   "));
-        PsDto dto = strategy.handle(projection, null, new AstContext());
+        PsDto dto = strategy.handle(projection, renderer, new AstContext());
         assertThat(dto.sql()).isEqualTo("baz");
         assertThat(dto.parameters()).containsExactly("x");
     }
@@ -61,7 +64,7 @@ class StandardSqlScalarExpressionProjectionPsStrategyTest {
     void propagatesParametersFromExpression() {
         ScalarExpression expr = new StubScalarExpression(new PsDto("col", List.of(42, "foo")));
         ScalarExpressionProjection projection = new ScalarExpressionProjection(expr, new Alias("a"));
-        PsDto dto = strategy.handle(projection, null, new AstContext());
+        PsDto dto = strategy.handle(projection, renderer, new AstContext());
         assertThat(dto.sql()).isEqualTo("col AS \"a\"");
         assertThat(dto.parameters()).containsExactly(42, "foo");
     }

@@ -20,7 +20,7 @@ class StandardSqlOrderByRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlOrderByRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

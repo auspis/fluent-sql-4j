@@ -5,7 +5,7 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 
-public class WhenNotMatchedInsertRenderStrategy {
+public class StandardSqlWhenNotMatchedInsertRenderStrategy {
 
     public String render(WhenNotMatchedInsert action, SqlRenderer sqlRenderer, AstContext ctx) {
         StringBuilder sql = new StringBuilder("WHEN NOT MATCHED");

@@ -17,7 +17,7 @@ class StandardSqlColumnReferenceRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlColumnReferenceRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

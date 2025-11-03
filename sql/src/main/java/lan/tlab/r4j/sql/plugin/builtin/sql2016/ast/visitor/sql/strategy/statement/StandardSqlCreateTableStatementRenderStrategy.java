@@ -7,6 +7,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.CreateTableStatementR
 
 public class StandardSqlCreateTableStatementRenderStrategy implements CreateTableStatementRenderStrategy {
 
+    @Override
     public String render(CreateTableStatement statement, SqlRenderer sqlRenderer, AstContext ctx) {
         return String.format("CREATE TABLE %s", statement.tableDefinition().accept(sqlRenderer, ctx));
     }

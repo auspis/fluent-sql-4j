@@ -18,7 +18,7 @@ class SimpleDataTypeRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new SimpleDataTypeRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql2008();
+        renderer = TestDialectRendererFactory.standardSql();
     }
 
     @ParameterizedTest

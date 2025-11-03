@@ -20,7 +20,7 @@ class StandardSqlInRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlInRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql2008();
+        sqlRenderer = TestDialectRendererFactory.standardSql();
     }
 
     @Test

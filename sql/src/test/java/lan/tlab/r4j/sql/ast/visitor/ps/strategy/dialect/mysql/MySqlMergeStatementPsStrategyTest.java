@@ -18,7 +18,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 import org.junit.jupiter.api.Test;
 
 class MySqlMergeStatementPsStrategyTest {
@@ -44,20 +44,23 @@ class MySqlMergeStatementPsStrategyTest {
                                         Literal.of("new")))))
                 .build();
 
+        // TODO: use TestDialectRendererFactory
         SqlRenderer sqlRenderer =
-                SqlRenderer.builder().escapeStrategy(EscapeStrategy.mysql()).build();
+                SqlRenderer.builder().escapeStrategy(new MysqlEscapeStrategy()).build();
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
                 .sqlRenderer(sqlRenderer)
-                .escapeStrategy(EscapeStrategy.mysql())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
 
         assertThat(result.sql())
-                .isEqualTo("INSERT INTO `users` (`id`, `name`, `status`) "
-                        + "SELECT `src`.`id`, `src`.`name`, ? "
-                        + "FROM `users_updates` AS src "
-                        + "ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `status` = ?");
+                .isEqualTo(
+                        """
+                    INSERT INTO `users` (`id`, `name`, `status`) \
+                    SELECT `src`.`id`, `src`.`name`, ? \
+                    FROM `users_updates` AS src \
+                    ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `status` = ?""");
         assertThat(result.parameters()).containsExactly("new", "updated");
     }
 
@@ -73,18 +76,20 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         SqlRenderer sqlRenderer =
-                SqlRenderer.builder().escapeStrategy(EscapeStrategy.mysql()).build();
+                SqlRenderer.builder().escapeStrategy(new MysqlEscapeStrategy()).build();
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
                 .sqlRenderer(sqlRenderer)
-                .escapeStrategy(EscapeStrategy.mysql())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
 
         assertThat(result.sql())
-                .isEqualTo("INSERT INTO `users` (`id`, `name`) "
-                        + "SELECT `src`.`id`, ? "
-                        + "FROM `users_updates` AS src");
+                .isEqualTo(
+                        """
+                    INSERT INTO `users` (`id`, `name`) \
+                    SELECT `src`.`id`, ? \
+                    FROM `users_updates` AS src""");
         assertThat(result.parameters()).containsExactly("John");
     }
 
@@ -103,19 +108,21 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         SqlRenderer sqlRenderer =
-                SqlRenderer.builder().escapeStrategy(EscapeStrategy.mysql()).build();
+                SqlRenderer.builder().escapeStrategy(new MysqlEscapeStrategy()).build();
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
                 .sqlRenderer(sqlRenderer)
-                .escapeStrategy(EscapeStrategy.mysql())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
 
         assertThat(result.sql())
-                .isEqualTo("INSERT INTO `users` (`id`, `status`) "
-                        + "SELECT ?, ? "
-                        + "FROM `users_updates` AS src "
-                        + "ON DUPLICATE KEY UPDATE `status` = ?");
+                .isEqualTo(
+                        """
+                    INSERT INTO `users` (`id`, `status`) \
+                    SELECT ?, ? \
+                    FROM `users_updates` AS src \
+                    ON DUPLICATE KEY UPDATE `status` = ?""");
         assertThat(result.parameters()).containsExactly(2, "pending", "active");
     }
 
@@ -130,10 +137,10 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         SqlRenderer sqlRenderer =
-                SqlRenderer.builder().escapeStrategy(EscapeStrategy.mysql()).build();
+                SqlRenderer.builder().escapeStrategy(new MysqlEscapeStrategy()).build();
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
                 .sqlRenderer(sqlRenderer)
-                .escapeStrategy(EscapeStrategy.mysql())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
 
