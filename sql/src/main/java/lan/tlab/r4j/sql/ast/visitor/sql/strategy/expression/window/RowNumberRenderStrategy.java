@@ -5,15 +5,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExpressionRenderStrategy;
 
-public class RowNumberRenderStrategy implements ExpressionRenderStrategy {
+public interface RowNumberRenderStrategy extends ExpressionRenderStrategy {
 
-    public String render(RowNumber rowNumber, SqlRenderer sqlRenderer, AstContext ctx) {
-        StringBuilder sql = new StringBuilder("ROW_NUMBER()");
-
-        if (rowNumber.overClause() != null) {
-            sql.append(" ").append(rowNumber.overClause().accept(sqlRenderer, ctx));
-        }
-
-        return sql.toString();
-    }
+    String render(RowNumber rowNumber, SqlRenderer sqlRenderer, AstContext ctx);
 }
