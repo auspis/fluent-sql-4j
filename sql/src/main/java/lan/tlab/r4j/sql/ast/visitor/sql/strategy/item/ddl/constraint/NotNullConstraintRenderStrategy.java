@@ -5,9 +5,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.SqlItemRenderStrategy;
 
-public class NotNullConstraintRenderStrategy implements SqlItemRenderStrategy {
+public interface NotNullConstraintRenderStrategy extends SqlItemRenderStrategy {
 
-    public String render(NotNullConstraintDefinition constraint, SqlRenderer sqlRenderer, AstContext ctx) {
-        return "NOT NULL";
-    }
+    String render(NotNullConstraintDefinition constraint, SqlRenderer sqlRenderer, AstContext ctx);
 }

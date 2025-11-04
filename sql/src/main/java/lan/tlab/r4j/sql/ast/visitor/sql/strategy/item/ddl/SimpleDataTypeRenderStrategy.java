@@ -5,9 +5,7 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.item.SqlItemRenderStrategy;
 
-public class SimpleDataTypeRenderStrategy implements SqlItemRenderStrategy {
+public interface SimpleDataTypeRenderStrategy extends SqlItemRenderStrategy {
 
-    public String render(SimpleDataType type, SqlRenderer sqlRenderer, AstContext ctx) {
-        return type.name();
-    }
+    String render(SimpleDataType type, SqlRenderer sqlRenderer, AstContext ctx);
 }
