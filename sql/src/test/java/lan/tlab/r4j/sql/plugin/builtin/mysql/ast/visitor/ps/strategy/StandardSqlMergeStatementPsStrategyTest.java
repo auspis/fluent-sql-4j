@@ -1,7 +1,6 @@
-package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.mysql;
+package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
@@ -17,15 +16,13 @@ import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy.statement.MySqlMergeStatementPsStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 import org.junit.jupiter.api.Test;
 
-class MySqlMergeStatementPsStrategyTest {
+class StandardSqlMergeStatementPsStrategyTest {
 
     @Test
-    void mergeWithMatchedAndNotMatched_generatesParametrizedMySqlSyntax() {
+    void mergeWithMatchedAndNotMatched_generatesParametrizedSql() {
         MergeStatement stmt = MergeStatement.builder()
                 .targetTable(new TableIdentifier("users", "tgt"))
                 .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
@@ -45,27 +42,22 @@ class MySqlMergeStatementPsStrategyTest {
                                         Literal.of("new")))))
                 .build();
 
-        // TODO: use TestDialectRendererFactory
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
-                .build();
-        MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
+        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo(
-                        """
-                    INSERT INTO `users` (`id`, `name`, `status`) \
-                    SELECT `src`.`id`, `src`.`name`, ? \
-                    FROM `users_updates` AS src \
-                    ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `status` = ?""");
-        assertThat(result.parameters()).containsExactly("new", "updated");
+                        "MERGE INTO \"users\" AS tgt "
+                                + "USING \"users_updates\" AS src "
+                                + "ON \"tgt\".\"id\" = \"src\".\"id\" "
+                                + "WHEN MATCHED THEN UPDATE SET \"name\" = \"src\".\"name\", \"status\" = ? "
+                                + "WHEN NOT MATCHED THEN INSERT (\"id\", \"name\", \"status\") VALUES (\"src\".\"id\", \"src\".\"name\", ?)");
+        assertThat(result.parameters()).containsExactly("updated", "new");
     }
 
     @Test
-    void mergeWithOnlyNotMatched_generatesInsertOnly() {
+    void mergeWithOnlyNotMatched_generatesParametrizedSql() {
         MergeStatement stmt = MergeStatement.builder()
                 .targetTable(new TableIdentifier("users"))
                 .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
@@ -75,25 +67,20 @@ class MySqlMergeStatementPsStrategyTest {
                         InsertData.InsertValues.of(ColumnReference.of("src", "id"), Literal.of("John")))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
-                .build();
-        MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
+        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
 
         assertThat(result.sql())
-                .isEqualTo(
-                        """
-                    INSERT INTO `users` (`id`, `name`) \
-                    SELECT `src`.`id`, ? \
-                    FROM `users_updates` AS src""");
+                .isEqualTo("MERGE INTO \"users\" "
+                        + "USING \"users_updates\" AS src "
+                        + "ON \"users\".\"id\" = \"src\".\"id\" "
+                        + "WHEN NOT MATCHED THEN INSERT (\"id\", \"name\") VALUES (\"src\".\"id\", ?)");
         assertThat(result.parameters()).containsExactly("John");
     }
 
     @Test
-    void mergeWithLiterals_generatesParametrizedSql() {
+    void mergeWithAllLiterals_generatesParametrizedSql() {
         MergeStatement stmt = MergeStatement.builder()
                 .targetTable(new TableIdentifier("users"))
                 .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
@@ -106,43 +93,16 @@ class MySqlMergeStatementPsStrategyTest {
                                 InsertData.InsertValues.of(Literal.of(2), Literal.of("pending")))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
-                .build();
-        MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
+        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
 
         assertThat(result.sql())
-                .isEqualTo(
-                        """
-                    INSERT INTO `users` (`id`, `status`) \
-                    SELECT ?, ? \
-                    FROM `users_updates` AS src \
-                    ON DUPLICATE KEY UPDATE `status` = ?""");
-        assertThat(result.parameters()).containsExactly(2, "pending", "active");
-    }
-
-    @Test
-    void missingWhenNotMatchedThrowsException() {
-        MergeStatement stmt = MergeStatement.builder()
-                .targetTable(new TableIdentifier("users"))
-                .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
-                .onCondition(Comparison.eq(ColumnReference.of("users", "id"), ColumnReference.of("src", "id")))
-                .actions(List.of(new WhenMatchedUpdate(
-                        List.of(new UpdateItem(ColumnReference.of("", "status"), Literal.of("active"))))))
-                .build();
-
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
-                .build();
-        MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
-
-        assertThatThrownBy(() -> strategy.handle(stmt, renderer, new AstContext()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("MySQL MERGE requires a WHEN NOT MATCHED THEN INSERT clause");
+                .isEqualTo("MERGE INTO \"users\" "
+                        + "USING \"users_updates\" AS src "
+                        + "ON \"users\".\"id\" = ? "
+                        + "WHEN MATCHED THEN UPDATE SET \"status\" = ? "
+                        + "WHEN NOT MATCHED THEN INSERT (\"id\", \"status\") VALUES (?, ?)");
+        assertThat(result.parameters()).containsExactly(1, "active", 2, "pending");
     }
 }
