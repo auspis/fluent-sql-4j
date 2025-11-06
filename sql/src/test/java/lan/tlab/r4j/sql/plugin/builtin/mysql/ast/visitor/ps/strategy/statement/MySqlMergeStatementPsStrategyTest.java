@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.mysql;
+package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy.statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +18,6 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy.statement.MySqlMergeStatementPsStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 import org.junit.jupiter.api.Test;
 
