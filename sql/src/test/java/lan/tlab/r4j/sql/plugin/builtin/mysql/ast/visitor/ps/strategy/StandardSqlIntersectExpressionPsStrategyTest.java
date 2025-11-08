@@ -2,8 +2,8 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
-import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.IntersectExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.NullSetExpression;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;

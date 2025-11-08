@@ -2,10 +2,10 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
-import lan.tlab.r4j.sql.ast.identifier.Alias;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.common.identifier.Alias;
+import lan.tlab.r4j.sql.ast.dql.projection.AggregateCallProjection;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

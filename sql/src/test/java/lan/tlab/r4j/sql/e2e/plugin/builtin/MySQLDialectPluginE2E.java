@@ -6,16 +6,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
-import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.dql.clause.Fetch;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.OrderBy;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
@@ -248,7 +248,7 @@ class MySQLDialectPluginE2E {
                         new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                         new ScalarExpressionProjection(ColumnReference.of("users", "age"))))
                 .from(From.fromTable("users"))
-                .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
+                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(
                         Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25))))
                 .build();
 
@@ -310,7 +310,7 @@ class MySQLDialectPluginE2E {
                         new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                         new ScalarExpressionProjection(ColumnReference.of("users", "email"))))
                 .from(From.fromTable("users"))
-                .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
+                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(
                         Comparison.gte(ColumnReference.of("users", "age"), Literal.of(25))))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("users", "name"))))
                 .fetch(new Fetch(0, 5))

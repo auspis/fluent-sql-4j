@@ -2,17 +2,17 @@ package lan.tlab.r4j.sql.dsl.table;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.sql.ast.predicate.Predicate;
-import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType;
+import lan.tlab.r4j.sql.ast.ddl.definition.IndexDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.ddl.definition.TableDefinition;
+import lan.tlab.r4j.sql.ast.ddl.statement.CreateTableStatement;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 
 public class CreateTableBuilder {

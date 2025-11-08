@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.item;
 
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 

@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery;
+import lan.tlab.r4j.sql.ast.dql.source.FromSubquery;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

@@ -1,10 +1,10 @@
 package lan.tlab.r4j.sql.dsl.select;
 
-import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
-import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.dql.source.FromSource;
+import lan.tlab.r4j.sql.ast.dql.source.join.OnJoin;
 
 public class JoinBuilder {
     private final SelectBuilder parent;

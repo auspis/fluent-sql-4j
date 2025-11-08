@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.identifier.Alias;
+import lan.tlab.r4j.sql.ast.common.identifier.Alias;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

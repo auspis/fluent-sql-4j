@@ -2,12 +2,12 @@ package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.stateme
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.dml.statement.DeleteStatement;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;

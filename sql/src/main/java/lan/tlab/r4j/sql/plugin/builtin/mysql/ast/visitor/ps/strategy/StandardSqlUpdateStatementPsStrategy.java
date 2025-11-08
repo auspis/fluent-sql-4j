@@ -2,8 +2,8 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
+import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
+import lan.tlab.r4j.sql.ast.dml.statement.UpdateStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
