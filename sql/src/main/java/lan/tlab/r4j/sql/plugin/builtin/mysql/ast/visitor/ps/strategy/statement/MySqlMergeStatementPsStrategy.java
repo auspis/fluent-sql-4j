@@ -2,12 +2,12 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy.statement;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
-import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
+import lan.tlab.r4j.sql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -110,10 +110,10 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         return new PsDto(sql, params);
     }
 
-    private String getSourceAlias(lan.tlab.r4j.sql.ast.expression.set.TableExpression source) {
-        if (source instanceof lan.tlab.r4j.sql.ast.identifier.TableIdentifier tableId) {
+    private String getSourceAlias(lan.tlab.r4j.sql.ast.common.expression.set.TableExpression source) {
+        if (source instanceof lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier tableId) {
             return tableId.getTableReference();
-        } else if (source instanceof lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression aliased) {
+        } else if (source instanceof lan.tlab.r4j.sql.ast.common.expression.set.AliasedTableExpression aliased) {
             return aliased.getTableReference();
         }
         return "src"; // fallback

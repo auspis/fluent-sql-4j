@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.sql.ast.clause.conditional.having.Having;
-import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.common.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.dql.clause.Having;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

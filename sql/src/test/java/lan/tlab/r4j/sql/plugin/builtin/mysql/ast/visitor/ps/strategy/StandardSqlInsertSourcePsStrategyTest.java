@@ -2,14 +2,14 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
-import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.set.NullSetExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertSource;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

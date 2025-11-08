@@ -1,9 +1,9 @@
 package lan.tlab.r4j.sql.dsl.select;
 
-import lan.tlab.r4j.sql.ast.clause.from.source.FromSource;
-import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.dql.source.FromSource;
+import lan.tlab.r4j.sql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
 
 public class JoinSpecBuilder {

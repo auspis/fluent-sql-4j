@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

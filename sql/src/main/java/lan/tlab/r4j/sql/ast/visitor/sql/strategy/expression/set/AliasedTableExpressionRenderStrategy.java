@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.set;
 
-import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExpressionRenderStrategy;

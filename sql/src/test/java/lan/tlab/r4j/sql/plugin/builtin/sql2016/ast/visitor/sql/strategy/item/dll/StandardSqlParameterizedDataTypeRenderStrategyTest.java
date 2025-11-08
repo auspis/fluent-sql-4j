@@ -3,10 +3,10 @@ package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.dl
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType.ParameterizedDataType;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;

@@ -1,11 +1,11 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.statement;
 
 import java.util.stream.Collectors;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
-import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
+import lan.tlab.r4j.sql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy;
@@ -81,7 +81,7 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
 
         // Select the values from the insert action's insertData
         if (insertAction.insertData()
-                instanceof lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues insertValues) {
+                instanceof lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertValues insertValues) {
             String selectColumns = insertValues.valueExpressions().stream()
                     .map(expr -> expr.accept(sqlRenderer, ctx))
                     .collect(Collectors.joining(", "));
@@ -119,10 +119,10 @@ public class MySqlMergeStatementRenderStrategy implements MergeStatementRenderSt
     /**
      * Extracts the alias from a TableExpression (TableIdentifier or AliasedTableExpression).
      */
-    private String getSourceAlias(lan.tlab.r4j.sql.ast.expression.set.TableExpression source) {
-        if (source instanceof lan.tlab.r4j.sql.ast.identifier.TableIdentifier tableId) {
+    private String getSourceAlias(lan.tlab.r4j.sql.ast.common.expression.set.TableExpression source) {
+        if (source instanceof lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier tableId) {
             return tableId.getTableReference();
-        } else if (source instanceof lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression aliased) {
+        } else if (source instanceof lan.tlab.r4j.sql.ast.common.expression.set.AliasedTableExpression aliased) {
             return aliased.getTableReference();
         }
         return "src"; // fallback

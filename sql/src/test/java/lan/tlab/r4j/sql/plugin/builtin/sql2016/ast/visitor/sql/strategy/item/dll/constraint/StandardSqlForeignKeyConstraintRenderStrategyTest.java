@@ -3,8 +3,8 @@ package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.dl
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;

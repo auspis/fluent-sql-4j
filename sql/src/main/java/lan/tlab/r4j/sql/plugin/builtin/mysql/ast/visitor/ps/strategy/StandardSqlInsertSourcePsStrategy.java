@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertSource;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.AstContext.Scope;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
