@@ -73,6 +73,11 @@
         <version>${dep.jackson-core.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${dep.jackson-core.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.vdurmont</groupId>
         <artifactId>semver4j</artifactId>
         <version>${dep.semver4j.version}</version>
