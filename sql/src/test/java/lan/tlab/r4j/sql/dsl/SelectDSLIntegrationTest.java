@@ -249,4 +249,113 @@ class SelectDSLIntegrationTest {
                 FROM "employees"\
                 """);
     }
+
+    @Test
+    void innerJoinWithMultipleConditions() {
+        String result = dsl.select("name", "email", "created_at")
+                .from("users")
+                .as("u")
+                .innerJoin("orders")
+                .as("o")
+                .on("u.id", "o.user_id")
+                .where("status")
+                .eq("active")
+                .and("email")
+                .like("%@example.com")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "u"."name", "u"."email", "u"."created_at" \
+                FROM "users" AS u \
+                INNER JOIN "orders" AS o ON "u"."id" = "o"."user_id" \
+                WHERE ("u"."status" = 'active') AND ("u"."email" LIKE '%@example.com')\
+                """);
+    }
+
+    @Test
+    void leftJoinWithWhereAndOrderBy() {
+        String result = dsl.select("name", "email")
+                .from("users")
+                .as("u")
+                .leftJoin("profiles")
+                .as("p")
+                .on("u.id", "p.user_id")
+                .where("active")
+                .eq(true)
+                .orderByDesc("created_at")
+                .fetch(10)
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "u"."name", "u"."email" \
+                FROM "users" AS u \
+                LEFT JOIN "profiles" AS p ON "u"."id" = "p"."user_id" \
+                WHERE "u"."active" = true \
+                ORDER BY "u"."created_at" DESC \
+                OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY\
+                """);
+    }
+
+    @Test
+    void multipleJoinsWithGroupByHaving() {
+        String result = dsl.select("name", "city")
+                .from("users")
+                .as("u")
+                .innerJoin("orders")
+                .as("o")
+                .on("u.id", "o.user_id")
+                .leftJoin("payments")
+                .as("p")
+                .on("o.id", "p.order_id")
+                .where("status")
+                .eq("active")
+                .groupBy("name", "city")
+                .having("city")
+                .like("New%")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "u"."name", "u"."city" \
+                FROM "users" AS u \
+                INNER JOIN "orders" AS o ON "u"."id" = "o"."user_id" \
+                LEFT JOIN "payments" AS p ON "o"."id" = "p"."order_id" \
+                WHERE "u"."status" = 'active' \
+                GROUP BY "u"."name", "u"."city" \
+                HAVING "u"."city" LIKE 'New%'\
+                """);
+    }
+
+    @Test
+    void rightJoinWithComplexWhereConditions() {
+        String result = dsl.select("dept_name", "budget", "location")
+                .from("departments")
+                .as("d")
+                .rightJoin("employees")
+                .as("e")
+                .on("d.id", "e.dept_id")
+                .where("budget")
+                .between(50000, 100000)
+                .and("active")
+                .eq(true)
+                .or("manager_id")
+                .isNull()
+                .orderByDesc("budget")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "d"."dept_name", "d"."budget", "d"."location" \
+                FROM "departments" AS d \
+                RIGHT JOIN "employees" AS e ON "d"."id" = "e"."dept_id" \
+                WHERE ((("d"."budget" >= 50000) AND ("d"."budget" <= 100000)) AND ("d"."active" = true)) OR ("d"."manager_id" IS NULL) \
+                ORDER BY "d"."budget" DESC\
+                """);
+    }
 }
