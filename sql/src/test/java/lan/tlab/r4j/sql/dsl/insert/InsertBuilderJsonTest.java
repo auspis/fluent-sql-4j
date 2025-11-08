@@ -29,9 +29,9 @@ class InsertBuilderJsonTest {
                 .build();
 
         assertThat(sql)
-                .contains("INSERT INTO \"users\"")
-                .contains("\"users\".\"id\", \"users\".\"data\"")
-                .contains("VALUES (1, '{\"name\":\"John\",\"age\":30}')");
+                .isEqualTo(
+                        """
+                INSERT INTO "users" ("users"."id", "users"."data") VALUES (1, '{"name":"John","age":30}')""");
     }
 
     @Test
@@ -43,9 +43,9 @@ class InsertBuilderJsonTest {
                 .build();
 
         assertThat(sql)
-                .contains("INSERT INTO \"products\"")
-                .contains("\"products\".\"id\", \"products\".\"tags\"")
-                .contains("VALUES (100, '[\"item1\",\"item2\",\"item3\"]')");
+                .isEqualTo(
+                        """
+                INSERT INTO "products" ("products"."id", "products"."tags") VALUES (100, '["item1","item2","item3"]')""");
     }
 
     @Test
@@ -57,10 +57,9 @@ class InsertBuilderJsonTest {
                 .build();
 
         assertThat(sql)
-                .contains("INSERT INTO \"documents\"")
-                .contains("\"documents\".\"doc_id\", \"documents\".\"content\"")
-                .contains("VALUES (42,")
-                .contains("{\"user\":{\"name\":\"Alice\",\"address\":{\"city\":\"NYC\"}}}");
+                .isEqualTo(
+                        """
+                INSERT INTO "documents" ("documents"."doc_id", "documents"."content") VALUES (42, '{"user":{"name":"Alice","address":{"city":"NYC"}}}')""");
     }
 
     @Test
@@ -74,12 +73,9 @@ class InsertBuilderJsonTest {
                 .build();
 
         assertThat(sql)
-                .contains("INSERT INTO \"articles\"")
-                .contains("\"articles\".\"title\"")
-                .contains("\"articles\".\"published\"")
-                .contains("\"articles\".\"metadata\"")
-                .contains("\"articles\".\"view_count\"")
-                .contains("VALUES ('Test Article', true, '{\"version\":\"1.0\",\"author\":\"admin\"}', 0)");
+                .isEqualTo(
+                        """
+                INSERT INTO "articles" ("articles"."title", "articles"."published", "articles"."metadata", "articles"."view_count") VALUES ('Test Article', true, '{"version":"1.0","author":"admin"}', 0)""");
     }
 
     @Test
@@ -90,9 +86,9 @@ class InsertBuilderJsonTest {
                 .build();
 
         assertThat(sql)
-                .contains("INSERT INTO \"settings\"")
-                .contains("\"settings\".\"key\", \"settings\".\"value\"")
-                .contains("VALUES ('app_config', null)");
+                .isEqualTo(
+                        """
+                INSERT INTO "settings" ("settings"."key", "settings"."value") VALUES ('app_config', null)""");
     }
 
     @Test
@@ -104,9 +100,9 @@ class InsertBuilderJsonTest {
                 .build();
 
         assertThat(sql)
-                .contains("INSERT INTO \"logs\"")
-                .contains("\"logs\".\"log_id\", \"logs\".\"details\"")
-                .contains("VALUES (999, '{}')");
+                .isEqualTo(
+                        """
+                INSERT INTO "logs" ("logs"."log_id", "logs"."details") VALUES (999, '{}')""");
     }
 
     @Test
@@ -118,8 +114,8 @@ class InsertBuilderJsonTest {
                 .build();
 
         assertThat(sql)
-                .contains("INSERT INTO \"collections\"")
-                .contains("\"collections\".\"collection_id\", \"collections\".\"items\"")
-                .contains("VALUES (5, '[]')");
+                .isEqualTo(
+                        """
+                INSERT INTO "collections" ("collections"."collection_id", "collections"."items") VALUES (5, '[]')""");
     }
 }
