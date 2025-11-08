@@ -125,6 +125,109 @@ public class SelectProjectionBuilder {
         return this;
     }
 
+    /**
+     * Starts building a JSON_EXISTS function call.
+     * <p>
+     * JSON_EXISTS checks whether a JSON path expression returns any data.
+     * <p>
+     * Example:
+     * <pre>{@code
+     * dsl.select()
+     *     .jsonExists("data", "$.email").as("has_email")
+     *     .from("users")
+     * }</pre>
+     *
+     * @param column the column containing the JSON document
+     * @param path the JSON path to check
+     * @return a JsonFunctionBuilder for further configuration
+     */
+    public JsonFunctionBuilder jsonExists(String column, String path) {
+        return jsonExists("", column, path);
+    }
+
+    /**
+     * Starts building a JSON_EXISTS function call with explicit table reference.
+     *
+     * @param table the table name
+     * @param column the column containing the JSON document
+     * @param path the JSON path to check
+     * @return a JsonFunctionBuilder for further configuration
+     */
+    public JsonFunctionBuilder jsonExists(String table, String column, String path) {
+        finalizePendingProjection();
+        return new JsonFunctionBuilder(this, table, column, path, JsonFunctionBuilder.JsonFunctionType.EXISTS);
+    }
+
+    /**
+     * Starts building a JSON_VALUE function call.
+     * <p>
+     * JSON_VALUE extracts a scalar value from a JSON document.
+     * <p>
+     * Example:
+     * <pre>{@code
+     * dsl.select()
+     *     .jsonValue("data", "$.price")
+     *         .returning("DECIMAL(10,2)")
+     *         .as("price")
+     *     .from("products")
+     * }</pre>
+     *
+     * @param column the column containing the JSON document
+     * @param path the JSON path to extract
+     * @return a JsonFunctionBuilder for further configuration
+     */
+    public JsonFunctionBuilder jsonValue(String column, String path) {
+        return jsonValue("", column, path);
+    }
+
+    /**
+     * Starts building a JSON_VALUE function call with explicit table reference.
+     *
+     * @param table the table name
+     * @param column the column containing the JSON document
+     * @param path the JSON path to extract
+     * @return a JsonFunctionBuilder for further configuration
+     */
+    public JsonFunctionBuilder jsonValue(String table, String column, String path) {
+        finalizePendingProjection();
+        return new JsonFunctionBuilder(this, table, column, path, JsonFunctionBuilder.JsonFunctionType.VALUE);
+    }
+
+    /**
+     * Starts building a JSON_QUERY function call.
+     * <p>
+     * JSON_QUERY extracts a JSON object or array from a JSON document.
+     * <p>
+     * Example:
+     * <pre>{@code
+     * dsl.select()
+     *     .jsonQuery("data", "$.items")
+     *         .withWrapper()
+     *         .as("items")
+     *     .from("products")
+     * }</pre>
+     *
+     * @param column the column containing the JSON document
+     * @param path the JSON path to extract
+     * @return a JsonFunctionBuilder for further configuration
+     */
+    public JsonFunctionBuilder jsonQuery(String column, String path) {
+        return jsonQuery("", column, path);
+    }
+
+    /**
+     * Starts building a JSON_QUERY function call with explicit table reference.
+     *
+     * @param table the table name
+     * @param column the column containing the JSON document
+     * @param path the JSON path to extract
+     * @return a JsonFunctionBuilder for further configuration
+     */
+    public JsonFunctionBuilder jsonQuery(String table, String column, String path) {
+        finalizePendingProjection();
+        return new JsonFunctionBuilder(this, table, column, path, JsonFunctionBuilder.JsonFunctionType.QUERY);
+    }
+
     public SelectBuilder from(String tableName) {
         finalizePendingProjection();
 
