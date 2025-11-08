@@ -749,6 +749,108 @@ class SelectBuilderTest {
     }
 
     @Test
+    void havingInOperatorWithStrings() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .groupBy("category")
+                .having("category")
+                .in("electronics", "books", "toys")
+                .build();
+
+        assertThat(sql).contains("HAVING \"products\".\"category\" IN('electronics', 'books', 'toys')");
+    }
+
+    @Test
+    void havingInOperatorWithNumbers() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("orders")
+                .groupBy("customer_id")
+                .having("customer_id")
+                .in(100, 200, 300)
+                .build();
+
+        assertThat(sql).contains("HAVING \"orders\".\"customer_id\" IN(100, 200, 300)");
+    }
+
+    @Test
+    void havingInOperatorWithBooleans() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .groupBy("active")
+                .having("active")
+                .in(true)
+                .build();
+
+        assertThat(sql).contains("HAVING \"users\".\"active\" IN(true)");
+    }
+
+    @Test
+    void havingInOperatorWithDates() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("events")
+                .groupBy("event_date")
+                .having("event_date")
+                .in(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
+                .build();
+
+        assertThat(sql).contains("HAVING \"events\".\"event_date\" IN('2023-01-01', '2023-12-31')");
+    }
+
+    @Test
+    void havingInOperatorWithAndCondition() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .groupBy("category", "brand")
+                .having("category")
+                .in("electronics", "computers")
+                .andHaving("brand")
+                .ne("unknown")
+                .build();
+
+        assertThat(sql)
+                .contains(
+                        "HAVING (\"products\".\"category\" IN('electronics', 'computers')) AND (\"products\".\"brand\" != 'unknown')");
+    }
+
+    @Test
+    void havingInOperatorWithOrCondition() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("orders")
+                .groupBy("status")
+                .having("status")
+                .in("completed", "shipped")
+                .orHaving("status")
+                .eq("delivered")
+                .build();
+
+        assertThat(sql)
+                .contains(
+                        "HAVING (\"orders\".\"status\" IN('completed', 'shipped')) OR (\"orders\".\"status\" = 'delivered')");
+    }
+
+    @Test
+    void havingInOperatorEmptyValues_throwsException() {
+        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+                        .from("users")
+                        .groupBy("age")
+                        .having("age")
+                        .in(new String[0]))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("At least one value must be provided for IN clause");
+    }
+
+    @Test
+    void havingInOperatorNullValues_throwsException() {
+        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+                        .from("users")
+                        .groupBy("age")
+                        .having("age")
+                        .in((String[]) null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("At least one value must be provided for IN clause");
+    }
+
+    @Test
     void countStar() {
         String result =
                 new SelectProjectionBuilder(renderer).countStar().from("users").build();
