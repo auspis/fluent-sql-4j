@@ -2,15 +2,15 @@ package lan.tlab.r4j.sql.dsl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.ScalarSubquery;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
-import lan.tlab.r4j.sql.ast.predicate.IsNull;
-import lan.tlab.r4j.sql.ast.predicate.Like;
-import lan.tlab.r4j.sql.ast.predicate.Predicate;
-import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.predicate.IsNotNull;
+import lan.tlab.r4j.sql.ast.common.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.common.predicate.Like;
+import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 
 /**

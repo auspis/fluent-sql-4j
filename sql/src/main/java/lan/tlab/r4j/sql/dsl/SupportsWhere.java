@@ -1,8 +1,8 @@
 package lan.tlab.r4j.sql.dsl;
 
 import java.util.function.Function;
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
 
 /**
  * Interface for builders that support WHERE clause construction.

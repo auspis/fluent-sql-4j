@@ -2,9 +2,9 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.expression.set.TableExpression;
-import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
+import lan.tlab.r4j.sql.ast.common.expression.set.TableExpression;
+import lan.tlab.r4j.sql.ast.dml.statement.DeleteStatement;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -17,12 +17,12 @@ public class StandardSqlDeleteStatementPsStrategy implements DeleteStatementPsSt
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
         String tableName =
-                table instanceof lan.tlab.r4j.sql.ast.identifier.TableIdentifier t ? t.name() : table.toString();
+                table instanceof lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier t ? t.name() : table.toString();
         sql.append("DELETE FROM ").append(tableName);
         Where where = stmt.where();
         if (where != null
                 && where.condition() != null
-                && !(where.condition() instanceof lan.tlab.r4j.sql.ast.predicate.NullPredicate)) {
+                && !(where.condition() instanceof lan.tlab.r4j.sql.ast.common.predicate.NullPredicate)) {
             PsDto whereDto = where.accept(renderer, ctx);
             sql.append(" WHERE ").append(whereDto.sql());
             params.addAll(whereDto.parameters());

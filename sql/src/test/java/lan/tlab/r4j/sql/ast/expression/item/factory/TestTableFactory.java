@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.ast.expression.item.factory;
 
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.ddl.definition.TableDefinition;
 
 public class TestTableFactory {
 

@@ -1,12 +1,12 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -19,15 +19,15 @@ class StandardSqlUnionExpressionPsStrategyTest {
     void unionOfTwoSimpleSelects() {
         SelectStatement select1 = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new lan.tlab.r4j.sql.ast.identifier.TableIdentifier("User")))
-                .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
-                        lan.tlab.r4j.sql.ast.predicate.Comparison.eq(ColumnReference.of("User", "id"), Literal.of(1))))
+                .from(From.of(new lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier("User")))
+                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(lan.tlab.r4j.sql.ast.common.predicate.Comparison.eq(
+                        ColumnReference.of("User", "id"), Literal.of(1))))
                 .build();
         SelectStatement select2 = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(From.of(new lan.tlab.r4j.sql.ast.identifier.TableIdentifier("User")))
-                .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
-                        lan.tlab.r4j.sql.ast.predicate.Comparison.eq(ColumnReference.of("User", "id"), Literal.of(2))))
+                .from(From.of(new lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier("User")))
+                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(lan.tlab.r4j.sql.ast.common.predicate.Comparison.eq(
+                        ColumnReference.of("User", "id"), Literal.of(2))))
                 .build();
         UnionExpression union = UnionExpression.union(select1, select2);
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();

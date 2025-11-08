@@ -1,95 +1,95 @@
 package lan.tlab.r4j.sql.ast.visitor.sql;
 
-import lan.tlab.r4j.sql.ast.clause.conditional.having.Having;
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery;
-import lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin;
-import lan.tlab.r4j.sql.ast.clause.groupby.GroupBy;
-import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
-import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.NullScalarExpression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ScalarSubquery;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDate;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDateTime;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.DateArithmetic;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.ExtractDatePart;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonExists;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonQuery;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Mod;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Power;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Round;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharLength;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharacterLength;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Concat;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Left;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Length;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.window.DenseRank;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lag;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Lead;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Ntile;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.window.OverClause;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.window.Rank;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.window.RowNumber;
-import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
-import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
-import lan.tlab.r4j.sql.ast.expression.set.ExceptExpression;
-import lan.tlab.r4j.sql.ast.expression.set.IntersectExpression;
-import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
-import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
-import lan.tlab.r4j.sql.ast.identifier.Alias;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.predicate.Between;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.predicate.In;
-import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
-import lan.tlab.r4j.sql.ast.predicate.IsNull;
-import lan.tlab.r4j.sql.ast.predicate.Like;
-import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
-import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
-import lan.tlab.r4j.sql.ast.predicate.logical.Not;
-import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.ParameterizedDataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType.SimpleDataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.IndexDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
-import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.UpdateStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertSource;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedDelete;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
-import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Cast;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.NullScalarExpression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDate;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDateTime;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.DateArithmetic;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.ExtractDatePart;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.interval.Interval;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonExists;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonQuery;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonValue;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.Mod;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.Power;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.Round;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.UnaryNumeric;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.CharLength;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.CharacterLength;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Concat;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Left;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Length;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Replace;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Substring;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Trim;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.UnaryString;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.DenseRank;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.Lag;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.Lead;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.Ntile;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.OverClause;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.Rank;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.RowNumber;
+import lan.tlab.r4j.sql.ast.common.expression.set.AliasedTableExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.ExceptExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.IntersectExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.NullSetExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.common.identifier.Alias;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.predicate.Between;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.predicate.In;
+import lan.tlab.r4j.sql.ast.common.predicate.IsNotNull;
+import lan.tlab.r4j.sql.ast.common.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.common.predicate.Like;
+import lan.tlab.r4j.sql.ast.common.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.common.predicate.logical.Not;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.DefaultConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType.ParameterizedDataType;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType.SimpleDataType;
+import lan.tlab.r4j.sql.ast.ddl.definition.IndexDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.ddl.definition.TableDefinition;
+import lan.tlab.r4j.sql.ast.ddl.statement.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.DefaultValues;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertSource;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenMatchedDelete;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.dml.component.MergeUsing;
+import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
+import lan.tlab.r4j.sql.ast.dml.statement.DeleteStatement;
+import lan.tlab.r4j.sql.ast.dml.statement.InsertStatement;
+import lan.tlab.r4j.sql.ast.dml.statement.MergeStatement;
+import lan.tlab.r4j.sql.ast.dml.statement.UpdateStatement;
+import lan.tlab.r4j.sql.ast.dql.clause.Fetch;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.GroupBy;
+import lan.tlab.r4j.sql.ast.dql.clause.Having;
+import lan.tlab.r4j.sql.ast.dql.clause.OrderBy;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
+import lan.tlab.r4j.sql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.source.FromSubquery;
+import lan.tlab.r4j.sql.ast.dql.source.join.OnJoin;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause.FetchRenderStrategy;
@@ -128,7 +128,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonExistsRenderStra
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonQueryRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonValueRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LeftRenderStrategy;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LegthRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LengthRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LikeRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.LiteralRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ModRenderStrategy;
@@ -182,8 +182,8 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.InsertStatementRender
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.SelectStatementRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.statement.UpdateStatementRenderStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.SdandardSqlFromRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFetchRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFromRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFromSubqueryRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlGroupByRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlHavingRenderStrategy;
@@ -193,7 +193,6 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.S
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlSortingRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlWhereRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarSqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlAggregateCallProjectionRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlAggregateCallRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlAndOrRenderStrategy;
@@ -207,6 +206,7 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expressi
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlConcatRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateTimeRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlExceptRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlExtractDatePartRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlInRenderStrategy;
@@ -215,9 +215,10 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expressi
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlIsNotNullRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlIsNullRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlJsonExistsRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlJsonQueryRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlJsonValueRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLeftRenderStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLegthRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLengthRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLikeRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlLiteralRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlModRenderStrategy;
@@ -235,7 +236,6 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expressi
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnaryNumericRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnaryStringRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnionRenderStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandarsSqlJsonQueryRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.set.StandardSqlAliasedTableExpressionRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.window.StandardSqlDenseRankRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.window.StandardSqlLagRenderStrategy;
@@ -319,7 +319,7 @@ public class SqlRenderer implements Visitor<String> {
             new StandardSqlScalarExpressionProjectionRenderStrategy();
 
     @Default
-    private final FromRenderStrategy fromStrategy = new SdandardSqlFromRenderStrategy();
+    private final FromRenderStrategy fromStrategy = new StandardSqlFromRenderStrategy();
 
     @Default
     private final OnJoinStrategyRenderStrategy onJoinStrategy = new StandardSqlOnJoinStrategyRenderStrategy();
@@ -410,7 +410,7 @@ public class SqlRenderer implements Visitor<String> {
             new StandardSqlCurrentDateTimeRenderStrategy();
 
     @Default
-    private final DateArithmeticRenderStrategy dateArithmeticStrategy = new StandarSqlDateArithmeticRenderStrategy();
+    private final DateArithmeticRenderStrategy dateArithmeticStrategy = new StandardSqlDateArithmeticRenderStrategy();
 
     @Default
     private final ExtractDatePartRenderStrategy extractDatePartStrategy =
@@ -420,7 +420,7 @@ public class SqlRenderer implements Visitor<String> {
     private final LeftRenderStrategy leftStrategy = new StandardSqlLeftRenderStrategy();
 
     @Default
-    private final LegthRenderStrategy lengthStrategy = new StandardSqlLegthRenderStrategy();
+    private final LengthRenderStrategy lengthStrategy = new StandardSqlLengthRenderStrategy();
 
     @Default
     private final CharLengthRenderStrategy charLengthStrategy = new StandardSqlCharLengthRenderStrategy();
@@ -461,7 +461,7 @@ public class SqlRenderer implements Visitor<String> {
     private final JsonExistsRenderStrategy jsonExistsStrategy = new StandardSqlJsonExistsRenderStrategy();
 
     @Default
-    private final JsonQueryRenderStrategy jsonQueryStrategy = new StandarsSqlJsonQueryRenderStrategy();
+    private final JsonQueryRenderStrategy jsonQueryStrategy = new StandardSqlJsonQueryRenderStrategy();
 
     @Default
     private final JsonValueRenderStrategy jsonValueStrategy = new StandardSqlJsonValueRenderStrategy();

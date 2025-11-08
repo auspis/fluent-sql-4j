@@ -3,12 +3,12 @@ package lan.tlab.r4j.spike.util;
 import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.common.expression.Expression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.dml.statement.InsertStatement;
 
 public class InsertStatementBuilderFromObject {
     public static InsertStatement fromObject(String tableName, Object obj) {
