@@ -518,100 +518,108 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueStringComparison() {
-        // SELECT * FROM users WHERE JSON_VALUE(info, '$.city') = 'Rome'
-        String jsonValue = "{\"name\": \"John\", \"age\": 30}";
+        // SELECT * FROM users WHERE JSON_VALUE(info, '$.name') = 'John'
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
-                .column("profile")
-                .eq(jsonValue)
+                .jsonValue("profile", "$.name")
+                .eq("John")
                 .build();
 
         assertThat(sql)
                 .isEqualTo(
                         """
-                SELECT * FROM "users" WHERE "users"."profile" = '{"name": "John", "age": 30}'""");
+                SELECT * FROM "users" WHERE JSON_VALUE("users"."profile", '$.name') = 'John'""");
     }
 
     @Test
-    void jsonArrayComparison() {
-        String jsonArray = "[\"tag1\", \"tag2\", \"tag3\"]";
+    void jsonValueNumberComparison() {
+        // SELECT * FROM users WHERE JSON_VALUE(info, '$.age') > 18
         String sql = new SelectBuilder(renderer, "*")
-                .from("posts")
+                .from("users")
                 .where()
-                .column("tags")
-                .eq(jsonArray)
+                .jsonValue("profile", "$.age")
+                .gt(18)
                 .build();
 
         assertThat(sql)
                 .isEqualTo(
                         """
-                SELECT * FROM "posts" WHERE "posts"."tags" = '["tag1", "tag2", "tag3"]'""");
+                SELECT * FROM "users" WHERE JSON_VALUE("users"."profile", '$.age') > 18""");
     }
 
     @Test
-    void jsonNestedObjectComparison() {
-        String nestedJson = "{\"address\": {\"city\": \"New York\", \"zip\": \"10001\"}}";
+    void jsonValueNestedPathComparison() {
+        // SELECT * FROM customers WHERE JSON_VALUE(details, '$.address.city') = 'New York'
         String sql = new SelectBuilder(renderer, "*")
                 .from("customers")
                 .where()
-                .column("details")
-                .ne(nestedJson)
+                .jsonValue("details", "$.address.city")
+                .eq("New York")
                 .build();
 
         assertThat(sql)
                 .isEqualTo(
                         """
-                SELECT * FROM "customers" WHERE "customers"."details" != '{"address": {"city": "New York", "zip": "10001"}}'""");
+                SELECT * FROM "customers" WHERE JSON_VALUE("customers"."details", '$.address.city') = 'New York'""");
     }
 
     @Test
-    void jsonNullValue() {
+    void jsonValueIsNull() {
+        // SELECT * FROM products WHERE JSON_VALUE(metadata, '$.discount') IS NULL
         String sql = new SelectBuilder(renderer, "*")
                 .from("products")
                 .where()
-                .column("metadata")
-                .eq("null")
+                .jsonValue("metadata", "$.discount")
+                .isNull()
                 .build();
 
-        assertThat(sql).isEqualTo("""
-                SELECT * FROM "products" WHERE "products"."metadata" = 'null'""");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "products" WHERE JSON_VALUE("products"."metadata", '$.discount') IS NULL""");
     }
 
     @Test
-    void jsonEmptyObject() {
+    void jsonExistsCondition() {
+        // SELECT * FROM settings WHERE JSON_EXISTS(config, '$.theme')
         String sql = new SelectBuilder(renderer, "*")
                 .from("settings")
                 .where()
-                .column("config")
-                .eq("{}")
+                .jsonExists("config", "$.theme")
+                .exists()
                 .build();
 
-        assertThat(sql).isEqualTo("""
-                SELECT * FROM "settings" WHERE "settings"."config" = '{}'""");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "settings" WHERE JSON_EXISTS("settings"."config", '$.theme') = true""");
     }
 
     @Test
-    void jsonEmptyArray() {
+    void jsonNotExistsCondition() {
+        // SELECT * FROM items WHERE JSON_EXISTS(tags, '$.featured') = false
         String sql = new SelectBuilder(renderer, "*")
                 .from("items")
                 .where()
-                .column("tags")
-                .eq("[]")
+                .jsonExists("tags", "$.featured")
+                .notExists()
                 .build();
 
-        assertThat(sql).isEqualTo("""
-                SELECT * FROM "items" WHERE "items"."tags" = '[]'""");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "items" WHERE JSON_EXISTS("items"."tags", '$.featured') = false""");
     }
 
     @Test
-    void jsonWithMultipleConditions() {
-        String jsonProfile = "{\"verified\": true}";
+    void jsonValueWithMultipleConditions() {
+        // SELECT * FROM users WHERE JSON_VALUE(profile, '$.verified') = 'true' AND active = true
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
-                .column("profile")
-                .eq(jsonProfile)
+                .jsonValue("profile", "$.verified")
+                .eq("true")
                 .and()
                 .column("active")
                 .eq(true)
@@ -620,57 +628,60 @@ class WhereConditionBuilderTest {
         assertThat(sql)
                 .isEqualTo(
                         """
-                SELECT * FROM "users" WHERE ("users"."profile" = '{"verified": true}') AND ("users"."active" = true)""");
+                SELECT * FROM "users" WHERE (JSON_VALUE("users"."profile", '$.verified') = 'true') AND ("users"."active" = true)""");
     }
 
     @Test
-    void jsonWithOrCondition() {
-        String json1 = "{\"type\": \"admin\"}";
-        String json2 = "{\"type\": \"moderator\"}";
+    void jsonValueWithOrCondition() {
+        // SELECT * FROM users WHERE JSON_VALUE(role, '$.type') = 'admin' OR JSON_VALUE(role, '$.type') = 'moderator'
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
-                .column("role")
-                .eq(json1)
+                .jsonValue("role", "$.type")
+                .eq("admin")
                 .or()
-                .column("role")
-                .eq(json2)
+                .jsonValue("role", "$.type")
+                .eq("moderator")
                 .build();
 
         assertThat(sql)
                 .isEqualTo(
                         """
-                SELECT * FROM "users" WHERE ("users"."role" = '{"type": "admin"}') OR ("users"."role" = '{"type": "moderator"}')""");
+                SELECT * FROM "users" WHERE (JSON_VALUE("users"."role", '$.type') = 'admin') OR (JSON_VALUE("users"."role", '$.type') = 'moderator')""");
     }
 
     @Test
-    void jsonComplexStructureWithSpecialCharacters() {
-        String complexJson = "{\"data\": {\"items\": [{\"id\": 1, \"name\": \"Item's \\\"special\\\" name\"}]}}";
+    void jsonQueryIsNotNull() {
+        // SELECT * FROM records WHERE JSON_QUERY(content, '$.data.items') IS NOT NULL
         String sql = new SelectBuilder(renderer, "*")
                 .from("records")
                 .where()
-                .column("content")
-                .eq(complexJson)
+                .jsonQuery("content", "$.data.items")
+                .isNotNull()
                 .build();
 
         assertThat(sql)
                 .isEqualTo(
                         """
-                SELECT * FROM "records" WHERE "records"."content" = '{"data": {"items": [{"id": 1, "name": "Item's \\"special\\" name"}]}}'""");
+                SELECT * FROM "records" WHERE JSON_QUERY("records"."content", '$.data.items') IS NOT NULL""");
     }
 
     @Test
-    void jsonLikePatternMatching() {
+    void jsonValueWithBetweenCondition() {
+        // SELECT * FROM products WHERE JSON_VALUE(metadata, '$.price') BETWEEN 10 AND 100
         String sql = new SelectBuilder(renderer, "*")
                 .from("products")
                 .where()
-                .column("metadata")
-                .like("%\"category\": \"electronics\"%")
+                .jsonValue("metadata", "$.price")
+                .gte(10)
+                .and()
+                .jsonValue("metadata", "$.price")
+                .lte(100)
                 .build();
 
         assertThat(sql)
                 .isEqualTo(
                         """
-                SELECT * FROM "products" WHERE "products"."metadata" LIKE '%"category": "electronics"%'""");
+                SELECT * FROM "products" WHERE (JSON_VALUE("products"."metadata", '$.price') >= 10) AND (JSON_VALUE("products"."metadata", '$.price') <= 100)""");
     }
 }
