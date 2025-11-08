@@ -2,10 +2,13 @@ package lan.tlab.r4j.sql.dsl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import lan.tlab.r4j.sql.ast.common.expression.Expression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
 import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.predicate.In;
 import lan.tlab.r4j.sql.ast.common.predicate.IsNotNull;
 import lan.tlab.r4j.sql.ast.common.predicate.IsNull;
 import lan.tlab.r4j.sql.ast.common.predicate.Like;
@@ -196,6 +199,52 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
 
     public T lte(SelectBuilder subquery) {
         return addCondition(Comparison.lte(getColumnRef(), toScalarSubquery(subquery)));
+    }
+
+    // IN operator
+    public T in(String... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be provided for IN clause");
+        }
+        return addCondition(new In(
+                getColumnRef(),
+                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+    }
+
+    public T in(Number... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be provided for IN clause");
+        }
+        return addCondition(new In(
+                getColumnRef(),
+                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+    }
+
+    public T in(Boolean... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be provided for IN clause");
+        }
+        return addCondition(new In(
+                getColumnRef(),
+                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+    }
+
+    public T in(LocalDate... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be provided for IN clause");
+        }
+        return addCondition(new In(
+                getColumnRef(),
+                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+    }
+
+    public T in(LocalDateTime... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("At least one value must be provided for IN clause");
+        }
+        return addCondition(new In(
+                getColumnRef(),
+                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
     }
 
     // Helper methods
