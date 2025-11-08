@@ -13,7 +13,7 @@ import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class SelectBuilder_WindowFunctionsTest {
+class SelectBuilderWindowFunctionsTest {
 
     private DSL dsl;
 
