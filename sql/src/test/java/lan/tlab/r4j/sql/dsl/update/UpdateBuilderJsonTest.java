@@ -28,7 +28,8 @@ class UpdateBuilderJsonTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "UPDATE \"users\" SET \"metadata\" = '{\"status\":\"active\",\"lastLogin\":\"2025-11-08\"}' WHERE \"users\".\"id\" = 1");
+                        """
+                UPDATE "users" SET "metadata" = '{"status":"active","lastLogin":"2025-11-08"}' WHERE "users"."id" = 1""");
     }
 
     @Test
@@ -45,7 +46,8 @@ class UpdateBuilderJsonTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "UPDATE \"user_settings\" SET \"username\" = 'alice', \"preferences\" = '[\"notifications\",\"theme-dark\",\"auto-save\"]', \"updated_at\" = '2025-11-08T10:30:00' WHERE \"user_settings\".\"user_id\" = 42");
+                        """
+                UPDATE "user_settings" SET "username" = 'alice', "preferences" = '["notifications","theme-dark","auto-save"]', "updated_at" = '2025-11-08T10:30:00' WHERE "user_settings"."user_id" = 42""");
     }
 
     @Test
@@ -61,7 +63,8 @@ class UpdateBuilderJsonTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "UPDATE \"profiles\" SET \"profile_data\" = '{\"personal\":{\"firstName\":\"Mario\",\"lastName\":\"Rossi\"},\"contact\":{\"email\":\"mario@example.com\",\"phone\":\"+39123456789\"}}' WHERE \"profiles\".\"profile_id\" = 100");
+                        """
+                UPDATE "profiles" SET "profile_data" = '{"personal":{"firstName":"Mario","lastName":"Rossi"},"contact":{"email":"mario@example.com","phone":"+39123456789"}}' WHERE "profiles"."profile_id" = 100""");
     }
 
     @Test
@@ -72,7 +75,8 @@ class UpdateBuilderJsonTest {
                 .eq(5)
                 .build();
 
-        assertThat(sql).isEqualTo("UPDATE \"users\" SET \"metadata\" = null WHERE \"users\".\"id\" = 5");
+        assertThat(sql).isEqualTo("""
+                UPDATE "users" SET "metadata" = null WHERE "users"."id" = 5""");
     }
 
     @Test
@@ -85,7 +89,10 @@ class UpdateBuilderJsonTest {
                 .eq(7)
                 .build();
 
-        assertThat(sql).isEqualTo("UPDATE \"documents\" SET \"properties\" = '{}' WHERE \"documents\".\"doc_id\" = 7");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                UPDATE "documents" SET "properties" = '{}' WHERE "documents"."doc_id" = 7""");
     }
 
     @Test
@@ -98,7 +105,9 @@ class UpdateBuilderJsonTest {
                 .eq(15)
                 .build();
 
-        assertThat(sql).isEqualTo("UPDATE \"tags\" SET \"tag_list\" = '[]' WHERE \"tags\".\"item_id\" = 15");
+        assertThat(sql)
+                .isEqualTo("""
+                UPDATE "tags" SET "tag_list" = '[]' WHERE "tags"."item_id" = 15""");
     }
 
     @Test
@@ -116,6 +125,7 @@ class UpdateBuilderJsonTest {
 
         assertThat(sql)
                 .isEqualTo(
-                        "UPDATE \"api_configs\" SET \"configuration\" = '{\"timeout\":30,\"retries\":3,\"enabled\":true}', \"last_modified\" = '2025-11-08' WHERE (\"api_configs\".\"api_name\" = 'payment-service') AND (\"api_configs\".\"version\" >= '2.0')");
+                        """
+                UPDATE "api_configs" SET "configuration" = '{"timeout":30,"retries":3,"enabled":true}', "last_modified" = '2025-11-08' WHERE ("api_configs"."api_name" = 'payment-service') AND ("api_configs"."version" >= '2.0')""");
     }
 }
