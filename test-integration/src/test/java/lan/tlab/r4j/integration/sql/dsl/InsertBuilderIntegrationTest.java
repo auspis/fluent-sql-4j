@@ -1,5 +1,6 @@
 package lan.tlab.r4j.integration.sql.dsl;
 
+import static lan.tlab.r4j.integration.sql.util.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
@@ -217,6 +218,96 @@ class InsertBuilderIntegrationTest {
             assertThat(rs.getDate("birthdate").toLocalDate()).isEqualTo(LocalDate.of(1996, 3, 20));
             assertThat(rs.getTimestamp("createdAt").toLocalDateTime())
                     .isEqualTo(LocalDateTime.of(2023, 10, 10, 14, 30, 0));
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void insertJsonObjectValue() throws SQLException {
+        String addressJson = "{\"street\":\"Via Roma 123\",\"city\":\"Milan\",\"zip\":\"20100\",\"country\":\"Italy\"}";
+
+        PreparedStatement ps = dsl.insertInto("users")
+                .set("id", 100)
+                .set("name", "Marco")
+                .set("email", "marco@example.com")
+                .set("age", 35)
+                .set("address", addressJson)
+                .buildPreparedStatement(connection);
+
+        int rowsAffected = ps.executeUpdate();
+        assertThat(rowsAffected).isEqualTo(1);
+
+        // Verify the JSON was inserted correctly
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, name, address FROM users WHERE id = 100")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(100);
+            assertThat(rs.getString("name")).isEqualTo("Marco");
+            String retrievedAddress = rs.getString("address");
+            assertThatJson(retrievedAddress)
+                    .isEqualToJson(
+                            """
+                    {
+                        "street": "Via Roma 123",
+                        "city": "Milan",
+                        "zip": "20100",
+                        "country": "Italy"
+                    }
+                    """);
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    @Test
+    void insertJsonArrayValue() throws SQLException {
+        String preferencesJson = "[\"email\",\"sms\",\"push\"]";
+        String metadataJson = "{\"tags\":[\"electronics\",\"new\"],\"featured\":true}";
+
+        PreparedStatement ps = dsl.insertInto("users")
+                .set("id", 101)
+                .set("name", "Laura")
+                .set("email", "laura@example.com")
+                .set("preferences", preferencesJson)
+                .buildPreparedStatement(connection);
+
+        int rowsAffected = ps.executeUpdate();
+        assertThat(rowsAffected).isEqualTo(1);
+
+        // Verify the JSON array was inserted correctly
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, name, preferences FROM users WHERE id = 101")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(101);
+            assertThat(rs.getString("name")).isEqualTo("Laura");
+            String retrievedPreferences = rs.getString("preferences");
+            assertThatJson(retrievedPreferences)
+                    .isEqualToJson("""
+                    ["email", "sms", "push"]
+                    """);
+            assertThat(rs.next()).isFalse();
+        }
+
+        // Also test with products table
+        PreparedStatement ps2 = dsl.insertInto("products")
+                .set("id", 200)
+                .set("name", "Laptop")
+                .set("price", 999.99)
+                .set("metadata", metadataJson)
+                .buildPreparedStatement(connection);
+
+        int rowsAffected2 = ps2.executeUpdate();
+        assertThat(rowsAffected2).isEqualTo(1);
+
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, name, metadata FROM products WHERE id = 200")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(200);
+            assertThat(rs.getString("name")).isEqualTo("Laptop");
+            String retrievedMetadata = rs.getString("metadata");
+            assertThat(retrievedMetadata)
+                    .contains("electronics")
+                    .contains("new")
+                    .contains("featured");
             assertThat(rs.next()).isFalse();
         }
     }
