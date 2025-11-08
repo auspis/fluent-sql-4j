@@ -7,34 +7,37 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.window.OverClause;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.window.WindowFunction;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
 import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
-import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SelectBuilderWindowFunctionsTest {
 
-    private DSL dsl;
+    private DialectRenderer renderer;
 
     @BeforeEach
     void setUp() {
-        dsl = TestDialectRendererFactory.dslStandardSql2008();
+        renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
     }
 
     @Test
     void select_withRowNumber_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rowNumber(OverClause.builder()
                                 .orderBy(Sorting.desc(ColumnReference.of("employees", "salary")))
                                 .build()),
-                        "row_num")
-                .from("employees")
+                        "row_num"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -45,19 +48,20 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withRowNumberPartitionBy_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "department")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "department")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rowNumber(OverClause.builder()
                                 .partitionBy(ColumnReference.of("employees", "department"))
                                 .orderBy(Sorting.desc(ColumnReference.of("employees", "salary")))
                                 .build()),
-                        "dept_row_num")
-                .from("employees")
+                        "dept_row_num"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -68,17 +72,18 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withRank_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rank(OverClause.builder()
                                 .orderBy(List.of(Sorting.desc(ColumnReference.of("employees", "salary"))))
                                 .build()),
-                        "salary_rank")
-                .from("employees")
+                        "salary_rank"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -89,17 +94,18 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withDenseRank_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.denseRank(OverClause.builder()
                                 .orderBy(List.of(Sorting.desc(ColumnReference.of("employees", "salary"))))
                                 .build()),
-                        "salary_dense_rank")
-                .from("employees")
+                        "salary_dense_rank"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -110,19 +116,20 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withNtile_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.ntile(
                                 4,
                                 OverClause.builder()
                                         .orderBy(List.of(Sorting.desc(ColumnReference.of("employees", "salary"))))
                                         .build()),
-                        "quartile")
-                .from("employees")
+                        "quartile"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -133,20 +140,21 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withLag_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.lag(
                                 ColumnReference.of("employees", "salary"),
                                 1,
                                 OverClause.builder()
                                         .orderBy(Sorting.asc(ColumnReference.of("employees", "hire_date")))
                                         .build()),
-                        "prev_salary")
-                .from("employees")
+                        "prev_salary"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -157,11 +165,11 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withLagWithDefaultValue_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.lag(
                                 ColumnReference.of("employees", "salary"),
                                 1,
@@ -169,9 +177,10 @@ class SelectBuilderWindowFunctionsTest {
                                 OverClause.builder()
                                         .orderBy(Sorting.desc(ColumnReference.of("employees", "hire_date")))
                                         .build()),
-                        "prev_salary")
-                .from("employees")
+                        "prev_salary"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -182,20 +191,21 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withLead_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.lead(
                                 ColumnReference.of("employees", "salary"),
                                 1,
                                 OverClause.builder()
                                         .orderBy(Sorting.desc(ColumnReference.of("employees", "hire_date")))
                                         .build()),
-                        "next_salary")
-                .from("employees")
+                        "next_salary"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -206,11 +216,11 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withLeadWithDefaultValue_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.lead(
                                 ColumnReference.of("employees", "salary"),
                                 1,
@@ -218,9 +228,10 @@ class SelectBuilderWindowFunctionsTest {
                                 OverClause.builder()
                                         .orderBy(Sorting.desc(ColumnReference.of("employees", "hire_date")))
                                         .build()),
-                        "next_salary")
-                .from("employees")
+                        "next_salary"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -231,31 +242,32 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withMultipleWindowFunctions_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rowNumber(OverClause.builder()
                                 .partitionBy(ColumnReference.of("employees", "department"))
                                 .orderBy(List.of(Sorting.desc(ColumnReference.of("employees", "salary"))))
                                 .build()),
-                        "row_num")
-                .expression(
+                        "row_num"))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rank(OverClause.builder()
                                 .partitionBy(ColumnReference.of("employees", "department"))
                                 .orderBy(List.of(Sorting.desc(ColumnReference.of("employees", "salary"))))
                                 .build()),
-                        "dept_rank")
-                .expression(
+                        "dept_rank"))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.ntile(
                                 4,
                                 OverClause.builder()
                                         .orderBy(List.of(Sorting.desc(ColumnReference.of("employees", "salary"))))
                                         .build()),
-                        "quartile")
-                .from("employees")
+                        "quartile"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -266,19 +278,20 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withRowNumberPartitionByOrderByAsc_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "department")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "department")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rowNumber(OverClause.builder()
                                 .partitionBy(ColumnReference.of("employees", "department"))
                                 .orderBy(Sorting.asc(ColumnReference.of("employees", "hire_date")))
                                 .build()),
-                        "hire_order")
-                .from("employees")
+                        "hire_order"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -289,18 +302,19 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withRankPartitionByOrderByDesc_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rank(OverClause.builder()
                                 .partitionBy(ColumnReference.of("employees", "department"))
                                 .orderBy(Sorting.desc(ColumnReference.of("employees", "salary")))
                                 .build()),
-                        "dept_salary_rank")
-                .from("employees")
+                        "dept_salary_rank"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -311,17 +325,18 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withDenseRankOrderByAsc_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.denseRank(OverClause.builder()
                                 .orderBy(Sorting.asc(ColumnReference.of("employees", "hire_date")))
                                 .build()),
-                        "hire_dense_rank")
-                .from("employees")
+                        "hire_dense_rank"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -332,19 +347,20 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withNtileWithDifferentBuckets_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.ntile(
                                 10,
                                 OverClause.builder()
                                         .orderBy(Sorting.desc(ColumnReference.of("employees", "salary")))
                                         .build()),
-                        "decile")
-                .from("employees")
+                        "decile"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -355,11 +371,11 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withLagWithOffset2_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.lag(
                                 ColumnReference.of("employees", "salary"),
                                 2,
@@ -367,9 +383,10 @@ class SelectBuilderWindowFunctionsTest {
                                         .partitionBy(ColumnReference.of("employees", "department"))
                                         .orderBy(Sorting.asc(ColumnReference.of("employees", "hire_date")))
                                         .build()),
-                        "salary_two_back")
-                .from("employees")
+                        "salary_two_back"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -380,11 +397,11 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withLeadWithOffset3AndDefault_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.lead(
                                 ColumnReference.of("employees", "salary"),
                                 3,
@@ -393,9 +410,10 @@ class SelectBuilderWindowFunctionsTest {
                                         .partitionBy(ColumnReference.of("employees", "department"))
                                         .orderBy(Sorting.asc(ColumnReference.of("employees", "hire_date")))
                                         .build()),
-                        "salary_three_ahead")
-                .from("employees")
+                        "salary_three_ahead"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -406,16 +424,17 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withRowNumberOnlyOrderBy_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rowNumber(OverClause.builder()
                                 .orderBy(Sorting.asc(ColumnReference.of("employees", "employee_id")))
                                 .build()),
-                        "id_order")
-                .from("employees")
+                        "id_order"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -426,17 +445,18 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withRankOnlyPartitionBy_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "department")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "department")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.rank(OverClause.builder()
                                 .partitionBy(ColumnReference.of("employees", "department"))
                                 .build()),
-                        "dept_rank_no_order")
-                .from("employees")
+                        "dept_rank_no_order"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -447,21 +467,22 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withDenseRankPartitionByMultipleColumns_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "department")
-                .column("employees", "job_title")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "department")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "job_title")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.denseRank(OverClause.builder()
                                 .partitionBy(
                                         ColumnReference.of("employees", "department"),
                                         ColumnReference.of("employees", "job_title"))
                                 .orderBy(List.of(Sorting.desc(ColumnReference.of("employees", "salary"))))
                                 .build()),
-                        "dept_job_rank")
-                .from("employees")
+                        "dept_job_rank"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
@@ -472,12 +493,12 @@ class SelectBuilderWindowFunctionsTest {
 
     @Test
     void select_withNtilePartitionByOrderByMultipleColumns_generatesCorrectSql() {
-        String result = dsl.select()
-                .column("employees", "employee_id")
-                .column("employees", "name")
-                .column("employees", "department")
-                .column("employees", "salary")
-                .expression(
+        Select select = Select.builder()
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "department")))
+                .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "salary")))
+                .projection(new ScalarExpressionProjection(
                         WindowFunction.ntile(
                                 5,
                                 OverClause.builder()
@@ -486,9 +507,10 @@ class SelectBuilderWindowFunctionsTest {
                                                 Sorting.asc(ColumnReference.of("employees", "hire_date")),
                                                 Sorting.desc(ColumnReference.of("employees", "salary"))))
                                         .build()),
-                        "dept_hire_quintile")
-                .from("employees")
+                        "dept_hire_quintile"))
                 .build();
+
+        String result = new SelectBuilder(renderer, select).from("employees").build();
 
         assertThat(result)
                 .isEqualTo(
