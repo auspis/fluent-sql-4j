@@ -22,7 +22,8 @@ class UpdateBuilderJsonTest {
 
         String sql = new UpdateBuilder(renderer, "users")
                 .set("metadata", jsonValue)
-                .where("id")
+                .where()
+                .column("id")
                 .eq(1)
                 .build();
 
@@ -40,7 +41,8 @@ class UpdateBuilderJsonTest {
                 .set("username", "alice")
                 .set("preferences", preferences)
                 .set("updated_at", "2025-11-08T10:30:00")
-                .where("user_id")
+                .where()
+                .column("user_id")
                 .eq(42)
                 .build();
 
@@ -57,7 +59,8 @@ class UpdateBuilderJsonTest {
 
         String sql = new UpdateBuilder(renderer, "profiles")
                 .set("profile_data", profile)
-                .where("profile_id")
+                .where()
+                .column("profile_id")
                 .eq(100)
                 .build();
 
@@ -71,7 +74,8 @@ class UpdateBuilderJsonTest {
     void updateJsonToNull() {
         String sql = new UpdateBuilder(renderer, "users")
                 .set("metadata", (String) null)
-                .where("id")
+                .where()
+                .column("id")
                 .eq(5)
                 .build();
 
@@ -85,7 +89,8 @@ class UpdateBuilderJsonTest {
 
         String sql = new UpdateBuilder(renderer, "documents")
                 .set("properties", emptyJson)
-                .where("doc_id")
+                .where()
+                .column("doc_id")
                 .eq(7)
                 .build();
 
@@ -101,7 +106,8 @@ class UpdateBuilderJsonTest {
 
         String sql = new UpdateBuilder(renderer, "tags")
                 .set("tag_list", emptyArray)
-                .where("item_id")
+                .where()
+                .column("item_id")
                 .eq(15)
                 .build();
 
@@ -117,9 +123,11 @@ class UpdateBuilderJsonTest {
         String sql = new UpdateBuilder(renderer, "api_configs")
                 .set("configuration", config)
                 .set("last_modified", "2025-11-08")
-                .where("api_name")
+                .where()
+                .column("api_name")
                 .eq("payment-service")
-                .and("version")
+                .and()
+                .column("version")
                 .gte("2.0")
                 .build();
 

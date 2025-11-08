@@ -34,7 +34,8 @@ class DSLRegistryIntegrationTest {
         // Build a SELECT query
         String sql = dsl.select("id", "name", "email")
                 .from("users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("active")
                 .build();
 
@@ -55,7 +56,8 @@ class DSLRegistryIntegrationTest {
         // Build a SELECT query
         String sql = dsl.select("id", "name", "email")
                 .from("users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("active")
                 .build();
 
@@ -91,7 +93,8 @@ class DSLRegistryIntegrationTest {
 
         String sql = dsl.update("users")
                 .set("status", "inactive")
-                .where("last_login")
+                .where()
+                .column("last_login")
                 .isNull()
                 .build();
 
@@ -105,8 +108,11 @@ class DSLRegistryIntegrationTest {
         DSL dsl = registry.dslFor(MySQLDialectPlugin.DIALECT_NAME, MySQLDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
 
-        String sql =
-                dsl.deleteFrom("users").where("created_at").lt("2020-01-01").build();
+        String sql = dsl.deleteFrom("users")
+                .where()
+                .column("created_at")
+                .lt("2020-01-01")
+                .build();
 
         assertThat(sql).contains("DELETE FROM `users`");
         assertThat(sql).contains("WHERE `users`.`created_at` < '2020-01-01'");
@@ -123,7 +129,8 @@ class DSLRegistryIntegrationTest {
                 .innerJoin("customers")
                 .as("c")
                 .on("o.customer_id", "c.id")
-                .where("o.status")
+                .where()
+                .column("o.status")
                 .eq("completed")
                 .build();
 

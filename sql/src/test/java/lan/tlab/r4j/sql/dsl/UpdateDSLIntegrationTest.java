@@ -19,8 +19,12 @@ class UpdateDSLIntegrationTest {
 
     @Test
     void createsUpdateBuilderWithRenderer() {
-        String result =
-                dsl.update("users").set("name", "John").where("id").eq(1).build();
+        String result = dsl.update("users")
+                .set("name", "John")
+                .where()
+                .column("id")
+                .eq(1)
+                .build();
 
         assertThat(result).isEqualTo("""
                 UPDATE "users" SET "name" = 'John' WHERE "users"."id" = 1""");
@@ -39,9 +43,11 @@ class UpdateDSLIntegrationTest {
         String result = dsl.update("products")
                 .set("stock", 0)
                 .set("discontinued", true)
-                .where("last_order_date")
+                .where()
+                .column("last_order_date")
                 .lt("2023-01-01")
-                .and("quantity")
+                .and()
+                .column("quantity")
                 .eq(0)
                 .build();
 
@@ -57,7 +63,8 @@ class UpdateDSLIntegrationTest {
 
         String result = dsl.update("user_preferences")
                 .set("settings", settings)
-                .where("user_id")
+                .where()
+                .column("user_id")
                 .eq(42)
                 .build();
 
@@ -78,9 +85,11 @@ class UpdateDSLIntegrationTest {
                 .set("contact_info", contacts)
                 .set("is_available", true)
                 .set("updated_at", "2025-11-08T12:00:00")
-                .where("developer_id")
+                .where()
+                .column("developer_id")
                 .eq(100)
-                .and("status")
+                .and()
+                .column("status")
                 .eq("active")
                 .build();
 

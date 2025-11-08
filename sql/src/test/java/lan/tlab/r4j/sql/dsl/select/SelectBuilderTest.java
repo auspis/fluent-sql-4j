@@ -48,7 +48,8 @@ class SelectBuilderTest {
         String result = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .as("u")
-                .where("name")
+                .where()
+                .column("name")
                 .eq("John")
                 .build();
 
@@ -63,7 +64,8 @@ class SelectBuilderTest {
     void where() {
         String result = new SelectBuilder(renderer, "*")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .gt(18)
                 .build();
         assertThat(result).isEqualTo("""
@@ -75,11 +77,14 @@ class SelectBuilderTest {
     void and() {
         String result = new SelectBuilder(renderer, "name", "email")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .gt(18)
-                .and("status")
+                .and()
+                .column("status")
                 .eq("active")
-                .and("country")
+                .and()
+                .column("country")
                 .eq("Italy")
                 .build();
 
@@ -94,9 +99,11 @@ class SelectBuilderTest {
     void or() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
-                .where("role")
+                .where()
+                .column("role")
                 .eq("admin")
-                .or("role")
+                .or()
+                .column("role")
                 .eq("moderator")
                 .build();
 
@@ -111,11 +118,14 @@ class SelectBuilderTest {
     void andOr() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("active")
-                .and("age")
+                .and()
+                .column("age")
                 .gt(18)
-                .or("role")
+                .or()
+                .column("role")
                 .eq("admin")
                 .build();
 
@@ -260,13 +270,17 @@ class SelectBuilderTest {
     void fullSelectQuery() {
         String sql = new SelectBuilder(renderer, "name", "email", "age")
                 .from("users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("active")
-                .and("age")
+                .and()
+                .column("age")
                 .gte(18)
-                .and("country")
+                .and()
+                .column("country")
                 .eq("Italy")
-                .or("role")
+                .or()
+                .column("role")
                 .eq("admin")
                 .orderByDesc("created_at")
                 .fetch(50)
@@ -284,15 +298,20 @@ class SelectBuilderTest {
     void allComparisonOperators() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("products")
-                .where("price")
+                .where()
+                .column("price")
                 .gt(100)
-                .and("discount")
+                .and()
+                .column("discount")
                 .lt(50)
-                .and("rating")
+                .and()
+                .column("rating")
                 .gte(4)
-                .and("stock")
+                .and()
+                .column("stock")
                 .lte(10)
-                .and("category")
+                .and()
+                .column("category")
                 .ne("deprecated")
                 .build();
 
@@ -319,7 +338,8 @@ class SelectBuilderTest {
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("users").where(""))
+        assertThatThrownBy(() ->
+                        new SelectBuilder(renderer, "*").from("users").where().column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
@@ -419,7 +439,8 @@ class SelectBuilderTest {
     void fromSubquery() {
         SelectBuilder subquery = new SelectBuilder(renderer, "id", "name")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .gt(18);
 
         String sql = new SelectBuilder(renderer, "*").from(subquery, "u").build();
@@ -435,12 +456,14 @@ class SelectBuilderTest {
     void fromSubqueryWithWhere() {
         SelectBuilder subquery = new SelectBuilder(renderer, "id", "total")
                 .from("orders")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("completed");
 
         String sql = new SelectBuilder(renderer, "*")
                 .from(subquery, "o")
-                .where("total")
+                .where()
+                .column("total")
                 .gt(100)
                 .build();
 
@@ -453,12 +476,16 @@ class SelectBuilderTest {
 
     @Test
     void whereWithScalarSubquery() {
-        SelectBuilder subquery =
-                new SelectBuilder(renderer, "*").from("users").where("age").gt(50);
+        SelectBuilder subquery = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where()
+                .column("age")
+                .gt(50);
 
         String sql = new SelectBuilder(renderer, "name")
                 .from("employees")
-                .where("age")
+                .where()
+                .column("age")
                 .gt(subquery)
                 .build();
 
@@ -472,7 +499,8 @@ class SelectBuilderTest {
 
         String sql = new SelectBuilder(renderer, "*")
                 .from("employees")
-                .where("age")
+                .where()
+                .column("age")
                 .eq(maxAgeSubquery)
                 .build();
 
@@ -578,7 +606,8 @@ class SelectBuilderTest {
     void havingWithWhereAndOrderBy() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("products")
-                .where("category")
+                .where()
+                .column("category")
                 .eq("electronics")
                 .groupBy("brand")
                 .having("brand")
@@ -722,7 +751,8 @@ class SelectBuilderTest {
         // Create a simple subquery without aggregate functions
         SelectBuilder subquery = new SelectBuilder(renderer, "budget")
                 .from("departments")
-                .where("active")
+                .where()
+                .column("active")
                 .eq(true);
 
         String sql = new SelectBuilder(renderer, "*")
@@ -1038,7 +1068,8 @@ class SelectBuilderTest {
         String result = new SelectProjectionBuilder(renderer)
                 .countStar()
                 .from("users")
-                .where("active")
+                .where()
+                .column("active")
                 .eq(true)
                 .build();
         assertThat(result)
