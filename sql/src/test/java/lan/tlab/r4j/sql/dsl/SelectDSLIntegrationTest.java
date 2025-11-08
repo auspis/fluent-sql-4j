@@ -6,6 +6,9 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.OverClause;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.window.WindowFunction;
+import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,6 +136,117 @@ class SelectDSLIntegrationTest {
                 SELECT "products"."name", \
                 JSON_VALUE("products"."data", '$.discount' RETURNING DECIMAL(5,2) DEFAULT 0.00 ON EMPTY) AS discount \
                 FROM "products"\
+                """);
+    }
+
+    @Test
+    void windowFunctionRowNumberWithFluentApi() {
+        String result = dsl.select()
+                .column("employees", "name")
+                .column("employees", "salary")
+                .rowNumber()
+                .orderByDesc("employees", "salary")
+                .as("rank")
+                .from("employees")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "employees"."name", "employees"."salary", \
+                ROW_NUMBER() OVER (ORDER BY "employees"."salary" DESC) AS rank \
+                FROM "employees"\
+                """);
+    }
+
+    @Test
+    void windowFunctionRowNumberWithPartitionBy() {
+        String result = dsl.select()
+                .column("employees", "name")
+                .column("employees", "department")
+                .column("employees", "salary")
+                .rowNumber()
+                .partitionBy("employees", "department")
+                .orderByDesc("employees", "salary")
+                .as("dept_rank")
+                .from("employees")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "employees"."name", "employees"."department", "employees"."salary", \
+                ROW_NUMBER() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_rank \
+                FROM "employees"\
+                """);
+    }
+
+    @Test
+    void windowFunctionRankAndDenseRank() {
+        String result = dsl.select()
+                .column("products", "name")
+                .column("products", "price")
+                .rank()
+                .orderByDesc("products", "price")
+                .as("price_rank")
+                .denseRank()
+                .orderByDesc("products", "price")
+                .as("price_dense_rank")
+                .from("products")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "products"."name", "products"."price", \
+                RANK() OVER (ORDER BY "products"."price" DESC) AS price_rank, \
+                DENSE_RANK() OVER (ORDER BY "products"."price" DESC) AS price_dense_rank \
+                FROM "products"\
+                """);
+    }
+
+    @Test
+    void windowFunctionLagWithFluentApi() {
+        String result = dsl.select()
+                .column("sales", "sale_date")
+                .column("sales", "amount")
+                .lag("sales", "amount", 1)
+                .orderByAsc("sales", "sale_date")
+                .as("previous_amount")
+                .from("sales")
+                .where("year")
+                .eq(2024)
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "sales"."sale_date", "sales"."amount", \
+                LAG("sales"."amount", 1) OVER (ORDER BY "sales"."sale_date" ASC) AS previous_amount \
+                FROM "sales" \
+                WHERE "sales"."year" = 2024\
+                """);
+    }
+
+    @Test
+    void windowFunctionUsingExpressionApi() {
+        // Test the low-level expression API for custom window function configurations
+        String result = dsl.select()
+                .column("employees", "name")
+                .expression(
+                        WindowFunction.rowNumber(OverClause.builder()
+                                .orderBy(Sorting.desc(ColumnReference.of("employees", "salary")))
+                                .build()),
+                        "rank")
+                .from("employees")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "employees"."name", \
+                ROW_NUMBER() OVER (ORDER BY "employees"."salary" DESC) AS rank \
+                FROM "employees"\
                 """);
     }
 }
