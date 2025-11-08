@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.sql.strategy.clause;
 
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 

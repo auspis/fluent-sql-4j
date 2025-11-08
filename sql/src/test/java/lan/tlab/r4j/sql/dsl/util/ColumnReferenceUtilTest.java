@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.dsl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
 import org.junit.jupiter.api.Test;
 
 class ColumnReferenceUtilTest {
