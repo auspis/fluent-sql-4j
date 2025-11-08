@@ -27,7 +27,9 @@ class WhereConditionBuilderTest {
                 .where("name")
                 .eq("John")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains("= 'John'");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."name" FROM "users" WHERE "users"."name" = 'John'""");
 
         // Test string inequality
         sql = new SelectBuilder(renderer, "name")
@@ -35,7 +37,9 @@ class WhereConditionBuilderTest {
                 .where("name")
                 .ne("Jane")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains("!= 'Jane'");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."name" FROM "users" WHERE "users"."name" != 'Jane'""");
 
         // Test string comparisons
         sql = new SelectBuilder(renderer, "name")
@@ -43,28 +47,34 @@ class WhereConditionBuilderTest {
                 .where("name")
                 .gt("A")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains("> 'A'");
+        assertThat(sql).isEqualTo("""
+                SELECT "users"."name" FROM "users" WHERE "users"."name" > 'A'""");
 
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
                 .where("name")
                 .lt("Z")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains("< 'Z'");
+        assertThat(sql).isEqualTo("""
+                SELECT "users"."name" FROM "users" WHERE "users"."name" < 'Z'""");
 
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
                 .where("name")
                 .gte("B")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains(">= 'B'");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."name" FROM "users" WHERE "users"."name" >= 'B'""");
 
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
                 .where("name")
                 .lte("Y")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains("<= 'Y'");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."name" FROM "users" WHERE "users"."name" <= 'Y'""");
     }
 
     @Test
@@ -75,28 +85,32 @@ class WhereConditionBuilderTest {
                 .where("age")
                 .eq(25)
                 .build();
-        assertThat(sql).contains("WHERE").contains("age").contains("= 25");
+        assertThat(sql).isEqualTo("""
+                SELECT "users"."age" FROM "users" WHERE "users"."age" = 25""");
 
         sql = new SelectBuilder(renderer, "age")
                 .from("users")
                 .where("age")
                 .ne(30)
                 .build();
-        assertThat(sql).contains("WHERE").contains("age").contains("!= 30");
+        assertThat(sql).isEqualTo("""
+                SELECT "users"."age" FROM "users" WHERE "users"."age" != 30""");
 
         sql = new SelectBuilder(renderer, "age")
                 .from("users")
                 .where("age")
                 .gt(18)
                 .build();
-        assertThat(sql).contains("WHERE").contains("age").contains("> 18");
+        assertThat(sql).isEqualTo("""
+                SELECT "users"."age" FROM "users" WHERE "users"."age" > 18""");
 
         sql = new SelectBuilder(renderer, "age")
                 .from("users")
                 .where("age")
                 .lt(65)
                 .build();
-        assertThat(sql).contains("WHERE").contains("age").contains("< 65");
+        assertThat(sql).isEqualTo("""
+                SELECT "users"."age" FROM "users" WHERE "users"."age" < 65""");
 
         // Test double operations
         sql = new SelectBuilder(renderer, "salary")
@@ -104,14 +118,20 @@ class WhereConditionBuilderTest {
                 .where("salary")
                 .gte(50000.5)
                 .build();
-        assertThat(sql).contains("WHERE").contains("salary").contains(">= 50000.5");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "employees"."salary" FROM "employees" WHERE "employees"."salary" >= 50000.5""");
 
         sql = new SelectBuilder(renderer, "salary")
                 .from("employees")
                 .where("salary")
                 .lte(100000.75)
                 .build();
-        assertThat(sql).contains("WHERE").contains("salary").contains("<= 100000.75");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "employees"."salary" FROM "employees" WHERE "employees"."salary" <= 100000.75""");
     }
 
     @Test
@@ -122,7 +142,9 @@ class WhereConditionBuilderTest {
                 .where("active")
                 .eq(true)
                 .build();
-        assertThat(sql).contains("WHERE").contains("active").contains("= true");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."active" FROM "users" WHERE "users"."active" = true""");
 
         // Test boolean inequality
         sql = new SelectBuilder(renderer, "active")
@@ -130,7 +152,9 @@ class WhereConditionBuilderTest {
                 .where("active")
                 .ne(false)
                 .build();
-        assertThat(sql).contains("WHERE").contains("active").contains("!= false");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."active" FROM "users" WHERE "users"."active" != false""");
     }
 
     @Test
@@ -143,21 +167,30 @@ class WhereConditionBuilderTest {
                 .where("birth_date")
                 .eq(date)
                 .build();
-        assertThat(sql).contains("WHERE").contains("birth_date").contains("= '2024-03-15'");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "users"."birth_date" FROM "users" WHERE "users"."birth_date" = '2024-03-15'""");
 
         sql = new SelectBuilder(renderer, "birth_date")
                 .from("users")
                 .where("birth_date")
                 .gt(date)
                 .build();
-        assertThat(sql).contains("WHERE").contains("birth_date").contains("> '2024-03-15'");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "users"."birth_date" FROM "users" WHERE "users"."birth_date" > '2024-03-15'""");
 
         sql = new SelectBuilder(renderer, "birth_date")
                 .from("users")
                 .where("birth_date")
                 .lt(date)
                 .build();
-        assertThat(sql).contains("WHERE").contains("birth_date").contains("< '2024-03-15'");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "users"."birth_date" FROM "users" WHERE "users"."birth_date" < '2024-03-15'""");
     }
 
     @Test
@@ -170,14 +203,20 @@ class WhereConditionBuilderTest {
                 .where("created_at")
                 .eq(dateTime)
                 .build();
-        assertThat(sql).contains("WHERE").contains("created_at").contains("= '2024-03-15T10:30:45'");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "posts"."created_at" FROM "posts" WHERE "posts"."created_at" = '2024-03-15T10:30:45'""");
 
         sql = new SelectBuilder(renderer, "created_at")
                 .from("posts")
                 .where("created_at")
                 .gte(dateTime)
                 .build();
-        assertThat(sql).contains("WHERE").contains("created_at").contains(">= '2024-03-15T10:30:45'");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "posts"."created_at" FROM "posts" WHERE "posts"."created_at" >= '2024-03-15T10:30:45'""");
     }
 
     @Test
@@ -187,14 +226,19 @@ class WhereConditionBuilderTest {
                 .where("name")
                 .like("John%")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains("LIKE 'John%'");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."name" FROM "users" WHERE "users"."name" LIKE 'John%'""");
 
         sql = new SelectBuilder(renderer, "email")
                 .from("users")
                 .where("email")
                 .like("%@example.com")
                 .build();
-        assertThat(sql).contains("WHERE").contains("email").contains("LIKE '%@example.com'");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "users"."email" FROM "users" WHERE "users"."email" LIKE '%@example.com'""");
     }
 
     @Test
@@ -205,7 +249,9 @@ class WhereConditionBuilderTest {
                 .where("email")
                 .isNull()
                 .build();
-        assertThat(sql).contains("WHERE").contains("email").contains("IS NULL");
+        assertThat(sql)
+                .isEqualTo("""
+                SELECT "users"."email" FROM "users" WHERE "users"."email" IS NULL""");
 
         // Test IS NOT NULL
         sql = new SelectBuilder(renderer, "email")
@@ -213,7 +259,10 @@ class WhereConditionBuilderTest {
                 .where("email")
                 .isNotNull()
                 .build();
-        assertThat(sql).contains("WHERE").contains("email").contains("IS NOT NULL");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT "users"."email" FROM "users" WHERE "users"."email" IS NOT NULL""");
     }
 
     @Test
@@ -227,11 +276,9 @@ class WhereConditionBuilderTest {
                 .between(startDate, endDate)
                 .build();
         assertThat(sql)
-                .contains("WHERE")
-                .contains("birth_date")
-                .contains(">= '2024-01-01'")
-                .contains("AND")
-                .contains("<= '2024-12-31'");
+                .isEqualTo(
+                        """
+                SELECT "users"."birth_date" FROM "users" WHERE ("users"."birth_date" >= '2024-01-01') AND ("users"."birth_date" <= '2024-12-31')""");
 
         // Test LocalDateTime between
         LocalDateTime startDateTime = LocalDateTime.of(2024, 3, 1, 0, 0, 0);
@@ -242,11 +289,9 @@ class WhereConditionBuilderTest {
                 .between(startDateTime, endDateTime)
                 .build();
         assertThat(sql)
-                .contains("WHERE")
-                .contains("created_at")
-                .contains(">= '2024-03-01T00:00'")
-                .contains("AND")
-                .contains("<= '2024-03-31T23:59:59'");
+                .isEqualTo(
+                        """
+                SELECT "posts"."created_at" FROM "posts" WHERE ("posts"."created_at" >= '2024-03-01T00:00') AND ("posts"."created_at" <= '2024-03-31T23:59:59')""");
 
         // Test Number between
         sql = new SelectBuilder(renderer, "age")
@@ -255,11 +300,9 @@ class WhereConditionBuilderTest {
                 .between(18, 65)
                 .build();
         assertThat(sql)
-                .contains("WHERE")
-                .contains("age")
-                .contains(">= 18")
-                .contains("AND")
-                .contains("<= 65");
+                .isEqualTo(
+                        """
+                SELECT "users"."age" FROM "users" WHERE ("users"."age" >= 18) AND ("users"."age" <= 65)""");
     }
 
     @Test
@@ -273,12 +316,9 @@ class WhereConditionBuilderTest {
                 .gt(25)
                 .build();
         assertThat(sql)
-                .contains("WHERE")
-                .contains("name")
-                .contains("= 'John'")
-                .contains("AND")
-                .contains("age")
-                .contains("> 25");
+                .isEqualTo(
+                        """
+                SELECT "users"."name", "users"."age" FROM "users" WHERE ("users"."name" = 'John') AND ("users"."age" > 25)""");
 
         // Test OR with different types
         sql = new SelectBuilder(renderer, "name", "age")
@@ -289,12 +329,9 @@ class WhereConditionBuilderTest {
                 .eq(false)
                 .build();
         assertThat(sql)
-                .contains("WHERE")
-                .contains("age")
-                .contains("< 18")
-                .contains("OR")
-                .contains("active")
-                .contains("= false");
+                .isEqualTo(
+                        """
+                SELECT "users"."name", "users"."age" FROM "users" WHERE ("users"."age" < 18) OR ("users"."active" = false)""");
     }
 
     @Test
@@ -306,11 +343,8 @@ class WhereConditionBuilderTest {
                 .where("name")
                 .eq("John")
                 .build();
-        assertThat(sql).contains("WHERE").contains("name").contains("= 'John'");
-        assertThat(sql).contains("FROM").contains("users").contains("AS u");
-
-        // Verify that column references use the alias
-        assertThat(sql).contains("\"u\".\"name\"");
+        assertThat(sql).isEqualTo("""
+                SELECT "u"."name" FROM "users" AS u WHERE "u"."name" = 'John'""");
     }
 
     @Test
@@ -321,7 +355,10 @@ class WhereConditionBuilderTest {
                 .in("active", "pending", "approved")
                 .build();
 
-        assertThat(sql).contains("WHERE").contains("\"users\".\"status\" IN('active', 'pending', 'approved')");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "users" WHERE "users"."status" IN('active', 'pending', 'approved')""");
     }
 
     @Test
@@ -332,7 +369,10 @@ class WhereConditionBuilderTest {
                 .in(100, 200, 300, 400)
                 .build();
 
-        assertThat(sql).contains("WHERE").contains("\"orders\".\"customer_id\" IN(100, 200, 300, 400)");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "orders" WHERE "orders"."customer_id" IN(100, 200, 300, 400)""");
     }
 
     @Test
@@ -343,7 +383,8 @@ class WhereConditionBuilderTest {
                 .in(true, false)
                 .build();
 
-        assertThat(sql).contains("WHERE").contains("\"users\".\"active\" IN(true, false)");
+        assertThat(sql).isEqualTo("""
+                SELECT * FROM "users" WHERE "users"."active" IN(true, false)""");
     }
 
     @Test
@@ -359,8 +400,9 @@ class WhereConditionBuilderTest {
                 .build();
 
         assertThat(sql)
-                .contains("WHERE")
-                .contains("\"events\".\"event_date\" IN('2023-01-01', '2023-06-01', '2023-12-31')");
+                .isEqualTo(
+                        """
+                SELECT * FROM "events" WHERE "events"."event_date" IN('2023-01-01', '2023-06-01', '2023-12-31')""");
     }
 
     @Test
@@ -374,7 +416,10 @@ class WhereConditionBuilderTest {
                 .in(dt1, dt2)
                 .build();
 
-        assertThat(sql).contains("WHERE").contains("\"logs\".\"created_at\" IN(");
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "logs" WHERE "logs"."created_at" IN('2023-01-01T10:00', '2023-06-01T15:30')""");
     }
 
     @Test
@@ -388,10 +433,9 @@ class WhereConditionBuilderTest {
                 .build();
 
         assertThat(sql)
-                .contains("WHERE")
-                .contains("\"products\".\"category\" IN('electronics', 'books')")
-                .contains("AND")
-                .contains("\"products\".\"price\" > 50");
+                .isEqualTo(
+                        """
+                SELECT * FROM "products" WHERE ("products"."category" IN('electronics', 'books')) AND ("products"."price" > 50)""");
     }
 
     @Test
@@ -405,10 +449,9 @@ class WhereConditionBuilderTest {
                 .build();
 
         assertThat(sql)
-                .contains("WHERE")
-                .contains("\"users\".\"role\" IN('admin', 'moderator')")
-                .contains("OR")
-                .contains("\"users\".\"status\" = 'verified'");
+                .isEqualTo(
+                        """
+                SELECT * FROM "users" WHERE ("users"."role" IN('admin', 'moderator')) OR ("users"."status" = 'verified')""");
     }
 
     @Test
