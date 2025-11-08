@@ -24,7 +24,8 @@ class WhereConditionBuilderTest {
         // Test string equality
         String sql = new SelectBuilder(renderer, "name")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .eq("John")
                 .build();
         assertThat(sql)
@@ -34,7 +35,8 @@ class WhereConditionBuilderTest {
         // Test string inequality
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .ne("Jane")
                 .build();
         assertThat(sql)
@@ -44,7 +46,8 @@ class WhereConditionBuilderTest {
         // Test string comparisons
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .gt("A")
                 .build();
         assertThat(sql).isEqualTo("""
@@ -52,7 +55,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .lt("Z")
                 .build();
         assertThat(sql).isEqualTo("""
@@ -60,7 +64,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .gte("B")
                 .build();
         assertThat(sql)
@@ -69,7 +74,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "name")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .lte("Y")
                 .build();
         assertThat(sql)
@@ -82,7 +88,8 @@ class WhereConditionBuilderTest {
         // Test integer operations
         String sql = new SelectBuilder(renderer, "age")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .eq(25)
                 .build();
         assertThat(sql).isEqualTo("""
@@ -90,7 +97,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "age")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .ne(30)
                 .build();
         assertThat(sql).isEqualTo("""
@@ -98,7 +106,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "age")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .gt(18)
                 .build();
         assertThat(sql).isEqualTo("""
@@ -106,7 +115,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "age")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .lt(65)
                 .build();
         assertThat(sql).isEqualTo("""
@@ -115,7 +125,8 @@ class WhereConditionBuilderTest {
         // Test double operations
         sql = new SelectBuilder(renderer, "salary")
                 .from("employees")
-                .where("salary")
+                .where()
+                .column("salary")
                 .gte(50000.5)
                 .build();
         assertThat(sql)
@@ -125,7 +136,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "salary")
                 .from("employees")
-                .where("salary")
+                .where()
+                .column("salary")
                 .lte(100000.75)
                 .build();
         assertThat(sql)
@@ -139,7 +151,8 @@ class WhereConditionBuilderTest {
         // Test boolean equality
         String sql = new SelectBuilder(renderer, "active")
                 .from("users")
-                .where("active")
+                .where()
+                .column("active")
                 .eq(true)
                 .build();
         assertThat(sql)
@@ -149,7 +162,8 @@ class WhereConditionBuilderTest {
         // Test boolean inequality
         sql = new SelectBuilder(renderer, "active")
                 .from("users")
-                .where("active")
+                .where()
+                .column("active")
                 .ne(false)
                 .build();
         assertThat(sql)
@@ -164,7 +178,8 @@ class WhereConditionBuilderTest {
         // Test LocalDate operations
         String sql = new SelectBuilder(renderer, "birth_date")
                 .from("users")
-                .where("birth_date")
+                .where()
+                .column("birth_date")
                 .eq(date)
                 .build();
         assertThat(sql)
@@ -174,7 +189,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "birth_date")
                 .from("users")
-                .where("birth_date")
+                .where()
+                .column("birth_date")
                 .gt(date)
                 .build();
         assertThat(sql)
@@ -184,7 +200,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "birth_date")
                 .from("users")
-                .where("birth_date")
+                .where()
+                .column("birth_date")
                 .lt(date)
                 .build();
         assertThat(sql)
@@ -200,7 +217,8 @@ class WhereConditionBuilderTest {
         // Test LocalDateTime operations
         String sql = new SelectBuilder(renderer, "created_at")
                 .from("posts")
-                .where("created_at")
+                .where()
+                .column("created_at")
                 .eq(dateTime)
                 .build();
         assertThat(sql)
@@ -210,7 +228,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "created_at")
                 .from("posts")
-                .where("created_at")
+                .where()
+                .column("created_at")
                 .gte(dateTime)
                 .build();
         assertThat(sql)
@@ -223,7 +242,8 @@ class WhereConditionBuilderTest {
     void likePatternMatching() {
         String sql = new SelectBuilder(renderer, "name")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .like("John%")
                 .build();
         assertThat(sql)
@@ -232,7 +252,8 @@ class WhereConditionBuilderTest {
 
         sql = new SelectBuilder(renderer, "email")
                 .from("users")
-                .where("email")
+                .where()
+                .column("email")
                 .like("%@example.com")
                 .build();
         assertThat(sql)
@@ -246,7 +267,8 @@ class WhereConditionBuilderTest {
         // Test IS NULL
         String sql = new SelectBuilder(renderer, "email")
                 .from("users")
-                .where("email")
+                .where()
+                .column("email")
                 .isNull()
                 .build();
         assertThat(sql)
@@ -256,7 +278,8 @@ class WhereConditionBuilderTest {
         // Test IS NOT NULL
         sql = new SelectBuilder(renderer, "email")
                 .from("users")
-                .where("email")
+                .where()
+                .column("email")
                 .isNotNull()
                 .build();
         assertThat(sql)
@@ -272,7 +295,8 @@ class WhereConditionBuilderTest {
         LocalDate endDate = LocalDate.of(2024, 12, 31);
         String sql = new SelectBuilder(renderer, "birth_date")
                 .from("users")
-                .where("birth_date")
+                .where()
+                .column("birth_date")
                 .between(startDate, endDate)
                 .build();
         assertThat(sql)
@@ -285,7 +309,8 @@ class WhereConditionBuilderTest {
         LocalDateTime endDateTime = LocalDateTime.of(2024, 3, 31, 23, 59, 59);
         sql = new SelectBuilder(renderer, "created_at")
                 .from("posts")
-                .where("created_at")
+                .where()
+                .column("created_at")
                 .between(startDateTime, endDateTime)
                 .build();
         assertThat(sql)
@@ -296,7 +321,8 @@ class WhereConditionBuilderTest {
         // Test Number between
         sql = new SelectBuilder(renderer, "age")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .between(18, 65)
                 .build();
         assertThat(sql)
@@ -310,9 +336,11 @@ class WhereConditionBuilderTest {
         // Test AND with different types
         String sql = new SelectBuilder(renderer, "name", "age")
                 .from("users")
-                .where("name")
+                .where()
+                .column("name")
                 .eq("John")
-                .and("age")
+                .and()
+                .column("age")
                 .gt(25)
                 .build();
         assertThat(sql)
@@ -323,9 +351,11 @@ class WhereConditionBuilderTest {
         // Test OR with different types
         sql = new SelectBuilder(renderer, "name", "age")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .lt(18)
-                .or("active")
+                .or()
+                .column("active")
                 .eq(false)
                 .build();
         assertThat(sql)
@@ -340,7 +370,8 @@ class WhereConditionBuilderTest {
         String sql = new SelectBuilder(renderer, "name")
                 .from("users")
                 .as("u")
-                .where("name")
+                .where()
+                .column("name")
                 .eq("John")
                 .build();
         assertThat(sql).isEqualTo("""
@@ -351,7 +382,8 @@ class WhereConditionBuilderTest {
     void inOperatorWithStrings() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
-                .where("status")
+                .where()
+                .column("status")
                 .in("active", "pending", "approved")
                 .build();
 
@@ -365,7 +397,8 @@ class WhereConditionBuilderTest {
     void inOperatorWithNumbers() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("orders")
-                .where("customer_id")
+                .where()
+                .column("customer_id")
                 .in(100, 200, 300, 400)
                 .build();
 
@@ -379,7 +412,8 @@ class WhereConditionBuilderTest {
     void inOperatorWithBooleans() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
-                .where("active")
+                .where()
+                .column("active")
                 .in(true, false)
                 .build();
 
@@ -395,7 +429,8 @@ class WhereConditionBuilderTest {
 
         String sql = new SelectBuilder(renderer, "*")
                 .from("events")
-                .where("event_date")
+                .where()
+                .column("event_date")
                 .in(date1, date2, date3)
                 .build();
 
@@ -412,7 +447,8 @@ class WhereConditionBuilderTest {
 
         String sql = new SelectBuilder(renderer, "*")
                 .from("logs")
-                .where("created_at")
+                .where()
+                .column("created_at")
                 .in(dt1, dt2)
                 .build();
 
@@ -426,9 +462,11 @@ class WhereConditionBuilderTest {
     void inOperatorWithAndCondition() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("products")
-                .where("category")
+                .where()
+                .column("category")
                 .in("electronics", "books")
-                .and("price")
+                .and()
+                .column("price")
                 .gt(50)
                 .build();
 
@@ -442,9 +480,11 @@ class WhereConditionBuilderTest {
     void inOperatorWithOrCondition() {
         String sql = new SelectBuilder(renderer, "*")
                 .from("users")
-                .where("role")
+                .where()
+                .column("role")
                 .in("admin", "moderator")
-                .or("status")
+                .or()
+                .column("status")
                 .eq("verified")
                 .build();
 
@@ -458,7 +498,8 @@ class WhereConditionBuilderTest {
     void inOperatorEmptyValues_throwsException() {
         assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
                         .from("users")
-                        .where("status")
+                        .where()
+                        .column("status")
                         .in(new String[0]))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be provided for IN clause");
@@ -468,9 +509,168 @@ class WhereConditionBuilderTest {
     void inOperatorNullValues_throwsException() {
         assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
                         .from("users")
-                        .where("status")
+                        .where()
+                        .column("status")
                         .in((String[]) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be provided for IN clause");
+    }
+
+    @Test
+    void jsonValueStringComparison() {
+        // SELECT * FROM users WHERE JSON_VALUE(info, '$.city') = 'Rome'
+        String jsonValue = "{\"name\": \"John\", \"age\": 30}";
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where()
+                .column("profile")
+                .eq(jsonValue)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "users" WHERE "users"."profile" = '{"name": "John", "age": 30}'""");
+    }
+
+    @Test
+    void jsonArrayComparison() {
+        String jsonArray = "[\"tag1\", \"tag2\", \"tag3\"]";
+        String sql = new SelectBuilder(renderer, "*")
+                .from("posts")
+                .where()
+                .column("tags")
+                .eq(jsonArray)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "posts" WHERE "posts"."tags" = '["tag1", "tag2", "tag3"]'""");
+    }
+
+    @Test
+    void jsonNestedObjectComparison() {
+        String nestedJson = "{\"address\": {\"city\": \"New York\", \"zip\": \"10001\"}}";
+        String sql = new SelectBuilder(renderer, "*")
+                .from("customers")
+                .where()
+                .column("details")
+                .ne(nestedJson)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "customers" WHERE "customers"."details" != '{"address": {"city": "New York", "zip": "10001"}}'""");
+    }
+
+    @Test
+    void jsonNullValue() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .where()
+                .column("metadata")
+                .eq("null")
+                .build();
+
+        assertThat(sql).isEqualTo("""
+                SELECT * FROM "products" WHERE "products"."metadata" = 'null'""");
+    }
+
+    @Test
+    void jsonEmptyObject() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("settings")
+                .where()
+                .column("config")
+                .eq("{}")
+                .build();
+
+        assertThat(sql).isEqualTo("""
+                SELECT * FROM "settings" WHERE "settings"."config" = '{}'""");
+    }
+
+    @Test
+    void jsonEmptyArray() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("items")
+                .where()
+                .column("tags")
+                .eq("[]")
+                .build();
+
+        assertThat(sql).isEqualTo("""
+                SELECT * FROM "items" WHERE "items"."tags" = '[]'""");
+    }
+
+    @Test
+    void jsonWithMultipleConditions() {
+        String jsonProfile = "{\"verified\": true}";
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where()
+                .column("profile")
+                .eq(jsonProfile)
+                .and()
+                .column("active")
+                .eq(true)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "users" WHERE ("users"."profile" = '{"verified": true}') AND ("users"."active" = true)""");
+    }
+
+    @Test
+    void jsonWithOrCondition() {
+        String json1 = "{\"type\": \"admin\"}";
+        String json2 = "{\"type\": \"moderator\"}";
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where()
+                .column("role")
+                .eq(json1)
+                .or()
+                .column("role")
+                .eq(json2)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "users" WHERE ("users"."role" = '{"type": "admin"}') OR ("users"."role" = '{"type": "moderator"}')""");
+    }
+
+    @Test
+    void jsonComplexStructureWithSpecialCharacters() {
+        String complexJson = "{\"data\": {\"items\": [{\"id\": 1, \"name\": \"Item's \\\"special\\\" name\"}]}}";
+        String sql = new SelectBuilder(renderer, "*")
+                .from("records")
+                .where()
+                .column("content")
+                .eq(complexJson)
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "records" WHERE "records"."content" = '{"data": {"items": [{"id": 1, "name": "Item's \\"special\\" name"}]}}'""");
+    }
+
+    @Test
+    void jsonLikePatternMatching() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .where()
+                .column("metadata")
+                .like("%\"category\": \"electronics\"%")
+                .build();
+
+        assertThat(sql)
+                .isEqualTo(
+                        """
+                SELECT * FROM "products" WHERE "products"."metadata" LIKE '%"category": "electronics"%'""");
     }
 }
