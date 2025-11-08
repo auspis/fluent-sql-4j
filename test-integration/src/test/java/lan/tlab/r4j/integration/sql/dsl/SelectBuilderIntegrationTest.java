@@ -1,5 +1,6 @@
 package lan.tlab.r4j.integration.sql.dsl;
 
+import static lan.tlab.r4j.integration.sql.util.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -747,6 +748,93 @@ class SelectBuilderIntegrationTest {
                     .extracting(r -> (Integer) r.get(0), r -> (Integer) r.get(1))
                     .containsExactly(
                             tuple(15, 1), tuple(25, 2), tuple(28, 1), tuple(30, 3), tuple(35, 2), tuple(40, 1));
+        }
+    }
+
+    @Test
+    void selectJsonColumns() throws SQLException {
+        // Frank (id=8), Grace (id=9), and Henry (id=10) have JSON data prepopulated
+        try (PreparedStatement ps = dsl.select("id", "name", "address", "preferences")
+                .from("users")
+                .where()
+                .column("id")
+                .gte(8)
+                .buildPreparedStatement(connection)) {
+            List<List<Object>> rows = ResultSetUtil.list(
+                    ps,
+                    r -> List.of(
+                            r.getInt("id"), r.getString("name"), r.getString("address"), r.getString("preferences")));
+
+            assertThat(rows).hasSize(3);
+
+            // Verify Frank's data (id=8)
+            List<Object> frankRow = rows.stream()
+                    .filter(row -> ((Integer) row.get(0)).equals(8))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(frankRow.get(1)).isEqualTo("Frank");
+            String frankAddress = (String) frankRow.get(2);
+            assertThatJson(frankAddress)
+                    .isEqualToJson(
+                            """
+                    {
+                        "street": "Via Roma 123",
+                        "city": "Milan",
+                        "zip": "20100",
+                        "country": "Italy"
+                    }
+                    """);
+            String frankPreferences = (String) frankRow.get(3);
+            assertThatJson(frankPreferences)
+                    .isEqualToJson("""
+                    ["email", "sms"]
+                    """);
+
+            // Verify Grace's data (id=9)
+            List<Object> graceRow = rows.stream()
+                    .filter(row -> ((Integer) row.get(0)).equals(9))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(graceRow.get(1)).isEqualTo("Grace");
+            String graceAddress = (String) graceRow.get(2);
+            assertThatJson(graceAddress)
+                    .isEqualToJson(
+                            """
+                    {
+                        "street": "Via Torino 45",
+                        "city": "Rome",
+                        "zip": "00100",
+                        "country": "Italy"
+                    }
+                    """);
+            String gracePreferences = (String) graceRow.get(3);
+            assertThatJson(gracePreferences)
+                    .isEqualToJson("""
+                    ["email", "push"]
+                    """);
+
+            // Verify Henry's data (id=10)
+            List<Object> henryRow = rows.stream()
+                    .filter(row -> ((Integer) row.get(0)).equals(10))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(henryRow.get(1)).isEqualTo("Henry");
+            String henryAddress = (String) henryRow.get(2);
+            assertThatJson(henryAddress)
+                    .isEqualToJson(
+                            """
+                    {
+                        "street": "Corso Vittorio 78",
+                        "city": "Turin",
+                        "zip": "10100",
+                        "country": "Italy"
+                    }
+                    """);
+            String henryPreferences = (String) henryRow.get(3);
+            assertThatJson(henryPreferences)
+                    .isEqualToJson("""
+                    ["sms", "push", "phone"]
+                    """);
         }
     }
 }
