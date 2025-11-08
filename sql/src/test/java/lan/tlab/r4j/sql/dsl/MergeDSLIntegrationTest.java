@@ -3,12 +3,12 @@ package lan.tlab.r4j.sql.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.Expression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
 import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;

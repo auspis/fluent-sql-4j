@@ -1,6 +1,6 @@
 package lan.tlab.r4j.sql.plugin.builtin.postgre.ast.visitor.sql.strategy.expression;
 
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.json.JsonValue;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonValue;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.JsonValueRenderStrategy;

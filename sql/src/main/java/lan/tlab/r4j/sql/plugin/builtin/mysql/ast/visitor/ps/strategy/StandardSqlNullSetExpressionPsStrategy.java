@@ -1,7 +1,7 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import java.util.Collections;
-import lan.tlab.r4j.sql.ast.expression.set.NullSetExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.NullSetExpression;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

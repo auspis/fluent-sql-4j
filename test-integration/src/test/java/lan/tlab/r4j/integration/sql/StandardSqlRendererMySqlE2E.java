@@ -8,25 +8,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
-import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
-import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType;
+import lan.tlab.r4j.sql.ast.ddl.definition.TableDefinition;
+import lan.tlab.r4j.sql.ast.ddl.statement.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData;
+import lan.tlab.r4j.sql.ast.dml.statement.InsertStatement;
+import lan.tlab.r4j.sql.ast.dql.clause.Fetch;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.OrderBy;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
@@ -73,12 +74,12 @@ public class StandardSqlRendererMySqlE2E {
 
             InsertStatement insertAlice = InsertStatement.builder()
                     .table(new TableIdentifier("Customer"))
-                    .data(lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues.of(
+                    .data(InsertData.InsertValues.of(
                             Literal.of(1), Literal.of("Alice"), Literal.of(400), Literal.of("2025-08-31 23:23:23")))
                     .build();
             InsertStatement insertBob = InsertStatement.builder()
                     .table(new TableIdentifier("Customer"))
-                    .data(lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues.of(
+                    .data(InsertData.InsertValues.of(
                             Literal.of(2), Literal.of("Bob"), Literal.of(500), Literal.of("2025-08-31 23:23:24")))
                     .build();
             stmt.execute(insertAlice.accept(renderer, new AstContext()));

@@ -2,11 +2,12 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
@@ -76,9 +77,9 @@ class StandardSqlFromClausePsStrategyTest {
     void innerJoin() {
         var t1 = new TableIdentifier("User");
         var t2 = new TableIdentifier("Order");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
+                OnJoin.JoinType.INNER,
                 t2,
                 Comparison.eq(ColumnReference.of("User", "id"), ColumnReference.of("Order", "user_id")));
         From from = From.of(join);
@@ -93,9 +94,9 @@ class StandardSqlFromClausePsStrategyTest {
     void leftJoin() {
         var t1 = new TableIdentifier("User");
         var t2 = new TableIdentifier("Profile");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
+                OnJoin.JoinType.LEFT,
                 t2,
                 Comparison.eq(ColumnReference.of("User", "id"), ColumnReference.of("Profile", "user_id")));
         From from = From.of(join);
@@ -111,9 +112,9 @@ class StandardSqlFromClausePsStrategyTest {
     void rightJoin() {
         var t1 = new TableIdentifier("User");
         var t2 = new TableIdentifier("Department");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.RIGHT,
+                OnJoin.JoinType.RIGHT,
                 t2,
                 Comparison.eq(ColumnReference.of("User", "dept_id"), ColumnReference.of("Department", "id")));
         From from = From.of(join);
@@ -129,9 +130,9 @@ class StandardSqlFromClausePsStrategyTest {
     void fullJoin() {
         var t1 = new TableIdentifier("User");
         var t2 = new TableIdentifier("Role");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.FULL,
+                OnJoin.JoinType.FULL,
                 t2,
                 Comparison.eq(ColumnReference.of("User", "role_id"), ColumnReference.of("Role", "id")));
         From from = From.of(join);
@@ -146,8 +147,7 @@ class StandardSqlFromClausePsStrategyTest {
     void crossJoin() {
         var t1 = new TableIdentifier("User");
         var t2 = new TableIdentifier("Settings");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
-                t1, lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.CROSS, t2, null);
+        var join = new OnJoin(t1, OnJoin.JoinType.CROSS, t2, null);
         From from = From.of(join);
 
         PsDto result = strategy.handle(from, visitor, ctx);
@@ -160,11 +160,8 @@ class StandardSqlFromClausePsStrategyTest {
     void joinWithParameters() {
         var t1 = new TableIdentifier("User");
         var t2 = new TableIdentifier("Order");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
-                t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
-                t2,
-                Comparison.gt(ColumnReference.of("Order", "amount"), Literal.of(100)));
+        var join = new OnJoin(
+                t1, OnJoin.JoinType.INNER, t2, Comparison.gt(ColumnReference.of("Order", "amount"), Literal.of(100)));
         From from = From.of(join);
 
         PsDto result = strategy.handle(from, visitor, ctx);
@@ -179,15 +176,15 @@ class StandardSqlFromClausePsStrategyTest {
         var t2 = new TableIdentifier("Order");
         var t3 = new TableIdentifier("Product");
 
-        var join1 = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join1 = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
+                OnJoin.JoinType.INNER,
                 t2,
                 Comparison.eq(ColumnReference.of("User", "id"), ColumnReference.of("Order", "user_id")));
 
-        var join2 = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join2 = new OnJoin(
                 join1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
+                OnJoin.JoinType.LEFT,
                 t3,
                 Comparison.eq(ColumnReference.of("Order", "product_id"), ColumnReference.of("Product", "id")));
 
@@ -206,9 +203,9 @@ class StandardSqlFromClausePsStrategyTest {
         var table = new TableIdentifier("User");
         var t1 = new TableIdentifier("Order");
         var t2 = new TableIdentifier("Product");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
+                OnJoin.JoinType.INNER,
                 t2,
                 Comparison.eq(ColumnReference.of("Order", "product_id"), ColumnReference.of("Product", "id")));
 

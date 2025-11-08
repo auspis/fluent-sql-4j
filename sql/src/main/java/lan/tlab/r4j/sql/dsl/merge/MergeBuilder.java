@@ -5,25 +5,25 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.sql.ast.expression.set.AliasedTableExpression;
-import lan.tlab.r4j.sql.ast.identifier.Alias;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.predicate.Predicate;
-import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedDelete;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeUsing;
-import lan.tlab.r4j.sql.ast.statement.dml.item.UpdateItem;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.Expression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.common.expression.set.AliasedTableExpression;
+import lan.tlab.r4j.sql.ast.common.identifier.Alias;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenMatchedDelete;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.dml.component.MergeUsing;
+import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
+import lan.tlab.r4j.sql.ast.dml.statement.MergeStatement;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
@@ -40,14 +40,14 @@ public class MergeBuilder {
             throw new IllegalArgumentException("Target table name cannot be null or empty");
         }
         this.renderer = renderer;
-        this.targetTable = new TableIdentifier(targetTableName);
+        targetTable = new TableIdentifier(targetTableName);
     }
 
     public MergeBuilder as(String alias) {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.targetTable = new TableIdentifier(this.targetTable.name(), alias);
+        targetTable = new TableIdentifier(targetTable.name(), alias);
         return this;
     }
 
@@ -55,7 +55,7 @@ public class MergeBuilder {
         if (sourceTableName == null || sourceTableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Source table name cannot be null or empty");
         }
-        this.using = new MergeUsing(new TableIdentifier(sourceTableName));
+        using = new MergeUsing(new TableIdentifier(sourceTableName));
         return this;
     }
 
@@ -66,7 +66,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.using = new MergeUsing(new TableIdentifier(sourceTableName, alias));
+        using = new MergeUsing(new TableIdentifier(sourceTableName, alias));
         return this;
     }
 
@@ -77,7 +77,7 @@ public class MergeBuilder {
         if (alias == null || alias.trim().isEmpty()) {
             throw new IllegalArgumentException("Alias cannot be null or empty");
         }
-        this.using = new MergeUsing(new AliasedTableExpression(subquery, new Alias(alias)));
+        using = new MergeUsing(new AliasedTableExpression(subquery, new Alias(alias)));
         return this;
     }
 
@@ -91,7 +91,7 @@ public class MergeBuilder {
 
         ColumnReference left = ColumnReferenceUtil.parseColumnReference(leftColumn, "");
         ColumnReference right = ColumnReferenceUtil.parseColumnReference(rightColumn, "");
-        this.onCondition = Comparison.eq(left, right);
+        onCondition = Comparison.eq(left, right);
         return this;
     }
 
@@ -99,7 +99,7 @@ public class MergeBuilder {
         if (condition == null) {
             throw new IllegalArgumentException("Condition cannot be null");
         }
-        this.onCondition = condition;
+        onCondition = condition;
         return this;
     }
 
@@ -107,7 +107,7 @@ public class MergeBuilder {
         if (updateItems == null || updateItems.isEmpty()) {
             throw new IllegalArgumentException("Update items cannot be null or empty");
         }
-        this.actions.add(new WhenMatchedUpdate(updateItems));
+        actions.add(new WhenMatchedUpdate(updateItems));
         return this;
     }
 
@@ -115,7 +115,7 @@ public class MergeBuilder {
         if (updateItems == null || updateItems.isEmpty()) {
             throw new IllegalArgumentException("Update items cannot be null or empty");
         }
-        this.actions.add(new WhenMatchedUpdate(condition, updateItems));
+        actions.add(new WhenMatchedUpdate(condition, updateItems));
         return this;
     }
 
@@ -131,7 +131,7 @@ public class MergeBuilder {
     }
 
     public MergeBuilder whenMatchedThenDelete(Predicate condition) {
-        this.actions.add(new WhenMatchedDelete(condition));
+        actions.add(new WhenMatchedDelete(condition));
         return this;
     }
 
@@ -146,7 +146,7 @@ public class MergeBuilder {
             throw new IllegalArgumentException("Number of columns must match number of values");
         }
         InsertData insertData = new InsertValues(values);
-        this.actions.add(new WhenNotMatchedInsert(columns, insertData));
+        actions.add(new WhenNotMatchedInsert(columns, insertData));
         return this;
     }
 
@@ -162,7 +162,7 @@ public class MergeBuilder {
             throw new IllegalArgumentException("Number of columns must match number of values");
         }
         InsertData insertData = new InsertValues(values);
-        this.actions.add(new WhenNotMatchedInsert(condition, columns, insertData));
+        actions.add(new WhenNotMatchedInsert(condition, columns, insertData));
         return this;
     }
 
@@ -238,7 +238,7 @@ public class MergeBuilder {
             ScalarExpression expr = value == null
                     ? Literal.ofNull()
                     : (value.contains(".") ? ColumnReferenceUtil.parseColumnReference(value, "") : Literal.of(value));
-            this.updateItems.add(new UpdateItem(colRef, expr));
+            updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
@@ -248,7 +248,7 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
-            this.updateItems.add(new UpdateItem(colRef, expr));
+            updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
@@ -258,7 +258,7 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
-            this.updateItems.add(new UpdateItem(colRef, expr));
+            updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
@@ -271,7 +271,7 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : (ScalarExpression) value;
-            this.updateItems.add(new UpdateItem(colRef, expr));
+            updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
@@ -354,8 +354,8 @@ public class MergeBuilder {
             Expression expr = value == null
                     ? Literal.ofNull()
                     : (value.contains(".") ? ColumnReferenceUtil.parseColumnReference(value, "") : Literal.of(value));
-            this.columns.add(colRef);
-            this.values.add(expr);
+            columns.add(colRef);
+            values.add(expr);
             return this;
         }
 
@@ -365,8 +365,8 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
-            this.columns.add(colRef);
-            this.values.add(expr);
+            columns.add(colRef);
+            values.add(expr);
             return this;
         }
 
@@ -376,8 +376,8 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
-            this.columns.add(colRef);
-            this.values.add(expr);
+            columns.add(colRef);
+            values.add(expr);
             return this;
         }
 
@@ -387,8 +387,8 @@ public class MergeBuilder {
             }
             ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             Expression expr = value == null ? Literal.ofNull() : value;
-            this.columns.add(colRef);
-            this.values.add(expr);
+            columns.add(colRef);
+            values.add(expr);
             return this;
         }
 

@@ -2,12 +2,12 @@ package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.express
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;

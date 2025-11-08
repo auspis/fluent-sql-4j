@@ -2,11 +2,11 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.statement.dml.MergeStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenMatchedUpdate;
-import lan.tlab.r4j.sql.ast.statement.dml.item.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenMatchedUpdate;
+import lan.tlab.r4j.sql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import lan.tlab.r4j.sql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

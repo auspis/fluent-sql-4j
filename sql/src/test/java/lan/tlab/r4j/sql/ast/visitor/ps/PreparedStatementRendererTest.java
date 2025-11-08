@@ -3,60 +3,63 @@ package lan.tlab.r4j.sql.ast.visitor.ps;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.groupby.GroupBy;
-import lan.tlab.r4j.sql.ast.clause.orderby.OrderBy;
-import lan.tlab.r4j.sql.ast.clause.orderby.Sorting;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.Expression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ArithmeticExpression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.NullScalarExpression;
-import lan.tlab.r4j.sql.ast.expression.scalar.ScalarSubquery;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDate;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDateTime;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.DateArithmetic;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.ExtractDatePart;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Mod;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Power;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.Round;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharLength;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.CharacterLength;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Concat;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Left;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Length;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Replace;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Substring;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.Trim;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString;
-import lan.tlab.r4j.sql.ast.expression.scalar.convert.Cast;
-import lan.tlab.r4j.sql.ast.expression.set.UnionExpression;
-import lan.tlab.r4j.sql.ast.identifier.Alias;
-import lan.tlab.r4j.sql.ast.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.predicate.IsNotNull;
-import lan.tlab.r4j.sql.ast.predicate.IsNull;
-import lan.tlab.r4j.sql.ast.predicate.Like;
-import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
-import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
-import lan.tlab.r4j.sql.ast.predicate.logical.Not;
-import lan.tlab.r4j.sql.ast.statement.ddl.CreateTableStatement;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.TableDefinition;
-import lan.tlab.r4j.sql.ast.statement.dml.DeleteStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.InsertStatement;
-import lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.InsertValues;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.Expression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Cast;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.NullScalarExpression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDate;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDateTime;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.DateArithmetic;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.ExtractDatePart;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.interval.Interval;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.Mod;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.Power;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.Round;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.UnaryNumeric;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.CharLength;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.CharacterLength;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Concat;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Left;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Length;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Replace;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Substring;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.Trim;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.UnaryString;
+import lan.tlab.r4j.sql.ast.common.expression.set.UnionExpression;
+import lan.tlab.r4j.sql.ast.common.identifier.Alias;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.predicate.IsNotNull;
+import lan.tlab.r4j.sql.ast.common.predicate.IsNull;
+import lan.tlab.r4j.sql.ast.common.predicate.Like;
+import lan.tlab.r4j.sql.ast.common.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.common.predicate.logical.Not;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.ddl.definition.TableDefinition;
+import lan.tlab.r4j.sql.ast.ddl.statement.CreateTableStatement;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData;
+import lan.tlab.r4j.sql.ast.dml.component.InsertData.InsertValues;
+import lan.tlab.r4j.sql.ast.dml.statement.DeleteStatement;
+import lan.tlab.r4j.sql.ast.dml.statement.InsertStatement;
+import lan.tlab.r4j.sql.ast.dql.clause.Fetch;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.GroupBy;
+import lan.tlab.r4j.sql.ast.dql.clause.OrderBy;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
+import lan.tlab.r4j.sql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.source.FromSubquery;
+import lan.tlab.r4j.sql.ast.dql.source.join.OnJoin;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import org.junit.jupiter.api.Test;
 
@@ -102,7 +105,7 @@ class PreparedStatementRendererTest {
     @Test
     void testInsertStatementWithDefaultValues() {
         TableIdentifier table = new TableIdentifier("User");
-        var defaultValues = new lan.tlab.r4j.sql.ast.statement.dml.item.InsertData.DefaultValues();
+        var defaultValues = new InsertData.DefaultValues();
         InsertStatement insertStatement =
                 InsertStatement.builder().table(table).data(defaultValues).build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
@@ -674,9 +677,9 @@ class PreparedStatementRendererTest {
     void testSelectInnerJoin() {
         var t1 = new TableIdentifier("t1");
         var t2 = new TableIdentifier("t2");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
+                OnJoin.JoinType.INNER,
                 t2,
                 Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
         SelectStatement stmt = SelectStatement.builder()
@@ -696,9 +699,9 @@ class PreparedStatementRendererTest {
     void testSelectLeftJoinWithWhere() {
         var t1 = new TableIdentifier("t1");
         var t2 = new TableIdentifier("t2");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
+                OnJoin.JoinType.LEFT,
                 t2,
                 Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
         SelectStatement stmt = SelectStatement.builder()
@@ -720,9 +723,9 @@ class PreparedStatementRendererTest {
     void testSelectRightJoinWithOrderBy() {
         var t1 = new TableIdentifier("t1");
         var t2 = new TableIdentifier("t2");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.RIGHT,
+                OnJoin.JoinType.RIGHT,
                 t2,
                 Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
         SelectStatement stmt = SelectStatement.builder()
@@ -744,9 +747,9 @@ class PreparedStatementRendererTest {
     void testSelectFullJoinWithGroupBy() {
         var t1 = new TableIdentifier("t1");
         var t2 = new TableIdentifier("t2");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.FULL,
+                OnJoin.JoinType.FULL,
                 t2,
                 Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
         SelectStatement stmt = SelectStatement.builder()
@@ -768,8 +771,7 @@ class PreparedStatementRendererTest {
     void testSelectCrossJoinWithLimitOffset() {
         var t1 = new TableIdentifier("t1");
         var t2 = new TableIdentifier("t2");
-        var join = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
-                t1, lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.CROSS, t2, null);
+        var join = new OnJoin(t1, OnJoin.JoinType.CROSS, t2, null);
         SelectStatement stmt = SelectStatement.builder()
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
@@ -789,14 +791,14 @@ class PreparedStatementRendererTest {
         var t1 = new TableIdentifier("t1");
         var t2 = new TableIdentifier("t2");
         var t3 = new TableIdentifier("t3");
-        var join1 = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join1 = new OnJoin(
                 t1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.INNER,
+                OnJoin.JoinType.INNER,
                 t2,
                 Comparison.eq(ColumnReference.of("t1", "id"), ColumnReference.of("t2", "t1_id")));
-        var join2 = new lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin(
+        var join2 = new OnJoin(
                 join1,
-                lan.tlab.r4j.sql.ast.clause.from.source.join.OnJoin.JoinType.LEFT,
+                OnJoin.JoinType.LEFT,
                 t3,
                 Comparison.eq(ColumnReference.of("t2", "id"), ColumnReference.of("t3", "t2_id")));
         SelectStatement stmt = SelectStatement.builder()
@@ -820,7 +822,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
                         Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(1))))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
@@ -836,8 +838,8 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        lan.tlab.r4j.sql.ast.predicate.logical.AndOr.and(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
+                        lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr.and(
                                 Comparison.gt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10)),
                                 Comparison.lt(AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(100)))))
                 .build();
@@ -855,8 +857,8 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.avg(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        lan.tlab.r4j.sql.ast.predicate.logical.AndOr.or(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
+                        lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr.or(
                                 Comparison.lt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(5)),
                                 Comparison.gt(AggregateCall.avg(ColumnReference.of("User", "id")), Literal.of(50)))))
                 .build();
@@ -875,7 +877,7 @@ class PreparedStatementRendererTest {
                         AggregateCall.count(ColumnReference.of("User", "id")), new Alias("total"))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
                         Comparison.gte(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(2))))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
@@ -892,7 +894,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email"), ColumnReference.of("User", "name")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
                         Comparison.ne(AggregateCall.max(ColumnReference.of("User", "id")), Literal.of(0))))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
@@ -909,7 +911,7 @@ class PreparedStatementRendererTest {
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
                         Comparison.lt(AggregateCall.min(ColumnReference.of("User", "id")), Literal.of(100))))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "email"))))
                 .fetch(new Fetch(0, 5))
@@ -928,7 +930,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
                         new IsNull(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
@@ -944,7 +946,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "name")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
                         new IsNotNull(AggregateCall.max(ColumnReference.of("User", "email")))))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
@@ -960,9 +962,8 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        new lan.tlab.r4j.sql.ast.predicate.Between(
-                                AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10), Literal.of(100))))
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(new lan.tlab.r4j.sql.ast.common.predicate.Between(
+                        AggregateCall.sum(ColumnReference.of("User", "id")), Literal.of(10), Literal.of(100))))
                 .build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto result = renderer.visit(selectStmt, new AstContext());
@@ -977,7 +978,7 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(new lan.tlab.r4j.sql.ast.predicate.In(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(new lan.tlab.r4j.sql.ast.common.predicate.In(
                         AggregateCall.count(ColumnReference.of("User", "id")),
                         List.of(Literal.of(1), Literal.of(2), Literal.of(3)))))
                 .build();
@@ -994,8 +995,8 @@ class PreparedStatementRendererTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(lan.tlab.r4j.sql.ast.clause.conditional.having.Having.of(
-                        new Not(lan.tlab.r4j.sql.ast.predicate.logical.AndOr.or(
+                .having(lan.tlab.r4j.sql.ast.dql.clause.Having.of(
+                        new Not(lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr.or(
                                 Comparison.lt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(5)),
                                 Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(50))))))
                 .build();
@@ -1084,7 +1085,7 @@ class PreparedStatementRendererTest {
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(10))))
                 .build();
 
-        var fromSubquery = lan.tlab.r4j.sql.ast.clause.from.source.FromSubquery.of(subquery, "sub");
+        var fromSubquery = FromSubquery.of(subquery, "sub");
 
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("sub", "id"))))

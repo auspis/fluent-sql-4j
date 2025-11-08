@@ -2,13 +2,13 @@ package lan.tlab.r4j.sql.dsl.select;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.Projection;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.sql.ast.dql.projection.Projection;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 
 public class SelectProjectionBuilder {
