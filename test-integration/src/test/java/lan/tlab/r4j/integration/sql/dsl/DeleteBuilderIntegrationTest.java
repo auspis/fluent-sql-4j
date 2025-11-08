@@ -34,7 +34,8 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void whereCondition() throws SQLException {
-        PreparedStatement ps = dsl.deleteFrom("users").where("id").eq(2).buildPreparedStatement(connection);
+        PreparedStatement ps =
+                dsl.deleteFrom("users").where().column("id").eq(2).buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -53,7 +54,8 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void multipleConditions() throws SQLException {
-        PreparedStatement ps = dsl.deleteFrom("users").where("age").lt(18).buildPreparedStatement(connection);
+        PreparedStatement ps =
+                dsl.deleteFrom("users").where().column("age").lt(18).buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -68,9 +70,11 @@ class DeleteBuilderIntegrationTest {
     @Test
     void andCondition() throws SQLException {
         PreparedStatement ps = dsl.deleteFrom("users")
-                .where("age")
+                .where()
+                .column("age")
                 .gt(18)
-                .and("name")
+                .and()
+                .column("name")
                 .eq("Alice")
                 .buildPreparedStatement(connection);
 
@@ -91,9 +95,11 @@ class DeleteBuilderIntegrationTest {
     @Test
     void orCondition() throws SQLException {
         PreparedStatement ps = dsl.deleteFrom("users")
-                .where("name")
+                .where()
+                .column("name")
                 .eq("John Doe")
-                .or("name")
+                .or()
+                .column("name")
                 .eq("Jane Smith")
                 .buildPreparedStatement(connection);
 
@@ -120,8 +126,11 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void stringLike() throws SQLException {
-        PreparedStatement ps =
-                dsl.deleteFrom("users").where("email").like("%example.com").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.deleteFrom("users")
+                .where()
+                .column("email")
+                .like("%example.com")
+                .buildPreparedStatement(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);

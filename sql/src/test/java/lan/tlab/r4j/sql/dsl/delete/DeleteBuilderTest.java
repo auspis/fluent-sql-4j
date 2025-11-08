@@ -28,7 +28,8 @@ class DeleteBuilderTest {
     @Test
     void ok() {
         String result = new DeleteBuilder(renderer, "users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("inactive")
                 .build();
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"status\" = 'inactive'");
@@ -42,16 +43,19 @@ class DeleteBuilderTest {
 
     @Test
     void whereWithNumber() {
-        String result = new DeleteBuilder(renderer, "users").where("id").eq(42).build();
+        String result =
+                new DeleteBuilder(renderer, "users").where().column("id").eq(42).build();
         assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"id\" = 42");
     }
 
     @Test
     void and() {
         String result = new DeleteBuilder(renderer, "users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("inactive")
-                .and("age")
+                .and()
+                .column("age")
                 .lt(18)
                 .build();
 
@@ -63,9 +67,11 @@ class DeleteBuilderTest {
     @Test
     void or() {
         String result = new DeleteBuilder(renderer, "users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("deleted")
-                .or("status")
+                .or()
+                .column("status")
                 .eq("banned")
                 .build();
 
@@ -77,11 +83,14 @@ class DeleteBuilderTest {
     @Test
     void andOr() {
         String result = new DeleteBuilder(renderer, "users")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("inactive")
-                .and("age")
+                .and()
+                .column("age")
                 .lt(18)
-                .or("role")
+                .or()
+                .column("role")
                 .eq("guest")
                 .build();
 
@@ -93,7 +102,8 @@ class DeleteBuilderTest {
     @Test
     void isNull() {
         String result = new DeleteBuilder(renderer, "users")
-                .where("deleted_at")
+                .where()
+                .column("deleted_at")
                 .isNotNull()
                 .build();
 
@@ -103,7 +113,8 @@ class DeleteBuilderTest {
     @Test
     void like() {
         String result = new DeleteBuilder(renderer, "users")
-                .where("email")
+                .where()
+                .column("email")
                 .like("%@temp.com")
                 .build();
 
@@ -113,15 +124,20 @@ class DeleteBuilderTest {
     @Test
     void allComparisonOperators() {
         String result = new DeleteBuilder(renderer, "products")
-                .where("price")
+                .where()
+                .column("price")
                 .gt(100)
-                .and("discount")
+                .and()
+                .column("discount")
                 .lt(50)
-                .and("rating")
+                .and()
+                .column("rating")
                 .gte(4)
-                .and("stock")
+                .and()
+                .column("stock")
                 .lte(10)
-                .and("category")
+                .and()
+                .column("category")
                 .ne("deprecated")
                 .build();
 
@@ -139,7 +155,7 @@ class DeleteBuilderTest {
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> new DeleteBuilder(renderer, "users").where(""))
+        assertThatThrownBy(() -> new DeleteBuilder(renderer, "users").where().column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
