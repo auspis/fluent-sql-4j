@@ -451,4 +451,81 @@ class SelectDSLIntegrationTest {
                 OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY\
                 """);
     }
+
+    @Test
+    void whereWithJsonValueComparison() {
+        String result = dsl.select("id", "name")
+                .from("users")
+                .where()
+                .jsonValue("profile", "$.city")
+                .eq("Rome")
+                .and()
+                .jsonValue("profile", "$.age")
+                .gt(25)
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "users"."id", "users"."name" \
+                FROM "users" \
+                WHERE (JSON_VALUE("users"."profile", '$.city') = 'Rome') \
+                AND (JSON_VALUE("users"."profile", '$.age') > 25)\
+                """);
+    }
+
+    @Test
+    void whereWithJsonExistsCondition() {
+        String result = dsl.select("product_id", "name", "price")
+                .from("products")
+                .where()
+                .jsonExists("metadata", "$.featured")
+                .exists()
+                .and()
+                .column("active")
+                .eq(true)
+                .orderBy("name")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "products"."product_id", "products"."name", "products"."price" \
+                FROM "products" \
+                WHERE (JSON_EXISTS("products"."metadata", '$.featured') = true) \
+                AND ("products"."active" = true) \
+                ORDER BY "products"."name" ASC\
+                """);
+    }
+
+    @Test
+    void whereWithMixedJsonFunctionsAndRegularColumns() {
+        String result = dsl.select("*")
+                .from("orders")
+                .as("o")
+                .where()
+                .column("status")
+                .eq("completed")
+                .and()
+                .jsonValue("o", "details", "$.payment.method")
+                .eq("credit_card")
+                .or()
+                .jsonExists("o", "details", "$.discount")
+                .notExists()
+                .orderByDesc("order_date")
+                .fetch(20)
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT * \
+                FROM "orders" AS o \
+                WHERE (("o"."status" = 'completed') \
+                AND (JSON_VALUE("o"."details", '$.payment.method') = 'credit_card')) \
+                OR (JSON_EXISTS("o"."details", '$.discount') = false) \
+                ORDER BY "o"."order_date" DESC \
+                OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY\
+                """);
+    }
 }
