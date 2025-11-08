@@ -19,7 +19,7 @@ class DeleteDSLIntegrationTest {
 
     @Test
     void createsDeleteBuilderWithRenderer() {
-        String result = dsl.deleteFrom("users").where("id").eq(1).build();
+        String result = dsl.deleteFrom("users").where().column("id").eq(1).build();
 
         assertThat(result).isEqualTo("""
                 DELETE FROM "users" WHERE "users"."id" = 1""");
@@ -36,9 +36,11 @@ class DeleteDSLIntegrationTest {
     @Test
     void fluentApiWithComplexConditions() {
         String result = dsl.deleteFrom("orders")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("cancelled")
-                .and("amount")
+                .and()
+                .column("amount")
                 .gt(100)
                 .build();
 
