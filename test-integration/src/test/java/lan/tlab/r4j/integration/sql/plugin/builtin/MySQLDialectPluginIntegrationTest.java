@@ -6,12 +6,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import lan.tlab.r4j.sql.ast.clause.fetch.Fetch;
-import lan.tlab.r4j.sql.ast.clause.from.From;
-import lan.tlab.r4j.sql.ast.clause.selection.Select;
-import lan.tlab.r4j.sql.ast.clause.selection.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.statement.dql.SelectStatement;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.dql.clause.Fetch;
+import lan.tlab.r4j.sql.ast.dql.clause.From;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
@@ -217,8 +217,8 @@ class MySQLDialectPluginIntegrationTest {
         var statement = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("users", "name"))))
                 .from(From.fromTable("users"))
-                .orderBy(lan.tlab.r4j.sql.ast.clause.orderby.OrderBy.of(
-                        lan.tlab.r4j.sql.ast.clause.orderby.Sorting.asc(ColumnReference.of("users", "name"))))
+                .orderBy(lan.tlab.r4j.sql.ast.dql.clause.OrderBy.of(
+                        lan.tlab.r4j.sql.ast.dql.clause.Sorting.asc(ColumnReference.of("users", "name"))))
                 .fetch(new Fetch(5, 3))
                 .build();
 
@@ -243,10 +243,9 @@ class MySQLDialectPluginIntegrationTest {
                         new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                         new ScalarExpressionProjection(ColumnReference.of("users", "age"))))
                 .from(From.fromTable("users"))
-                .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
-                        lan.tlab.r4j.sql.ast.predicate.Comparison.gt(
-                                ColumnReference.of("users", "age"),
-                                lan.tlab.r4j.sql.ast.expression.scalar.Literal.of(25))))
+                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(lan.tlab.r4j.sql.ast.common.predicate.Comparison.gt(
+                        ColumnReference.of("users", "age"),
+                        lan.tlab.r4j.sql.ast.common.expression.scalar.Literal.of(25))))
                 .build();
 
         String selectSql = renderer.renderSql(selectStatement);
@@ -307,12 +306,11 @@ class MySQLDialectPluginIntegrationTest {
                         new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                         new ScalarExpressionProjection(ColumnReference.of("users", "email"))))
                 .from(From.fromTable("users"))
-                .where(lan.tlab.r4j.sql.ast.clause.conditional.where.Where.of(
-                        lan.tlab.r4j.sql.ast.predicate.Comparison.gte(
-                                ColumnReference.of("users", "age"),
-                                lan.tlab.r4j.sql.ast.expression.scalar.Literal.of(25))))
-                .orderBy(lan.tlab.r4j.sql.ast.clause.orderby.OrderBy.of(
-                        lan.tlab.r4j.sql.ast.clause.orderby.Sorting.asc(ColumnReference.of("users", "name"))))
+                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(lan.tlab.r4j.sql.ast.common.predicate.Comparison.gte(
+                        ColumnReference.of("users", "age"),
+                        lan.tlab.r4j.sql.ast.common.expression.scalar.Literal.of(25))))
+                .orderBy(lan.tlab.r4j.sql.ast.dql.clause.OrderBy.of(
+                        lan.tlab.r4j.sql.ast.dql.clause.Sorting.asc(ColumnReference.of("users", "name"))))
                 .fetch(new Fetch(0, 5))
                 .build();
 

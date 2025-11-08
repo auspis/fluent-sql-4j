@@ -1,11 +1,11 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import static lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString.lower;
-import static lan.tlab.r4j.sql.ast.expression.scalar.call.function.string.UnaryString.upper;
+import static lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.UnaryString.lower;
+import static lan.tlab.r4j.sql.ast.common.expression.scalar.function.string.UnaryString.upper;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

@@ -3,13 +3,13 @@ package lan.tlab.r4j.sql.dsl.delete;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import lan.tlab.r4j.sql.ast.clause.conditional.where.Where;
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.predicate.NullPredicate;
-import lan.tlab.r4j.sql.ast.predicate.Predicate;
-import lan.tlab.r4j.sql.ast.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.sql.ast.common.predicate.NullPredicate;
+import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.sql.ast.dql.clause.Where;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
@@ -180,7 +180,7 @@ class DeleteBuilderTest {
 
         assertThat(result.condition()).isInstanceOf(AndOr.class);
         AndOr andOr = (AndOr) result.condition();
-        assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.sql.ast.predicate.logical.LogicalOperator.OR);
+        assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.sql.ast.common.predicate.logical.LogicalOperator.OR);
     }
 
     @Test

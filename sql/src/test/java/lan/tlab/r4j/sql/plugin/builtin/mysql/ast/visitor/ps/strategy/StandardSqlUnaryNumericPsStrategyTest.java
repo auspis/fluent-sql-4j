@@ -1,13 +1,13 @@
 package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import static lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric.abs;
-import static lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric.ceil;
-import static lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric.floor;
-import static lan.tlab.r4j.sql.ast.expression.scalar.call.function.number.UnaryNumeric.sqrt;
+import static lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.UnaryNumeric.abs;
+import static lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.UnaryNumeric.ceil;
+import static lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.UnaryNumeric.floor;
+import static lan.tlab.r4j.sql.ast.common.expression.scalar.function.number.UnaryNumeric.sqrt;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;

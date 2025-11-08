@@ -2,12 +2,12 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expressio
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.CurrentDate;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.DateArithmetic;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval;
-import lan.tlab.r4j.sql.ast.expression.scalar.call.function.datetime.interval.Interval.IntervalUnit;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDate;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.DateArithmetic;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.interval.Interval;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.interval.Interval.IntervalUnit;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
