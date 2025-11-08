@@ -1,10 +1,10 @@
 package lan.tlab.r4j.sql.dsl.table;
 
-import lan.tlab.r4j.sql.ast.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.sql.ast.predicate.Predicate;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.DataType;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import lan.tlab.r4j.sql.ast.ddl.definition.DataType;
 
 public class ColumnBuilder {
     private final CreateTableBuilder tableBuilder;

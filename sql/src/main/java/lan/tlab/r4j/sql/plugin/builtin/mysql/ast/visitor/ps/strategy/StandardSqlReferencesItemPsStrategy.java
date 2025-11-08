@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.sql.ast.statement.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.sql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
