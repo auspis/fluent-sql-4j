@@ -134,7 +134,8 @@ class SelectBuilderJoinTest {
                 .innerJoin("orders")
                 .as("o")
                 .on("u.id", "o.user_id")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("active")
                 .build();
 
@@ -183,9 +184,11 @@ class SelectBuilderJoinTest {
                 .leftJoin("payments")
                 .as("p")
                 .on("o.id", "p.order_id")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("completed")
-                .and("amount")
+                .and()
+                .column("amount")
                 .gt(100)
                 .orderByDesc("created_at")
                 .fetch(20)

@@ -138,7 +138,8 @@ class StandardSQLDialectPluginE2E {
         // Test SELECT with WHERE using the custom renderer
         String selectSql = DSL.select(renderer, "name", "age")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .gt(25)
                 .build();
         assertThat(selectSql).contains("WHERE");
@@ -147,14 +148,16 @@ class StandardSQLDialectPluginE2E {
         // Test UPDATE using the custom renderer
         String updateSql = DSL.update(renderer, "users")
                 .set("age", 31)
-                .where("name")
+                .where()
+                .column("name")
                 .eq("John Doe")
                 .build();
         assertThat(updateSql).contains("UPDATE");
         assertThat(updateSql).contains("SET");
 
         // Test DELETE using the custom renderer
-        String deleteSql = DSL.deleteFrom(renderer, "users").where("age").lt(18).build();
+        String deleteSql =
+                DSL.deleteFrom(renderer, "users").where().column("age").lt(18).build();
         assertThat(deleteSql).contains("DELETE");
         assertThat(deleteSql).contains("FROM");
 
@@ -245,7 +248,8 @@ class StandardSQLDialectPluginE2E {
         List<List<Object>> johnDoe = ResultSetUtil.list(
                 DSL.select(renderer, "id", "name", "email", "age", "active")
                         .from("users")
-                        .where("id")
+                        .where()
+                        .column("id")
                         .eq(1)
                         .buildPreparedStatement(connection),
                 r -> List.of(
@@ -262,7 +266,8 @@ class StandardSQLDialectPluginE2E {
         List<List<Object>> newUser = ResultSetUtil.list(
                 DSL.select(renderer, "id", "name", "email", "age", "active")
                         .from("users")
-                        .where("id")
+                        .where()
+                        .column("id")
                         .eq(11)
                         .buildPreparedStatement(connection),
                 r -> List.of(

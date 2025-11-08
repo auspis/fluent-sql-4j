@@ -210,7 +210,8 @@ class SelectBuilderJsonTest {
 
         String result = new SelectBuilder(renderer, select)
                 .from("products")
-                .where("category")
+                .where()
+                .column("category")
                 .eq("Electronics")
                 .build();
 

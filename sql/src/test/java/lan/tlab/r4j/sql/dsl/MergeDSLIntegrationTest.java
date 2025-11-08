@@ -61,7 +61,8 @@ class MergeDSLIntegrationTest {
     void mergeWithSubquerySource() {
         SelectStatement subquery = dsl.select("id", "name", "price")
                 .from("staging_products")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("active")
                 .getCurrentStatement();
 

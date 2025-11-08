@@ -29,7 +29,8 @@ class UpdateBuilderTest {
     void singleSet() {
         String result = new UpdateBuilder(renderer, "users")
                 .set("name", "John")
-                .where("id")
+                .where()
+                .column("id")
                 .eq(1)
                 .build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"name\" = 'John' WHERE \"users\".\"id\" = 1");
@@ -40,7 +41,8 @@ class UpdateBuilderTest {
         String result = new UpdateBuilder(renderer, "users")
                 .set("name", "John")
                 .set("age", 30)
-                .where("id")
+                .where()
+                .column("id")
                 .eq(1)
                 .build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"name\" = 'John', \"age\" = 30 WHERE \"users\".\"id\" = 1");
@@ -57,7 +59,8 @@ class UpdateBuilderTest {
     void whereWithNumber() {
         String result = new UpdateBuilder(renderer, "users")
                 .set("age", 25)
-                .where("id")
+                .where()
+                .column("id")
                 .eq(42)
                 .build();
         assertThat(result).isEqualTo("UPDATE \"users\" SET \"age\" = 25 WHERE \"users\".\"id\" = 42");
@@ -67,9 +70,11 @@ class UpdateBuilderTest {
     void and() {
         String result = new UpdateBuilder(renderer, "users")
                 .set("status", "inactive")
-                .where("age")
+                .where()
+                .column("age")
                 .lt(18)
-                .and("verified")
+                .and()
+                .column("verified")
                 .eq(false)
                 .build();
 
@@ -82,9 +87,11 @@ class UpdateBuilderTest {
     void or() {
         String result = new UpdateBuilder(renderer, "users")
                 .set("status", "deleted")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("banned")
-                .or("status")
+                .or()
+                .column("status")
                 .eq("inactive")
                 .build();
 
@@ -97,11 +104,14 @@ class UpdateBuilderTest {
     void andOr() {
         String result = new UpdateBuilder(renderer, "users")
                 .set("status", "inactive")
-                .where("age")
+                .where()
+                .column("age")
                 .lt(18)
-                .and("verified")
+                .and()
+                .column("verified")
                 .eq(false)
-                .or("deleted_at")
+                .or()
+                .column("deleted_at")
                 .isNotNull()
                 .build();
 
@@ -114,7 +124,8 @@ class UpdateBuilderTest {
     void isNull() {
         String result = new UpdateBuilder(renderer, "users")
                 .set("deleted_at", (String) null)
-                .where("status")
+                .where()
+                .column("status")
                 .isNull()
                 .build();
 
@@ -125,7 +136,8 @@ class UpdateBuilderTest {
     void like() {
         String result = new UpdateBuilder(renderer, "users")
                 .set("status", "verified")
-                .where("email")
+                .where()
+                .column("email")
                 .like("%@example.com")
                 .build();
 
@@ -138,15 +150,20 @@ class UpdateBuilderTest {
     void allComparisonOperators() {
         String result = new UpdateBuilder(renderer, "products")
                 .set("discount", 20)
-                .where("price")
+                .where()
+                .column("price")
                 .gt(100)
-                .and("stock")
+                .and()
+                .column("stock")
                 .lt(50)
-                .and("rating")
+                .and()
+                .column("rating")
                 .gte(4)
-                .and("views")
+                .and()
+                .column("views")
                 .lte(1000)
-                .and("category")
+                .and()
+                .column("category")
                 .ne("deprecated")
                 .build();
 
@@ -171,8 +188,11 @@ class UpdateBuilderTest {
 
     @Test
     void buildWithoutSetThrowsException() {
-        assertThatThrownBy(() ->
-                        new UpdateBuilder(renderer, "users").where("id").eq(1).build())
+        assertThatThrownBy(() -> new UpdateBuilder(renderer, "users")
+                        .where()
+                        .column("id")
+                        .eq(1)
+                        .build())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("At least one SET clause must be specified");
     }

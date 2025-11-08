@@ -35,7 +35,6 @@ import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.dsl.HavingConditionBuilder;
 import lan.tlab.r4j.sql.dsl.LogicalCombinator;
 import lan.tlab.r4j.sql.dsl.SupportsWhere;
-import lan.tlab.r4j.sql.dsl.WhereConditionBuilder;
 import lan.tlab.r4j.sql.dsl.util.ColumnReferenceUtil;
 
 // TODO: Add support for SELECT AggregateCalls, subqueries, and other SQL features as needed.
@@ -237,11 +236,13 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return this;
     }
 
-    public WhereConditionBuilder<SelectBuilder> where(String column) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        return new WhereConditionBuilder<>(this, column, LogicalCombinator.AND);
+    /**
+     * Start building a WHERE clause with support for both regular columns and JSON functions.
+     *
+     * @return a WHERE builder
+     */
+    public lan.tlab.r4j.sql.dsl.WhereBuilder<SelectBuilder> where() {
+        return new lan.tlab.r4j.sql.dsl.WhereBuilder<>(this, lan.tlab.r4j.sql.dsl.LogicalCombinator.AND);
     }
 
     public SelectBuilder groupBy(String... columns) {
@@ -303,12 +304,22 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         });
     }
 
-    public WhereConditionBuilder<SelectBuilder> and(String column) {
-        return new WhereConditionBuilder<>(this, column, LogicalCombinator.AND);
+    /**
+     * Continue building WHERE clause with AND combinator.
+     *
+     * @return a WHERE builder with AND combinator
+     */
+    public lan.tlab.r4j.sql.dsl.WhereBuilder<SelectBuilder> and() {
+        return new lan.tlab.r4j.sql.dsl.WhereBuilder<>(this, lan.tlab.r4j.sql.dsl.LogicalCombinator.AND);
     }
 
-    public WhereConditionBuilder<SelectBuilder> or(String column) {
-        return new WhereConditionBuilder<>(this, column, LogicalCombinator.OR);
+    /**
+     * Continue building WHERE clause with OR combinator.
+     *
+     * @return a WHERE builder with OR combinator
+     */
+    public lan.tlab.r4j.sql.dsl.WhereBuilder<SelectBuilder> or() {
+        return new lan.tlab.r4j.sql.dsl.WhereBuilder<>(this, lan.tlab.r4j.sql.dsl.LogicalCombinator.OR);
     }
 
     // Functional WHERE updater
