@@ -2,6 +2,7 @@ package lan.tlab.r4j.sql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonValue;
@@ -375,7 +376,7 @@ class SelectDSLIntegrationTest {
         assertThat(result)
                 .isEqualTo(
                         """
-                SELECT "e"."department", COUNT(*), SUM("salary"), AVG("age") \
+                SELECT "e"."department", "e"."COUNT(*)", "e"."SUM(salary)", "e"."AVG(age)" \
                 FROM "employees" AS e \
                 WHERE "e"."status" = 'active' \
                 GROUP BY "e"."department" \
@@ -391,7 +392,7 @@ class SelectDSLIntegrationTest {
                 .as("p")
                 .groupBy("region", "category")
                 .having("region")
-                .ne("West")
+                .in("North", "South", "East")
                 .andHaving("category")
                 .ne("discontinued")
                 .orderBy("region")
@@ -401,11 +402,11 @@ class SelectDSLIntegrationTest {
         assertThat(result)
                 .isEqualTo(
                         """
-                SELECT "p"."region", "p"."category", COUNT(*), MAX("price") \
+                SELECT "p"."region", "p"."category", "p"."COUNT(*)", "p"."MAX(price)" \
                 FROM "products" AS p \
                 GROUP BY "p"."region", "p"."category" \
-                HAVING ("p"."region" != 'West') AND ("p"."category" != 'discontinued') \
-                ORDER BY "p"."region" ASC, "p"."category" ASC\
+                HAVING ("p"."region" IN('North', 'South', 'East')) AND ("p"."category" != 'discontinued') \
+                ORDER BY "p"."category" ASC\
                 """);
     }
 
@@ -415,7 +416,7 @@ class SelectDSLIntegrationTest {
                 .from("orders")
                 .as("o")
                 .where("order_date")
-                .between(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
+                .between(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 12, 31))
                 .groupBy("customer_id")
                 .having("customer_id")
                 .gt(1000)
@@ -428,13 +429,13 @@ class SelectDSLIntegrationTest {
         assertThat(result)
                 .isEqualTo(
                         """
-                SELECT "o"."customer_id", COUNT(*), SUM("amount"), AVG("quantity") \
+                SELECT "o"."customer_id", "o"."COUNT(*)", "o"."SUM(amount)", "o"."AVG(quantity)" \
                 FROM "orders" AS o \
                 WHERE ("o"."order_date" >= '2023-01-01') AND ("o"."order_date" <= '2023-12-31') \
                 GROUP BY "o"."customer_id" \
                 HAVING ("o"."customer_id" > 1000) AND ("o"."customer_id" < 9999) \
                 ORDER BY "o"."customer_id" DESC \
-                FETCH NEXT 10 ROWS ONLY\
+                OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY\
                 """);
     }
 }

@@ -1,6 +1,7 @@
 package lan.tlab.r4j.sql.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -310,5 +311,123 @@ class WhereConditionBuilderTest {
 
         // Verify that column references use the alias
         assertThat(sql).contains("\"u\".\"name\"");
+    }
+
+    @Test
+    void inOperatorWithStrings() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where("status")
+                .in("active", "pending", "approved")
+                .build();
+
+        assertThat(sql).contains("WHERE").contains("\"users\".\"status\" IN('active', 'pending', 'approved')");
+    }
+
+    @Test
+    void inOperatorWithNumbers() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("orders")
+                .where("customer_id")
+                .in(100, 200, 300, 400)
+                .build();
+
+        assertThat(sql).contains("WHERE").contains("\"orders\".\"customer_id\" IN(100, 200, 300, 400)");
+    }
+
+    @Test
+    void inOperatorWithBooleans() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where("active")
+                .in(true, false)
+                .build();
+
+        assertThat(sql).contains("WHERE").contains("\"users\".\"active\" IN(true, false)");
+    }
+
+    @Test
+    void inOperatorWithDates() {
+        LocalDate date1 = LocalDate.of(2023, 1, 1);
+        LocalDate date2 = LocalDate.of(2023, 6, 1);
+        LocalDate date3 = LocalDate.of(2023, 12, 31);
+
+        String sql = new SelectBuilder(renderer, "*")
+                .from("events")
+                .where("event_date")
+                .in(date1, date2, date3)
+                .build();
+
+        assertThat(sql)
+                .contains("WHERE")
+                .contains("\"events\".\"event_date\" IN('2023-01-01', '2023-06-01', '2023-12-31')");
+    }
+
+    @Test
+    void inOperatorWithDateTimes() {
+        LocalDateTime dt1 = LocalDateTime.of(2023, 1, 1, 10, 0);
+        LocalDateTime dt2 = LocalDateTime.of(2023, 6, 1, 15, 30);
+
+        String sql = new SelectBuilder(renderer, "*")
+                .from("logs")
+                .where("created_at")
+                .in(dt1, dt2)
+                .build();
+
+        assertThat(sql).contains("WHERE").contains("\"logs\".\"created_at\" IN(");
+    }
+
+    @Test
+    void inOperatorWithAndCondition() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("products")
+                .where("category")
+                .in("electronics", "books")
+                .and("price")
+                .gt(50)
+                .build();
+
+        assertThat(sql)
+                .contains("WHERE")
+                .contains("\"products\".\"category\" IN('electronics', 'books')")
+                .contains("AND")
+                .contains("\"products\".\"price\" > 50");
+    }
+
+    @Test
+    void inOperatorWithOrCondition() {
+        String sql = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where("role")
+                .in("admin", "moderator")
+                .or("status")
+                .eq("verified")
+                .build();
+
+        assertThat(sql)
+                .contains("WHERE")
+                .contains("\"users\".\"role\" IN('admin', 'moderator')")
+                .contains("OR")
+                .contains("\"users\".\"status\" = 'verified'");
+    }
+
+    @Test
+    void inOperatorEmptyValues_throwsException() {
+        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+                        .from("users")
+                        .where("status")
+                        .in(new String[0]))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("At least one value must be provided for IN clause");
+    }
+
+    @Test
+    void inOperatorNullValues_throwsException() {
+        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+                        .from("users")
+                        .where("status")
+                        .in((String[]) null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("At least one value must be provided for IN clause");
     }
 }
