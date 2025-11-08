@@ -358,4 +358,83 @@ class SelectDSLIntegrationTest {
                 ORDER BY "d"."budget" DESC\
                 """);
     }
+
+    @Test
+    void groupByWithMultipleAggregationsAndHaving() {
+        String result = dsl.select("department", "COUNT(*)", "SUM(salary)", "AVG(age)")
+                .from("employees")
+                .as("e")
+                .where("status")
+                .eq("active")
+                .groupBy("department")
+                .having("department")
+                .like("Engineering%")
+                .orderBy("department")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "e"."department", COUNT(*), SUM("salary"), AVG("age") \
+                FROM "employees" AS e \
+                WHERE "e"."status" = 'active' \
+                GROUP BY "e"."department" \
+                HAVING "e"."department" LIKE 'Engineering%' \
+                ORDER BY "e"."department" ASC\
+                """);
+    }
+
+    @Test
+    void groupByMultipleColumnsWithHavingComplexConditions() {
+        String result = dsl.select("region", "category", "COUNT(*)", "MAX(price)")
+                .from("products")
+                .as("p")
+                .groupBy("region", "category")
+                .having("region")
+                .ne("West")
+                .andHaving("category")
+                .ne("discontinued")
+                .orderBy("region")
+                .orderBy("category")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "p"."region", "p"."category", COUNT(*), MAX("price") \
+                FROM "products" AS p \
+                GROUP BY "p"."region", "p"."category" \
+                HAVING ("p"."region" != 'West') AND ("p"."category" != 'discontinued') \
+                ORDER BY "p"."region" ASC, "p"."category" ASC\
+                """);
+    }
+
+    @Test
+    void groupByWithWhereHavingOrderByFetch() {
+        String result = dsl.select("customer_id", "COUNT(*)", "SUM(amount)", "AVG(quantity)")
+                .from("orders")
+                .as("o")
+                .where("order_date")
+                .between(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
+                .groupBy("customer_id")
+                .having("customer_id")
+                .gt(1000)
+                .andHaving("customer_id")
+                .lt(9999)
+                .orderByDesc("customer_id")
+                .fetch(10)
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "o"."customer_id", COUNT(*), SUM("amount"), AVG("quantity") \
+                FROM "orders" AS o \
+                WHERE ("o"."order_date" >= '2023-01-01') AND ("o"."order_date" <= '2023-12-31') \
+                GROUP BY "o"."customer_id" \
+                HAVING ("o"."customer_id" > 1000) AND ("o"."customer_id" < 9999) \
+                ORDER BY "o"."customer_id" DESC \
+                FETCH NEXT 10 ROWS ONLY\
+                """);
+    }
 }
