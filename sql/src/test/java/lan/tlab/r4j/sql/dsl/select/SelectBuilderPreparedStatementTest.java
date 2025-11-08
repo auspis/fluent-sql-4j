@@ -20,8 +20,11 @@ class SelectBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementRequiresConnection() {
-        SelectBuilder builder =
-                new SelectBuilder(renderer, "*").from("users").where("age").gt(20);
+        SelectBuilder builder = new SelectBuilder(renderer, "*")
+                .from("users")
+                .where()
+                .column("age")
+                .gt(20);
 
         assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(Exception.class);
     }
@@ -30,9 +33,11 @@ class SelectBuilderPreparedStatementTest {
     void buildPreparedStatementCompilesWithoutError() {
         SelectBuilder builder = new SelectBuilder(renderer, "name", "email")
                 .from("users")
-                .where("age")
+                .where()
+                .column("age")
                 .gte(18)
-                .and("status")
+                .and()
+                .column("status")
                 .eq("active");
 
         assertThat(builder).isNotNull();
@@ -49,7 +54,8 @@ class SelectBuilderPreparedStatementTest {
                 .innerJoin("orders")
                 .as("o")
                 .on("u.id", "o.user_id")
-                .where("status")
+                .where()
+                .column("status")
                 .eq("active");
 
         assertThat(builder).isNotNull();
