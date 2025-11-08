@@ -256,6 +256,77 @@ class SelectDSLIntegrationTest {
     }
 
     @Test
+    void windowFunctionNtileWithFluentApi() {
+        String result = dsl.select()
+                .column("employees", "name")
+                .column("employees", "salary")
+                .ntile(4)
+                .orderByDesc("employees", "salary")
+                .as("quartile")
+                .from("employees")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "employees"."name", "employees"."salary", \
+                NTILE(4) OVER (ORDER BY "employees"."salary" DESC) AS quartile \
+                FROM "employees"\
+                """);
+    }
+
+    @Test
+    void windowFunctionLeadWithFluentApi() {
+        String result = dsl.select()
+                .column("sales", "sale_date")
+                .lead("sales", "amount", 1)
+                .orderByAsc("sales", "sale_date")
+                .as("next_amount")
+                .column("sales", "amount")
+                .from("sales")
+                .where()
+                .column("year")
+                .eq(2024)
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "sales"."sale_date", \
+                LEAD("sales"."amount", 1) OVER (ORDER BY "sales"."sale_date" ASC) AS next_amount, "sales"."amount" \
+                FROM "sales" \
+                WHERE "sales"."year" = 2024\
+                """);
+    }
+
+    @Test
+    void windowFunctionWithComplexPartitioningAndOrdering() {
+        String result = dsl.select()
+                .column("employees", "name")
+                .column("employees", "department")
+                .column("employees", "salary")
+                .rowNumber()
+                .partitionBy("employees", "department")
+                .orderByDesc("employees", "salary")
+                .as("dept_rank")
+                .rank()
+                .partitionBy("employees", "department")
+                .orderByDesc("employees", "salary")
+                .as("dept_rank_with_gaps")
+                .from("employees")
+                .build();
+
+        assertThat(result)
+                .isEqualTo(
+                        """
+                SELECT "employees"."name", "employees"."department", "employees"."salary", \
+                ROW_NUMBER() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_rank, \
+                RANK() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_rank_with_gaps \
+                FROM "employees"\
+                """);
+    }
+
+    @Test
     void innerJoinWithMultipleConditions() {
         String result = dsl.select("name", "email", "created_at")
                 .from("users")

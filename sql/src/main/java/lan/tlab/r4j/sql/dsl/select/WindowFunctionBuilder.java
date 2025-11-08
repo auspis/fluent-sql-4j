@@ -200,6 +200,39 @@ public class WindowFunctionBuilder {
     }
 
     /**
+     * Adds a regular column projection and finalizes the current window function without an alias.
+     * <p>
+     * This allows mixing window functions and regular columns in the SELECT clause.
+     * <p>
+     * Example:
+     * <pre>{@code
+     * dsl.select()
+     *     .column("name")
+     *     .rowNumber().partitionBy("dept").column("salary")  // finalize window function
+     *     .from("employees")
+     * }</pre>
+     *
+     * @param column the column name to add
+     * @return SelectProjectionBuilder for continued query building
+     */
+    public SelectProjectionBuilder column(String column) {
+        finalizeCurrentWindowFunction();
+        return projectionBuilder.column(column);
+    }
+
+    /**
+     * Adds a regular column projection with table reference and finalizes the current window function.
+     *
+     * @param table the table name
+     * @param column the column name to add
+     * @return SelectProjectionBuilder for continued query building
+     */
+    public SelectProjectionBuilder column(String table, String column) {
+        finalizeCurrentWindowFunction();
+        return projectionBuilder.column(table, column);
+    }
+
+    /**
      * Finalizes the window function with an alias and returns to the projection builder.
      *
      * @param alias the alias for this window function
@@ -208,6 +241,15 @@ public class WindowFunctionBuilder {
     public SelectProjectionBuilder as(String alias) {
         WindowFunction windowFunction = buildWindowFunction();
         return projectionBuilder.expression(windowFunction, alias);
+    }
+
+    /**
+     * Finalizes the current window function without an alias.
+     * This is used internally when switching to another projection type.
+     */
+    private void finalizeCurrentWindowFunction() {
+        WindowFunction windowFunction = buildWindowFunction();
+        projectionBuilder.expression(windowFunction);
     }
 
     /**
