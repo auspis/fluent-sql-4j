@@ -3,6 +3,8 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.DSL;
+import lan.tlab.r4j.sql.dsl.mysql.MysqlDSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.clause.MySqlFetchRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MySqlConcatRenderStrategy;
@@ -97,16 +99,16 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.M
  * <b>ServiceLoader Discovery:</b>
  * <p>
  * This plugin is automatically discovered through Java's {@link java.util.ServiceLoader}
- * mechanism via {@link MySQLDialectPluginProvider}. The provider is registered in
+ * mechanism via {@link MysqlDialectPluginProvider}. The provider is registered in
  * {@code META-INF/services/lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider}.
  *
  * @see SqlDialectPlugin
- * @see MySQLDialectPluginProvider
+ * @see MysqlDialectPluginProvider
  * @see <a href="https://dev.mysql.com/doc/">MySQL Documentation</a>
  * @see <a href="https://dev.mysql.com/doc/refman/8.0/en/">MySQL 8.0 Reference Manual</a>
  * @since 1.0
  */
-public final class MySQLDialectPlugin {
+public final class MysqlDialectPlugin {
 
     /**
      * The canonical name for the MySQL dialect.
@@ -130,7 +132,7 @@ public final class MySQLDialectPlugin {
     public static final String DIALECT_VERSION = "^8.0.0";
 
     private static final SqlDialectPlugin INSTANCE =
-            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, MySQLDialectPlugin::createMySqlDSL);
+            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, MysqlDialectPlugin::createMySqlDSL);
 
     /**
      * Private constructor to prevent instantiation.
@@ -138,7 +140,7 @@ public final class MySQLDialectPlugin {
      * This class follows the singleton pattern. Use {@link #instance()} to obtain
      * the plugin instance.
      */
-    private MySQLDialectPlugin() {
+    private MysqlDialectPlugin() {
         // Utility class - prevent instantiation
     }
 
@@ -179,14 +181,22 @@ public final class MySQLDialectPlugin {
     /**
      * Creates a MySQL-specific DSL instance.
      * <p>
-     * Currently returns the base {@link lan.tlab.r4j.sql.dsl.DSL} class configured with
-     * the MySQL renderer. In future versions, this will return {@code MySQLDSL} with
-     * MySQL-specific custom functions like GROUP_CONCAT, IF, DATE_FORMAT, etc.
+     * Returns a {@link MysqlDSL} instance configured with
+     * the MySQL renderer. This DSL provides MySQL-specific custom functions like
+     * {@code GROUP_CONCAT}, {@code IF}, {@code DATE_FORMAT}, {@code NOW()}, etc.
+     * <p>
+     * <b>Example usage:</b>
+     * <pre>{@code
+     * MySQLDSL dsl = (MySQLDSL) MySQLDialectPlugin.instance().createDSL();
+     * String sql = dsl.select(
+     *     dsl.groupConcat("name", ", ").as("names")
+     * ).from("users").build();
+     * }</pre>
      *
-     * @return a new {@link lan.tlab.r4j.sql.dsl.DSL} instance configured for MySQL, never {@code null}
+     * @return a new {@link lan.tlab.r4j.sql.dsl.mysql.MysqlDSL} instance configured for MySQL, never {@code null}
      */
-    private static lan.tlab.r4j.sql.dsl.DSL createMySqlDSL() {
-        return new lan.tlab.r4j.sql.dsl.DSL(createMySqlRenderer());
+    private static DSL createMySqlDSL() {
+        return new MysqlDSL(createMySqlRenderer());
     }
 
     /**

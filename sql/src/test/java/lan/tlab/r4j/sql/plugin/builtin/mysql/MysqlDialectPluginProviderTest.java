@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import org.junit.jupiter.api.Test;
 
-class MySQLDialectPluginProviderTest {
+class MysqlDialectPluginProviderTest {
 
     @Test
     void shouldReturnMySQLDialectPlugin() {
-        MySQLDialectPluginProvider provider = new MySQLDialectPluginProvider();
+        MysqlDialectPluginProvider provider = new MysqlDialectPluginProvider();
         SqlDialectPlugin plugin = provider.get();
 
         assertThat(plugin).isNotNull();
@@ -19,9 +19,9 @@ class MySQLDialectPluginProviderTest {
 
     @Test
     void shouldReturnSameInstanceAsMySQLDialectPlugin() {
-        MySQLDialectPluginProvider provider = new MySQLDialectPluginProvider();
+        MysqlDialectPluginProvider provider = new MysqlDialectPluginProvider();
         SqlDialectPlugin pluginFromProvider = provider.get();
-        SqlDialectPlugin pluginFromFactory = MySQLDialectPlugin.instance();
+        SqlDialectPlugin pluginFromFactory = MysqlDialectPlugin.instance();
 
         assertThat(pluginFromProvider).isSameAs(pluginFromFactory);
     }
@@ -29,12 +29,12 @@ class MySQLDialectPluginProviderTest {
     @Test
     void shouldBeThreadSafe() throws InterruptedException {
         // Test that multiple providers return the same singleton instance
-        MySQLDialectPluginProvider[] providers = new MySQLDialectPluginProvider[5];
+        MysqlDialectPluginProvider[] providers = new MysqlDialectPluginProvider[5];
         SqlDialectPlugin[] plugins = new SqlDialectPlugin[5];
         Thread[] threads = new Thread[5];
 
         for (int i = 0; i < 5; i++) {
-            providers[i] = new MySQLDialectPluginProvider();
+            providers[i] = new MysqlDialectPluginProvider();
             int index = i;
             threads[i] = new Thread(() -> {
                 plugins[index] = providers[index].get();
@@ -55,7 +55,7 @@ class MySQLDialectPluginProviderTest {
 
     @Test
     void shouldImplementSqlDialectPluginProvider() {
-        MySQLDialectPluginProvider provider = new MySQLDialectPluginProvider();
+        MysqlDialectPluginProvider provider = new MysqlDialectPluginProvider();
 
         // Verify it implements the interface
         assertThat(provider).isInstanceOf(lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider.class);

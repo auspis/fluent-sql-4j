@@ -8,14 +8,14 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
 import org.junit.jupiter.api.Test;
 
-class MySQLDialectPluginServiceLoaderTest {
+class MysqlDialectPluginServiceLoaderTest {
 
     @Test
     void shouldBeDiscoverableViaServiceLoader() {
         ServiceLoader<SqlDialectPluginProvider> serviceLoader = ServiceLoader.load(SqlDialectPluginProvider.class);
 
         boolean found = StreamSupport.stream(serviceLoader.spliterator(), false)
-                .anyMatch(provider -> provider instanceof MySQLDialectPluginProvider);
+                .anyMatch(provider -> provider instanceof MysqlDialectPluginProvider);
 
         assertThat(found).isTrue();
     }
@@ -25,7 +25,7 @@ class MySQLDialectPluginServiceLoaderTest {
         ServiceLoader<SqlDialectPluginProvider> serviceLoader = ServiceLoader.load(SqlDialectPluginProvider.class);
 
         SqlDialectPlugin mysqlPlugin = StreamSupport.stream(serviceLoader.spliterator(), false)
-                .filter(provider -> provider instanceof MySQLDialectPluginProvider)
+                .filter(provider -> provider instanceof MysqlDialectPluginProvider)
                 .map(SqlDialectPluginProvider::get)
                 .findFirst()
                 .orElse(null);
@@ -40,12 +40,12 @@ class MySQLDialectPluginServiceLoaderTest {
         ServiceLoader<SqlDialectPluginProvider> serviceLoader = ServiceLoader.load(SqlDialectPluginProvider.class);
 
         SqlDialectPlugin plugin1 = StreamSupport.stream(serviceLoader.spliterator(), false)
-                .filter(provider -> provider instanceof MySQLDialectPluginProvider)
+                .filter(provider -> provider instanceof MysqlDialectPluginProvider)
                 .map(SqlDialectPluginProvider::get)
                 .findFirst()
                 .orElse(null);
 
-        SqlDialectPlugin plugin2 = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin2 = MysqlDialectPlugin.instance();
 
         assertThat(plugin1).isSameAs(plugin2);
     }
@@ -65,7 +65,7 @@ class MySQLDialectPluginServiceLoaderTest {
         ServiceLoader<SqlDialectPluginProvider> serviceLoader = ServiceLoader.load(SqlDialectPluginProvider.class);
 
         SqlDialectPlugin mysqlPlugin = StreamSupport.stream(serviceLoader.spliterator(), false)
-                .filter(provider -> provider instanceof MySQLDialectPluginProvider)
+                .filter(provider -> provider instanceof MysqlDialectPluginProvider)
                 .map(SqlDialectPluginProvider::get)
                 .findFirst()
                 .orElseThrow();
