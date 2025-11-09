@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.DSLRegistry;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.dsl.MysqlDSL;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -66,8 +66,8 @@ public class DSL {
         return new CreateTableBuilder(renderer, tableName);
     }
 
-    public SelectProjectionBuilder select() {
-        return new SelectProjectionBuilder(renderer);
+    public SelectProjectionBuilder<?> select() {
+        return new SelectProjectionBuilder<>(renderer);
     }
 
     public SelectBuilder select(String... columns) {
