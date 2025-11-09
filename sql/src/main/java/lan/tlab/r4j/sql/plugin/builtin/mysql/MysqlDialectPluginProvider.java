@@ -6,7 +6,7 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
 /**
  * Service provider for the MySQL dialect plugin.
  * <p>
- * This provider enables automatic discovery of the {@link MySQLDialectPlugin}
+ * This provider enables automatic discovery of the {@link MysqlDialectPlugin}
  * through Java's {@link java.util.ServiceLoader} mechanism. It is registered in
  * {@code META-INF/services/lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider}.
  * <p>
@@ -32,12 +32,12 @@ import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
  * This provider is stateless and thread-safe. The ServiceLoader framework may create
  * multiple instances, but since the provider is stateless, this has no adverse effects.
  *
- * @see MySQLDialectPlugin
+ * @see MysqlDialectPlugin
  * @see SqlDialectPluginProvider
  * @see java.util.ServiceLoader
  * @since 1.0
  */
-public final class MySQLDialectPluginProvider implements SqlDialectPluginProvider {
+public final class MysqlDialectPluginProvider implements SqlDialectPluginProvider {
 
     /**
      * Returns the MySQL dialect plugin instance.
@@ -49,6 +49,6 @@ public final class MySQLDialectPluginProvider implements SqlDialectPluginProvide
      */
     @Override
     public SqlDialectPlugin get() {
-        return MySQLDialectPlugin.instance();
+        return MysqlDialectPlugin.instance();
     }
 }

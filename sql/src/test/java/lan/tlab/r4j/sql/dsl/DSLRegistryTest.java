@@ -10,7 +10,7 @@ import lan.tlab.r4j.sql.functional.Result.Success;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.SqlTestPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,7 +101,7 @@ class DSLRegistryTest {
     void dslFor_withMySQL_shouldReturnMySQLConfiguredDSL() {
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 
-        Result<DSL> result = registry.dslFor(MySQLDialectPlugin.DIALECT_NAME, MySQLDialectPlugin.DIALECT_VERSION);
+        Result<DSL> result = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(Success.class);
         DSL dsl = result.orElseThrow();

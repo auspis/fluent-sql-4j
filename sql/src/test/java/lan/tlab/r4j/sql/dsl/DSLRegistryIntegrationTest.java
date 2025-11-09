@@ -3,7 +3,7 @@ package lan.tlab.r4j.sql.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.sql.functional.Result;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +71,7 @@ class DSLRegistryIntegrationTest {
 
     @Test
     void insertQuery_withMySQL_shouldGenerateCorrectSQL() {
-        DSL dsl = registry.dslFor(MySQLDialectPlugin.DIALECT_NAME, MySQLDialectPlugin.DIALECT_VERSION)
+        DSL dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
 
         String sql = dsl.insertInto("users")
@@ -105,7 +105,7 @@ class DSLRegistryIntegrationTest {
 
     @Test
     void deleteQuery_withMySQL_shouldGenerateCorrectSQL() {
-        DSL dsl = registry.dslFor(MySQLDialectPlugin.DIALECT_NAME, MySQLDialectPlugin.DIALECT_VERSION)
+        DSL dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
 
         String sql = dsl.deleteFrom("users")
