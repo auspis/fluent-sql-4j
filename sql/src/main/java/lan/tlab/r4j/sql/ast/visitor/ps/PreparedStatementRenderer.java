@@ -1,6 +1,7 @@
 package lan.tlab.r4j.sql.ast.visitor.ps;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Cast;
@@ -9,6 +10,7 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.NullScalarExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDate;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDateTime;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.DateArithmetic;
@@ -1014,5 +1016,21 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Override
     public PsDto visit(OverClause overClause, AstContext ctx) {
         return overClauseStrategy.handle(overClause, this, ctx);
+    }
+
+    @Override
+    public PsDto visit(CustomFunctionCall functionCall, AstContext ctx) {
+        List<Object> allParams = new java.util.ArrayList<>();
+
+        String args = functionCall.arguments().stream()
+                .map(arg -> {
+                    PsDto argDto = arg.accept(this, ctx);
+                    allParams.addAll(argDto.parameters());
+                    return argDto.sql();
+                })
+                .collect(Collectors.joining(", "));
+
+        String sql = functionCall.functionName() + "(" + args + ")";
+        return new PsDto(sql, allParams);
     }
 }

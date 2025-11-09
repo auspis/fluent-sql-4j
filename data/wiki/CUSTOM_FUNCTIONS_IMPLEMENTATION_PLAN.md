@@ -10,8 +10,8 @@ Last Updated: 2025-11-09
 |----|-------------------------------------------------|--------|----------------------------------------------------|
 | 1  | Create CustomFunctionCall AST node              | ✅ DONE | New generic node for dialect-specific functions    |
 | 2  | Add visit method to Visitor interface           | ✅ DONE | `T visit(CustomFunctionCall call, AstContext ctx)` |
-| 3  | Implement fallback rendering in SqlRenderer     | ⏳ TODO | Generic rendering for CustomFunctionCall           |
-| 4  | Implement fallback in PreparedStatementRenderer | ⏳ TODO | Generic PS rendering for CustomFunctionCall        |
+| 3  | Implement fallback rendering in SqlRenderer     | ✅ DONE | Generic rendering for CustomFunctionCall           |
+| 4  | Implement fallback in PreparedStatementRenderer | ✅ DONE | Generic PS rendering for CustomFunctionCall        |
 | 5  | Make DSL class non-final and extendible         | ⏳ TODO | Allow dialects to extend base DSL                  |
 | 6  | Update SqlDialectPlugin interface               | ⏳ TODO | Add `createDSL()` method                           |
 | 7  | Create MySQLDSL extension                       | ⏳ TODO | MySQL-specific DSL with custom functions           |
