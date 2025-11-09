@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.plugin.builtin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.Test;
@@ -34,22 +34,23 @@ class StandardSQLDialectPluginTest {
     }
 
     @Test
-    void shouldCreateValidRenderer() {
+    void shouldCreateValidDSL() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-        DialectRenderer renderer = plugin.createRenderer();
+        DSL dsl = plugin.createDSL();
 
-        assertThat(renderer).isNotNull();
+        assertThat(dsl).isNotNull();
+        assertThat(dsl.getRenderer()).isNotNull();
     }
 
     @Test
-    void shouldCreateNewRendererOnEachCall() {
+    void shouldCreateNewDSLOnEachCall() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
 
-        DialectRenderer renderer1 = plugin.createRenderer();
-        DialectRenderer renderer2 = plugin.createRenderer();
+        DSL dsl1 = plugin.createDSL();
+        DSL dsl2 = plugin.createDSL();
 
         // Verify that each call creates a new instance
-        assertThat(renderer1).isNotSameAs(renderer2);
+        assertThat(dsl1).isNotSameAs(dsl2);
     }
 
     @Test
@@ -65,14 +66,15 @@ class StandardSQLDialectPluginTest {
     }
 
     @Test
-    void shouldCreateRendererCompatibleWithStandardSql2008() {
+    void shouldCreateDSLCompatibleWithStandardSql2008() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-        DialectRenderer renderer = plugin.createRenderer();
+        DSL dsl = plugin.createDSL();
 
-        // Verify renderer is configured for standard SQL:2008
-        assertThat(renderer).isNotNull();
+        // Verify DSL is configured for standard SQL:2008
+        assertThat(dsl).isNotNull();
+        assertThat(dsl.getRenderer()).isNotNull();
         // The renderer should support standard SQL features
-        assertThat(renderer.toString()).isNotNull();
+        assertThat(dsl.getRenderer().toString()).isNotNull();
     }
 
     @Test
