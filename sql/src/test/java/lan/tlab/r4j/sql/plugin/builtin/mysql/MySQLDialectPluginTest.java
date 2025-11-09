@@ -2,7 +2,7 @@ package lan.tlab.r4j.sql.plugin.builtin.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import org.junit.jupiter.api.Test;
 
@@ -33,22 +33,23 @@ class MySQLDialectPluginTest {
     }
 
     @Test
-    void shouldCreateValidRenderer() {
+    void shouldCreateValidDSL() {
         SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-        DialectRenderer renderer = plugin.createRenderer();
+        DSL dsl = plugin.createDSL();
 
-        assertThat(renderer).isNotNull();
+        assertThat(dsl).isNotNull();
+        assertThat(dsl.getRenderer()).isNotNull();
     }
 
     @Test
-    void shouldCreateNewRendererOnEachCall() {
+    void shouldCreateNewDSLOnEachCall() {
         SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
 
-        DialectRenderer renderer1 = plugin.createRenderer();
-        DialectRenderer renderer2 = plugin.createRenderer();
+        DSL dsl1 = plugin.createDSL();
+        DSL dsl2 = plugin.createDSL();
 
         // Verify that each call creates a new instance
-        assertThat(renderer1).isNotSameAs(renderer2);
+        assertThat(dsl1).isNotSameAs(dsl2);
     }
 
     @Test
@@ -64,14 +65,15 @@ class MySQLDialectPluginTest {
     }
 
     @Test
-    void shouldCreateRendererCompatibleWithMySQL() {
+    void shouldCreateDSLCompatibleWithMySQL() {
         SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-        DialectRenderer renderer = plugin.createRenderer();
+        DSL dsl = plugin.createDSL();
 
-        // Verify renderer is configured for MySQL
-        assertThat(renderer).isNotNull();
+        // Verify DSL is configured for MySQL
+        assertThat(dsl).isNotNull();
+        assertThat(dsl.getRenderer()).isNotNull();
         // The renderer should support MySQL-specific features
-        assertThat(renderer.toString()).isNotNull();
+        assertThat(dsl.getRenderer().toString()).isNotNull();
     }
 
     @Test
