@@ -248,7 +248,7 @@ public final class SqlDialectPluginRegistry {
             logMultipleMatches(dialect, version, matchingPlugins);
         }
 
-        return new Success<>(matchingPlugins.get(0).createRenderer());
+        return new Success<>(matchingPlugins.get(0).createDSL().getRenderer());
     }
 
     /**

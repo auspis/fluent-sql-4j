@@ -19,7 +19,7 @@ public final class SqlTestPlugin {
      * Creates a plugin with custom name, version and renderer.
      */
     public static SqlDialectPlugin create(String dialectName, String dialectVersion, DialectRenderer renderer) {
-        return new SqlDialectPlugin(dialectName, dialectVersion, () -> renderer, () -> new DSL(renderer));
+        return new SqlDialectPlugin(dialectName, dialectVersion, () -> new DSL(renderer));
     }
 
     /**
