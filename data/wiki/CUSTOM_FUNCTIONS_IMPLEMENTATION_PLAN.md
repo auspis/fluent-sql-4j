@@ -23,7 +23,7 @@ Last Updated: 2025-11-09 18:00
 | 13 | Write unit tests for MySQLDSL                   | ✅ DONE | 26 tests covering GROUP_CONCAT builder             |
 | 14 | Write integration tests                         | ✅ DONE | 21 MySQL E2E tests, all passing                    |
 | 15 | Fix raw type warnings in builder classes        | ✅ DONE | Added generics to Json/Window function builders    |
-| 16 | Update documentation                            | ⏳ TODO | README with examples                               |
+| 16 | Update documentation                            | ✅ DONE | README with Standard/MySQL DSL sections + examples |
 
 **Legend:** ✅ DONE | 🚧 IN PROGRESS | ⏳ TODO | ⏸️ BLOCKED | ❌ CANCELLED
 
@@ -1219,9 +1219,9 @@ For each task, follow this process:
 
 ## 🔍 Current Progress
 
-**Last Task Completed:** Task 15 - Fix raw type warnings in builder classes  
-**Next Task:** Task 16 - Update documentation (README with examples)  
-**Blockers:** None
+**Last Task Completed:** Task 16 - Update documentation  
+**Next Task:** None - All tasks complete! 🎉  
+**Status:** Ready for commit and PR
 
 ### Completed Work Summary
 
@@ -1299,10 +1299,23 @@ For each task, follow this process:
 - `WindowFunctionBuilder.java` - Added generic type parameters
 - `SelectBuilderTest.java` - Fixed raw type warnings with diamond operator
 
+### Documentation Additions
+
+- ✅ **SQL DSL Overview**: Added section explaining Standard vs Dialect-Specific DSL
+- ✅ **Getting Started**: Code examples for both standard and MySQL DSL
+- ✅ **Standard SQL Examples**: SELECT with Window Functions and JSON Functions
+- ✅ **MySQL-Specific Examples**: GROUP_CONCAT with basic, advanced, and complex queries
+- ✅ **Extension Guide**: Complete guide on how to add custom dialects (PostgreSQL example)
+- ✅ **Architecture Overview**: Explained the three-component extension mechanism
+
 ### Next Steps
 
-Only documentation remains to be completed. All core functionality, tests, and type safety improvements are done. Ready to commit and create PR documentation.
+All tasks complete! The implementation is ready for:
+1. Final code review
+2. Git commit with comprehensive message
+3. Pull Request creation
+4. Merge to main branch
 
 ---
 
-_Last updated: 2025-11-09 18:00 - All implementation and testing complete_
+_Last updated: 2025-11-09 18:15 - All implementation, testing, and documentation complete! 🎉_
