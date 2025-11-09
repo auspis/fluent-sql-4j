@@ -152,9 +152,8 @@ public final class DSLRegistry {
             return new Result.Success<>(cachedDsl);
         }
 
-        // Not in cache, create new DSL and cache it
-        return pluginRegistry.getDialectRenderer(dialect, version).map(renderer -> {
-            DSL dsl = new DSL(renderer);
+        // Not in cache, get DSL from plugin and cache it
+        return pluginRegistry.getDsl(dialect, version).map(dsl -> {
             dslCache.put(cacheKey, dsl);
             return dsl;
         });

@@ -4,7 +4,7 @@ import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.oracle.OracleDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 
@@ -67,7 +67,7 @@ public final class TestDialectRendererFactory {
      * @throws IllegalArgumentException if the MySQL plugin is not available
      */
     public static SqlRenderer mysql() {
-        return REGISTRY.getDialectRenderer(MySQLDialectPlugin.DIALECT_NAME, MySQLDialectPlugin.DIALECT_VERSION)
+        return REGISTRY.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow()
                 .sqlRenderer();
     }
@@ -103,7 +103,7 @@ public final class TestDialectRendererFactory {
      * @throws IllegalArgumentException if the MySQL plugin is not available
      */
     public static DialectRenderer dialectRendererMysql() {
-        return REGISTRY.getDialectRenderer(MySQLDialectPlugin.DIALECT_NAME, MySQLDialectPlugin.DIALECT_VERSION)
+        return REGISTRY.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }
 

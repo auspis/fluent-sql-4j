@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.functional.Result.Failure;
 import lan.tlab.r4j.sql.functional.Result.Success;
@@ -275,6 +276,58 @@ public final class SqlDialectPluginRegistry {
      */
     public Result<PreparedStatementRenderer> getPsRenderer(String dialect, String version) {
         return getDialectRenderer(dialect, version).map(DialectRenderer::psRenderer);
+    }
+
+    /**
+     * Retrieves a {@link lan.tlab.r4j.sql.dsl.DSL} instance for the specified SQL dialect and version.
+     * <p>
+     * This method returns the DSL instance created by the plugin's {@code createDSL()} method.
+     * This allows dialect-specific DSL extensions (like {@link lan.tlab.r4j.sql.dsl.mysql.MySQLDSL})
+     * to be properly returned to callers.
+     * <p>
+     * The dialect name is matched case-insensitively. The registry finds all plugins
+     * registered for the given dialect and filters them by version compatibility.
+     * <p>
+     * Version matching strategy:
+     * <ul>
+     *   <li>If the requested version is SemVer-compatible, uses SemVer range matching</li>
+     *   <li>If the requested version is not SemVer-compatible, uses exact string matching</li>
+     * </ul>
+     * <p>
+     * If multiple plugins match the requested version, the first match is used and a warning
+     * is logged.
+     * <p>
+     * <b>Example:</b>
+     * <pre>{@code
+     * Result<DSL> result = registry.getDialect("mysql", "8.0.35");
+     * // Returns a MySQLDSL instance, not a base DSL
+     * }</pre>
+     *
+     * @param dialect the name of the SQL dialect, must not be {@code null}
+     * @param version the database version, may be {@code null} to match any version
+     * @return a result containing the DSL instance, or a failure if no matching plugin is found
+     */
+    public Result<DSL> getDsl(String dialect, String version) {
+        if (dialect == null) {
+            return new Failure<>("Dialect name must not be null");
+        }
+
+        List<SqlDialectPlugin> dialectPlugins =
+                plugins.getOrDefault(getNormalizedDialect(dialect), Collections.emptyList());
+
+        List<SqlDialectPlugin> matchingPlugins = findMatchingPlugins(dialectPlugins, version);
+
+        if (matchingPlugins.isEmpty()) {
+            String versionInfo = version != null ? " version '" + version + "'" : "";
+            return new Failure<>("No plugin found for dialect '" + dialect + "'" + versionInfo
+                    + ". Supported dialects: " + getSupportedDialects());
+        }
+
+        if (matchingPlugins.size() > 1) {
+            logMultipleMatches(dialect, version, matchingPlugins);
+        }
+
+        return new Success<>(matchingPlugins.get(0).createDSL());
     }
 
     /**
