@@ -26,10 +26,12 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.WrapperBehavi
  *     .from("products")
  *     .build();
  * }</pre>
+ *
+ * @param <PARENT> the type of the parent projection builder
  */
-public class JsonFunctionBuilder {
+public class JsonFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT>> {
 
-    private final SelectProjectionBuilder parent;
+    private final PARENT parent;
     private final ColumnReference jsonDocument;
     private final String path;
     private final JsonFunctionType functionType;
@@ -46,8 +48,7 @@ public class JsonFunctionBuilder {
         QUERY
     }
 
-    JsonFunctionBuilder(
-            SelectProjectionBuilder parent, String table, String column, String path, JsonFunctionType functionType) {
+    JsonFunctionBuilder(PARENT parent, String table, String column, String path, JsonFunctionType functionType) {
         this.parent = parent;
         this.jsonDocument = ColumnReference.of(table, column);
         this.path = path;
@@ -60,7 +61,7 @@ public class JsonFunctionBuilder {
      * @param type the SQL data type (e.g., "DECIMAL(10,2)", "VARCHAR(100)", "JSON")
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder returning(String type) {
+    public JsonFunctionBuilder<PARENT> returning(String type) {
         this.returningType = type;
         return this;
     }
@@ -71,7 +72,7 @@ public class JsonFunctionBuilder {
      *
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder withWrapper() {
+    public JsonFunctionBuilder<PARENT> withWrapper() {
         this.wrapperBehavior = WrapperBehavior.WITH_WRAPPER;
         return this;
     }
@@ -82,7 +83,7 @@ public class JsonFunctionBuilder {
      *
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder withConditionalWrapper() {
+    public JsonFunctionBuilder<PARENT> withConditionalWrapper() {
         this.wrapperBehavior = WrapperBehavior.WITH_CONDITIONAL_WRAPPER;
         return this;
     }
@@ -93,7 +94,7 @@ public class JsonFunctionBuilder {
      *
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder withoutWrapper() {
+    public JsonFunctionBuilder<PARENT> withoutWrapper() {
         this.wrapperBehavior = WrapperBehavior.WITHOUT_WRAPPER;
         return this;
     }
@@ -105,7 +106,7 @@ public class JsonFunctionBuilder {
      * @param defaultValue the default value as a string
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder defaultOnEmpty(String defaultValue) {
+    public JsonFunctionBuilder<PARENT> defaultOnEmpty(String defaultValue) {
         this.onEmptyBehavior = OnEmptyBehavior.defaultValue(defaultValue);
         return this;
     }
@@ -116,7 +117,7 @@ public class JsonFunctionBuilder {
      *
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder nullOnEmpty() {
+    public JsonFunctionBuilder<PARENT> nullOnEmpty() {
         this.onEmptyBehavior = OnEmptyBehavior.returnNull();
         return this;
     }
@@ -127,7 +128,7 @@ public class JsonFunctionBuilder {
      *
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder errorOnEmpty() {
+    public JsonFunctionBuilder<PARENT> errorOnEmpty() {
         this.onEmptyBehavior = OnEmptyBehavior.error();
         return this;
     }
@@ -138,7 +139,7 @@ public class JsonFunctionBuilder {
      *
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder nullOnError() {
+    public JsonFunctionBuilder<PARENT> nullOnError() {
         this.onErrorBehavior = BehaviorKind.NONE;
         return this;
     }
@@ -149,7 +150,7 @@ public class JsonFunctionBuilder {
      *
      * @return this builder for method chaining
      */
-    public JsonFunctionBuilder errorOnError() {
+    public JsonFunctionBuilder<PARENT> errorOnError() {
         this.onErrorBehavior = BehaviorKind.ERROR;
         return this;
     }
@@ -160,7 +161,7 @@ public class JsonFunctionBuilder {
      * @param alias the alias for this projection
      * @return the parent SelectProjectionBuilder for continued fluent API
      */
-    public SelectProjectionBuilder as(String alias) {
+    public PARENT as(String alias) {
         switch (functionType) {
             case EXISTS -> {
                 JsonExists jsonExists = new JsonExists(jsonDocument, Literal.of(path), onErrorBehavior);
