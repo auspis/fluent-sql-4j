@@ -338,6 +338,7 @@ class MySQLDialectPluginE2E {
         // Get renderer from registry
         DialectRenderer renderer =
                 registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
+        lan.tlab.r4j.sql.dsl.DSL dsl = new lan.tlab.r4j.sql.dsl.DSL(renderer);
 
         // Create source table with user updates
         try (var stmt = connection.createStatement()) {
@@ -365,12 +366,7 @@ class MySQLDialectPluginE2E {
         }
 
         // Build and execute MERGE statement using DSL
-        String mergeSql = lan.tlab
-                .r4j
-                .sql
-                .dsl
-                .DSL
-                .mergeInto(renderer, "users")
+        String mergeSql = dsl.mergeInto("users")
                 .as("tgt")
                 .using("users_updates", "src")
                 .on("tgt.id", "src.id")

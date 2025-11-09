@@ -92,9 +92,10 @@ class StandardSQLDialectPluginE2E {
         // Get renderer from registry
         Result<DialectRenderer> result = registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         DialectRenderer renderer = result.orElseThrow();
+        DSL dsl = new DSL(renderer);
 
         // Verify renderer works with real queries using the DSL
-        String sql = DSL.select(renderer, "name", "email").from("users").build();
+        String sql = dsl.select("name", "email").from("users").build();
         // DSL adds table references and quotes by default
         assertThat(sql).contains("name");
         assertThat(sql).contains("email");
@@ -102,7 +103,7 @@ class StandardSQLDialectPluginE2E {
 
         // Execute the query to verify it works with H2
         List<List<Object>> rows = ResultSetUtil.list(
-                DSL.select(renderer, "name", "email").from("users").buildPreparedStatement(connection),
+                dsl.select("name", "email").from("users").buildPreparedStatement(connection),
                 r -> List.of(r.getString("name"), r.getString("email")));
 
         assertThat(rows)
@@ -116,9 +117,10 @@ class StandardSQLDialectPluginE2E {
         // Get renderer from registry
         DialectRenderer renderer =
                 registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+        DSL dsl = new DSL(renderer);
 
         // Verify it generates standard SQL:2008 syntax for pagination using the DSL
-        String paginationSql = DSL.select(renderer, "name")
+        String paginationSql = dsl.select("name")
                 .from("users")
                 .orderBy("name")
                 .offset(5)
@@ -134,9 +136,10 @@ class StandardSQLDialectPluginE2E {
         // Get renderer from registry
         DialectRenderer renderer =
                 registry.getDialectRenderer("StandardSQL", "2008").orElseThrow();
+        DSL dsl = new DSL(renderer);
 
         // Test SELECT with WHERE using the custom renderer
-        String selectSql = DSL.select(renderer, "name", "age")
+        String selectSql = dsl.select("name", "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -146,7 +149,7 @@ class StandardSQLDialectPluginE2E {
         assertThat(selectSql).isNotEmpty();
 
         // Test UPDATE using the custom renderer
-        String updateSql = DSL.update(renderer, "users")
+        String updateSql = dsl.update("users")
                 .set("age", 31)
                 .where()
                 .column("name")
@@ -156,16 +159,13 @@ class StandardSQLDialectPluginE2E {
         assertThat(updateSql).contains("SET");
 
         // Test DELETE using the custom renderer
-        String deleteSql =
-                DSL.deleteFrom(renderer, "users").where().column("age").lt(18).build();
+        String deleteSql = dsl.deleteFrom("users").where().column("age").lt(18).build();
         assertThat(deleteSql).contains("DELETE");
         assertThat(deleteSql).contains("FROM");
 
         // Test INSERT using the custom renderer
-        String insertSql = DSL.insertInto(renderer, "users")
-                .set("name", "Test")
-                .set("age", 25)
-                .build();
+        String insertSql =
+                dsl.insertInto("users").set("name", "Test").set("age", 25).build();
         assertThat(insertSql).contains("INSERT");
         assertThat(insertSql).contains("INTO");
     }
@@ -201,6 +201,7 @@ class StandardSQLDialectPluginE2E {
         // Get renderer from registry
         DialectRenderer renderer =
                 registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+        DSL dsl = new DSL(renderer);
 
         // Create source table with user updates
         try (var stmt = connection.createStatement()) {
@@ -222,7 +223,7 @@ class StandardSQLDialectPluginE2E {
         }
 
         // Build and execute MERGE statement using DSL
-        String mergeSql = DSL.mergeInto(renderer, "users")
+        String mergeSql = dsl.mergeInto("users")
                 .as("tgt")
                 .using("users_updates", "src")
                 .on("tgt.id", "src.id")
@@ -246,7 +247,7 @@ class StandardSQLDialectPluginE2E {
 
         // Verify John Doe was updated
         List<List<Object>> johnDoe = ResultSetUtil.list(
-                DSL.select(renderer, "id", "name", "email", "age", "active")
+                dsl.select("id", "name", "email", "age", "active")
                         .from("users")
                         .where()
                         .column("id")
@@ -264,7 +265,7 @@ class StandardSQLDialectPluginE2E {
 
         // Verify new user was inserted
         List<List<Object>> newUser = ResultSetUtil.list(
-                DSL.select(renderer, "id", "name", "email", "age", "active")
+                dsl.select("id", "name", "email", "age", "active")
                         .from("users")
                         .where()
                         .column("id")
