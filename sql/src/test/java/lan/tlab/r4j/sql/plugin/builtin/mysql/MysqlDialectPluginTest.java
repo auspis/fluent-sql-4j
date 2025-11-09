@@ -120,7 +120,7 @@ class MysqlDialectPluginTest {
         DSL dsl = plugin.createDSL();
 
         // Verify it returns MySQLDSL, not base DSL
-        assertThat(dsl).isInstanceOf(lan.tlab.r4j.sql.dsl.mysql.MysqlDSL.class);
+        assertThat(dsl).isInstanceOf(lan.tlab.r4j.sql.plugin.builtin.mysql.dsl.MysqlDSL.class);
         assertThat(dsl.getRenderer()).isNotNull();
     }
 }

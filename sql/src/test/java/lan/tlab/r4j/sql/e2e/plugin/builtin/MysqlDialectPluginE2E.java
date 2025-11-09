@@ -57,6 +57,7 @@ class MysqlDialectPluginE2E {
 
         // Set up MySQL database for renderer functionality tests
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
+        // TODO: replace with TestDatabaseUtil
         createMySQLUsersTable(connection);
         insertMySQLSampleUsers(connection);
     }
