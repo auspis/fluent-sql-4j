@@ -4,12 +4,13 @@ import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.dsl.mysql.MysqlDSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.clause.MySqlFetchRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MySqlConcatRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MysqlCustomFunctionCallRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MysqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.statement.MySqlMergeStatementRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.dsl.MysqlDSL;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 
 /**
@@ -169,6 +170,7 @@ public final class MysqlDialectPlugin {
                 .currentDateTimeStrategy((functionCall1, sqlRenderer1, ctx1) -> "NOW()")
                 .dateArithmeticStrategy(new MysqlDateArithmeticRenderStrategy())
                 .concatStrategy(new MySqlConcatRenderStrategy())
+                .customFunctionCallStrategy(new MysqlCustomFunctionCallRenderStrategy())
                 .mergeStatementStrategy(new MySqlMergeStatementRenderStrategy())
                 .build();
 
