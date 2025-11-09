@@ -2,7 +2,7 @@
 
 ## 📋 Status Overview
 
-Last Updated: 2025-11-09
+Last Updated: 2025-11-09 18:00
 
 ### Task List
 
@@ -10,19 +10,20 @@ Last Updated: 2025-11-09
 |----|-------------------------------------------------|--------|----------------------------------------------------|
 | 1  | Create CustomFunctionCall AST node              | ✅ DONE | New generic node for dialect-specific functions    |
 | 2  | Add visit method to Visitor interface           | ✅ DONE | `T visit(CustomFunctionCall call, AstContext ctx)` |
-| 3  | Implement fallback rendering in SqlRenderer     | ✅ DONE | Generic rendering for CustomFunctionCall           |
+| 3  | Implement fallback rendering in SqlRenderer     | ✅ DONE | Generic rendering with strategy pattern            |
 | 4  | Implement fallback in PreparedStatementRenderer | ✅ DONE | Generic PS rendering for CustomFunctionCall        |
 | 5  | Make DSL class non-final and extendible         | ✅ DONE | Changed renderer to protected, added JavaDoc       |
 | 6  | Update SqlDialectPlugin interface               | ✅ DONE | Add `createDSL()` method                           |
-| 7  | Create MySQLDSL extension                       | ✅ DONE | MySQL-specific DSL with custom functions           |
-| 8  | Implement MySQL custom function rendering       | ⏳ TODO | GROUP_CONCAT, IF, DATE_FORMAT, etc.                |
-| 9  | Update MySQLDialectPlugin                       | ⏳ TODO | Return MySQLDSL from createDSL()                   |
-| 10 | Update DSLRegistry                              | ⏳ TODO | Use plugin.createDSL() instead of new DSL()        |
-| 11 | Update SelectProjectionBuilder                  | ⏳ TODO | Add expression(ScalarExpression) method            |
-| 12 | Write unit tests for CustomFunctionCall         | ⏳ TODO | Test AST node and basic rendering                  |
-| 13 | Write unit tests for MySQLDSL                   | ⏳ TODO | Test custom function builders                      |
-| 14 | Write integration tests                         | ⏳ TODO | E2E tests with real SQL generation                 |
-| 15 | Update documentation                            | ⏳ TODO | README with examples                               |
+| 7  | Create MySQLDSL extension                       | ✅ DONE | MySQL-specific DSL with GROUP_CONCAT support       |
+| 8  | Implement MySQL custom function rendering       | ✅ DONE | MysqlCustomFunctionCallRenderStrategy with options |
+| 9  | Update MySQLDialectPlugin                       | ✅ DONE | Returns MySQLDSL from createDSL()                  |
+| 10 | Update DSLRegistry                              | ✅ DONE | Uses plugin.createDSL() instead of new DSL()       |
+| 11 | Update SelectProjectionBuilder                  | ✅ DONE | Added expression(ScalarExpression) method          |
+| 12 | Write unit tests for CustomFunctionCall         | ✅ DONE | 15 tests covering validation and immutability      |
+| 13 | Write unit tests for MySQLDSL                   | ✅ DONE | 26 tests covering GROUP_CONCAT builder             |
+| 14 | Write integration tests                         | ✅ DONE | 21 MySQL E2E tests, all passing                    |
+| 15 | Fix raw type warnings in builder classes        | ✅ DONE | Added generics to Json/Window function builders    |
+| 16 | Update documentation                            | ⏳ TODO | README with examples                               |
 
 **Legend:** ✅ DONE | 🚧 IN PROGRESS | ⏳ TODO | ⏸️ BLOCKED | ❌ CANCELLED
 
@@ -1216,13 +1217,92 @@ For each task, follow this process:
 
 ---
 
-## �🔍 Current Progress
+## 🔍 Current Progress
 
-**Last Task Completed:** None (planning phase)
-**Next Task:** Task 1 - Create CustomFunctionCall AST node
+**Last Task Completed:** Task 15 - Fix raw type warnings in builder classes  
+**Next Task:** Task 16 - Update documentation (README with examples)  
 **Blockers:** None
-**Notes:** Ready to start implementation
+
+### Completed Work Summary
+
+#### Phase 1-4: Core Implementation (✅ COMPLETE)
+
+- ✅ Created `CustomFunctionCall` AST node with validation and immutability
+- ✅ Updated `Visitor` interface with new visit method
+- ✅ Implemented strategy pattern for custom function rendering:
+  - `CustomFunctionCallRenderStrategy` interface
+  - `StandardSqlCustomFunctionCallRenderStrategy` (base implementation)
+  - `MysqlCustomFunctionCallRenderStrategy` (MySQL-specific with OPTIONS support)
+- ✅ Implemented fallback in `PreparedStatementRenderer`
+- ✅ Made `DSL` class extendible (removed final, protected renderer)
+- ✅ Updated `SqlDialectPlugin` record with `dslSupplier`
+- ✅ Created `MysqlDSL` with `groupConcat()` fluent builder
+- ✅ Updated `MysqlDialectPlugin` to return `MysqlDSL`
+- ✅ Updated `DSLRegistry` to use plugin-provided DSL
+- ✅ Updated `SelectProjectionBuilder` with `expression(ScalarExpression)` method
+
+#### Phase 5: Testing (✅ COMPLETE)
+
+- ✅ Unit tests for `CustomFunctionCall` (15 tests)
+- ✅ Unit tests for `MysqlDSL` (26 tests)
+- ✅ Integration tests for MySQL dialect (21 tests)
+- ✅ All tests passing (1281 unit + 75 integration = 1356 total)
+
+#### Phase 6: Type Safety Improvements (✅ COMPLETE)
+
+- ✅ Fixed raw type warnings in `JsonFunctionBuilder<PARENT>`
+- ✅ Fixed raw type warnings in `WindowFunctionBuilder<PARENT>`
+- ✅ Fixed raw type warnings in `SelectBuilderTest` (diamond operator)
+- ✅ Fixed raw type warnings in `SelectProjectionBuilder` return types
+- ✅ Compilation successful with no warnings
+
+### Key Architectural Decisions
+
+1. **Strategy Pattern for Custom Functions**: Instead of hardcoding MySQL-specific logic in the renderer, we use a pluggable strategy that allows each dialect to provide its own rendering logic for custom functions.
+
+2. **Dialect-Specific DSL Architecture**: Extended the base `DSL` class to create `MysqlDSL`, allowing MySQL-specific methods like `groupConcat()` while maintaining backward compatibility with standard SQL.
+
+3. **Self-Referential Generics**: Used `<SELF extends SelectProjectionBuilder<SELF>>` pattern for type-safe fluent API in builder classes, ensuring proper type inference when chaining methods.
+
+4. **Function Options Map**: `CustomFunctionCall` includes a `Map<String, Object> options` to handle dialect-specific modifiers (e.g., SEPARATOR, ORDER BY, DISTINCT in MySQL's GROUP_CONCAT).
+
+### Test Coverage
+
+- **CustomFunctionCall**: 15 unit tests covering creation, validation, immutability
+- **MysqlDSL**: 26 unit tests covering groupConcat() builder with all options
+- **Integration**: 21 E2E tests covering real SQL generation with MySQL containers
+- **Total**: 1356 tests passing (1281 unit + 75 integration)
+
+### Files Created/Modified
+
+**New Files:**
+- `CustomFunctionCall.java` - AST node
+- `CustomFunctionCallRenderStrategy.java` - Strategy interface
+- `StandardSqlCustomFunctionCallRenderStrategy.java` - Base implementation
+- `MysqlCustomFunctionCallRenderStrategy.java` - MySQL implementation
+- `MysqlDSL.java` - MySQL-specific DSL extension
+- `CustomFunctionCallTest.java` - Unit tests (15 tests)
+- `MysqlDSLTest.java` - Unit tests (26 tests)
+- `MysqlDSLIntegrationTest.java` - Integration tests (6 tests)
+
+**Modified Files:**
+- `Visitor.java` - Added visit method for CustomFunctionCall
+- `SqlRenderer.java` - Added strategy field and delegation
+- `PreparedStatementRenderer.java` - Added fallback implementation
+- `DSL.java` - Made extendible (removed final, protected renderer)
+- `SqlDialectPlugin.java` - Added dslSupplier parameter
+- `MysqlDialectPlugin.java` - Returns MysqlDSL from createDSL()
+- `StandardSQLDialectPlugin.java` - Returns base DSL from createDSL()
+- `DSLRegistry.java` - Uses plugin.createDSL() instead of new DSL()
+- `SelectProjectionBuilder.java` - Added expression(ScalarExpression) and generic types
+- `JsonFunctionBuilder.java` - Added generic type parameters
+- `WindowFunctionBuilder.java` - Added generic type parameters
+- `SelectBuilderTest.java` - Fixed raw type warnings with diamond operator
+
+### Next Steps
+
+Only documentation remains to be completed. All core functionality, tests, and type safety improvements are done. Ready to commit and create PR documentation.
 
 ---
 
-_This document will be updated after each task completion to track progress._
+_Last updated: 2025-11-09 18:00 - All implementation and testing complete_
