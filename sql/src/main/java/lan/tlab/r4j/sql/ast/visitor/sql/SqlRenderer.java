@@ -1,5 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.sql;
 
+import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Cast;
@@ -8,6 +9,7 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.NullScalarExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDate;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDateTime;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.DateArithmetic;
@@ -1040,5 +1042,14 @@ public class SqlRenderer implements Visitor<String> {
     @Override
     public String visit(OverClause overClause, AstContext ctx) {
         return overClauseStrategy.render(overClause, this, ctx);
+    }
+
+    @Override
+    public String visit(CustomFunctionCall functionCall, AstContext ctx) {
+        String args = functionCall.arguments().stream()
+                .map(arg -> arg.accept(this, ctx))
+                .collect(Collectors.joining(", "));
+
+        return functionCall.functionName() + "(" + args + ")";
     }
 }
