@@ -8,8 +8,8 @@ Last Updated: 2025-11-09
 
 | #  |                      Task                       | Status |                       Notes                        |
 |----|-------------------------------------------------|--------|----------------------------------------------------|
-| 1  | Create CustomFunctionCall AST node              | ⏳ TODO | New generic node for dialect-specific functions    |
-| 2  | Add visit method to Visitor interface           | ⏳ TODO | `T visit(CustomFunctionCall call, AstContext ctx)` |
+| 1  | Create CustomFunctionCall AST node              | ✅ DONE | New generic node for dialect-specific functions    |
+| 2  | Add visit method to Visitor interface           | ✅ DONE | `T visit(CustomFunctionCall call, AstContext ctx)` |
 | 3  | Implement fallback rendering in SqlRenderer     | ⏳ TODO | Generic rendering for CustomFunctionCall           |
 | 4  | Implement fallback in PreparedStatementRenderer | ⏳ TODO | Generic PS rendering for CustomFunctionCall        |
 | 5  | Make DSL class non-final and extendible         | ⏳ TODO | Allow dialects to extend base DSL                  |
@@ -1140,6 +1140,13 @@ Each task is considered complete when:
 - Render strategies: See `MySqlConcatRenderStrategy.java`
 - DSL builders: See `SelectProjectionBuilder.java`
 - Tests: See `SelectDSLIntegrationTest.java`
+
+### Coding Style Guidelines
+
+- **JavaDoc for classes:** Required - Document purpose, usage, and examples for main classes
+- **JavaDoc for methods:** NOT required - Keep methods clean without JavaDoc unless absolutely necessary
+- **JavaDoc for public APIs:** Only if the method signature is not self-explanatory
+- **Follow project conventions:** See `.github/copilot-instructions.md` for full guidelines
 
 ---
 
