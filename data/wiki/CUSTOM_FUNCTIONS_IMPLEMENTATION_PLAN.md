@@ -12,7 +12,7 @@ Last Updated: 2025-11-09
 | 2  | Add visit method to Visitor interface           | ✅ DONE | `T visit(CustomFunctionCall call, AstContext ctx)` |
 | 3  | Implement fallback rendering in SqlRenderer     | ✅ DONE | Generic rendering for CustomFunctionCall           |
 | 4  | Implement fallback in PreparedStatementRenderer | ✅ DONE | Generic PS rendering for CustomFunctionCall        |
-| 5  | Make DSL class non-final and extendible         | ⏳ TODO | Allow dialects to extend base DSL                  |
+| 5  | Make DSL class non-final and extendible         | ✅ DONE | Changed renderer to protected, added JavaDoc       |
 | 6  | Update SqlDialectPlugin interface               | ⏳ TODO | Add `createDSL()` method                           |
 | 7  | Create MySQLDSL extension                       | ⏳ TODO | MySQL-specific DSL with custom functions           |
 | 8  | Implement MySQL custom function rendering       | ⏳ TODO | GROUP_CONCAT, IF, DATE_FORMAT, etc.                |
