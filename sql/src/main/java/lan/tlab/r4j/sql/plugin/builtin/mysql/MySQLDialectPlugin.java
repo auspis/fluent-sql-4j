@@ -129,8 +129,8 @@ public final class MySQLDialectPlugin {
      */
     public static final String DIALECT_VERSION = "^8.0.0";
 
-    private static final SqlDialectPlugin INSTANCE = new SqlDialectPlugin(
-            DIALECT_NAME, DIALECT_VERSION, MySQLDialectPlugin::createMySqlRenderer, MySQLDialectPlugin::createMySqlDSL);
+    private static final SqlDialectPlugin INSTANCE =
+            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, MySQLDialectPlugin::createMySqlDSL);
 
     /**
      * Private constructor to prevent instantiation.

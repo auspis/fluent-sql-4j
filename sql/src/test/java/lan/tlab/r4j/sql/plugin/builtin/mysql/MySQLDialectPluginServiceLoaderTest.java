@@ -70,7 +70,8 @@ class MySQLDialectPluginServiceLoaderTest {
                 .findFirst()
                 .orElseThrow();
 
-        // Verify the renderer can be created
-        assertThat(mysqlPlugin.createRenderer()).isNotNull();
+        // Verify the DSL can be created
+        assertThat(mysqlPlugin.createDSL()).isNotNull();
+        assertThat(mysqlPlugin.createDSL().getRenderer()).isNotNull();
     }
 }
