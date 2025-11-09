@@ -119,6 +119,16 @@ public final class TestDialectRendererFactory {
     }
 
     /**
+     * Creates a complete {@link DialectRenderer} (SQL + PreparedStatement) for PostgreSQL.
+     *
+     * @return DialectRenderer configured for PostgreSQL 15.x
+     * @throws IllegalArgumentException if the PostgreSQL plugin is not available
+     */
+    public static DialectRenderer dialectRendererPostgreSql() {
+        return REGISTRY.getDialectRenderer("PostgreSQL", "^15.0.0").orElseThrow();
+    }
+
+    /**
      * Creates a {@link lan.tlab.r4j.sql.dsl.DSL} instance configured for Standard SQL:2008.
      * <p>
      * This method provides a convenient way for tests to obtain a DSL instance
