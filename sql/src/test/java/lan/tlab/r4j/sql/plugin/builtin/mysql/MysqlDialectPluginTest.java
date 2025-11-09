@@ -6,35 +6,35 @@ import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import org.junit.jupiter.api.Test;
 
-class MySQLDialectPluginTest {
+class MysqlDialectPluginTest {
 
     @Test
     void shouldReturnSingletonInstance() {
-        SqlDialectPlugin instance1 = MySQLDialectPlugin.instance();
-        SqlDialectPlugin instance2 = MySQLDialectPlugin.instance();
+        SqlDialectPlugin instance1 = MysqlDialectPlugin.instance();
+        SqlDialectPlugin instance2 = MysqlDialectPlugin.instance();
 
         assertThat(instance1).isSameAs(instance2);
     }
 
     @Test
     void shouldHaveCorrectDialectName() {
-        SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
 
         assertThat(plugin.dialectName()).isEqualTo("MySQL");
-        assertThat(plugin.dialectName()).isEqualTo(MySQLDialectPlugin.DIALECT_NAME);
+        assertThat(plugin.dialectName()).isEqualTo(MysqlDialectPlugin.DIALECT_NAME);
     }
 
     @Test
     void shouldHaveCorrectDialectVersion() {
-        SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
 
         assertThat(plugin.dialectVersion()).isEqualTo("^8.0.0");
-        assertThat(plugin.dialectVersion()).isEqualTo(MySQLDialectPlugin.DIALECT_VERSION);
+        assertThat(plugin.dialectVersion()).isEqualTo(MysqlDialectPlugin.DIALECT_VERSION);
     }
 
     @Test
     void shouldCreateValidDSL() {
-        SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
         DSL dsl = plugin.createDSL();
 
         assertThat(dsl).isNotNull();
@@ -43,7 +43,7 @@ class MySQLDialectPluginTest {
 
     @Test
     void shouldCreateNewDSLOnEachCall() {
-        SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
 
         DSL dsl1 = plugin.createDSL();
         DSL dsl2 = plugin.createDSL();
@@ -54,19 +54,19 @@ class MySQLDialectPluginTest {
 
     @Test
     void shouldHaveNonNullDialectNameConstant() {
-        assertThat(MySQLDialectPlugin.DIALECT_NAME).isNotNull();
-        assertThat(MySQLDialectPlugin.DIALECT_NAME).isNotBlank();
+        assertThat(MysqlDialectPlugin.DIALECT_NAME).isNotNull();
+        assertThat(MysqlDialectPlugin.DIALECT_NAME).isNotBlank();
     }
 
     @Test
     void shouldHaveNonNullDialectVersionConstant() {
-        assertThat(MySQLDialectPlugin.DIALECT_VERSION).isNotNull();
-        assertThat(MySQLDialectPlugin.DIALECT_VERSION).isNotBlank();
+        assertThat(MysqlDialectPlugin.DIALECT_VERSION).isNotNull();
+        assertThat(MysqlDialectPlugin.DIALECT_VERSION).isNotBlank();
     }
 
     @Test
     void shouldCreateDSLCompatibleWithMySQL() {
-        SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
         DSL dsl = plugin.createDSL();
 
         // Verify DSL is configured for MySQL
@@ -78,7 +78,7 @@ class MySQLDialectPluginTest {
 
     @Test
     void shouldBeImmutable() {
-        SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
 
         // Plugin is a record, so it's immutable by design
         assertThat(plugin.dialectName()).isEqualTo("MySQL");
@@ -98,7 +98,7 @@ class MySQLDialectPluginTest {
         for (int i = 0; i < 10; i++) {
             int index = i;
             threads[i] = new Thread(() -> {
-                plugins[index] = MySQLDialectPlugin.instance();
+                plugins[index] = MysqlDialectPlugin.instance();
             });
             threads[i].start();
         }
@@ -112,5 +112,15 @@ class MySQLDialectPluginTest {
         for (SqlDialectPlugin plugin : plugins) {
             assertThat(plugin).isSameAs(firstPlugin);
         }
+    }
+
+    @Test
+    void shouldCreateMySQLDSL() {
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
+        DSL dsl = plugin.createDSL();
+
+        // Verify it returns MySQLDSL, not base DSL
+        assertThat(dsl).isInstanceOf(lan.tlab.r4j.sql.dsl.mysql.MysqlDSL.class);
+        assertThat(dsl.getRenderer()).isNotNull();
     }
 }
