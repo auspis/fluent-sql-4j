@@ -129,8 +129,8 @@ public final class MySQLDialectPlugin {
      */
     public static final String DIALECT_VERSION = "^8.0.0";
 
-    private static final SqlDialectPlugin INSTANCE =
-            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, MySQLDialectPlugin::createMySqlRenderer);
+    private static final SqlDialectPlugin INSTANCE = new SqlDialectPlugin(
+            DIALECT_NAME, DIALECT_VERSION, MySQLDialectPlugin::createMySqlRenderer, MySQLDialectPlugin::createMySqlDSL);
 
     /**
      * Private constructor to prevent instantiation.
@@ -174,6 +174,19 @@ public final class MySQLDialectPlugin {
                 PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
 
         return new DialectRenderer(sqlRenderer, psRenderer);
+    }
+
+    /**
+     * Creates a MySQL-specific DSL instance.
+     * <p>
+     * Currently returns the base {@link lan.tlab.r4j.sql.dsl.DSL} class configured with
+     * the MySQL renderer. In future versions, this will return {@code MySQLDSL} with
+     * MySQL-specific custom functions like GROUP_CONCAT, IF, DATE_FORMAT, etc.
+     *
+     * @return a new {@link lan.tlab.r4j.sql.dsl.DSL} instance configured for MySQL, never {@code null}
+     */
+    private static lan.tlab.r4j.sql.dsl.DSL createMySqlDSL() {
+        return new lan.tlab.r4j.sql.dsl.DSL(createMySqlRenderer());
     }
 
     /**
