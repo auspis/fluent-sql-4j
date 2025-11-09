@@ -3,6 +3,7 @@ package lan.tlab.r4j.sql.plugin;
 import java.util.Objects;
 import java.util.function.Supplier;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.sql.dsl.DSL;
 
 /**
  * Immutable record representing a SQL dialect plugin.
@@ -52,14 +53,20 @@ import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
  * @param dialectName the canonical name of the SQL dialect in lowercase (e.g., "mysql", "postgresql", "standardsql")
  * @param dialectVersion the version this plugin supports - either a SemVer range (e.g., "^8.0.0") or exact version string (e.g., "2008")
  * @param rendererSupplier a supplier that creates new {@link DialectRenderer} instances
+ * @param dslSupplier a supplier that creates new {@link DSL} instances for this dialect, may return the base DSL or a dialect-specific extension
  * @see SqlDialectPluginProvider
  * @see SqlDialectPluginRegistry
  * @see DialectRenderer
+ * @see DSL
  * @see <a href="https://semver.org/">Semantic Versioning</a>
  * @see <a href="https://github.com/npm/node-semver">NPM semver ranges</a>
  * @since 1.0
  */
-public record SqlDialectPlugin(String dialectName, String dialectVersion, Supplier<DialectRenderer> rendererSupplier) {
+public record SqlDialectPlugin(
+        String dialectName,
+        String dialectVersion,
+        Supplier<DialectRenderer> rendererSupplier,
+        Supplier<DSL> dslSupplier) {
 
     /**
      * Compact constructor with validation.
@@ -76,6 +83,7 @@ public record SqlDialectPlugin(String dialectName, String dialectVersion, Suppli
         Objects.requireNonNull(dialectName, "Dialect name must not be null");
         Objects.requireNonNull(dialectVersion, "Dialect version must not be null");
         Objects.requireNonNull(rendererSupplier, "Renderer supplier must not be null");
+        Objects.requireNonNull(dslSupplier, "DSL supplier must not be null");
 
         if (dialectVersion.isBlank()) {
             throw new IllegalArgumentException("Dialect version must not be blank in plugin '" + dialectName + "'");
@@ -97,5 +105,30 @@ public record SqlDialectPlugin(String dialectName, String dialectVersion, Suppli
      */
     public DialectRenderer createRenderer() {
         return rendererSupplier.get();
+    }
+
+    /**
+     * Creates a {@link DSL} instance configured for this SQL dialect.
+     * <p>
+     * The DSL provides a fluent, type-safe API for building SQL queries. This method
+     * returns either the base {@link DSL} class or a dialect-specific extension that
+     * provides additional custom functions (e.g., {@code MySQLDSL} with MySQL-specific
+     * functions like {@code GROUP_CONCAT}, {@code IF}, {@code DATE_FORMAT}).
+     * <p>
+     * <b>Example usage:</b>
+     * <pre>{@code
+     * SqlDialectPlugin plugin = registry.getPlugin("mysql", "8.0.35").orElseThrow();
+     * DSL dsl = plugin.createDSL();
+     * String sql = dsl.select("name").from("users").build();
+     * }</pre>
+     * <p>
+     * <b>Thread Safety:</b> The thread safety of the returned DSL depends on the
+     * {@code dslSupplier} implementation. It is recommended that the supplier creates
+     * a new instance on each invocation to ensure thread safety.
+     *
+     * @return a {@link DSL} instance for this dialect, never {@code null}
+     */
+    public DSL createDSL() {
+        return dslSupplier.get();
     }
 }
