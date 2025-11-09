@@ -11,7 +11,7 @@ import lan.tlab.r4j.sql.ast.dql.projection.Projection;
 import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 
-public class SelectProjectionBuilder {
+public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>> {
     private final DialectRenderer renderer;
     private final List<Projection> projections;
     private Projection pendingProjection;
@@ -22,95 +22,100 @@ public class SelectProjectionBuilder {
         this.pendingProjection = null;
     }
 
-    public SelectProjectionBuilder column(String column) {
+    @SuppressWarnings("unchecked")
+    protected SELF self() {
+        return (SELF) this;
+    }
+
+    public SELF column(String column) {
         return column("", column);
     }
 
-    public SelectProjectionBuilder column(String table, String column) {
+    public SELF column(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new ScalarExpressionProjection(ColumnReference.of(table, column));
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder expression(ScalarExpression expression) {
+    public SELF expression(ScalarExpression expression) {
         finalizePendingProjection();
         pendingProjection = new ScalarExpressionProjection(expression);
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder expression(ScalarExpression expression, String alias) {
+    public SELF expression(ScalarExpression expression, String alias) {
         finalizePendingProjection();
         pendingProjection = new ScalarExpressionProjection(expression, alias);
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder sum(String column) {
+    public SELF sum(String column) {
         return sum("", column);
     }
 
-    public SelectProjectionBuilder sum(String table, String column) {
+    public SELF sum(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new AggregateCallProjection(AggregateCall.sum(ColumnReference.of(table, column)));
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder avg(String column) {
+    public SELF avg(String column) {
         return avg("", column);
     }
 
-    public SelectProjectionBuilder avg(String table, String column) {
+    public SELF avg(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new AggregateCallProjection(AggregateCall.avg(ColumnReference.of(table, column)));
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder count(String column) {
+    public SELF count(String column) {
         return count("", column);
     }
 
-    public SelectProjectionBuilder count(String table, String column) {
+    public SELF count(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new AggregateCallProjection(AggregateCall.count(ColumnReference.of(table, column)));
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder countStar() {
+    public SELF countStar() {
         finalizePendingProjection();
         pendingProjection = new AggregateCallProjection(AggregateCall.countStar());
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder countDistinct(String column) {
+    public SELF countDistinct(String column) {
         return countDistinct("", column);
     }
 
-    public SelectProjectionBuilder countDistinct(String table, String column) {
+    public SELF countDistinct(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new AggregateCallProjection(AggregateCall.countDistinct(ColumnReference.of(table, column)));
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder max(String column) {
+    public SELF max(String column) {
         return max("", column);
     }
 
-    public SelectProjectionBuilder max(String table, String column) {
+    public SELF max(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new AggregateCallProjection(AggregateCall.max(ColumnReference.of(table, column)));
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder min(String column) {
+    public SELF min(String column) {
         return min("", column);
     }
 
-    public SelectProjectionBuilder min(String table, String column) {
+    public SELF min(String table, String column) {
         finalizePendingProjection();
         pendingProjection = new AggregateCallProjection(AggregateCall.min(ColumnReference.of(table, column)));
-        return this;
+        return self();
     }
 
-    public SelectProjectionBuilder as(String alias) {
+    public SELF as(String alias) {
         if (pendingProjection == null) {
             throw new IllegalStateException("No projection to alias. Call an aggregate or column method first.");
         }
@@ -122,7 +127,7 @@ public class SelectProjectionBuilder {
             pendingProjection = new ScalarExpressionProjection((ScalarExpression) scalarProj.expression(), alias);
         }
 
-        return this;
+        return self();
     }
 
     /**
@@ -399,7 +404,7 @@ public class SelectProjectionBuilder {
         return selectBuilder.from(tableName);
     }
 
-    private void finalizePendingProjection() {
+    protected void finalizePendingProjection() {
         if (pendingProjection != null) {
             projections.add(pendingProjection);
             pendingProjection = null;

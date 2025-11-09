@@ -1,6 +1,5 @@
 package lan.tlab.r4j.sql.ast.visitor.sql;
 
-import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Cast;
@@ -118,6 +117,7 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ComparisonRenderStra
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ConcatRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CurrentDateTimeRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CustomFunctionCallRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
 import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.ExtractDatePartRenderStrategy;
@@ -208,6 +208,7 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expressi
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlConcatRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCurrentDateTimeRenderStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlCustomFunctionCallRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlExceptRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlExtractDatePartRenderStrategy;
@@ -452,6 +453,10 @@ public class SqlRenderer implements Visitor<String> {
 
     @Default
     private final TrimRenderStrategy trimStrategy = new StandardSqlTrimRenderStrategy();
+
+    @Default
+    private final CustomFunctionCallRenderStrategy customFunctionCallStrategy =
+            new StandardSqlCustomFunctionCallRenderStrategy();
 
     @Default
     private final UnaryNumericRenderStrategy unaryNumericStrategy = new StandardSqlUnaryNumericRenderStrategy();
@@ -1046,10 +1051,6 @@ public class SqlRenderer implements Visitor<String> {
 
     @Override
     public String visit(CustomFunctionCall functionCall, AstContext ctx) {
-        String args = functionCall.arguments().stream()
-                .map(arg -> arg.accept(this, ctx))
-                .collect(Collectors.joining(", "));
-
-        return functionCall.functionName() + "(" + args + ")";
+        return customFunctionCallStrategy.render(functionCall, this, ctx);
     }
 }
