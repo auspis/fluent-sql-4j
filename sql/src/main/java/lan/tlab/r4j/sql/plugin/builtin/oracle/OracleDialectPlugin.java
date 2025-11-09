@@ -88,11 +88,8 @@ public final class OracleDialectPlugin {
      */
     public static final String DIALECT_VERSION = "^19.0.0";
 
-    private static final SqlDialectPlugin INSTANCE = new SqlDialectPlugin(
-            DIALECT_NAME,
-            DIALECT_VERSION,
-            OracleDialectPlugin::createOracleRenderer,
-            OracleDialectPlugin::createOracleDSL);
+    private static final SqlDialectPlugin INSTANCE =
+            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, OracleDialectPlugin::createOracleDSL);
 
     /**
      * Private constructor to prevent instantiation.
