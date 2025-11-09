@@ -30,10 +30,12 @@ import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
  *     .from("employees")
  * }</pre>
  *
+ * @param <PARENT> the type of the parent projection builder
  * @see WindowFunction
  * @see OverClause
  */
-public class WindowFunctionBuilder {
+// TODO: separate builders for different window functions (see fields and constructors)
+public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT>> {
 
     /**
      * Types of window functions supported by the builder.
@@ -47,7 +49,7 @@ public class WindowFunctionBuilder {
         LEAD
     }
 
-    private final SelectProjectionBuilder projectionBuilder;
+    private final PARENT projectionBuilder;
     private final String defaultTableReference;
     private final WindowFunctionType functionType;
 
@@ -64,8 +66,7 @@ public class WindowFunctionBuilder {
     /**
      * Creates a window function builder for ROW_NUMBER, RANK, or DENSE_RANK.
      */
-    WindowFunctionBuilder(
-            SelectProjectionBuilder projectionBuilder, String defaultTableReference, WindowFunctionType functionType) {
+    WindowFunctionBuilder(PARENT projectionBuilder, String defaultTableReference, WindowFunctionType functionType) {
         this.projectionBuilder = projectionBuilder;
         this.defaultTableReference = defaultTableReference;
         this.functionType = functionType;
@@ -75,10 +76,7 @@ public class WindowFunctionBuilder {
      * Creates a window function builder for NTILE.
      */
     WindowFunctionBuilder(
-            SelectProjectionBuilder projectionBuilder,
-            String defaultTableReference,
-            WindowFunctionType functionType,
-            int buckets) {
+            PARENT projectionBuilder, String defaultTableReference, WindowFunctionType functionType, int buckets) {
         this(projectionBuilder, defaultTableReference, functionType);
         this.ntileBuckets = buckets;
     }
@@ -87,7 +85,7 @@ public class WindowFunctionBuilder {
      * Creates a window function builder for LAG or LEAD.
      */
     WindowFunctionBuilder(
-            SelectProjectionBuilder projectionBuilder,
+            PARENT projectionBuilder,
             String defaultTableReference,
             WindowFunctionType functionType,
             String column,
@@ -101,7 +99,7 @@ public class WindowFunctionBuilder {
      * Creates a window function builder for LAG or LEAD with table reference.
      */
     WindowFunctionBuilder(
-            SelectProjectionBuilder projectionBuilder,
+            PARENT projectionBuilder,
             String defaultTableReference,
             WindowFunctionType functionType,
             String table,
@@ -118,7 +116,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to partition by
      * @return this builder for chaining
      */
-    public WindowFunctionBuilder partitionBy(String column) {
+    public WindowFunctionBuilder<PARENT> partitionBy(String column) {
         partitionByColumns.add(parseColumnReference(column));
         return this;
     }
@@ -130,7 +128,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to partition by
      * @return this builder for chaining
      */
-    public WindowFunctionBuilder partitionBy(String table, String column) {
+    public WindowFunctionBuilder<PARENT> partitionBy(String table, String column) {
         partitionByColumns.add(ColumnReference.of(table, column));
         return this;
     }
@@ -141,7 +139,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to order by
      * @return this builder for chaining
      */
-    public WindowFunctionBuilder orderByAsc(String column) {
+    public WindowFunctionBuilder<PARENT> orderByAsc(String column) {
         ColumnReference columnRef = parseColumnReference(column);
         orderByList.add(Sorting.asc(columnRef));
         return this;
@@ -153,7 +151,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to order by
      * @return this builder for chaining
      */
-    public WindowFunctionBuilder orderByDesc(String column) {
+    public WindowFunctionBuilder<PARENT> orderByDesc(String column) {
         ColumnReference columnRef = parseColumnReference(column);
         orderByList.add(Sorting.desc(columnRef));
         return this;
@@ -166,7 +164,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to order by
      * @return this builder for chaining
      */
-    public WindowFunctionBuilder orderByAsc(String table, String column) {
+    public WindowFunctionBuilder<PARENT> orderByAsc(String table, String column) {
         ColumnReference columnRef = ColumnReference.of(table, column);
         orderByList.add(Sorting.asc(columnRef));
         return this;
@@ -179,7 +177,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to order by
      * @return this builder for chaining
      */
-    public WindowFunctionBuilder orderByDesc(String table, String column) {
+    public WindowFunctionBuilder<PARENT> orderByDesc(String table, String column) {
         ColumnReference columnRef = ColumnReference.of(table, column);
         orderByList.add(Sorting.desc(columnRef));
         return this;
@@ -191,7 +189,7 @@ public class WindowFunctionBuilder {
      * @param defaultValue the default value as a ScalarExpression
      * @return this builder for chaining
      */
-    public WindowFunctionBuilder defaultValue(ScalarExpression defaultValue) {
+    public WindowFunctionBuilder<PARENT> defaultValue(ScalarExpression defaultValue) {
         if (functionType != WindowFunctionType.LAG && functionType != WindowFunctionType.LEAD) {
             throw new IllegalStateException("defaultValue() can only be used with LAG or LEAD functions");
         }
@@ -215,7 +213,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to add
      * @return SelectProjectionBuilder for continued query building
      */
-    public SelectProjectionBuilder column(String column) {
+    public PARENT column(String column) {
         finalizeCurrentWindowFunction();
         return projectionBuilder.column(column);
     }
@@ -227,7 +225,7 @@ public class WindowFunctionBuilder {
      * @param column the column name to add
      * @return SelectProjectionBuilder for continued query building
      */
-    public SelectProjectionBuilder column(String table, String column) {
+    public PARENT column(String table, String column) {
         finalizeCurrentWindowFunction();
         return projectionBuilder.column(table, column);
     }
@@ -238,7 +236,7 @@ public class WindowFunctionBuilder {
      * @param alias the alias for this window function
      * @return the SelectProjectionBuilder for continued query building
      */
-    public SelectProjectionBuilder as(String alias) {
+    public PARENT as(String alias) {
         WindowFunction windowFunction = buildWindowFunction();
         return projectionBuilder.expression(windowFunction, alias);
     }
