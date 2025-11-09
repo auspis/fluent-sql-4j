@@ -8,6 +8,7 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.NullScalarExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDate;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDateTime;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.DateArithmetic;
@@ -287,4 +288,6 @@ public interface Visitor<T> {
     T visit(Lead functionCall, AstContext ctx);
 
     T visit(OverClause overClause, AstContext ctx);
+
+    T visit(CustomFunctionCall functionCall, AstContext ctx);
 }
