@@ -882,8 +882,10 @@ class SelectBuilderTest {
 
     @Test
     void countStar() {
-        String result =
-                new SelectProjectionBuilder(renderer).countStar().from("users").build();
+        String result = new SelectProjectionBuilder<>(renderer)
+                .countStar()
+                .from("users")
+                .build();
         assertThat(result).isEqualTo("""
             SELECT COUNT(*) FROM "users"\
             """);
@@ -891,7 +893,7 @@ class SelectBuilderTest {
 
     @Test
     void countStarWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .countStar()
                 .as("total")
                 .from("users")
@@ -903,7 +905,7 @@ class SelectBuilderTest {
 
     @Test
     void sum() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .sum("amount")
                 .from("orders")
                 .build();
@@ -914,7 +916,7 @@ class SelectBuilderTest {
 
     @Test
     void sumWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .sum("amount")
                 .as("total_amount")
                 .from("orders")
@@ -928,7 +930,7 @@ class SelectBuilderTest {
 
     @Test
     void avg() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .avg("score")
                 .from("students")
                 .build();
@@ -939,7 +941,7 @@ class SelectBuilderTest {
 
     @Test
     void avgWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .avg("score")
                 .as("avg_score")
                 .from("students")
@@ -953,8 +955,10 @@ class SelectBuilderTest {
 
     @Test
     void count() {
-        String result =
-                new SelectProjectionBuilder(renderer).count("id").from("users").build();
+        String result = new SelectProjectionBuilder<>(renderer)
+                .count("id")
+                .from("users")
+                .build();
         assertThat(result).isEqualTo("""
             SELECT COUNT("users"."id") FROM "users"\
             """);
@@ -962,7 +966,7 @@ class SelectBuilderTest {
 
     @Test
     void countWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .count("id")
                 .as("user_count")
                 .from("users")
@@ -975,7 +979,7 @@ class SelectBuilderTest {
 
     @Test
     void countDistinct() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .countDistinct("email")
                 .from("users")
                 .build();
@@ -987,7 +991,7 @@ class SelectBuilderTest {
 
     @Test
     void countDistinctWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .countDistinct("email")
                 .as("unique_emails")
                 .from("users")
@@ -1001,7 +1005,7 @@ class SelectBuilderTest {
 
     @Test
     void max() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .max("price")
                 .from("products")
                 .build();
@@ -1012,7 +1016,7 @@ class SelectBuilderTest {
 
     @Test
     void maxWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .max("price")
                 .as("max_price")
                 .from("products")
@@ -1026,7 +1030,7 @@ class SelectBuilderTest {
 
     @Test
     void min() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .min("price")
                 .from("products")
                 .build();
@@ -1037,7 +1041,7 @@ class SelectBuilderTest {
 
     @Test
     void minWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .min("price")
                 .as("min_price")
                 .from("products")
@@ -1051,7 +1055,7 @@ class SelectBuilderTest {
 
     @Test
     void sumWithGroupBy() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .sum("amount")
                 .from("orders")
                 .groupBy("customer_id")
@@ -1065,7 +1069,7 @@ class SelectBuilderTest {
 
     @Test
     void countWithWhere() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .countStar()
                 .from("users")
                 .where()
@@ -1080,7 +1084,7 @@ class SelectBuilderTest {
 
     @Test
     void avgWithGroupByAndHaving() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .avg("salary")
                 .from("employees")
                 .groupBy("department")
@@ -1096,7 +1100,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithoutAliases() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .sum("score")
                 .max("createdAt")
                 .from("users")
@@ -1110,7 +1114,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithAliases() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .sum("score")
                 .as("total_score")
                 .max("createdAt")
@@ -1126,7 +1130,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithOneAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .sum("score")
                 .max("createdAt")
                 .as("latest")
@@ -1141,7 +1145,7 @@ class SelectBuilderTest {
 
     @Test
     void column() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .column("name")
                 .from("users")
                 .build();
@@ -1152,7 +1156,7 @@ class SelectBuilderTest {
 
     @Test
     void columnWithAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .column("name")
                 .as("user_name")
                 .from("users")
@@ -1164,7 +1168,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumns() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .column("name")
                 .column("email")
                 .from("users")
@@ -1177,7 +1181,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumnsWithAliases() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .column("name")
                 .as("user_name")
                 .column("email")
@@ -1193,7 +1197,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumnsWithOneAlias() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .column("name")
                 .column("email")
                 .as("user_email")
@@ -1208,7 +1212,7 @@ class SelectBuilderTest {
 
     @Test
     void tableQualifiedColumn() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .column("users", "name")
                 .from("users")
                 .build();
@@ -1219,7 +1223,7 @@ class SelectBuilderTest {
 
     @Test
     void mixedColumnsAndAggregates() {
-        String result = new SelectProjectionBuilder(renderer)
+        String result = new SelectProjectionBuilder<>(renderer)
                 .column("name")
                 .sum("score")
                 .as("total_score")

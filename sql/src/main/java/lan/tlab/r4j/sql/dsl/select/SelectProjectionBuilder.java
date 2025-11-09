@@ -146,7 +146,7 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param path the JSON path to check
      * @return a JsonFunctionBuilder for further configuration
      */
-    public JsonFunctionBuilder jsonExists(String column, String path) {
+    public JsonFunctionBuilder<SELF> jsonExists(String column, String path) {
         return jsonExists("", column, path);
     }
 
@@ -158,9 +158,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param path the JSON path to check
      * @return a JsonFunctionBuilder for further configuration
      */
-    public JsonFunctionBuilder jsonExists(String table, String column, String path) {
+    public JsonFunctionBuilder<SELF> jsonExists(String table, String column, String path) {
         finalizePendingProjection();
-        return new JsonFunctionBuilder(this, table, column, path, JsonFunctionBuilder.JsonFunctionType.EXISTS);
+        return new JsonFunctionBuilder<>(self(), table, column, path, JsonFunctionBuilder.JsonFunctionType.EXISTS);
     }
 
     /**
@@ -181,7 +181,7 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param path the JSON path to extract
      * @return a JsonFunctionBuilder for further configuration
      */
-    public JsonFunctionBuilder jsonValue(String column, String path) {
+    public JsonFunctionBuilder<SELF> jsonValue(String column, String path) {
         return jsonValue("", column, path);
     }
 
@@ -193,9 +193,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param path the JSON path to extract
      * @return a JsonFunctionBuilder for further configuration
      */
-    public JsonFunctionBuilder jsonValue(String table, String column, String path) {
+    public JsonFunctionBuilder<SELF> jsonValue(String table, String column, String path) {
         finalizePendingProjection();
-        return new JsonFunctionBuilder(this, table, column, path, JsonFunctionBuilder.JsonFunctionType.VALUE);
+        return new JsonFunctionBuilder<>(self(), table, column, path, JsonFunctionBuilder.JsonFunctionType.VALUE);
     }
 
     /**
@@ -216,7 +216,7 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param path the JSON path to extract
      * @return a JsonFunctionBuilder for further configuration
      */
-    public JsonFunctionBuilder jsonQuery(String column, String path) {
+    public JsonFunctionBuilder<SELF> jsonQuery(String column, String path) {
         return jsonQuery("", column, path);
     }
 
@@ -228,9 +228,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param path the JSON path to extract
      * @return a JsonFunctionBuilder for further configuration
      */
-    public JsonFunctionBuilder jsonQuery(String table, String column, String path) {
+    public JsonFunctionBuilder<SELF> jsonQuery(String table, String column, String path) {
         finalizePendingProjection();
-        return new JsonFunctionBuilder(this, table, column, path, JsonFunctionBuilder.JsonFunctionType.QUERY);
+        return new JsonFunctionBuilder<>(self(), table, column, path, JsonFunctionBuilder.JsonFunctionType.QUERY);
     }
 
     /**
@@ -249,9 +249,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      *
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder rowNumber() {
+    public WindowFunctionBuilder<SELF> rowNumber() {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(this, "", WindowFunctionBuilder.WindowFunctionType.ROW_NUMBER);
+        return new WindowFunctionBuilder<>(self(), "", WindowFunctionBuilder.WindowFunctionType.ROW_NUMBER);
     }
 
     /**
@@ -270,9 +270,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      *
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder rank() {
+    public WindowFunctionBuilder<SELF> rank() {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(this, "", WindowFunctionBuilder.WindowFunctionType.RANK);
+        return new WindowFunctionBuilder<>(self(), "", WindowFunctionBuilder.WindowFunctionType.RANK);
     }
 
     /**
@@ -292,9 +292,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      *
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder denseRank() {
+    public WindowFunctionBuilder<SELF> denseRank() {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(this, "", WindowFunctionBuilder.WindowFunctionType.DENSE_RANK);
+        return new WindowFunctionBuilder<>(self(), "", WindowFunctionBuilder.WindowFunctionType.DENSE_RANK);
     }
 
     /**
@@ -314,9 +314,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param buckets the number of groups to divide rows into
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder ntile(int buckets) {
+    public WindowFunctionBuilder<SELF> ntile(int buckets) {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(this, "", WindowFunctionBuilder.WindowFunctionType.NTILE, buckets);
+        return new WindowFunctionBuilder<>(self(), "", WindowFunctionBuilder.WindowFunctionType.NTILE, buckets);
     }
 
     /**
@@ -337,9 +337,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param offset the number of rows back from the current row
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder lag(String column, int offset) {
+    public WindowFunctionBuilder<SELF> lag(String column, int offset) {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(this, "", WindowFunctionBuilder.WindowFunctionType.LAG, column, offset);
+        return new WindowFunctionBuilder<>(self(), "", WindowFunctionBuilder.WindowFunctionType.LAG, column, offset);
     }
 
     /**
@@ -350,9 +350,10 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param offset the number of rows back from the current row
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder lag(String table, String column, int offset) {
+    public WindowFunctionBuilder<SELF> lag(String table, String column, int offset) {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(this, "", WindowFunctionBuilder.WindowFunctionType.LAG, table, column, offset);
+        return new WindowFunctionBuilder<>(
+                self(), "", WindowFunctionBuilder.WindowFunctionType.LAG, table, column, offset);
     }
 
     /**
@@ -373,9 +374,9 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param offset the number of rows forward from the current row
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder lead(String column, int offset) {
+    public WindowFunctionBuilder<SELF> lead(String column, int offset) {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(this, "", WindowFunctionBuilder.WindowFunctionType.LEAD, column, offset);
+        return new WindowFunctionBuilder<>(self(), "", WindowFunctionBuilder.WindowFunctionType.LEAD, column, offset);
     }
 
     /**
@@ -386,10 +387,10 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
      * @param offset the number of rows forward from the current row
      * @return a WindowFunctionBuilder for further configuration
      */
-    public WindowFunctionBuilder lead(String table, String column, int offset) {
+    public WindowFunctionBuilder<SELF> lead(String table, String column, int offset) {
         finalizePendingProjection();
-        return new WindowFunctionBuilder(
-                this, "", WindowFunctionBuilder.WindowFunctionType.LEAD, table, column, offset);
+        return new WindowFunctionBuilder<>(
+                self(), "", WindowFunctionBuilder.WindowFunctionType.LEAD, table, column, offset);
     }
 
     public SelectBuilder from(String tableName) {
