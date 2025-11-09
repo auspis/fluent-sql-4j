@@ -78,11 +78,8 @@ public final class StandardSQLDialectPlugin {
      */
     public static final String DIALECT_VERSION = "2008";
 
-    private static final SqlDialectPlugin INSTANCE = new SqlDialectPlugin(
-            DIALECT_NAME,
-            DIALECT_VERSION,
-            StandardSQLDialectPlugin::createStandardSql2008Renderer,
-            StandardSQLDialectPlugin::createStandardSql2008DSL);
+    private static final SqlDialectPlugin INSTANCE =
+            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, StandardSQLDialectPlugin::createStandardSql2008DSL);
 
     /**
      * Private constructor to prevent instantiation.

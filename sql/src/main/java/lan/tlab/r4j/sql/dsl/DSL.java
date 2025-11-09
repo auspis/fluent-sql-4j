@@ -50,6 +50,18 @@ public class DSL {
         this.renderer = java.util.Objects.requireNonNull(renderer, "DialectRenderer must not be null");
     }
 
+    /**
+     * Returns the dialect renderer used by this DSL instance.
+     * <p>
+     * This method provides access to the underlying {@link DialectRenderer} for
+     * advanced use cases where direct access to the renderer is needed.
+     *
+     * @return the dialect renderer, never {@code null}
+     */
+    public DialectRenderer getRenderer() {
+        return renderer;
+    }
+
     public CreateTableBuilder createTable(String tableName) {
         return new CreateTableBuilder(renderer, tableName);
     }
