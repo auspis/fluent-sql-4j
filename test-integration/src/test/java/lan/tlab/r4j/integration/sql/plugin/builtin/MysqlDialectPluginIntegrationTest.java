@@ -1,6 +1,6 @@
 package lan.tlab.r4j.integration.sql.plugin.builtin;
 
-import static lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin.DIALECT_NAME;
+import static lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin.DIALECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
@@ -16,7 +16,7 @@ import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MySQLDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * that work with real MySQL database operations using Testcontainers.
  */
 @Testcontainers
-class MySQLDialectPluginIntegrationTest {
+class MysqlDialectPluginIntegrationTest {
 
     @Container
     @SuppressWarnings("resource")
@@ -285,7 +285,7 @@ class MySQLDialectPluginIntegrationTest {
         assertThat(emptyRegistry.isSupported(DIALECT_NAME)).isFalse();
 
         // Register the plugin
-        SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
+        SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
         SqlDialectPluginRegistry newRegistry = emptyRegistry.register(plugin);
 
         // Verify it's now available
