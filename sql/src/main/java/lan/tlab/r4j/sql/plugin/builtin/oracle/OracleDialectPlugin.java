@@ -88,8 +88,11 @@ public final class OracleDialectPlugin {
      */
     public static final String DIALECT_VERSION = "^19.0.0";
 
-    private static final SqlDialectPlugin INSTANCE =
-            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, OracleDialectPlugin::createOracleRenderer);
+    private static final SqlDialectPlugin INSTANCE = new SqlDialectPlugin(
+            DIALECT_NAME,
+            DIALECT_VERSION,
+            OracleDialectPlugin::createOracleRenderer,
+            OracleDialectPlugin::createOracleDSL);
 
     /**
      * Private constructor to prevent instantiation.
@@ -126,6 +129,18 @@ public final class OracleDialectPlugin {
                 PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
 
         return new DialectRenderer(sqlRenderer, psRenderer);
+    }
+
+    /**
+     * Creates an Oracle-specific DSL instance.
+     * <p>
+     * Returns the base {@link lan.tlab.r4j.sql.dsl.DSL} class configured with
+     * the Oracle renderer.
+     *
+     * @return a new {@link lan.tlab.r4j.sql.dsl.DSL} instance configured for Oracle, never {@code null}
+     */
+    private static lan.tlab.r4j.sql.dsl.DSL createOracleDSL() {
+        return new lan.tlab.r4j.sql.dsl.DSL(createOracleRenderer());
     }
 
     /**

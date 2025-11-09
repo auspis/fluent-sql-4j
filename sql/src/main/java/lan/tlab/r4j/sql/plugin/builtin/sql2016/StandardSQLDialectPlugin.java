@@ -79,7 +79,10 @@ public final class StandardSQLDialectPlugin {
     public static final String DIALECT_VERSION = "2008";
 
     private static final SqlDialectPlugin INSTANCE = new SqlDialectPlugin(
-            DIALECT_NAME, DIALECT_VERSION, StandardSQLDialectPlugin::createStandardSql2008Renderer);
+            DIALECT_NAME,
+            DIALECT_VERSION,
+            StandardSQLDialectPlugin::createStandardSql2008Renderer,
+            StandardSQLDialectPlugin::createStandardSql2008DSL);
 
     /**
      * Private constructor to prevent instantiation.
@@ -106,6 +109,18 @@ public final class StandardSQLDialectPlugin {
                 PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
 
         return new DialectRenderer(sqlRenderer, psRenderer);
+    }
+
+    /**
+     * Creates a DSL instance for Standard SQL:2008.
+     * <p>
+     * Returns the base {@link lan.tlab.r4j.sql.dsl.DSL} class configured with
+     * the Standard SQL:2008 renderer.
+     *
+     * @return a new {@link lan.tlab.r4j.sql.dsl.DSL} instance, never {@code null}
+     */
+    private static lan.tlab.r4j.sql.dsl.DSL createStandardSql2008DSL() {
+        return new lan.tlab.r4j.sql.dsl.DSL(createStandardSql2008Renderer());
     }
 
     /**
