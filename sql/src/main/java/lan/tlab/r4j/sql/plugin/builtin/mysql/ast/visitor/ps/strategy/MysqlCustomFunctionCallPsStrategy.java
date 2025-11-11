@@ -1,13 +1,16 @@
-package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression;
+package lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CustomFunctionCallRenderStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 
 /**
- * Render strategy for MySQL custom function calls.
+ * MySQL strategy for rendering custom function calls in prepared statements.
  * <p>
  * This strategy handles rendering of custom functions with options, such as:
  * <ul>
@@ -19,12 +22,18 @@ import lan.tlab.r4j.sql.ast.visitor.sql.strategy.expression.CustomFunctionCallRe
  * GROUP_CONCAT(name SEPARATOR ', ')
  * </pre>
  */
-public class MysqlCustomFunctionCallRenderStrategy implements CustomFunctionCallRenderStrategy {
+public class MysqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsStrategy {
 
     @Override
-    public String render(CustomFunctionCall functionCall, SqlRenderer sqlRenderer, AstContext ctx) {
+    public PsDto handle(CustomFunctionCall functionCall, PreparedStatementRenderer renderer, AstContext ctx) {
+        List<Object> allParams = new ArrayList<>();
+
         String args = functionCall.arguments().stream()
-                .map(arg -> arg.accept(sqlRenderer, ctx))
+                .map(arg -> {
+                    PsDto argDto = arg.accept(renderer, ctx);
+                    allParams.addAll(argDto.parameters());
+                    return argDto.sql();
+                })
                 .collect(Collectors.joining(", "));
 
         StringBuilder result = new StringBuilder();
@@ -65,6 +74,6 @@ public class MysqlCustomFunctionCallRenderStrategy implements CustomFunctionCall
         }
 
         result.append(")");
-        return result.toString();
+        return new PsDto(result.toString(), allParams);
     }
 }

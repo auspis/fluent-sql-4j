@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.dql.clause.Fetch;
@@ -420,6 +421,46 @@ class MysqlDialectPluginIntegrationTest {
             // Verify we found both categories
             assertThat(foundAdult).isTrue();
             assertThat(foundMinor).isTrue();
+        }
+    }
+
+    @Test
+    void shouldExecuteMySQLGroupConcatFunctionWithPreparedStatement() throws SQLException {
+        // Get DSL from registry
+        var dsl = (MysqlDSL) registry.getDsl(DIALECT_NAME, "8.0.35").orElseThrow();
+
+        // Use GROUP_CONCAT to concatenate names by age group
+        var selectBuilder = dsl.select()
+                .column("age")
+                .groupConcat("name")
+                .separator(", ")
+                .as("names")
+                .from("users")
+                .groupBy("age")
+                .orderBy("age");
+
+        // Build prepared statement
+        PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
+
+        // Execute and verify results
+        try (var rs = ps.executeQuery()) {
+            boolean found30YearOlds = false;
+            while (rs.next()) {
+                int age = rs.getInt("age");
+                String names = rs.getString("names");
+                assertThat(names).isNotNull();
+
+                // Verify 30-year-olds are concatenated
+                if (age == 30) {
+                    found30YearOlds = true;
+                    // Should contain multiple names separated by ", "
+                    assertThat(names).contains(", ");
+                    assertThat(names.split(", ")).hasSizeGreaterThanOrEqualTo(2);
+                }
+            }
+            assertThat(found30YearOlds).isTrue();
+        } finally {
+            ps.close();
         }
     }
 
