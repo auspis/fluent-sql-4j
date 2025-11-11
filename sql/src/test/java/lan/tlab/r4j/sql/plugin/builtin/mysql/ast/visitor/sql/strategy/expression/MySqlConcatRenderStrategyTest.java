@@ -21,7 +21,7 @@ class MySqlConcatRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new MySqlConcatRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql();
+        sqlRenderer = TestDialectRendererFactory.mysql();
     }
 
     @Test
@@ -35,7 +35,7 @@ class MySqlConcatRenderStrategyTest {
     void concat_columnReference() {
         Concat concat = Concat.concat(Literal.of("Mr."), ColumnReference.of("Customer", "name"));
         String sql = strategy.render(concat, sqlRenderer, new AstContext());
-        assertThat(sql).isEqualTo("CONCAT('Mr.', \"Customer\".\"name\")");
+        assertThat(sql).isEqualTo("CONCAT('Mr.', `Customer`.`name`)");
     }
 
     @Test
@@ -43,7 +43,7 @@ class MySqlConcatRenderStrategyTest {
         Concat concat = Concat.concatWithSeparator(
                 " - ", Literal.of("Mr."), Literal.of("other"), ColumnReference.of("Customer", "name"));
         String sql = strategy.render(concat, sqlRenderer, new AstContext());
-        assertThat(sql).isEqualTo("CONCAT_WS(' - ', 'Mr.', 'other', \"Customer\".\"name\")");
+        assertThat(sql).isEqualTo("CONCAT_WS(' - ', 'Mr.', 'other', `Customer`.`name`)");
     }
 
     @Test
@@ -54,6 +54,6 @@ class MySqlConcatRenderStrategyTest {
                 Substring.of(ColumnReference.of("Customer", "name"), Literal.of(1), Literal.of(5)),
                 Literal.of("suffix"));
         String sql = strategy.render(concat, sqlRenderer, new AstContext());
-        assertThat(sql).isEqualTo("CONCAT_WS(' - ', 'prefix', SUBSTRING(\"Customer\".\"name\", 1, 5), 'suffix')");
+        assertThat(sql).isEqualTo("CONCAT_WS(' - ', 'prefix', SUBSTRING(`Customer`.`name`, 1, 5), 'suffix')");
     }
 }
