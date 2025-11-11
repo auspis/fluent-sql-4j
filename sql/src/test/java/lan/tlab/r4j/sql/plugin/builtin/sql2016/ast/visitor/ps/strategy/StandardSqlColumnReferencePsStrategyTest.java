@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.ast.visitor.ps.strategy.dialect.sql2016;
+package lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,7 +7,6 @@ import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlColumnReferencePsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlColumnReferencePsStrategyTest {
