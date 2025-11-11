@@ -5,6 +5,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCustomFunctionCallPsStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.clause.MySqlFetchRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MySqlConcatRenderStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MysqlCustomFunctionCallRenderStrategy;
@@ -174,8 +175,10 @@ public final class MysqlDialectPlugin {
                 .mergeStatementStrategy(new MySqlMergeStatementRenderStrategy())
                 .build();
 
-        PreparedStatementRenderer psRenderer =
-                PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
+        PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+                .sqlRenderer(sqlRenderer)
+                .customFunctionCallStrategy(new MysqlCustomFunctionCallPsStrategy())
+                .build();
 
         return new DialectRenderer(sqlRenderer, psRenderer);
     }
