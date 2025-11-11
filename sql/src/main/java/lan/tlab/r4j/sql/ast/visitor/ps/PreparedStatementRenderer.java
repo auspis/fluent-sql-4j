@@ -1,7 +1,6 @@
 package lan.tlab.r4j.sql.ast.visitor.ps;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Cast;
@@ -113,6 +112,7 @@ import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ConcatPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CreateTableStatementPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CurrentDatePsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CurrentDateTimePsStrategy;
+import lan.tlab.r4j.sql.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DefaultConstraintPsStrategy;
 import lan.tlab.r4j.sql.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
@@ -200,6 +200,7 @@ import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardS
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCreateTableStatementPsStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCurrentDatePsStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCurrentDateTimePsStrategy;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCustomFunctionCallPsStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlDateArithmeticPsStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlDefaultConstraintPsStrategy;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlDefaultValuesPsStrategy;
@@ -382,6 +383,10 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Default
     private final ConcatPsStrategy concatStrategy = new StandardSqlConcatPsStrategy();
+
+    @Default
+    private final CustomFunctionCallPsStrategy customFunctionCallStrategy =
+            new StandardSqlCustomFunctionCallPsStrategy();
 
     @Default
     private final CurrentDatePsStrategy currentDateStrategy = new StandardSqlCurrentDatePsStrategy();
@@ -1020,17 +1025,6 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(CustomFunctionCall functionCall, AstContext ctx) {
-        List<Object> allParams = new java.util.ArrayList<>();
-
-        String args = functionCall.arguments().stream()
-                .map(arg -> {
-                    PsDto argDto = arg.accept(this, ctx);
-                    allParams.addAll(argDto.parameters());
-                    return argDto.sql();
-                })
-                .collect(Collectors.joining(", "));
-
-        String sql = functionCall.functionName() + "(" + args + ")";
-        return new PsDto(sql, allParams);
+        return customFunctionCallStrategy.handle(functionCall, this, ctx);
     }
 }
