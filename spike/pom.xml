@@ -16,7 +16,7 @@
     </dependency>
     <dependency>
       <groupId>lan.tlab</groupId>
-      <artifactId>sql</artifactId>
+      <artifactId>jdsql</artifactId>
     </dependency>
   </dependencies>
 </project>
