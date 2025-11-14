@@ -614,39 +614,48 @@ String sql = dsl.mergeInto("users")
 The project is split into Maven modules:
 
 - `sql`: contains the SQL AST, DSL, unit tests, integration tests, and E2E tests
-- `test-integration`: contains legacy integration tests (to be migrated)
 - `spike`: experimental code and prototypes
 
 ## Running Tests
 
-This project uses a structured approach to test execution with three distinct test categories:
+This project uses a structured approach to test execution with three distinct test categories organized within the `sql` module:
 
 ### Test Categories
 
-1. **Unit Tests** - Fast, isolated tests with no external dependencies
-   - Run by Maven Surefire during `test` phase
-   - Excluded tags: `integration`, `e2e`
-   - Located in all modules under `src/test/java`
-2. **Integration Tests** - Tests with external dependencies (databases, containers)
-   - Run by Maven Failsafe during `verify` phase
-   - Tagged with `@IntegrationTest` (includes `@Tag("integration")`)
-   - Test against H2 in-memory database for fast feedback
-3. **End-to-End (E2E) Tests** - Full system tests with real databases via Testcontainers
-   - Run by Maven Failsafe during `verify` phase
-   - Tagged with `@E2ETest` (includes `@Tag("e2e")`)
-   - Test against real database engines (MySQL, PostgreSQL, etc.)
+📊 Refined Test Classification
+
+|     Level      |         Type          |      Isolation      |  Dependencies  |    Database    | Speed |                                    Examples                                     |
+|----------------|-----------------------|---------------------|----------------|----------------|-------|---------------------------------------------------------------------------------|
+| 🧱 UNIT        | Logic Unit Tests      | Complete            | None           | No             | 🚀    | SemVerUtilTest                                                                  |
+| 🧱 UNIT        | Strategy Unit Tests   | Complete            | None           | No             | 🚀    | StandardSqlColumnReferencePsStrategyTest, MysqlCustomFunctionCallPsStrategyTest |
+| 🔗 INTEGRATION | Plugin/ServiceLoader  | ServiceLoader       | Java SPI       | No             | 🏃    | MysqlDialectPluginServiceLoaderTest                                             |
+| 🔗 INTEGRATION | Component Integration | Internal Components | Registry/DSL   | No             | 🏃    | DSLRegistryTest                                                                 |
+| 🔗 INTEGRATION | DSL Integration       | Complete API        | H2 in-memory   | Yes (embedded) | 🏃    | SelectBuilderIntegrationTest                                                    |
+| 🔗 INTEGRATION | Database Integration  | Complete Plugin     | Testcontainers | Yes (real)     | 🏃    | MysqlDialectPluginIntegrationTest                                               |
+| 🌐 END-TO-END  | System E2E            | Entire System       | Complete JDBC  | Yes (real)     | 🐌    | PreparedStatementRendererTest                                                   |
+
+### Project Structure
+
+All tests are now consolidated within the `sql` module with the following organization:
+
+```
+sql/src/test/java/
+├── lan/tlab/r4j/sql/          # Unit tests (205+)
+├── integration/               # Integration tests (21)
+└── e2e/system/                # E2E tests (3)
+```
 
 ### Basic Commands
 
 ```bash
 # Run only unit tests (fast, no containers)
-./mvnw test
+./mvnw test -pl sql
 
 # Run unit tests for specific module
 ./mvnw test -pl sql
 
 # Run all tests (unit + integration + e2e)
-./mvnw verify
+./mvnw verify -pl sql
 
 # Run all tests for specific module
 ./mvnw verify -pl sql
@@ -656,19 +665,13 @@ This project uses a structured approach to test execution with three distinct te
 
 ```bash
 # Run only integration tests
-./mvnw verify -Dgroups=integration
-
-# Run only e2e tests
-./mvnw verify -Dgroups=e2e
-
-# Run only integration tests in sql module
 ./mvnw verify -pl sql -Dgroups=integration
 
-# Run only e2e tests in sql module
+# Run only e2e tests
 ./mvnw verify -pl sql -Dgroups=e2e
 
 # Run both integration and e2e (skip unit tests)
-./mvnw verify -Dgroups=integration,e2e
+./mvnw verify -pl sql -Dgroups=integration,e2e
 ```
 
 ### Development Workflow
@@ -792,7 +795,6 @@ To generate coverage for a specific module and its dependencies:
 Coverage reports are generated as HTML files in each module's `target/site/jacoco/` directory:
 
 - **SQL Module**: `sql/target/site/jacoco/index.html`
-- **Test Integration Module**: `test-integration/target/site/jacoco/index.html`
 
 Open the `index.html` file in your browser to view detailed coverage information including:
 - Overall coverage percentages (instructions, branches, lines, methods, classes)
