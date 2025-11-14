@@ -42,12 +42,11 @@ jobs:
       with:
         name: surefire-reports
         path: |
-          sql/target/surefire-reports/
-          test-integration/target/surefire-reports/
+          jdsql/target/surefire-reports/
     - name: Upload Failsafe reports
       if: always()
       uses: actions/upload-artifact@v5
       with:
         name: failsafe-reports
         path: |
-          test-integration/target/failsafe-reports/
+          jdsql/target/failsafe-reports/

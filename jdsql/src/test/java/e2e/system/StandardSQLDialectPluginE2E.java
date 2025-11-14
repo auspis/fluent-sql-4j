@@ -1,4 +1,4 @@
-package lan.tlab.r4j.integration.sql.plugin.builtin;
+package e2e.system;
 
 import static lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_NAME;
 import static lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
@@ -8,7 +8,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import lan.tlab.r4j.integration.sql.util.TestDatabaseUtil;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
@@ -16,18 +15,21 @@ import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import lan.tlab.r4j.sql.util.TestDatabaseUtil;
+import lan.tlab.r4j.sql.util.annotation.E2ETest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests for StandardSQLDialectPlugin with SqlDialectRegistry.
+ * End-to-end tests for StandardSQLDialectPlugin with SqlDialectRegistry.
  * <p>
  * These tests verify that the plugin integrates correctly with the registry,
  * is discoverable via ServiceLoader, and produces functional SQL renderers
  * that work with real database operations.
  */
-class StandardSQLDialectPluginIntegrationTest {
+@E2ETest
+class StandardSQLDialectPluginE2E {
 
     private SqlDialectPluginRegistry registry;
     private Connection connection;
@@ -135,6 +137,7 @@ class StandardSQLDialectPluginIntegrationTest {
         DialectRenderer renderer =
                 registry.getDialectRenderer("StandardSQL", "2008").orElseThrow();
         DSL dsl = new DSL(renderer);
+
         // Test SELECT with WHERE using the custom renderer
         String selectSql = dsl.select("name", "age")
                 .from("users")
@@ -191,5 +194,96 @@ class StandardSQLDialectPluginIntegrationTest {
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
         Result<DialectRenderer> result = newRegistry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION);
         assertThat(result).isInstanceOf(Result.Success.class);
+    }
+
+    @Test
+    void mergeStatementWithRealDatabase() throws SQLException {
+        // Get renderer from registry
+        DialectRenderer renderer =
+                registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+        DSL dsl = new DSL(renderer);
+
+        // Create source table with user updates
+        try (var stmt = connection.createStatement()) {
+            stmt.execute(
+                    """
+                    CREATE TABLE users_updates (
+                        "id" INTEGER PRIMARY KEY,
+                        "name" VARCHAR(50),
+                        "email" VARCHAR(100),
+                        "age" INTEGER,
+                        "active" BOOLEAN
+                    )
+                    """);
+
+            // Source has: updated John Doe (age changed), new user (id=11), Jane Smith unchanged
+            stmt.execute("INSERT INTO users_updates VALUES (1, 'John Doe', 'john.newemail@example.com', 31, true)");
+            stmt.execute("INSERT INTO users_updates VALUES (2, 'Jane Smith', 'jane@example.com', 25, true)");
+            stmt.execute("INSERT INTO users_updates VALUES (11, 'New User', 'newuser@example.com', 28, true)");
+        }
+
+        // Build and execute MERGE statement using DSL
+        String mergeSql = dsl.mergeInto("users")
+                .as("tgt")
+                .using("users_updates", "src")
+                .on("tgt.id", "src.id")
+                .whenMatched()
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .whenNotMatched()
+                .set("id", "src.id")
+                .set("name", "src.name")
+                .set("email", "src.email")
+                .set("age", "src.age")
+                .set("active", "src.active")
+                .build();
+
+        try (var stmt = connection.createStatement()) {
+            int affectedRows = stmt.executeUpdate(mergeSql);
+            assertThat(affectedRows).isGreaterThanOrEqualTo(0);
+        }
+
+        // Verify John Doe was updated
+        List<List<Object>> johnDoe = ResultSetUtil.list(
+                dsl.select("id", "name", "email", "age", "active")
+                        .from("users")
+                        .where()
+                        .column("id")
+                        .eq(1)
+                        .buildPreparedStatement(connection),
+                r -> List.of(
+                        r.getInt("id"),
+                        r.getString("name"),
+                        r.getString("email"),
+                        r.getInt("age"),
+                        r.getBoolean("active")));
+
+        assertThat(johnDoe).hasSize(1);
+        assertThat(johnDoe.get(0)).containsExactly(1, "John Doe", "john.newemail@example.com", 31, true);
+
+        // Verify new user was inserted
+        List<List<Object>> newUser = ResultSetUtil.list(
+                dsl.select("id", "name", "email", "age", "active")
+                        .from("users")
+                        .where()
+                        .column("id")
+                        .eq(11)
+                        .buildPreparedStatement(connection),
+                r -> List.of(
+                        r.getInt("id"),
+                        r.getString("name"),
+                        r.getString("email"),
+                        r.getInt("age"),
+                        r.getBoolean("active")));
+
+        assertThat(newUser).hasSize(1);
+        assertThat(newUser.get(0)).containsExactly(11, "New User", "newuser@example.com", 28, true);
+
+        // Verify total count (original 10 + 1 new = 11)
+        List<Integer> count = ResultSetUtil.list(
+                connection.prepareStatement("SELECT COUNT(*) as cnt FROM users"), r -> r.getInt("cnt"));
+        assertThat(count.get(0)).isEqualTo(11);
     }
 }
