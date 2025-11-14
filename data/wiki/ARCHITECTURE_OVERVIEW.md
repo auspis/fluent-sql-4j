@@ -348,7 +348,7 @@ User Code:
 ### File Location
 
 ```
-sql/src/main/resources/META-INF/services/lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin
+jdsql/src/main/resources/META-INF/services/lan.tlab.r4j.sql.dsl.plugin.SqlDialectPlugin
 ```
 
 ### File Contents

@@ -636,10 +636,10 @@ This project uses a structured approach to test execution with three distinct te
 
 ### Project Structure
 
-All tests are now consolidated within the `sql` module with the following organization:
+All tests are now consolidated within the `jdsql` module with the following organization:
 
 ```
-sql/src/test/java/
+jdsql/src/test/java/
 ├── lan/tlab/r4j/sql/          # Unit tests (205+)
 ├── integration/               # Integration tests (21)
 └── e2e/system/                # E2E tests (3)
@@ -794,7 +794,7 @@ To generate coverage for a specific module and its dependencies:
 
 Coverage reports are generated as HTML files in each module's `target/site/jacoco/` directory:
 
-- **SQL Module**: `sql/target/site/jacoco/index.html`
+- **SQL Module**: `jdsql/target/site/jacoco/index.html`
 
 Open the `index.html` file in your browser to view detailed coverage information including:
 - Overall coverage percentages (instructions, branches, lines, methods, classes)
