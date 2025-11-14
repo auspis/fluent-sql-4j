@@ -6,7 +6,7 @@
     <artifactId>r4j</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>sql</artifactId>
+  <artifactId>jdsql</artifactId>
 
   <properties>
     <!-- Run both integration and e2e by default during verify phase -->
