@@ -22,12 +22,11 @@ This repository is a multi-module Java project managed with Maven. It is structu
 
 - Root directory contains:
   - `pom.xml` (parent POM)
-  - Subfolders for each module (e.g., `sql/`, `test-integration/`, etc.)
+  - Subfolders for each module (e.g., `sql/`, `spike/`)
   - `.github/` for GitHub-specific configuration
 - Common modules:
-  - `sql/`: Core SQL AST and DSL logic
-  - `test-integration/`: Integration tests, uses Testcontainers
-  - Other modules for shared code, applications, and services
+  - `sql/`: Core SQL AST and DSL logic, plus all tests (unit, integration, E2E)
+  - `spike/`: Experimental code and prototypes
 
 ## Conventions
 
@@ -43,10 +42,10 @@ This repository is a multi-module Java project managed with Maven. It is structu
 
 ## Dependencies
 
-- Testcontainers for integration testing
+- Testcontainers for integration and E2E testing
 - AssertJ for fluent assertions
 - JUnit 5 for testing
-- MySQL (via Testcontainers) for integration tests
+- MySQL and PostgreSQL (via Testcontainers) for integration and E2E tests
 
 ## Coding Guidelines
 
@@ -144,14 +143,60 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 2. Add a `pom.xml` for the module
 3. Register the module in the root `pom.xml` under `<modules>`
 
+**Note**: All tests (unit, integration, E2E) are now consolidated in the `sql/` module. Do not create separate test modules.
+
 ## How to Run Tests
 
 - make sure you are in the root folder or `cd` to it
-- Use `./mvnw clean test` at the root to run unit tests
-- Use `./mvnw clean verify` at the root to run all tests (unit and integration)
+- Use `./mvnw clean test -am -pl sql` to run unit tests only (fast feedback)
+- Use `./mvnw clean verify -am -pl sql` to run all tests (unit + integration + E2E)
+- Use `./mvnw verify -am -pl sql -Dgroups=integration` to run only integration tests
+- Use `./mvnw verify -am -pl sql -Dgroups=e2e` to run only E2E tests
 - The project is a multi module maven project, so in some cases you may need to add -am to compile dependencies
 - When you need to run integration tests try to run only the needed ones
-- Integration tests are located in `test-integration/`
+- All tests are now consolidated in the `sql/` module with the following structure:
+  - `sql/src/test/java/lan/tlab/r4j/sql/`: Unit tests (fast, isolated)
+  - `sql/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
+  - `sql/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
+
+## Test Categories
+
+The project uses a structured test pyramid with three main categories:
+
+### Unit Tests (`sql/src/test/java/lan/tlab/r4j/sql/`)
+
+- **Purpose**: Test individual components in isolation
+- **Speed**: Very fast (🚀)
+- **Dependencies**: None
+- **Database**: No database access
+- **Examples**: `SemVerUtilTest`, `StandardSqlColumnReferencePsStrategyTest`
+
+### Integration Tests (`sql/src/test/java/integration/`)
+
+- **Purpose**: Test component interactions and data flow
+- **Speed**: Medium (🏃)
+- **Dependencies**: Internal components, H2 in-memory database
+- **Database**: Embedded H2 or Testcontainers
+- **Examples**: `SelectBuilderIntegrationTest`, `MysqlDialectPluginIntegrationTest`
+
+### End-to-End Tests (`sql/src/test/java/e2e/system/`)
+
+- **Purpose**: Test complete workflows from start to finish
+- **Speed**: Slow (🐌)
+- **Dependencies**: Full system, real databases
+- **Database**: Real databases via Testcontainers
+- **Examples**: `PreparedStatementRendererTest`, `StandardSqlRendererMySqlE2E`
+
+### Test Annotations
+
+- `@IntegrationTest`: Marks integration tests (JUnit tag: `integration`)
+- `@E2ETest`: Marks end-to-end tests (JUnit tag: `e2e`)
+
+### Writing New Tests
+
+- **Unit tests**: Place in `sql/src/test/java/lan/tlab/r4j/sql/` following existing package structure
+- **Integration tests**: Place in `sql/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
+- **E2E tests**: Place in `sql/src/test/java/e2e/system/` with `@E2ETest` annotation
 
 ## Code Formatting
 

@@ -27,12 +27,9 @@ class PostgreSqlDSLIntegrationTest {
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 
         // Test various PostgreSQL 15.x versions
-        assertThat(registry.dslFor("postgresql", "15.0.0").orElseThrow())
-                .isInstanceOf(PostgreSqlDSL.class);
-        assertThat(registry.dslFor("postgresql", "15.2.0").orElseThrow())
-                .isInstanceOf(PostgreSqlDSL.class);
-        assertThat(registry.dslFor("postgresql", "15.9.0").orElseThrow())
-                .isInstanceOf(PostgreSqlDSL.class);
+        assertThat(registry.dslFor("postgresql", "15.0.0").orElseThrow()).isInstanceOf(PostgreSqlDSL.class);
+        assertThat(registry.dslFor("postgresql", "15.2.0").orElseThrow()).isInstanceOf(PostgreSqlDSL.class);
+        assertThat(registry.dslFor("postgresql", "15.9.0").orElseThrow()).isInstanceOf(PostgreSqlDSL.class);
     }
 
     @Test
@@ -111,8 +108,10 @@ class PostgreSqlDSLIntegrationTest {
                 (PostgreSqlDSL) registry.dslFor("postgresql", "15.0.0").orElseThrow();
 
         String sql = dsl.select()
-                .expression(
-                        dsl.stringAgg("name").separator(", ").orderBy("name DESC").build())
+                .expression(dsl.stringAgg("name")
+                        .separator(", ")
+                        .orderBy("name DESC")
+                        .build())
                 .as("names")
                 .from("users")
                 .build();
@@ -129,7 +128,8 @@ class PostgreSqlDSLIntegrationTest {
                 (PostgreSqlDSL) registry.dslFor("postgresql", "15.0.0").orElseThrow();
 
         String sql = dsl.select()
-                .expression(dsl.stringAgg("category").distinct().separator(" | ").build())
+                .expression(
+                        dsl.stringAgg("category").distinct().separator(" | ").build())
                 .as("categories")
                 .from("products")
                 .build();
