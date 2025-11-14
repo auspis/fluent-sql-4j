@@ -7,7 +7,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>sql</module>
+    <module>jdsql</module>
     <module>spike</module>
   </modules>
 
@@ -47,7 +47,7 @@
     <dependencies>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>sql</artifactId>
+        <artifactId>jdsql</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>

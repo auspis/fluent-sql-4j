@@ -1,4 +1,4 @@
-package integration.plugin.builtin;
+package integration.plugin;
 
 import static lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_NAME;
 import static lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;

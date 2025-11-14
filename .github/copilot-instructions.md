@@ -22,10 +22,10 @@ This repository is a multi-module Java project managed with Maven. It is structu
 
 - Root directory contains:
   - `pom.xml` (parent POM)
-  - Subfolders for each module (e.g., `sql/`, `spike/`)
+  - Subfolders for each module (e.g., `jdsql/`, `spike/`)
   - `.github/` for GitHub-specific configuration
 - Common modules:
-  - `sql/`: Core SQL AST and DSL logic, plus all tests (unit, integration, E2E)
+  - `jdsql/`: Core SQL AST and DSL logic, plus all tests (unit, integration, E2E)
   - `spike/`: Experimental code and prototypes
 
 ## Conventions
@@ -143,27 +143,27 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 2. Add a `pom.xml` for the module
 3. Register the module in the root `pom.xml` under `<modules>`
 
-**Note**: All tests (unit, integration, E2E) are now consolidated in the `sql/` module. Do not create separate test modules.
+**Note**: All tests (unit, integration, E2E) are now consolidated in the `jdsql/` module. Do not create separate test modules.
 
 ## How to Run Tests
 
 - make sure you are in the root folder or `cd` to it
-- Use `./mvnw clean test -am -pl sql` to run unit tests only (fast feedback)
-- Use `./mvnw clean verify -am -pl sql` to run all tests (unit + integration + E2E)
-- Use `./mvnw verify -am -pl sql -Dgroups=integration` to run only integration tests
-- Use `./mvnw verify -am -pl sql -Dgroups=e2e` to run only E2E tests
+- Use `./mvnw clean test -am -pl jdsql` to run unit tests only (fast feedback)
+- Use `./mvnw clean verify -am -pl jdsql` to run all tests (unit + integration + E2E)
+- Use `./mvnw verify -am -pl jdsql -Dgroups=integration` to run only integration tests
+- Use `./mvnw verify -am -pl jdsql -Dgroups=e2e` to run only E2E tests
 - The project is a multi module maven project, so in some cases you may need to add -am to compile dependencies
 - When you need to run integration tests try to run only the needed ones
-- All tests are now consolidated in the `sql/` module with the following structure:
-  - `sql/src/test/java/lan/tlab/r4j/sql/`: Unit tests (fast, isolated)
-  - `sql/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
-  - `sql/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
+- All tests are now consolidated in the `jdsql/` module with the following structure:
+  - `jdsql/src/test/java/lan/tlab/r4j/sql/`: Unit tests (fast, isolated)
+  - `jdsql/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
+  - `jdsql/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
 
 ## Test Categories
 
 The project uses a structured test pyramid with three main categories:
 
-### Unit Tests (`sql/src/test/java/lan/tlab/r4j/sql/`)
+### Unit Tests (`jdsql/src/test/java/lan/tlab/r4j/sql/`)
 
 - **Purpose**: Test individual components in isolation
 - **Speed**: Very fast (🚀)
@@ -171,7 +171,7 @@ The project uses a structured test pyramid with three main categories:
 - **Database**: No database access
 - **Examples**: `SemVerUtilTest`, `StandardSqlColumnReferencePsStrategyTest`
 
-### Integration Tests (`sql/src/test/java/integration/`)
+### Integration Tests (`jdsql/src/test/java/integration/`)
 
 - **Purpose**: Test component interactions and data flow
 - **Speed**: Medium (🏃)
@@ -179,7 +179,7 @@ The project uses a structured test pyramid with three main categories:
 - **Database**: Embedded H2 or Testcontainers
 - **Examples**: `SelectBuilderIntegrationTest`, `MysqlDialectPluginIntegrationTest`
 
-### End-to-End Tests (`sql/src/test/java/e2e/system/`)
+### End-to-End Tests (`jdsql/src/test/java/e2e/system/`)
 
 - **Purpose**: Test complete workflows from start to finish
 - **Speed**: Slow (🐌)
@@ -194,9 +194,9 @@ The project uses a structured test pyramid with three main categories:
 
 ### Writing New Tests
 
-- **Unit tests**: Place in `sql/src/test/java/lan/tlab/r4j/sql/` following existing package structure
-- **Integration tests**: Place in `sql/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
-- **E2E tests**: Place in `sql/src/test/java/e2e/system/` with `@E2ETest` annotation
+- **Unit tests**: Place in `jdsql/src/test/java/lan/tlab/r4j/sql/` following existing package structure
+- **Integration tests**: Place in `jdsql/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
+- **E2E tests**: Place in `jdsql/src/test/java/e2e/system/` with `@E2ETest` annotation
 
 ## Code Formatting
 

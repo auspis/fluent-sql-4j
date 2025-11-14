@@ -19,6 +19,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Integration tests for PreparedStatementRenderer with H2 in-memory database.
+ */
+@IntegrationTest
 class PreparedStatementRendererTest {
 
     private Connection connection;
