@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.e2e.plugin.builtin;
+package e2e.system;
 
 import static lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin.DIALECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
