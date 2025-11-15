@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.function.datetime.CurrentDateTime;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import lan.tlab.r4j.sql.test.util.TestDialectRendererFactory;
 import org.junit.jupiter.api.Test;
 
 class CurrentDateTimeRenderStrategyTest {
