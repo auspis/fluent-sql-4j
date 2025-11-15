@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class StandardSqlCustomFunctionCallRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlCustomFunctionCallRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql();
+        sqlRenderer = StandardSqlRendererFactory.standardSql();
         ctx = new AstContext();
     }
 

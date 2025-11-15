@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.postgre.PostgreSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class PostgreSqlDSLTest {
 
     @BeforeEach
     void setUp() {
-        dsl = new PostgreSqlDSL(TestDialectRendererFactory.dialectRendererPostgreSql());
+        dsl = new PostgreSqlDSL(PostgreSqlRendererFactory.dialectRendererPostgreSql());
     }
 
     // STRING_AGG Tests
@@ -143,12 +143,13 @@ class PostgreSqlDSLTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void toCharWithTimestampFormat() {
         ScalarExpression expr = dsl.toChar(ColumnReference.of("events", "timestamp"), "YYYY-MM-DD HH24:MI:SS");
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
         assertThat(call.arguments().get(1)).isInstanceOf(Literal.class);
-        Literal format = (Literal) call.arguments().get(1);
+        Literal<String> format = (Literal<String>) call.arguments().get(1);
         assertThat(format.value()).isEqualTo("YYYY-MM-DD HH24:MI:SS");
     }
 
@@ -164,12 +165,13 @@ class PostgreSqlDSLTest {
         assertThat(call.arguments()).hasSize(2);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void dateTruncMonth() {
         ScalarExpression expr = dsl.dateTrunc("month", ColumnReference.of("sales", "sale_date"));
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        Literal field = (Literal) call.arguments().get(0);
+        Literal<String> field = (Literal<String>) call.arguments().get(0);
         assertThat(field.value()).isEqualTo("month");
     }
 

@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.dml.statement.DeleteStatement;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ class StandardSqlDeleteStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlDeleteStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql();
+        renderer = StandardSqlRendererFactory.standardSql();
     }
 
     @Test
