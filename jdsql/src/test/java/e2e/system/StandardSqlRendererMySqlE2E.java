@@ -30,7 +30,7 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlSqlRendererFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ public class StandardSqlRendererMySqlE2E {
     void setUp() throws Exception {
         mysql.start();
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
-        renderer = TestDialectRendererFactory.mysql();
+        renderer = MysqlSqlRendererFactory.mysql();
         // Create table using CreateTableStatement and renderer
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
                 .table(new TableIdentifier("Customer"))

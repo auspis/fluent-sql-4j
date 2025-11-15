@@ -19,8 +19,8 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -54,7 +54,7 @@ class JsonFunctionsMySqlIntegrationTest {
     void setUp() throws Exception {
         mysql.start();
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
-        renderer = TestDialectRendererFactory.mysql();
+        renderer = MysqlSqlRendererFactory.mysql();
 
         // Use standard tables from TestDatabaseUtil
         connection.createStatement().execute("CREATE TABLE users (id INT, name VARCHAR(100), email VARCHAR(100))");

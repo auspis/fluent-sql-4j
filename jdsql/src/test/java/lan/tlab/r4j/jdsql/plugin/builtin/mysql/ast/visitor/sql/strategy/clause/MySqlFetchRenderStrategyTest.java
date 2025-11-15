@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Fetch;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class MySqlFetchRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new MySqlFetchRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.mysql();
+        sqlRenderer = MysqlSqlRendererFactory.mysql();
     }
 
     @Test

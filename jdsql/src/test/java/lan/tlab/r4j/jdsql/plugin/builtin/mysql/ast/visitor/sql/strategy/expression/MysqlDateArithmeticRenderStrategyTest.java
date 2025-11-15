@@ -11,7 +11,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.interva
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.expression.DateArithmeticRenderStrategy;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class MysqlDateArithmeticRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new MysqlDateArithmeticRenderStrategy();
-        renderer = TestDialectRendererFactory.mysql();
+        renderer = MysqlSqlRendererFactory.mysql();
     }
 
     @Test

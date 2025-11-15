@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.Current
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,9 +19,9 @@ class StandardSqlUpdateItemRenderStrategyTest {
     private SqlRenderer renderer;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         strategy = new StandardSqlUpdateItemRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql();
+        renderer = StandardSqlRendererFactory.standardSql();
     }
 
     @Test

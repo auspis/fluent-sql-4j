@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class StandardSqlLiteralRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlLiteralRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql();
+        sqlRenderer = StandardSqlRendererFactory.standardSql();
     }
 
     @Test
