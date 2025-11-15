@@ -2,9 +2,9 @@ package lan.tlab.r4j.jdsql.dsl.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.dsl.DSLRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.dsl.MysqlDSL;
+import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import org.junit.jupiter.api.Test;
 
 /**

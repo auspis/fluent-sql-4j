@@ -1,0 +1,26 @@
+package lan.tlab.r4j.jdsql.ast.dql.projection;
+
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.common.identifier.Alias;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
+
+public class AggregateCallProjection extends Projection {
+
+    public AggregateCallProjection(AggregateCall expression) {
+        super(expression);
+    }
+
+    public AggregateCallProjection(AggregateCall expression, String as) {
+        super(expression, as);
+    }
+
+    public AggregateCallProjection(AggregateCall expression, Alias as) {
+        super(expression, as);
+    }
+
+    @Override
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
+    }
+}

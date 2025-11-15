@@ -4,10 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPluginProvider;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider;
 import org.junit.jupiter.api.Test;
 
 class MysqlDialectPluginServiceLoaderTest {

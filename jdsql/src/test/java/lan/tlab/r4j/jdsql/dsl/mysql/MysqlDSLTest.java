@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.CustomFunctionCall;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.dsl.MysqlDSL;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import org.junit.jupiter.api.Test;
 
 class MysqlDSLTest {

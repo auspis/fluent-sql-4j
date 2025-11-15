@@ -2,19 +2,18 @@ package lan.tlab.r4j.jdsql.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.BehaviorKind;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonExists;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonQuery;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.WrapperBehavior;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.BehaviorKind;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonExists;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonQuery;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonValue;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.WrapperBehavior;
-import lan.tlab.r4j.sql.ast.dql.clause.Select;
-import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

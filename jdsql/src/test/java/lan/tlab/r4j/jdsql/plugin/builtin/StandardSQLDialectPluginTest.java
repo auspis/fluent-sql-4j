@@ -2,9 +2,9 @@ package lan.tlab.r4j.jdsql.plugin.builtin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginTest {

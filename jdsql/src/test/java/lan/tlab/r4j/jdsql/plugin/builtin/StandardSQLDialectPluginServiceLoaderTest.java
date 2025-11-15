@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.ServiceLoader;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.functional.Result;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.functional.Result;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginServiceLoaderTest {

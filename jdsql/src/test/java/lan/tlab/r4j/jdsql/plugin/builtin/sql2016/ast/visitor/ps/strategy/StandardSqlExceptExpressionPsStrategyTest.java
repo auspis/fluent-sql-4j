@@ -2,12 +2,11 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.common.expression.set.ExceptExpression;
-import lan.tlab.r4j.sql.ast.common.expression.set.NullSetExpression;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlExceptExpressionPsStrategy;
+import lan.tlab.r4j.jdsql.ast.common.expression.set.ExceptExpression;
+import lan.tlab.r4j.jdsql.ast.common.expression.set.NullSetExpression;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlExceptExpressionPsStrategyTest {

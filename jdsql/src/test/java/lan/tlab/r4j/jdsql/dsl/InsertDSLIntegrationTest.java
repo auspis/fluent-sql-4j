@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
-import lan.tlab.r4j.sql.dsl.DSL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -2,23 +2,22 @@ package lan.tlab.r4j.jdsql.ast.visitor.sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.dql.clause.From;
+import lan.tlab.r4j.jdsql.ast.dql.clause.GroupBy;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Having;
+import lan.tlab.r4j.jdsql.ast.dql.clause.OrderBy;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
+import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
-import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.dql.clause.From;
-import lan.tlab.r4j.sql.ast.dql.clause.GroupBy;
-import lan.tlab.r4j.sql.ast.dql.clause.Having;
-import lan.tlab.r4j.sql.ast.dql.clause.OrderBy;
-import lan.tlab.r4j.sql.ast.dql.clause.Select;
-import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
-import lan.tlab.r4j.sql.ast.dql.clause.Where;
-import lan.tlab.r4j.sql.ast.dql.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

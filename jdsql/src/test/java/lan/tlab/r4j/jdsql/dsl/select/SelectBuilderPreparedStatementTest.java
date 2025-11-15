@@ -3,9 +3,8 @@ package lan.tlab.r4j.jdsql.dsl.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
