@@ -3,17 +3,15 @@ package lan.tlab.r4j.jdsql.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.functional.Result;
+import lan.tlab.r4j.jdsql.functional.Result.Failure;
+import lan.tlab.r4j.jdsql.functional.Result.Success;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.jdsql.plugin.SqlTestPlugin;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.dsl.DSLRegistry;
-import lan.tlab.r4j.sql.functional.Result;
-import lan.tlab.r4j.sql.functional.Result.Failure;
-import lan.tlab.r4j.sql.functional.Result.Success;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

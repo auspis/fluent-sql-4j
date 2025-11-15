@@ -2,16 +2,15 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.identifier.Alias;
-import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.dql.clause.Select;
-import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.dql.source.FromSubquery;
-import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlFromSubqueryPsStrategy;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.identifier.Alias;
+import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
+import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlFromSubqueryPsStrategyTest {
@@ -20,7 +19,7 @@ class StandardSqlFromSubqueryPsStrategyTest {
     void handleFromSubqueryWithAlias() {
         var subquery = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(lan.tlab.r4j.sql.ast.dql.clause.From.of(new TableIdentifier("User")))
+                .from(lan.tlab.r4j.jdsql.ast.dql.clause.From.of(new TableIdentifier("User")))
                 .build();
 
         var fromSubquery = FromSubquery.of(subquery, "sub");
@@ -37,7 +36,7 @@ class StandardSqlFromSubqueryPsStrategyTest {
     void handleFromSubqueryWithoutAlias() {
         var subquery = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(lan.tlab.r4j.sql.ast.dql.clause.From.of(new TableIdentifier("User")))
+                .from(lan.tlab.r4j.jdsql.ast.dql.clause.From.of(new TableIdentifier("User")))
                 .build();
 
         var fromSubquery = FromSubquery.of(subquery, Alias.nullObject());
@@ -54,10 +53,10 @@ class StandardSqlFromSubqueryPsStrategyTest {
     void handleFromSubqueryWithParameters() {
         var subquery = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
-                .from(lan.tlab.r4j.sql.ast.dql.clause.From.of(new TableIdentifier("User")))
-                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(lan.tlab.r4j.sql.ast.common.predicate.Comparison.eq(
+                .from(lan.tlab.r4j.jdsql.ast.dql.clause.From.of(new TableIdentifier("User")))
+                .where(lan.tlab.r4j.jdsql.ast.dql.clause.Where.of(lan.tlab.r4j.jdsql.ast.common.predicate.Comparison.eq(
                         ColumnReference.of("User", "name"),
-                        lan.tlab.r4j.sql.ast.common.expression.scalar.Literal.of("John"))))
+                        lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal.of("John"))))
                 .build();
 
         var fromSubquery = FromSubquery.of(subquery, new Alias("sub"));

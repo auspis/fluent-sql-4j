@@ -3,12 +3,11 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
+import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
-import lan.tlab.r4j.sql.ast.ddl.definition.ReferencesItem;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.dll.constraint.StandardSqlForeignKeyConstraintRenderStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

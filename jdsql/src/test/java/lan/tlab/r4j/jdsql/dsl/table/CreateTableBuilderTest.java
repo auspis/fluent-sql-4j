@@ -2,12 +2,11 @@ package lan.tlab.r4j.jdsql.dsl.table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.table.CreateTableBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

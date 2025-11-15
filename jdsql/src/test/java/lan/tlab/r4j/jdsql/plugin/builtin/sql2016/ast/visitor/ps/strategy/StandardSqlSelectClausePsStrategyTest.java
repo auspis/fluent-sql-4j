@@ -3,15 +3,14 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.common.expression.Expression;
-import lan.tlab.r4j.sql.ast.common.identifier.Alias;
-import lan.tlab.r4j.sql.ast.dql.clause.Select;
-import lan.tlab.r4j.sql.ast.dql.projection.Projection;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.SelectClausePsStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlSelectClausePsStrategy;
+import lan.tlab.r4j.jdsql.ast.common.expression.Expression;
+import lan.tlab.r4j.jdsql.ast.common.identifier.Alias;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.projection.Projection;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlSelectClausePsStrategyTest {

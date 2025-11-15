@@ -1,12 +1,12 @@
 package lan.tlab.r4j.jdsql.test.util;
 
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.oracle.OracleDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
+import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.oracle.OracleDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 
 /**
  * Test utility factory for creating SQL renderers via the plugin system.
@@ -129,7 +129,7 @@ public final class TestDialectRendererFactory {
     }
 
     /**
-     * Creates a {@link lan.tlab.r4j.sql.dsl.DSL} instance configured for Standard SQL:2008.
+     * Creates a {@link lan.tlab.r4j.jdsql.dsl.DSL} instance configured for Standard SQL:2008.
      * <p>
      * This method provides a convenient way for tests to obtain a DSL instance
      * using the default Standard SQL:2008 dialect without going through DSLRegistry.
