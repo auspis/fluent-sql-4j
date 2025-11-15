@@ -11,14 +11,14 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.WrapperBeha
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.expression.JsonQueryRenderStrategy;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlJsonQueryRenderStrategyTest {
 
     @Test
     void standardSql2016WithBasicArguments() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
+        SqlRenderer sqlRenderer = StandardSqlRendererFactory.standardSql();
         JsonQueryRenderStrategy strategy = new StandardSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
         String sql = strategy.render(jsonQuery, sqlRenderer, new AstContext());
@@ -27,7 +27,7 @@ class StandardSqlJsonQueryRenderStrategyTest {
 
     @Test
     void standardSql2016WithReturningType() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
+        SqlRenderer sqlRenderer = StandardSqlRendererFactory.standardSql();
         JsonQueryRenderStrategy strategy = new StandardSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery =
                 new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"), "JSON", null, null, null);
@@ -37,7 +37,7 @@ class StandardSqlJsonQueryRenderStrategyTest {
 
     @Test
     void standardSql2016WithAllOptions() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
+        SqlRenderer sqlRenderer = StandardSqlRendererFactory.standardSql();
         JsonQueryRenderStrategy strategy = new StandardSqlJsonQueryRenderStrategy();
         JsonQuery jsonQuery = new JsonQuery(
                 ColumnReference.of("products", "data"),

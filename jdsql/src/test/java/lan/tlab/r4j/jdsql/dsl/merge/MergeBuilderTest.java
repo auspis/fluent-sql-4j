@@ -11,7 +11,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class MergeBuilderTest {
 
     @BeforeEach
     void setUp() {
-        renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
+        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
     }
 
     @Test

@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ class CreateTableDSLIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        dsl = TestDialectRendererFactory.dslStandardSql2008();
+        dsl = StandardSqlRendererFactory.dslStandardSql();
     }
 
     @Test

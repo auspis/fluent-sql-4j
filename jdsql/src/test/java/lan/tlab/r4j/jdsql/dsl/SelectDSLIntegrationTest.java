@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBeha
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.OverClause;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.WindowFunction;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class SelectDSLIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        dsl = TestDialectRendererFactory.dslStandardSql2008();
+        dsl = StandardSqlRendererFactory.dslStandardSql();
     }
 
     @Test
