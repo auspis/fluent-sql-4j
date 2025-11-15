@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.dsl.DSLRegistry;
+import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
 
 /**
  * Utility class for creating and managing test database connections and tables in integration tests.

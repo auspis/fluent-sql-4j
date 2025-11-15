@@ -6,12 +6,10 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.List;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.functional.Result;
-import lan.tlab.r4j.sql.functional.Result.Failure;
-import lan.tlab.r4j.sql.functional.Result.Success;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.functional.Result;
+import lan.tlab.r4j.jdsql.functional.Result.Failure;
+import lan.tlab.r4j.jdsql.functional.Result.Success;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -5,9 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.sql.dsl.util.LiteralUtil;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
 import org.junit.jupiter.api.Test;
 
 class LiteralUtilTest {
