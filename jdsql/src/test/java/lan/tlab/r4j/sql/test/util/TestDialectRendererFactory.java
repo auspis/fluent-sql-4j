@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.test;
+package lan.tlab.r4j.sql.test.util;
 
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
