@@ -1,12 +1,11 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.sql.ast.ddl.definition.ColumnDefinition;
-import lan.tlab.r4j.sql.ast.ddl.definition.DataType.SimpleDataType;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlColumnDefinitionPsStrategy;
+import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition;
+import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.SimpleDataType;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

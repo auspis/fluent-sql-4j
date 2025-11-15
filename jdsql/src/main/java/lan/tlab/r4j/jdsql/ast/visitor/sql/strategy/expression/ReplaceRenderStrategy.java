@@ -1,0 +1,10 @@
+package lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.expression;
+
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Replace;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
+
+public interface ReplaceRenderStrategy extends ExpressionRenderStrategy {
+
+    String render(Replace functionCall, SqlRenderer sqlRenderer, AstContext ctx);
+}
