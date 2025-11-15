@@ -19,8 +19,9 @@ import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
+import lan.tlab.r4j.sql.test.util.TestDatabaseUtil;
+import lan.tlab.r4j.sql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import util.TestDatabaseUtil;
 
 /**
  * Integration tests for JSON functions with MySQL database via Testcontainers.

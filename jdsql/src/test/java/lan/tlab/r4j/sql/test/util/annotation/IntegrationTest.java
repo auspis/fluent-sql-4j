@@ -1,4 +1,4 @@
-package lan.tlab.r4j.sql.util.annotation;
+package lan.tlab.r4j.sql.test.util.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

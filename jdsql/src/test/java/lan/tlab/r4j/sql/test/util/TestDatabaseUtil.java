@@ -1,4 +1,4 @@
-package util;
+package lan.tlab.r4j.sql.test.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
