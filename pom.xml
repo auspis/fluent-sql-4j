@@ -63,6 +63,11 @@
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
+        <artifactId>jdsql-plugin-mysql</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>lan.tlab</groupId>
         <artifactId>spike</artifactId>
         <version>1.0</version>
       </dependency>

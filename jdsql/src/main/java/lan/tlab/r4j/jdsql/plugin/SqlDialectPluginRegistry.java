@@ -176,7 +176,7 @@ public final class SqlDialectPluginRegistry {
         Objects.requireNonNull(plugin, "Plugin must not be null");
 
         List<SqlDialectPlugin> allPlugins = Stream.concat(
-                        this.plugins.values().stream().flatMap(List::stream), Stream.of(plugin))
+                        plugins.values().stream().flatMap(List::stream), Stream.of(plugin))
                 .toList();
 
         return of(allPlugins);

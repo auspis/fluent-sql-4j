@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
@@ -10,7 +11,6 @@ import lan.tlab.r4j.jdsql.functional.Result.Success;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.jdsql.plugin.SqlTestPlugin;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class DSLRegistryTest {
 
     @Test
     void of_shouldThrowForNullPluginRegistry() {
-        org.junit.jupiter.api.Assertions.assertThrows(NullPointerException.class, () -> DSLRegistry.of(null));
+        assertThrows(NullPointerException.class, () -> DSLRegistry.of(null));
     }
 
     @Test
@@ -95,21 +95,6 @@ class DSLRegistryTest {
         assertThat(dsl.insertInto("table1")).isNotNull();
         assertThat(dsl.update("table1")).isNotNull();
         assertThat(dsl.deleteFrom("table1")).isNotNull();
-    }
-
-    @Test
-    void dslFor_withMySQL_shouldReturnMySQLConfiguredDSL() {
-        DSLRegistry registry = DSLRegistry.createWithServiceLoader();
-
-        Result<DSL> result = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION);
-
-        assertThat(result).isInstanceOf(Success.class);
-        DSL dsl = result.orElseThrow();
-
-        // Verify that MySQL-specific rendering works
-        String sql = dsl.select("name").from("users").build();
-        // MySQL uses backticks by default
-        assertThat(sql).contains("`");
     }
 
     @Test
