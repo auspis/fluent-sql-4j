@@ -2,9 +2,9 @@ package lan.tlab.r4j.jdsql.plugin.builtin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPluginProvider;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPluginProvider;
 import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginProviderTest {
@@ -60,6 +60,6 @@ class StandardSQLDialectPluginProviderTest {
         StandardSQLDialectPluginProvider provider = new StandardSQLDialectPluginProvider();
 
         // Verify it implements the interface
-        assertThat(provider).isInstanceOf(lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider.class);
+        assertThat(provider).isInstanceOf(lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider.class);
     }
 }

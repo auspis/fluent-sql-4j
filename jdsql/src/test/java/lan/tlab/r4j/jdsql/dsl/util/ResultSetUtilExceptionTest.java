@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.stream.Stream;
-import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
 import org.junit.jupiter.api.Test;
 
 class ResultSetUtilExceptionTest {
