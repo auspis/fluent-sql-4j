@@ -11,7 +11,7 @@ import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
+import lan.tlab.r4j.sql.test.util.TestDialectRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
