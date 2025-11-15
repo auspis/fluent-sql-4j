@@ -11,6 +11,10 @@
   <dependencies>
     <dependency>
       <groupId>lan.tlab</groupId>
+      <artifactId>jdsql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>lan.tlab</groupId>
       <artifactId>jdsql-test-support</artifactId>
       <scope>test</scope>
     </dependency>
