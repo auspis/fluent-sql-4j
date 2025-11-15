@@ -7,6 +7,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>jdsql-test-support</module>
     <module>jdsql</module>
     <module>spike</module>
   </modules>
@@ -52,6 +53,12 @@
         <groupId>lan.tlab</groupId>
         <artifactId>jdsql</artifactId>
         <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>lan.tlab</groupId>
+        <artifactId>jdsql-test-support</artifactId>
+        <version>1.0</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>

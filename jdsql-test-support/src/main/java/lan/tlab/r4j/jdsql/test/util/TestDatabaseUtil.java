@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 /**
  * Utility class for creating and managing test database connections and tables in integration tests.
@@ -16,12 +17,15 @@ public final class TestDatabaseUtil {
 
     /**
      * Creates an H2 in-memory database connection with standard SQL mode.
+     * Each connection gets a unique database name to avoid conflicts between tests.
      *
      * @return a new H2 database connection
      * @throws SQLException if connection cannot be established
      */
     public static Connection createH2Connection() throws SQLException {
-        String jdbcUrl = "jdbc:h2:mem:testdb;MODE=REGULAR;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
+        String uniqueDbName = "testdb_" + UUID.randomUUID().toString().replace("-", "");
+        String jdbcUrl =
+                "jdbc:h2:mem:" + uniqueDbName + ";MODE=REGULAR;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
         return DriverManager.getConnection(jdbcUrl, "sa", "");
     }
 
@@ -29,12 +33,15 @@ public final class TestDatabaseUtil {
      * Creates an H2 in-memory database connection with MySQL compatibility mode.
      * This mode is useful for testing MySQL-specific features like JSON functions,
      * though H2 may not support all MySQL JSON functions.
+     * Each connection gets a unique database name to avoid conflicts between tests.
      *
      * @return a new H2 database connection in MySQL mode
      * @throws SQLException if connection cannot be established
      */
     public static Connection createH2JsonConnection() throws SQLException {
-        String jdbcUrl = "jdbc:h2:mem:testdb_json;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
+        String uniqueDbName = "testdb_json_" + UUID.randomUUID().toString().replace("-", "");
+        String jdbcUrl =
+                "jdbc:h2:mem:" + uniqueDbName + ";MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
         return DriverManager.getConnection(jdbcUrl, "sa", "");
     }
 
@@ -163,13 +170,24 @@ public final class TestDatabaseUtil {
 
     /**
      * Closes the database connection if it is not null and not already closed.
+     * For H2 in-memory databases, this ensures immediate shutdown and release of resources.
      *
      * @param connection the database connection to close
      * @throws SQLException if closing the connection fails
      */
     public static void closeConnection(Connection connection) throws SQLException {
         if (connection != null && !connection.isClosed()) {
-            connection.close();
+            try {
+                // Shutdown the H2 database to release all resources
+                try (Statement stmt = connection.createStatement()) {
+                    stmt.execute("SHUTDOWN");
+                }
+            } catch (SQLException e) {
+                // SHUTDOWN may fail if connection is already closed
+                // This is acceptable - we still want to close the connection
+            } finally {
+                connection.close();
+            }
         }
     }
 }
