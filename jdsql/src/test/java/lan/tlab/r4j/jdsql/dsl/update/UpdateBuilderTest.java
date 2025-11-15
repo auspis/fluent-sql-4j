@@ -12,7 +12,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ class UpdateBuilderTest {
 
     @BeforeEach
     void setUp() {
-        renderer = TestDialectRendererFactory.dialectRendererStandardSql2008();
+        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
     }
 
     @Test
