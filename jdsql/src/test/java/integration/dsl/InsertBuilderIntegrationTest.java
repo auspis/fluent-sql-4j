@@ -1,6 +1,6 @@
 package integration.dsl;
 
-import static lan.tlab.r4j.sql.test.JsonAssert.assertThatJson;
+import static lan.tlab.r4j.jdsql.test.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
+import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.test.util.TestDatabaseUtil;
-import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,0 +1,72 @@
+package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.sql.ast.common.identifier.Alias;
+import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.sql.ast.dql.clause.Select;
+import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.sql.ast.dql.source.FromSubquery;
+import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
+import lan.tlab.r4j.sql.ast.visitor.AstContext;
+import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlFromSubqueryPsStrategy;
+import org.junit.jupiter.api.Test;
+
+class StandardSqlFromSubqueryPsStrategyTest {
+
+    @Test
+    void handleFromSubqueryWithAlias() {
+        var subquery = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(lan.tlab.r4j.sql.ast.dql.clause.From.of(new TableIdentifier("User")))
+                .build();
+
+        var fromSubquery = FromSubquery.of(subquery, "sub");
+
+        var strategy = new StandardSqlFromSubqueryPsStrategy();
+        var visitor = new PreparedStatementRenderer();
+        var result = strategy.handle(fromSubquery, visitor, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("(SELECT \"id\" FROM \"User\") AS \"sub\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void handleFromSubqueryWithoutAlias() {
+        var subquery = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(lan.tlab.r4j.sql.ast.dql.clause.From.of(new TableIdentifier("User")))
+                .build();
+
+        var fromSubquery = FromSubquery.of(subquery, Alias.nullObject());
+
+        var strategy = new StandardSqlFromSubqueryPsStrategy();
+        var visitor = new PreparedStatementRenderer();
+        var result = strategy.handle(fromSubquery, visitor, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("(SELECT \"id\" FROM \"User\")");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void handleFromSubqueryWithParameters() {
+        var subquery = SelectStatement.builder()
+                .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
+                .from(lan.tlab.r4j.sql.ast.dql.clause.From.of(new TableIdentifier("User")))
+                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(lan.tlab.r4j.sql.ast.common.predicate.Comparison.eq(
+                        ColumnReference.of("User", "name"),
+                        lan.tlab.r4j.sql.ast.common.expression.scalar.Literal.of("John"))))
+                .build();
+
+        var fromSubquery = FromSubquery.of(subquery, new Alias("sub"));
+
+        var strategy = new StandardSqlFromSubqueryPsStrategy();
+        var visitor = new PreparedStatementRenderer();
+        var result = strategy.handle(fromSubquery, visitor, new AstContext());
+
+        assertThat(result.sql()).isEqualTo("(SELECT \"id\" FROM \"User\" WHERE \"name\" = ?) AS \"sub\"");
+        assertThat(result.parameters()).containsExactly("John");
+    }
+}
