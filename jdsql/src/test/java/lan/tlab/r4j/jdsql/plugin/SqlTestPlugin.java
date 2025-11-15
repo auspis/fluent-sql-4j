@@ -1,8 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin;
 
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.dsl.DSL;
 
 /**
  * Test helper for creating SQL dialect plugins in tests.

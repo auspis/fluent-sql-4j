@@ -2,12 +2,11 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.ast.ddl.definition.DataType.SimpleDataType;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.ast.visitor.ps.strategy.SimpleDataTypePsStrategy;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlSimpleDataTypePsStrategy;
+import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.SimpleDataType;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.SimpleDataTypePsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlSimpleDataTypePsStrategyTest {

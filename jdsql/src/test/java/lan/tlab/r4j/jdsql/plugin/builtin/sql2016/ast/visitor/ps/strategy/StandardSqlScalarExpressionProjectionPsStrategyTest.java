@@ -3,14 +3,13 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.sql.ast.common.identifier.Alias;
-import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.Visitor;
-import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlScalarExpressionProjectionPsStrategy;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.jdsql.ast.common.identifier.Alias;
+import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

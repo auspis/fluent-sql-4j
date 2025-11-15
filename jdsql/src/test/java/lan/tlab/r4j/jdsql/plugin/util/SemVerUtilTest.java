@@ -3,7 +3,6 @@ package lan.tlab.r4j.jdsql.plugin.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import lan.tlab.r4j.sql.plugin.util.SemVerUtil;
 import org.junit.jupiter.api.Test;
 
 class SemVerUtilTest {

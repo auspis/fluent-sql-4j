@@ -1,27 +1,27 @@
 package e2e.system;
 
-import static lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin.DIALECT_NAME;
+import static lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin.DIALECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Fetch;
+import lan.tlab.r4j.jdsql.ast.dql.clause.From;
+import lan.tlab.r4j.jdsql.ast.dql.clause.OrderBy;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
+import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
+import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.functional.Result;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
 import lan.tlab.r4j.jdsql.test.util.annotation.E2ETest;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.dql.clause.Fetch;
-import lan.tlab.r4j.sql.ast.dql.clause.From;
-import lan.tlab.r4j.sql.ast.dql.clause.OrderBy;
-import lan.tlab.r4j.sql.ast.dql.clause.Select;
-import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
-import lan.tlab.r4j.sql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.functional.Result;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -249,7 +249,7 @@ class MysqlDialectPluginE2E {
                         new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                         new ScalarExpressionProjection(ColumnReference.of("users", "age"))))
                 .from(From.fromTable("users"))
-                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(
+                .where(lan.tlab.r4j.jdsql.ast.dql.clause.Where.of(
                         Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25))))
                 .build();
 
@@ -311,7 +311,7 @@ class MysqlDialectPluginE2E {
                         new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                         new ScalarExpressionProjection(ColumnReference.of("users", "email"))))
                 .from(From.fromTable("users"))
-                .where(lan.tlab.r4j.sql.ast.dql.clause.Where.of(
+                .where(lan.tlab.r4j.jdsql.ast.dql.clause.Where.of(
                         Comparison.gte(ColumnReference.of("users", "age"), Literal.of(25))))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("users", "name"))))
                 .fetch(new Fetch(0, 5))
@@ -339,7 +339,7 @@ class MysqlDialectPluginE2E {
         // Get renderer from registry
         DialectRenderer renderer =
                 registry.getDialectRenderer(DIALECT_NAME, "8.0.35").orElseThrow();
-        lan.tlab.r4j.sql.dsl.DSL dsl = new lan.tlab.r4j.sql.dsl.DSL(renderer);
+        lan.tlab.r4j.jdsql.dsl.DSL dsl = new lan.tlab.r4j.jdsql.dsl.DSL(renderer);
 
         // Create source table with user updates
         try (var stmt = connection.createStatement()) {
