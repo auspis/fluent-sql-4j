@@ -2,20 +2,19 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expre
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ArithmeticExpression;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarSubquery;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.dql.clause.From;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ScalarSubquery;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.aggregate.AggregateCall;
-import lan.tlab.r4j.sql.ast.dql.clause.From;
-import lan.tlab.r4j.sql.ast.dql.clause.Select;
-import lan.tlab.r4j.sql.ast.dql.projection.AggregateCallProjection;
-import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.expression.StandardSqlUnaryArithmeticExpressionRenderStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

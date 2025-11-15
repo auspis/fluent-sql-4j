@@ -1,22 +1,22 @@
 package e2e.system;
 
-import static lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_NAME;
-import static lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
+import static lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_NAME;
+import static lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil;
+import lan.tlab.r4j.jdsql.functional.Result;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.E2ETest;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
-import lan.tlab.r4j.sql.functional.Result;
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

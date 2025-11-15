@@ -2,15 +2,14 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.claus
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
+import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin.JoinType;
+import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.identifier.TableIdentifier;
-import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.dql.source.join.OnJoin;
-import lan.tlab.r4j.sql.ast.dql.source.join.OnJoin.JoinType;
-import lan.tlab.r4j.sql.ast.visitor.AstContext;
-import lan.tlab.r4j.sql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlOnJoinStrategyRenderStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

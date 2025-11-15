@@ -2,12 +2,10 @@ package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import lan.tlab.r4j.jdsql.functional.Result;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
-import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.dsl.DSLRegistry;
-import lan.tlab.r4j.sql.functional.Result;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

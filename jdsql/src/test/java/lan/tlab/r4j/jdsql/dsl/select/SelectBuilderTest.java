@@ -3,18 +3,16 @@ package lan.tlab.r4j.jdsql.dsl.select;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
+import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.sql.ast.common.predicate.NullPredicate;
-import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
-import lan.tlab.r4j.sql.ast.common.predicate.logical.AndOr;
-import lan.tlab.r4j.sql.ast.dql.clause.Where;
-import lan.tlab.r4j.sql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.sql.dsl.LogicalCombinator;
-import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
-import lan.tlab.r4j.sql.dsl.select.SelectProjectionBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -403,7 +401,7 @@ class SelectBuilderTest {
 
         assertThat(result.condition()).isInstanceOf(AndOr.class);
         AndOr andOr = (AndOr) result.condition();
-        assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.sql.ast.common.predicate.logical.LogicalOperator.OR);
+        assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.jdsql.ast.common.predicate.logical.LogicalOperator.OR);
     }
 
     @Test

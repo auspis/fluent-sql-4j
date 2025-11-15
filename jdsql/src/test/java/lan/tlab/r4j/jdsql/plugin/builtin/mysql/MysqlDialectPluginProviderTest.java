@@ -2,9 +2,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
-import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPluginProvider;
+import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import org.junit.jupiter.api.Test;
 
 class MysqlDialectPluginProviderTest {
@@ -60,6 +58,6 @@ class MysqlDialectPluginProviderTest {
         MysqlDialectPluginProvider provider = new MysqlDialectPluginProvider();
 
         // Verify it implements the interface
-        assertThat(provider).isInstanceOf(lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider.class);
+        assertThat(provider).isInstanceOf(lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider.class);
     }
 }

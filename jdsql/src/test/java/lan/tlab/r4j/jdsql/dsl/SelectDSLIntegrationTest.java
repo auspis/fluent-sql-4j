@@ -3,16 +3,15 @@ package lan.tlab.r4j.jdsql.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.OverClause;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.WindowFunction;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.JsonValue;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.window.OverClause;
-import lan.tlab.r4j.sql.ast.common.expression.scalar.window.WindowFunction;
-import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
-import lan.tlab.r4j.sql.dsl.DSL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

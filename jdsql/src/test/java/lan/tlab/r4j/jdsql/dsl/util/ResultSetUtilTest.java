@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Stream;
-import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
 import org.junit.jupiter.api.Test;
 
 class ResultSetUtilTest {
