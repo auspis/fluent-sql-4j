@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +29,7 @@ class DeleteBuilderIntegrationTest {
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
-        dsl = TestDatabaseUtil.getDSL();
+        dsl = StandardSqlRendererFactory.dslStandardSql();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.createProductsTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
