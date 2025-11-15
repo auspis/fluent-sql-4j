@@ -41,6 +41,9 @@
     <dep.assertj-core.version>3.27.6</dep.assertj-core.version>
     <dep.mockito-core.version>5.20.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.17.8</dep.byte-buddy.version>
+
+    <!-- Run both integration and e2e by default during verify phase -->
+    <test.groups.slow>integration,e2e</test.groups.slow>
   </properties>
 
   <dependencyManagement>
@@ -334,6 +337,37 @@
                 <argument>.git/hooks/pre-commit</argument>
               </arguments>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Surefire: run only unit tests (exclude integration and e2e) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven.surefire.plugin.version}</version>
+        <configuration>
+          <excludedGroups>${test.groups.slow}</excludedGroups>
+        </configuration>
+      </plugin>
+      <!-- Failsafe: run only integration and e2e tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven.failsafe.plugin.version}</version>
+        <configuration>
+          <!-- Include all test files, filter by JUnit tags only -->
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*E2E.java</include>
+          </includes>
+          <groups>${test.groups.slow}</groups>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
