@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.Current
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.ExtractDatePart;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class StandardSqlExtractDatePartRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlExtractDatePartRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql();
+        sqlRenderer = StandardSqlRendererFactory.standardSql();
     }
 
     @Test

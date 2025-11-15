@@ -11,7 +11,7 @@ import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.expression.ExceptRenderStrategy;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.oracle.OracleSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class OracleExceptRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new OracleExceptRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.oracle();
+        sqlRenderer = OracleSqlRendererFactory.oracle();
     }
 
     @Test

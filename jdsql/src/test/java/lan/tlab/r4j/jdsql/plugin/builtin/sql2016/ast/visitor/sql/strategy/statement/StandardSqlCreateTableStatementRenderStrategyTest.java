@@ -17,7 +17,7 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class StandardSqlCreateTableStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlCreateTableStatementRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql();
+        renderer = StandardSqlRendererFactory.standardSql();
     }
 
     @Test

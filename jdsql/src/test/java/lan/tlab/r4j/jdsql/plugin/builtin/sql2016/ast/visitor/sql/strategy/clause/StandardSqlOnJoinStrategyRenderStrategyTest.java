@@ -9,19 +9,19 @@ import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin.JoinType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlOnJoinStrategyRenderStrategyTest {
 
     private StandardSqlOnJoinStrategyRenderStrategy strategy = new StandardSqlOnJoinStrategyRenderStrategy();
-    private SqlRenderer standardSql2008 = TestDialectRendererFactory.standardSql();
+    private SqlRenderer standardSql2008 = StandardSqlRendererFactory.standardSql();
 
     @BeforeEach
-    public void SsetUp() {
+    void setUp() {
         strategy = new StandardSqlOnJoinStrategyRenderStrategy();
-        standardSql2008 = TestDialectRendererFactory.standardSql();
+        standardSql2008 = StandardSqlRendererFactory.standardSql();
     }
 
     @Test

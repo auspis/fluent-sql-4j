@@ -17,7 +17,7 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ class Standard2008SqlRendererTest {
 
     @BeforeEach
     void setUp() {
-        renderer = TestDialectRendererFactory.standardSql();
+        renderer = StandardSqlRendererFactory.standardSql();
     }
 
     @Test
