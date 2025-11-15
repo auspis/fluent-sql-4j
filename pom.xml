@@ -10,6 +10,7 @@
     <module>jdsql-test-support</module>
     <module>jdsql</module>
     <module>spike</module>
+    <module>jdsql-plugin-mysql</module>
   </modules>
 
   <properties>
