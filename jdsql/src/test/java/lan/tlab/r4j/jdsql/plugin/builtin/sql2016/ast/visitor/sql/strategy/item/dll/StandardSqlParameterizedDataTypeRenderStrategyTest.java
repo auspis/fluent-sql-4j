@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class StandardSqlParameterizedDataTypeRenderStrategyTest {
 
     @BeforeEach
     void setUp() {
-        renderer = TestDialectRendererFactory.standardSql();
+        renderer = StandardSqlRendererFactory.standardSql();
         strategy = new StandardSqlParameterizedDataTypeRenderStrategy();
     }
 

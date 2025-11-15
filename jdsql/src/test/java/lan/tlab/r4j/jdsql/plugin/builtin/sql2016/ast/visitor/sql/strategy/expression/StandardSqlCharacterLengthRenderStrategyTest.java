@@ -7,14 +7,14 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Character
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.expression.CharacterLengthRenderStrategy;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlCharacterLengthRenderStrategyTest {
 
     @Test
     void ok() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
+        SqlRenderer sqlRenderer = StandardSqlRendererFactory.standardSql();
         CharacterLengthRenderStrategy strategy = new StandardSqlCharacterLengthRenderStrategy();
         CharacterLength fun = new CharacterLength(ColumnReference.of("Customer", "name"));
         String sql = strategy.render(fun, sqlRenderer, new AstContext());

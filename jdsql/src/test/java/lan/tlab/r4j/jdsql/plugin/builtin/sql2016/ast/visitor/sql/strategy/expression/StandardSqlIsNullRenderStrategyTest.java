@@ -6,7 +6,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.predicate.IsNull;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class StandardSqlIsNullRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new StandardSqlIsNullRenderStrategy();
-        sqlRenderer = TestDialectRendererFactory.standardSql();
+        sqlRenderer = StandardSqlRendererFactory.standardSql();
     }
 
     @Test

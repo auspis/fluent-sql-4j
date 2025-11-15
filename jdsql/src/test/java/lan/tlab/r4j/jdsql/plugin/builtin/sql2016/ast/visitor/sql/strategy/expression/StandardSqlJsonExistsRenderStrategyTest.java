@@ -9,14 +9,14 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonExists;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.expression.JsonExistsRenderStrategy;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlJsonExistsRenderStrategyTest {
 
     @Test
     void basicArguments() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
+        SqlRenderer sqlRenderer = StandardSqlRendererFactory.standardSql();
         JsonExistsRenderStrategy strategy = new StandardSqlJsonExistsRenderStrategy();
         JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
         String sql = strategy.render(jsonExists, sqlRenderer, new AstContext());
@@ -25,7 +25,7 @@ class StandardSqlJsonExistsRenderStrategyTest {
 
     @Test
     void onErrorBehavior() {
-        SqlRenderer sqlRenderer = TestDialectRendererFactory.standardSql();
+        SqlRenderer sqlRenderer = StandardSqlRendererFactory.standardSql();
         JsonExistsRenderStrategy strategy = new StandardSqlJsonExistsRenderStrategy();
         JsonExists jsonExists =
                 new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);

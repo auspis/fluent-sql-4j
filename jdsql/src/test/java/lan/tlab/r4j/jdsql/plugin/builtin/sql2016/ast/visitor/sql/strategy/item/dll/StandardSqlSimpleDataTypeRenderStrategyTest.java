@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -18,7 +18,7 @@ class StandardSqlSimpleDataTypeRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlSimpleDataTypeRenderStrategy();
-        renderer = TestDialectRendererFactory.standardSql();
+        renderer = StandardSqlRendererFactory.standardSql();
     }
 
     @ParameterizedTest

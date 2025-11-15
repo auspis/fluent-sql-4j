@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.jdsql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class MergeDSLIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        dsl = TestDialectRendererFactory.dslStandardSql2008();
+        dsl = StandardSqlRendererFactory.dslStandardSql();
     }
 
     @Test
