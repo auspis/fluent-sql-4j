@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
+import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
@@ -14,8 +16,6 @@ import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.sql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.sql.test.util.TestDatabaseUtil;
-import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
