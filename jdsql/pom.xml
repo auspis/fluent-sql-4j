@@ -10,6 +10,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>lan.tlab</groupId>
+      <artifactId>jdsql-test-support</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.vdurmont</groupId>
       <artifactId>semver4j</artifactId>
     </dependency>
