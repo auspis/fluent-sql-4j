@@ -1,6 +1,6 @@
 package integration.dsl;
 
-import static lan.tlab.r4j.sql.test.JsonAssert.assertThatJson;
+import static lan.tlab.r4j.jdsql.test.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -9,11 +9,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
+import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.select.SelectBuilder;
 import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
-import lan.tlab.r4j.sql.test.util.TestDatabaseUtil;
-import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
