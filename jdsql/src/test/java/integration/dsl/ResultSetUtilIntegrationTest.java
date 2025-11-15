@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.r4j.sql.dsl.DSL;
 import lan.tlab.r4j.sql.dsl.util.ResultSetUtil;
-import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
+import lan.tlab.r4j.sql.test.util.TestDatabaseUtil;
+import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import util.TestDatabaseUtil;
 
 /**
  * Integration tests for ResultSetUtil with H2 in-memory database.

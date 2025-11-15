@@ -9,8 +9,8 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.sql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.sql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.sql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
+import lan.tlab.r4j.sql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

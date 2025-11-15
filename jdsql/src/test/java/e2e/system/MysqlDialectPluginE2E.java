@@ -21,7 +21,7 @@ import lan.tlab.r4j.sql.functional.Result;
 import lan.tlab.r4j.sql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.sql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.sql.plugin.builtin.mysql.MysqlDialectPlugin;
-import lan.tlab.r4j.sql.util.annotation.E2ETest;
+import lan.tlab.r4j.sql.test.util.annotation.E2ETest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
