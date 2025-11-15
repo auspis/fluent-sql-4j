@@ -1,5 +1,6 @@
 package lan.tlab.r4j.sql.ast.common.expression.scalar;
 
+import lan.tlab.r4j.sql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.sql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.sql.ast.visitor.AstContext;
 import lan.tlab.r4j.sql.ast.visitor.Visitor;

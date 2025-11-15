@@ -1,7 +1,7 @@
 package integration.dsl;
 
+import static lan.tlab.r4j.sql.test.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static util.JsonAssert.assertThatJson;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,11 +11,11 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lan.tlab.r4j.sql.dsl.DSL;
-import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
+import lan.tlab.r4j.sql.test.util.TestDatabaseUtil;
+import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import util.TestDatabaseUtil;
 
 /**
  * Integration tests for InsertBuilder with H2 in-memory database.

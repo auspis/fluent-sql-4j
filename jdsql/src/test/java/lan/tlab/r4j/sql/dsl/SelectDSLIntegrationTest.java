@@ -10,8 +10,8 @@ import lan.tlab.r4j.sql.ast.common.expression.scalar.function.json.OnEmptyBehavi
 import lan.tlab.r4j.sql.ast.common.expression.scalar.window.OverClause;
 import lan.tlab.r4j.sql.ast.common.expression.scalar.window.WindowFunction;
 import lan.tlab.r4j.sql.ast.dql.clause.Sorting;
-import lan.tlab.r4j.sql.test.TestDialectRendererFactory;
-import lan.tlab.r4j.sql.util.annotation.IntegrationTest;
+import lan.tlab.r4j.sql.test.util.TestDialectRendererFactory;
+import lan.tlab.r4j.sql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

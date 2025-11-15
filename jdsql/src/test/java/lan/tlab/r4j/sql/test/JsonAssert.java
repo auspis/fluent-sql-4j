@@ -1,4 +1,4 @@
-package util;
+package lan.tlab.r4j.sql.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
