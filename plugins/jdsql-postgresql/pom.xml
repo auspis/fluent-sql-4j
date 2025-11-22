@@ -5,5 +5,5 @@
     <artifactId>plugins</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>jdsql-prostgresql</artifactId>
+  <artifactId>jdsql-postgresql</artifactId>
 </project>

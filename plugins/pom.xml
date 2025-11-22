@@ -11,6 +11,6 @@
 
   <modules>
     <module>jdsql-mysql</module>
-    <module>jdsql-prostgresql</module>
+    <module>jdsql-postgresql</module>
   </modules>
 </project>
