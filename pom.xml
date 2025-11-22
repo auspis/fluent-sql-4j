@@ -67,7 +67,7 @@
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
-		<artifactId>jdsql-prostgresql</artifactId>
+		<artifactId>jdsql-postgresql</artifactId>
 		<version>1.0</version>
       </dependency>
 
