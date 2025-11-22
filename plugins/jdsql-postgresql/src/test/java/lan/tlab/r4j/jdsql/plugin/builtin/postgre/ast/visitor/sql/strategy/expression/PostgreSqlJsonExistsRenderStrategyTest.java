@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.postgre.ast.visitor.sql.strategy.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
+
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonExists;
@@ -9,6 +9,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.expression.JsonExistsRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.postgre.PostgreSqlRendererFactory;
+import org.junit.jupiter.api.Test;
 
 class PostgreSqlJsonExistsRenderStrategyTest {
 
