@@ -27,7 +27,7 @@ public final class PostgreSqlRendererFactory {
      * @return SqlRenderer configured for PostgreSQL 15.x
      * @throws IllegalStateException if the PostgreSQL plugin is not available
      */
-    public static SqlRenderer postgreSql() {
+    public static SqlRenderer create() {
         return REGISTRY.getDialectRenderer(
                         PostgreSqlDialectPlugin.DIALECT_NAME, PostgreSqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow()
