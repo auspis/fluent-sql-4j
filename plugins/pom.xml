@@ -3,20 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>lan.tlab</groupId>
-    <artifactId>r4j</artifactId>
+    <artifactId>jdsql</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>spike</artifactId>
+  <artifactId>plugins</artifactId>
+  <packaging>pom</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>lan.tlab</groupId>
-      <artifactId>jdsql</artifactId>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>jdsql-mysql</module>
+  </modules>
 </project>

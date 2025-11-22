@@ -2,15 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>lan.tlab</groupId>
-  <artifactId>r4j</artifactId>
+  <artifactId>jdsql</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>jdsql-test-support</module>
-    <module>jdsql</module>
-    <module>spike</module>
-    <module>jdsql-plugin-mysql</module>
+    <module>test-support</module>
+    <module>jdsql-core</module>
+    <module>plugins</module>
   </modules>
 
   <properties>
@@ -52,18 +51,18 @@
     <dependencies>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>jdsql</artifactId>
+        <artifactId>jdsql-core</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>jdsql-test-support</artifactId>
+        <artifactId>test-support</artifactId>
         <version>1.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>jdsql-plugin-mysql</artifactId>
+        <artifactId>jdsql-mysql</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
