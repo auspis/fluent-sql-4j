@@ -67,8 +67,8 @@
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
-		<artifactId>jdsql-postgresql</artifactId>
-		<version>1.0</version>
+        <artifactId>jdsql-postgresql</artifactId>
+        <version>1.0</version>
       </dependency>
 
       <dependency>
