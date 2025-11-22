@@ -12,7 +12,7 @@ class CurrentDateRenderStrategyTest {
 
     @Test
     void mysql() {
-        SqlRenderer sqlRenderer = MysqlSqlRendererFactory.mysql();
+        SqlRenderer sqlRenderer = MysqlSqlRendererFactory.create();
         String sql = sqlRenderer.visit(new CurrentDate(), new AstContext());
         assertThat(sql).isEqualTo("CURDATE()");
     }

@@ -17,7 +17,7 @@ class MySqlFetchRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new MySqlFetchRenderStrategy();
-        sqlRenderer = MysqlSqlRendererFactory.mysql();
+        sqlRenderer = MysqlSqlRendererFactory.create();
     }
 
     @Test
