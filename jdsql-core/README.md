@@ -410,192 +410,38 @@ For implementation details, architecture, and technical specifications, see [MER
 
 ---
 
-## Extending the DSL for Custom Dialects
+## Plugin Architecture
 
-The SQL DSL is designed to be extensible, allowing you to add dialect-specific functionality for any database.
+The SQL DSL uses a plugin system to support multiple database dialects. Each plugin provides:
 
-### Architecture Overview
+- **Dialect-specific DSL**: Extended DSL with custom functions (e.g., `MysqlDSL` with `GROUP_CONCAT`)
+- **Rendering Strategies**: Dialect-specific SQL generation
+- **Version Support**: Semantic versioning for compatibility
 
-The DSL extension mechanism consists of three main components:
+### Available Plugins
 
-1. **Custom DSL Class**: Extends the base `DSL` class with dialect-specific methods
-2. **Custom Function AST Node**: `CustomFunctionCall` represents dialect-specific functions
-3. **Custom Rendering Strategy**: Dialect-specific rendering logic for custom functions
+- **Standard SQL**: SQL:2008/2016 compliant (built-in)
+- **MySQL**: MySQL 8.0+ support (see [`plugins/jdsql-mysql/`](../plugins/jdsql-mysql/))
+- **Custom Dialects**: Create your own (see [Plugin Development Guide](../data/wiki/PLUGIN_DEVELOPMENT.md))
 
-### Example: Adding a Custom Dialect
+### Creating Custom Plugins
 
-#### Step 1: Create Dialect-Specific DSL
+To add support for a new database dialect:
 
-```java
-public class PostgreSqlDSL extends DSL {
-    
-    public PostgreSqlDSL(DialectRenderer renderer) {
-        super(renderer);
-    }
-    
-    /**
-     * PostgreSQL's STRING_AGG function.
-     * Example: STRING_AGG(name, ', ' ORDER BY name)
-     */
-    public StringAggBuilder stringAgg(String column) {
-        return new StringAggBuilder(column);
-    }
-    
-    public class StringAggBuilder {
-        private final String column;
-        private String orderBy;
-        private String separator = ",";
-        
-        StringAggBuilder(String column) {
-            this.column = column;
-        }
-        
-        public StringAggBuilder orderBy(String column) {
-            this.orderBy = column;
-            return this;
-        }
-        
-        public StringAggBuilder separator(String separator) {
-            this.separator = separator;
-            return this;
-        }
-        
-        public ScalarExpression build() {
-            Map<String, Object> options = new HashMap<>();
-            if (orderBy != null) {
-                options.put("ORDER_BY", orderBy);
-            }
-            options.put("SEPARATOR", separator);
-            
-            return new CustomFunctionCall(
-                "STRING_AGG",
-                List.of(ColumnReference.of("", column)),
-                options
-            );
-        }
-    }
-}
-```
+1. Extend the base `DSL` class with dialect-specific methods
+2. Implement custom rendering strategies for dialect-specific functions
+3. Register your plugin using Java ServiceLoader
 
-#### Step 2: Create Custom Rendering Strategy
+For complete examples and step-by-step instructions, see:
 
-```java
-public class PostgreSqlCustomFunctionRenderStrategy 
-        implements CustomFunctionCallRenderStrategy {
-    
-    @Override
-    public String render(CustomFunctionCall functionCall, 
-                        SqlRenderer renderer, 
-                        AstContext ctx) {
-        return switch (functionCall.functionName()) {
-            case "STRING_AGG" -> renderStringAgg(functionCall, renderer, ctx);
-            default -> renderGeneric(functionCall, renderer, ctx);
-        };
-    }
-    
-    private String renderStringAgg(CustomFunctionCall call, 
-                                   SqlRenderer renderer, 
-                                   AstContext ctx) {
-        StringBuilder sql = new StringBuilder("STRING_AGG(");
-        sql.append(call.arguments().get(0).accept(renderer, ctx));
-        
-        String separator = (String) call.options().get("SEPARATOR");
-        sql.append(", '").append(separator).append("'");
-        
-        if (call.options().containsKey("ORDER_BY")) {
-            sql.append(" ORDER BY ").append(call.options().get("ORDER_BY"));
-        }
-        
-        sql.append(")");
-        return sql.toString();
-    }
-    
-    private String renderGeneric(CustomFunctionCall call, 
-                                 SqlRenderer renderer, 
-                                 AstContext ctx) {
-        String args = call.arguments().stream()
-            .map(arg -> arg.accept(renderer, ctx))
-            .collect(Collectors.joining(", "));
-        return call.functionName() + "(" + args + ")";
-    }
-}
-```
+- **[Plugin Development Guide](../data/wiki/PLUGIN_DEVELOPMENT.md)**: Comprehensive guide with PostgreSQL example
+- **[MySQL Plugin](../plugins/jdsql-mysql/)**: Reference implementation
 
-#### Step 3: Update Dialect Plugin
+---
 
-```java
-public class PostgreSqlDialectPlugin implements SqlDialectPluginProvider {
-    
-    @Override
-    public SqlDialectPlugin getPlugin() {
-        return new SqlDialectPlugin(
-            "postgresql",
-            "^15.0.0",
-            this::createDialectRenderer,
-            this::createPostgreSqlDSL
-        );
-    }
-    
-    private DialectRenderer createDialectRenderer() {
-        return DialectRenderer.of(
-            createPostgreSqlRenderer(),
-            createPostgreSqlPreparedStatementRenderer()
-        );
-    }
-    
-    private SqlRenderer createPostgreSqlRenderer() {
-        return SqlRenderer.builder()
-            .customFunctionCallStrategy(new PostgreSqlCustomFunctionRenderStrategy())
-            // ... other strategies
-            .build();
-    }
-    
-    private DSL createPostgreSqlDSL() {
-        return new PostgreSqlDSL(createDialectRenderer());
-    }
-}
-```
+## Additional Resources
 
-#### Step 4: Use Your Custom DSL
-
-```java
-DSLRegistry registry = DSLRegistry.createWithServiceLoader();
-PostgreSqlDSL postgres = (PostgreSqlDSL) registry.dslFor("postgresql", "15.0.0").orElseThrow();
-
-String sql = postgres.select()
-    .column("department")
-    .expression(
-        postgres.stringAgg("name")
-            .orderBy("name")
-            .separator(", ")
-            .build()
-    ).as("employees")
-    .from("employees")
-    .groupBy("department")
-    .build();
-
-// Output: SELECT "department", STRING_AGG("name", ', ' ORDER BY name) AS employees ...
-```
-
-### Key Extension Points
-
-1. **CustomFunctionCall**: Generic AST node for any dialect-specific function
-2. **CustomFunctionCallRenderStrategy**: Interface for custom rendering logic
-3. **DSL Extension**: Add fluent builder methods for your dialect
-4. **SqlDialectPlugin**: Register your DSL and renderer with the plugin system
-
-### Benefits of This Architecture
-
-- ✅ **Type Safety**: Full Java type checking at compile time
-- ✅ **Fluent API**: Intuitive builder pattern for custom functions
-- ✅ **Separation of Concerns**: DSL logic separate from rendering logic
-- ✅ **Extensibility**: Add new dialects without modifying core code
-- ✅ **Testability**: Easy to unit test DSL builders and rendering strategies
-- ✅ **Plugin System**: Automatic discovery via ServiceLoader
-
-### More Information
-
-- **Implementation Guide**: See [CUSTOM_FUNCTIONS_IMPLEMENTATION_PLAN.md](../../data/wiki/CUSTOM_FUNCTIONS_IMPLEMENTATION_PLAN.md)
-- **Plugin Architecture**: See [README_PLUGIN_ARCHITECTURE.md](../../data/wiki/README_PLUGIN_ARCHITECTURE.md)
-- **MySQL Example**: See [MysqlDSL.java](src/main/java/lan/tlab/r4j/sql/plugin/builtin/mysql/dsl/MysqlDSL.java)
+- **[DSL Usage Guide](../data/wiki/DSL_USAGE_GUIDE.md)**: Complete DSL reference with examples
+- **[Developer Guide](../data/wiki/DEVELOPER_GUIDE.md)**: Testing, coverage, and formatting
+- **[MERGE Implementation](./MERGE_IMPLEMENTATION.md)**: Technical details for MERGE statement
 
