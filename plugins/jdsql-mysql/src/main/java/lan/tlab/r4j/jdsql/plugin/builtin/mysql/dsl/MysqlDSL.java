@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.common.expression.scalar.PredicateExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
@@ -120,23 +122,14 @@ public class MysqlDSL extends DSL {
      * @return the corresponding ScalarExpression
      */
     private ScalarExpression toScalarExpression(Object value) {
-        if (value instanceof ScalarExpression se) {
-            return se;
-        }
-        if (value instanceof lan.tlab.r4j.jdsql.ast.common.predicate.Predicate predicate) {
-            // Wrap predicate as an expression for use in functions like IF()
-            return new lan.tlab.r4j.jdsql.ast.common.expression.scalar.PredicateExpression(predicate);
-        }
-        if (value instanceof String str) {
-            return ColumnReference.of("", str);
-        }
-        if (value instanceof Number n) {
-            return Literal.of(n);
-        }
-        if (value instanceof Boolean b) {
-            return Literal.of(b);
-        }
-        // Fallback: treat as string literal
-        return Literal.of(String.valueOf(value));
+        return switch (value) {
+            case ScalarExpression se -> se;
+            case Predicate predicate -> /* Wrap predicate as an expression for use in functions like IF() */
+                new PredicateExpression(predicate);
+            case String str -> ColumnReference.of("", str);
+            case Number n -> Literal.of(n);
+            case Boolean b -> Literal.of(b);
+            case null, default -> /* Fallback: treat as string literal */ Literal.of(String.valueOf(value));
+        };
     }
 }
