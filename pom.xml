@@ -67,8 +67,8 @@
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>spike</artifactId>
-        <version>1.0</version>
+		<artifactId>jdsql-prostgresql</artifactId>
+		<version>1.0</version>
       </dependency>
 
       <dependency>
