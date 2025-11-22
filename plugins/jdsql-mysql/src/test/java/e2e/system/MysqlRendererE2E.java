@@ -31,6 +31,7 @@ import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.util.annotation.E2ETest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@E2ETest
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MysqlRendererE2E {
