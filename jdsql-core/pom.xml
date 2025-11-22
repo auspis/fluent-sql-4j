@@ -3,19 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>lan.tlab</groupId>
-    <artifactId>r4j</artifactId>
+    <artifactId>jdsql</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>jdsql-plugin-mysql</artifactId>
+  <artifactId>jdsql-core</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>lan.tlab</groupId>
-      <artifactId>jdsql</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>lan.tlab</groupId>
-      <artifactId>jdsql-test-support</artifactId>
+      <artifactId>test-support</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -55,6 +51,17 @@
     <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy-agent</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- PostgreSQL support for integration and E2E tests -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- JSON support for test data -->
