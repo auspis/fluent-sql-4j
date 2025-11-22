@@ -28,7 +28,7 @@ public final class MysqlSqlRendererFactory {
      * @throws IllegalStateException if the MySQL plugin is not available
      *
      */
-    public static SqlRenderer mysql() {
+    public static SqlRenderer create() {
         return REGISTRY.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow()
                 .sqlRenderer();

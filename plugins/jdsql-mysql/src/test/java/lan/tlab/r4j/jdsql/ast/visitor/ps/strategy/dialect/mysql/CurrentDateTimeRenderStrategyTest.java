@@ -12,7 +12,7 @@ class CurrentDateTimeRenderStrategyTest {
 
     @Test
     void mysql() {
-        SqlRenderer sqlRenderer = MysqlSqlRendererFactory.mysql();
+        SqlRenderer sqlRenderer = MysqlSqlRendererFactory.create();
         String sql = sqlRenderer.visit(new CurrentDateTime(), new AstContext());
         assertThat(sql).isEqualTo("NOW()");
     }

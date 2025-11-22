@@ -21,7 +21,7 @@ class MySqlConcatRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new MySqlConcatRenderStrategy();
-        sqlRenderer = MysqlSqlRendererFactory.mysql();
+        sqlRenderer = MysqlSqlRendererFactory.create();
     }
 
     @Test
