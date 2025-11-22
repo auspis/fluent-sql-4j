@@ -23,7 +23,7 @@ class MysqlDateArithmeticRenderStrategyTest {
     @BeforeEach
     public void setUp() {
         strategy = new MysqlDateArithmeticRenderStrategy();
-        renderer = MysqlSqlRendererFactory.mysql();
+        renderer = MysqlSqlRendererFactory.create();
     }
 
     @Test

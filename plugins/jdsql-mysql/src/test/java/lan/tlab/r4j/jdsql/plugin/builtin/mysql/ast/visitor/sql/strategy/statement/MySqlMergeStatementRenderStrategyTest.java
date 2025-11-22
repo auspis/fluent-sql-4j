@@ -28,7 +28,7 @@ class MySqlMergeStatementRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new MySqlMergeStatementRenderStrategy();
-        renderer = MysqlSqlRendererFactory.mysql();
+        renderer = MysqlSqlRendererFactory.create();
     }
 
     @Test

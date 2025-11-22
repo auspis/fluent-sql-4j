@@ -21,7 +21,7 @@ class MysqlCustomFunctionCallRenderStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new MysqlCustomFunctionCallRenderStrategy();
-        sqlRenderer = MysqlSqlRendererFactory.mysql();
+        sqlRenderer = MysqlSqlRendererFactory.create();
         ctx = new AstContext();
     }
 

@@ -41,7 +41,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class StandardSqlRendererMySqlE2E {
+public class MysqlRendererE2E {
     @Container
     @SuppressWarnings("resource")
     private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
@@ -56,7 +56,7 @@ public class StandardSqlRendererMySqlE2E {
     void setUp() throws Exception {
         mysql.start();
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
-        renderer = MysqlSqlRendererFactory.mysql();
+        renderer = MysqlSqlRendererFactory.create();
         // Create table using CreateTableStatement and renderer
         CreateTableStatement createTable = new CreateTableStatement(TableDefinition.builder()
                 .table(new TableIdentifier("Customer"))

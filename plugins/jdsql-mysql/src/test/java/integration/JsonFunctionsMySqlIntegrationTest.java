@@ -54,7 +54,7 @@ class JsonFunctionsMySqlIntegrationTest {
     void setUp() throws Exception {
         mysql.start();
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
-        renderer = MysqlSqlRendererFactory.mysql();
+        renderer = MysqlSqlRendererFactory.create();
 
         // Use standard tables from TestDatabaseUtil
         connection.createStatement().execute("CREATE TABLE users (id INT, name VARCHAR(100), email VARCHAR(100))");
