@@ -21,7 +21,7 @@ class StandardSqlPaginationPsStrategyTest {
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo(" FETCH NEXT 10 ROWS ONLY");
+        assertThat(result.sql()).isEqualTo("FETCH NEXT 10 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -31,7 +31,7 @@ class StandardSqlPaginationPsStrategyTest {
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo(" FETCH NEXT 5 ROWS ONLY");
+        assertThat(result.sql()).isEqualTo("FETCH NEXT 5 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -41,7 +41,7 @@ class StandardSqlPaginationPsStrategyTest {
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo(" OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY");
+        assertThat(result.sql()).isEqualTo("OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -51,7 +51,7 @@ class StandardSqlPaginationPsStrategyTest {
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo(" OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY");
+        assertThat(result.sql()).isEqualTo("OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -61,7 +61,7 @@ class StandardSqlPaginationPsStrategyTest {
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo(" OFFSET 80 ROWS FETCH NEXT 20 ROWS ONLY");
+        assertThat(result.sql()).isEqualTo("OFFSET 80 ROWS FETCH NEXT 20 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -71,7 +71,7 @@ class StandardSqlPaginationPsStrategyTest {
 
         PsDto result = strategy.handle(pagination, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo(" OFFSET 45 ROWS FETCH NEXT 15 ROWS ONLY");
+        assertThat(result.sql()).isEqualTo("OFFSET 45 ROWS FETCH NEXT 15 ROWS ONLY");
         assertThat(result.parameters()).isEmpty();
     }
 }
