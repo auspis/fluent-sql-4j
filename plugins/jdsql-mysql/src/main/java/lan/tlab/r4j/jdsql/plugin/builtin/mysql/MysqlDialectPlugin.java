@@ -6,6 +6,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCustomFunctionCallPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.clause.MySqlFetchPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.clause.MySqlFetchRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MySqlConcatRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MysqlCustomFunctionCallRenderStrategy;
@@ -177,6 +178,7 @@ public final class MysqlDialectPlugin {
 
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .sqlRenderer(sqlRenderer)
+                .paginationStrategy(new MySqlFetchPsStrategy(sqlRenderer))
                 .customFunctionCallStrategy(new MysqlCustomFunctionCallPsStrategy())
                 .build();
 

@@ -54,7 +54,7 @@ public final class ResultSetUtil {
         final AtomicBoolean closed = new AtomicBoolean(false);
 
         Spliterator<T> spliterator =
-                new Spliterators.AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL) {
+                new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL) {
                     @Override
                     public boolean tryAdvance(Consumer<? super T> action) {
                         try {
@@ -156,6 +156,7 @@ public final class ResultSetUtil {
         try {
             rs = ps.executeQuery();
         } catch (SQLException e) {
+            e.printStackTrace();
             // on execute failure, attempt to close the PreparedStatement and propagate
             try {
                 ps.close();
@@ -168,7 +169,7 @@ public final class ResultSetUtil {
         final java.util.concurrent.atomic.AtomicBoolean closed = new AtomicBoolean(false);
 
         Spliterator<T> spliterator =
-                new Spliterators.AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL) {
+                new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL) {
                     @Override
                     public boolean tryAdvance(Consumer<? super T> action) {
                         try {
