@@ -62,7 +62,7 @@ class StandardSqlInsertStatementPsStrategyTest {
     }
 
     @Test
-    void insertWithMultipleColumns() {
+    void insertWitthMultipleColumns() {
         TableIdentifier table = new TableIdentifier("User");
         List<ColumnReference> columns = List.of(
                 ColumnReference.of("User", "id"),
