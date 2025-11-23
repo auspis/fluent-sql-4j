@@ -1,5 +1,6 @@
 package lan.tlab.r4j.jdsql.dsl;
 
+import java.util.Objects;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.dsl.delete.DeleteBuilder;
 import lan.tlab.r4j.jdsql.dsl.insert.InsertBuilder;
@@ -47,7 +48,7 @@ public class DSL {
      * @see DSLRegistry
      */
     public DSL(DialectRenderer renderer) {
-        this.renderer = java.util.Objects.requireNonNull(renderer, "DialectRenderer must not be null");
+        this.renderer = Objects.requireNonNull(renderer, "DialectRenderer must not be null");
     }
 
     /**

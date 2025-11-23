@@ -12,7 +12,6 @@ public class MySqlFetchRenderStrategy implements FetchRenderStrategy {
         if (!clause.isActive()) {
             return "";
         }
-
         Integer offset = clause.offset();
         Integer rows = clause.rows();
         return String.format("LIMIT %s OFFSET %s", rows, offset);
