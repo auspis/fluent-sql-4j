@@ -9,19 +9,16 @@
   <artifactId>test-support</artifactId>
 
   <dependencies>
-    <!-- JUnit 5 for annotations - compile scope since we provide annotations -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>compile</scope>
     </dependency>
-    <!-- AssertJ for fluent assertions - compile scope for JsonAssert -->
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <scope>compile</scope>
     </dependency>
-    <!-- Jackson for JSON handling - compile scope for JsonAssert -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>

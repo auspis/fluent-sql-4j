@@ -16,11 +16,11 @@ public class StandardSqlPaginationPsStrategy implements FetchPsStrategy {
         // SQL 2008 standard uses OFFSET ... ROWS FETCH NEXT ... ROWS ONLY
         // Add OFFSET clause if offset > 0
         if (pagination.offset() > 0) {
-            sql.append(" OFFSET ").append(pagination.offset()).append(" ROWS");
+            sql.append("OFFSET ").append(pagination.offset()).append(" ROWS ");
         }
 
         // Add FETCH clause (SQL 2008 standard)
-        sql.append(" FETCH NEXT ").append(pagination.rows()).append(" ROWS ONLY");
+        sql.append("FETCH NEXT ").append(pagination.rows()).append(" ROWS ONLY");
 
         return new PsDto(sql.toString(), List.of());
     }

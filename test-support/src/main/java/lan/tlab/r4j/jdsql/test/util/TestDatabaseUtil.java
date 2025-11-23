@@ -45,6 +45,11 @@ public final class TestDatabaseUtil {
         return DriverManager.getConnection(jdbcUrl, "sa", "");
     }
 
+    public static void dropUsersTable(Connection connection) throws SQLException {
+        try (var stmt = connection.createStatement()) {
+            stmt.execute("DROP TABLE IF EXISTS users");
+        }
+    }
     /**
      * Creates a standard users table with columns: id, name, email, age, active, birthdate, createdAt.
      *
@@ -69,6 +74,24 @@ public final class TestDatabaseUtil {
         }
     }
 
+    public static void createUsersTableWithBackTicks(Connection connection) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(
+                    """
+                    CREATE TABLE users (\
+                    `id` INTEGER PRIMARY KEY, \
+                    `name` VARCHAR(50), \
+                    `email` VARCHAR(100), \
+                    `age` INTEGER, \
+                    `active` BOOLEAN, \
+                    `birthdate` DATE, \
+                    `createdAt` TIMESTAMP, \
+                    `address` JSON, \
+                    `preferences` JSON)
+                    """);
+        }
+    }
+
     /**
      * Creates a standard products table with columns: id, name, price, quantity.
      *
@@ -89,6 +112,11 @@ public final class TestDatabaseUtil {
         }
     }
 
+    public static void truncateUsers(Connection connection) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("TRUNCATE TABLE users");
+        }
+    }
     /**
      * Inserts sample data into the users table.
      * Some users have JSON data prepopulated for testing JSON operations.
@@ -165,6 +193,33 @@ public final class TestDatabaseUtil {
                     INSERT INTO products VALUES (5, 'Keyboard', 49.99, 75, \
                     '{"tags":["electronics","accessories"],"featured":true,"backlit":true}')
                     """);
+        }
+    }
+
+    public static void createUsersUpdatesTableWithRecords(Connection connection) throws SQLException {
+        try (var stmt = connection.createStatement()) {
+            stmt.execute("DROP TABLE IF EXISTS users_updates");
+            stmt.execute(
+                    """
+                    CREATE TABLE users_updates (
+                        id INTEGER PRIMARY KEY,
+                        name VARCHAR(50),
+                        email VARCHAR(100),
+                        age INTEGER,
+                        active BOOLEAN,
+                        birthdate DATE,
+                        createdAt TIMESTAMP,
+                        address JSON,
+                        preferences JSON
+                    )
+                    """);
+            // Source has: updated John Doe (age changed), new user (id=11), Jane Smith unchanged
+            stmt.execute(
+                    "INSERT INTO users_updates VALUES (1, 'John Doe', 'john.newemail@example.com', 31, true, '1990-01-01', '2023-01-01', NULL, NULL)");
+            stmt.execute(
+                    "INSERT INTO users_updates VALUES (2, 'Jane Smith', 'jane@example.com', 25, true, '1995-01-01', '2023-01-01', NULL, NULL)");
+            stmt.execute(
+                    "INSERT INTO users_updates VALUES (11, 'New User', 'newuser@example.com', 28, true, '2000-01-01', '2023-01-08', NULL, NULL)");
         }
     }
 
