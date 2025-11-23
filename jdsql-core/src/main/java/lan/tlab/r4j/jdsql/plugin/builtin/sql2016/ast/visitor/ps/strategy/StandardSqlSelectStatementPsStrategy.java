@@ -59,10 +59,11 @@ public class StandardSqlSelectStatementPsStrategy implements SelectStatementPsSt
         String paginationClause = "";
         if (stmt.getFetch() != null && stmt.getFetch().isActive()) {
             paginationResult = stmt.getFetch().accept(renderer, ctx);
-            paginationClause = paginationResult.sql();
+            paginationClause = " " + paginationResult.sql();
         }
         String sql = "SELECT " + selectResult.sql() + " FROM " + fromResult.sql() + whereClause + groupByClause
                 + havingClause + orderByClause + paginationClause;
+
         List<Object> allParams = new ArrayList<>();
         allParams.addAll(selectResult.parameters());
         allParams.addAll(fromResult.parameters());
