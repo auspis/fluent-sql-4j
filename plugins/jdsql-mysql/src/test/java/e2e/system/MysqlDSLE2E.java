@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
+import lan.tlab.r4j.jdsql.dsl.select.SelectBuilder;
 import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil;
 import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil.RowMapper;
 import lan.tlab.r4j.jdsql.functional.Result;
@@ -184,82 +185,62 @@ class MysqlDSLE2E {
                 List.of("John Doe, Charlie, Henry", "30"),
                 List.of("Alice, Frank", "35"),
                 List.of("Eve", "40"));
-        // prepared statement
-        PreparedStatement ps = dsl.select()
+        SelectBuilder selectBuilder = dsl.select()
                 .column("age")
                 .groupConcat("name")
                 .separator(", ")
                 .as("names")
                 .from("users")
                 .groupBy("age")
-                .orderBy("age")
-                .buildPreparedStatement(connection);
+                .orderBy("age");
+
+        // prepared statement
+        PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
         assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
 
         // raw SQL
-        String sql = dsl.select()
-                .column("age")
-                .groupConcat("name")
-                .separator(", ")
-                .as("names")
-                .from("users")
-                .groupBy("age")
-                .orderBy("age")
-                .build();
+        String sql = selectBuilder.build();
         ps = connection.prepareStatement(sql);
         assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
     }
 
-    //  @Test
-    //  void shouldExecuteMySQLIfFunction() throws SQLException {
-    //      // Get DSL from registry
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      // Use IF fluent API to categorize users by age (age >= 18 ? 'adult' : 'minor')
-    //      String sql = dsl.select()
-    //              .column("name")
-    //              .column("age")
-    //              .ifExpr()
-    //              .when("users", "age")
-    //              .gte(18)
-    //              .then("adult")
-    //              .otherwise("minor")
-    //              .as("age_group")
-    //              .from("users")
-    //              .orderBy("name")
-    //              .build();
-    //
-    //      // Verify SQL contains IF function
-    //      assertThat(sql).containsIgnoringCase("IF");
-    //
-    //      // Execute and verify results
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          boolean foundAdult = false;
-    //          boolean foundMinor = false;
-    //
-    //          while (rs.next()) {
-    //              int age = rs.getInt("age");
-    //              String ageGroup = rs.getString("age_group");
-    //
-    //              assertThat(ageGroup).isIn("adult", "minor");
-    //
-    //              // Verify logic: age >= 18 should be 'adult', otherwise 'minor'
-    //              if (age >= 18) {
-    //                  assertThat(ageGroup).isEqualTo("adult");
-    //                  foundAdult = true;
-    //              } else {
-    //                  assertThat(ageGroup).isEqualTo("minor");
-    //                  foundMinor = true;
-    //              }
-    //          }
-    //
-    //          // Verify we found both categories
-    //          assertThat(foundAdult).isTrue();
-    //          assertThat(foundMinor).isTrue();
-    //      }
-    //  }
-    //
+    @Test
+    void ifFunction() throws SQLException {
+        RowMapper<List<String>> mapper =
+                r -> List.of(r.getString("name"), r.getString("age"), r.getString("age_group"));
+        List<List<String>> expected = List.of(
+                List.of("Alice", "35", "adult"),
+                List.of("Bob", "15", "minor"),
+                List.of("Charlie", "30", "adult"),
+                List.of("Diana", "25", "adult"),
+                List.of("Eve", "40", "adult"),
+                List.of("Frank", "35", "adult"),
+                List.of("Grace", "28", "adult"),
+                List.of("Henry", "30", "adult"),
+                List.of("Jane Smith", "25", "adult"),
+                List.of("John Doe", "30", "adult"));
+        SelectBuilder selectBuilder = dsl.select()
+                .column("name")
+                .column("age")
+                .ifExpr()
+                .when("users", "age")
+                .gte(18)
+                .then("adult")
+                .otherwise("minor")
+                .as("age_group")
+                .from("users")
+                .orderBy("name");
+
+        // prepared statement
+        PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
+        assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
+
+        // raw SQL
+        String sql = selectBuilder.build();
+        ps = connection.prepareStatement(sql);
+        assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
+    }
+
     //  @Test
     //  void shouldExecuteMySQLGroupConcatFunctionWithPreparedStatement() throws SQLException {
     //      // Get DSL from registry
