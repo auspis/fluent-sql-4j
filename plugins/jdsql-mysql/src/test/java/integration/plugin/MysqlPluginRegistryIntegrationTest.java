@@ -19,6 +19,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.jdsql.functional.Result;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
@@ -238,8 +239,8 @@ class MysqlPluginRegistryIntegrationTest {
                 .groupBy(GroupBy.of(ColumnReference.of("users", "age")))
                 .fetch(new Fetch(5, 3))
                 .build();
-        String sql = renderer.renderSql(statement);
 
+        String sql = renderer.renderSql(statement);
         assertThat(sql)
                 .isEqualTo(
                         """
@@ -250,5 +251,72 @@ class MysqlPluginRegistryIntegrationTest {
             ORDER BY `users`.`age` ASC \
             LIMIT 3 OFFSET 5\
             """);
+
+        PsDto psDto = renderer.renderPreparedStatement(statement);
+        assertThat(psDto.sql())
+                .isEqualTo(
+                        """
+            SELECT `users`.`age`, \
+            GROUP_CONCAT(`name` SEPARATOR ', ') AS names \
+            FROM `users` \
+            GROUP BY `users`.`age` \
+            ORDER BY `users`.`age` ASC \
+            LIMIT 3 OFFSET 5\
+            """);
+        // "SELECT `age`,
+        //        GROUP_CONCAT(`name` SEPARATOR ', ') AS `names`
+        //        FROM `users`
+        //        GROUP BY `age`
+        //        ORDER BY `age` ASC LIMIT 3 OFFSET 5"
+    }
+
+    @Test
+    void ifFunction() throws SQLException {
+        //        DialectRenderer renderer = pluginRegistry
+        //                .getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "8.0.35")
+        //                .orElseThrow();
+        //
+        //        String sql = dsl.select()
+        //                .column("name")
+        //                .column("age")
+        //                .ifExpr()
+        //                .when("users", "age")
+        //                .gte(18)
+        //                .then("adult")
+        //                .otherwise("minor")
+        //                .as("age_group")
+        //                .from("users")
+        //                .orderBy("name")
+        //                .build();
+        //
+        //        // Verify SQL contains IF function
+        //        assertThat(sql).containsIgnoringCase("IF");
+        //
+        //        // Execute and verify results
+        //        try (var ps = connection.prepareStatement(sql);
+        //                var rs = ps.executeQuery()) {
+        //            boolean foundAdult = false;
+        //            boolean foundMinor = false;
+        //
+        //            while (rs.next()) {
+        //                int age = rs.getInt("age");
+        //                String ageGroup = rs.getString("age_group");
+        //
+        //                assertThat(ageGroup).isIn("adult", "minor");
+        //
+        //                // Verify logic: age >= 18 should be 'adult', otherwise 'minor'
+        //                if (age >= 18) {
+        //                    assertThat(ageGroup).isEqualTo("adult");
+        //                    foundAdult = true;
+        //                } else {
+        //                    assertThat(ageGroup).isEqualTo("minor");
+        //                    foundMinor = true;
+        //                }
+        //            }
+        //
+        //            // Verify we found both categories
+        //            assertThat(foundAdult).isTrue();
+        //            assertThat(foundMinor).isTrue();
+        //        }
     }
 }
