@@ -28,7 +28,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
         params.addAll(usingDto.parameters());
 
         // ON condition - use JOIN_ON scope to qualify column references
-        AstContext onCtx = new AstContext(AstContext.Scope.JOIN_ON);
+        AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
         PsDto onDto = stmt.getOnCondition().accept(renderer, onCtx);
         sql += " ON " + onDto.sql();
         params.addAll(onDto.parameters());

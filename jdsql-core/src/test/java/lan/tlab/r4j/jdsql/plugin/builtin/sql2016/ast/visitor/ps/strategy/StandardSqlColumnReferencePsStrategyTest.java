@@ -32,7 +32,7 @@ class StandardSqlColumnReferencePsStrategyTest {
     @Test
     void join() {
         ColumnReference col = ColumnReference.of("Customer", "name");
-        AstContext ctx = new AstContext(AstContext.Scope.JOIN_ON);
+        AstContext ctx = new AstContext(AstContext.Feature.JOIN_ON);
         PsDto dto = strategy.handle(col, renderer, ctx);
         assertThat(dto.sql()).isEqualTo("\"Customer\".\"name\"");
         assertThat(dto.parameters()).isEmpty();
@@ -41,7 +41,7 @@ class StandardSqlColumnReferencePsStrategyTest {
     @Test
     void blankTableJoinOnContext() {
         ColumnReference col = ColumnReference.of("   ", "name");
-        AstContext ctx = new AstContext(AstContext.Scope.JOIN_ON);
+        AstContext ctx = new AstContext(AstContext.Feature.JOIN_ON);
         PsDto dto = strategy.handle(col, renderer, ctx);
         assertThat(dto.sql()).isEqualTo("\"name\"");
         assertThat(dto.parameters()).isEmpty();
