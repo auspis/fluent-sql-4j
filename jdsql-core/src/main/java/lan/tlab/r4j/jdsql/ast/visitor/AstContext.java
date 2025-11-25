@@ -7,13 +7,12 @@ import java.util.Set;
 
 public record AstContext(Set<Feature> features) {
     public enum Feature {
-        DEFAULT,
         WHERE,
         HAVING,
         GROUP_BY,
         JOIN_ON,
         UNION,
-        HAS_SUBQUERY,
+        SUBQUERY,
         WINDOW_FUNCTION
     }
 
