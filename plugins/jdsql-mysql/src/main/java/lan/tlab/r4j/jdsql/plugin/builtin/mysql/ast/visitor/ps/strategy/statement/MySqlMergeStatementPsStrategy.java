@@ -57,7 +57,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         String sourceAlias = getSourceAlias(stmt.getUsing().source());
 
         // Use JOIN_ON scope to qualify column references
-        AstContext selectCtx = new AstContext(AstContext.Scope.JOIN_ON);
+        AstContext selectCtx = new AstContext(AstContext.Feature.JOIN_ON);
 
         // Render the values from insertData
         if (insertAction.insertData() instanceof InsertData.InsertValues insertValues) {

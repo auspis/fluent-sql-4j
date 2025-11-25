@@ -32,7 +32,7 @@ public class StandardSqlOnJoinPsStrategy implements OnJoinPsStrategy {
         if (join.type() != OnJoin.JoinType.CROSS) {
             if (join.onCondition() != null) {
                 // Passa il contesto con scope JOIN_ON
-                PsDto onResult = join.onCondition().accept(renderer, new AstContext(AstContext.Scope.JOIN_ON));
+                PsDto onResult = join.onCondition().accept(renderer, new AstContext(AstContext.Feature.JOIN_ON));
                 sql.append(" ON ").append(onResult.sql());
                 params.addAll(onResult.parameters());
             }
