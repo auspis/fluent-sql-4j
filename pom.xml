@@ -41,7 +41,7 @@
     <dep.junit-jupiter.version>6.0.1</dep.junit-jupiter.version>
     <dep.assertj-core.version>3.27.6</dep.assertj-core.version>
     <dep.mockito-core.version>5.20.0</dep.mockito-core.version>
-    <dep.byte-buddy.version>1.17.8</dep.byte-buddy.version>
+    <dep.byte-buddy.version>1.18.2</dep.byte-buddy.version>
 
     <!-- Run both integration and e2e by default during verify phase -->
     <test.groups.slow>integration,e2e</test.groups.slow>
