@@ -92,7 +92,9 @@ import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.clause.FetchRenderStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.clause.FromRenderStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.clause.FromSubqueryRenderStrategy;
@@ -179,11 +181,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.item.ddl.constraint.NotNullCo
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.item.ddl.constraint.PrimaryKeyRenderStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.item.ddl.constraint.UniqueConstraintRenderStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.statement.CreateTableStatementRenderStrategy;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.statement.DeleteStatementRenderStrategy;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.statement.InsertStatementRenderStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.statement.MergeStatementRenderStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.statement.SelectStatementRenderStrategy;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.statement.UpdateStatementRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFetchRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFromRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.clause.StandardSqlFromSubqueryRenderStrategy;
@@ -270,15 +269,58 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.d
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.dll.constraint.StandardSqlPrimaryKeyRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.item.dll.constraint.StandardSqlUniqueConstraintRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlCreateTableStatementRenderStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlDeleteStatementRenderStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlInsertStatementRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlMergeStatementRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlSelectStatementRenderStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.statement.StandardSqlUpdateStatementRenderStrategy;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 
+/**
+ * SQL string renderer for AST nodes.
+ * <p>
+ * <b>IMPORTANT - Scope Limitation:</b> This renderer is primarily maintained for:
+ * <ul>
+ *   <li><b>DDL statements</b> (CREATE TABLE) - used internally by {@link lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer}
+ *       for static schema elements that don't support parameters</li>
+ *   <li><b>MERGE statements</b> - temporary fallback for incomplete PreparedStatement implementation</li>
+ *   <li><b>SELECT statements and expressions</b> - maintained for MERGE transitive dependencies and subqueries</li>
+ * </ul>
+ * <p>
+ * <b>Deprecated for DML:</b> INSERT, UPDATE, and DELETE statement rendering has been removed from this class.
+ * Use {@link lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer} instead for parameterized queries
+ * which are safer and more performant.
+ * <p>
+ * <b>Why keep this class?</b>
+ * <ul>
+ *   <li>PreparedStatementRenderer strategies for DDL elements (constraints, data types, column definitions)
+ *       delegate to SqlRenderer because DDL doesn't support parameters</li>
+ *   <li>MERGE statement components temporarily use SqlRenderer until full PreparedStatement support is implemented</li>
+ *   <li>All expression and predicate strategies must be retained for CHECK constraints and DEFAULT values
+ *       which can contain arbitrary SQL expressions</li>
+ *   <li>SELECT statement rendering is needed for subqueries in MERGE statements and table expressions</li>
+ * </ul>
+ * <p>
+ * <b>Transitive Dependencies:</b> While only ~15 PreparedStatement strategies directly call SqlRenderer,
+ * they trigger a cascade of dependencies:
+ * <ul>
+ *   <li>CHECK constraints → any predicate (Comparison, Between, In, Like, etc.)</li>
+ *   <li>DEFAULT values → any scalar expression (arithmetic, functions, casts, etc.)</li>
+ *   <li>MERGE USING → SELECT statements → full DQL tree (FROM, WHERE, GROUP BY, etc.)</li>
+ *   <li>AliasedTableExpression → subqueries → full SELECT support</li>
+ * </ul>
+ * Therefore, almost all rendering strategies must be maintained except for top-level INSERT/UPDATE/DELETE statements.
+ * <p>
+ * <b>Migration Path:</b>
+ * <ol>
+ *   <li>Use {@link DialectRenderer#renderPreparedStatement(lan.tlab.r4j.jdsql.ast.statement.Statement)} for DML operations</li>
+ *   <li>DSL builders should prefer {@code buildPreparedStatement(Connection)} over {@code build()}</li>
+ *   <li>Direct {@link DialectRenderer#renderSql(lan.tlab.r4j.jdsql.ast.statement.Statement)} calls for DML are discouraged</li>
+ * </ol>
+ *
+ * @see lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer
+ * @see DialectRenderer
+ * @since 1.0
+ */
 @Builder
 public class SqlRenderer implements Visitor<String> {
 
@@ -289,18 +331,6 @@ public class SqlRenderer implements Visitor<String> {
     @Default
     private final SelectStatementRenderStrategy selectStatementStrategy =
             new StandardSqlSelectStatementRenderStrategy();
-
-    @Default
-    private final InsertStatementRenderStrategy insertStatementStrategy =
-            new StandardSqlInsertStatementRenderStrategy();
-
-    @Default
-    private final UpdateStatementRenderStrategy updateStatementStrategy =
-            new StandardSqlUpdateStatementRenderStrategy();
-
-    @Default
-    private final DeleteStatementRenderStrategy deleteStatementStrategy =
-            new StandardSqlDeleteStatementRenderStrategy();
 
     @Default
     private final MergeStatementRenderStrategy mergeStatementStrategy = new StandardSqlMergeStatementRenderStrategy();
@@ -597,19 +627,45 @@ public class SqlRenderer implements Visitor<String> {
         return selectStatementStrategy.render(statement, this, ctx);
     }
 
+    /**
+     * @deprecated This method still works but SqlRenderer will be phased out for DML statements.
+     *             Use {@link PreparedStatementRenderer} with {@link DialectRenderer#renderPreparedStatement(lan.tlab.r4j.jdsql.ast.statement.Statement)}
+     *             for INSERT statements to get parameterized queries.
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     @Override
     public String visit(InsertStatement statement, AstContext ctx) {
-        return insertStatementStrategy.render(statement, this, ctx);
+        // Temporary: delegate to SelectStatement renderer with a simple string builder
+        // This is a fallback for legacy code still using renderSql()
+        throw new UnsupportedOperationException("INSERT statement rendering removed from SqlRenderer. "
+                + "Use PreparedStatementRenderer with renderPreparedStatement() instead. "
+                + "The DSL builder.build() method is deprecated - use builder.buildPreparedStatement() instead.");
     }
 
+    /**
+     * @deprecated This method still works but SqlRenderer will be phased out for DML statements.
+     *             Use {@link PreparedStatementRenderer} with {@link DialectRenderer#renderPreparedStatement(lan.tlab.r4j.jdsql.ast.statement.Statement)}
+     *             for UPDATE statements to get parameterized queries.
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     @Override
     public String visit(UpdateStatement statement, AstContext ctx) {
-        return updateStatementStrategy.render(statement, this, ctx);
+        throw new UnsupportedOperationException("UPDATE statement rendering removed from SqlRenderer. "
+                + "Use PreparedStatementRenderer with renderPreparedStatement() instead. "
+                + "The DSL builder.build() method is deprecated - use builder.buildPreparedStatement() instead.");
     }
 
+    /**
+     * @deprecated This method still works but SqlRenderer will be phased out for DML statements.
+     *             Use {@link PreparedStatementRenderer} with {@link DialectRenderer#renderPreparedStatement(lan.tlab.r4j.jdsql.ast.statement.Statement)}
+     *             for DELETE statements to get parameterized queries.
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     @Override
     public String visit(DeleteStatement statement, AstContext ctx) {
-        return deleteStatementStrategy.render(statement, this, ctx);
+        throw new UnsupportedOperationException("DELETE statement rendering removed from SqlRenderer. "
+                + "Use PreparedStatementRenderer with renderPreparedStatement() instead. "
+                + "The DSL builder.build() method is deprecated - use builder.buildPreparedStatement() instead.");
     }
 
     @Override
