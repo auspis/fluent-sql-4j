@@ -104,7 +104,6 @@ public final class StandardSQLDialectPlugin {
         SqlRenderer sqlRenderer = SqlRenderer.builder().build();
 
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(sqlRenderer)
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 

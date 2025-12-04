@@ -11,9 +11,12 @@ public class StandardSqlPrimaryKeyPsStrategy implements PrimaryKeyPsStrategy {
 
     @Override
     public PsDto handle(PrimaryKeyDefinition item, PreparedStatementRenderer renderer, AstContext ctx) {
-        // PrimaryKey constraints are static DDL elements without parameters
-        // Use the SQL renderer from the PreparedStatementRenderer to ensure dialect consistency
-        String sql = item.accept(renderer.getSqlRenderer(), ctx);
+        // Primary key constraints are static DDL elements without parameters
+        // Inline rendering logic from StandardSqlPrimaryKeyRenderStrategy
+        String columns = item.columns().stream()
+                .map(c -> renderer.getEscapeStrategy().apply(c))
+                .collect(java.util.stream.Collectors.joining(", "));
+        String sql = String.format("PRIMARY KEY (%s)", columns);
         return new PsDto(sql, List.of());
     }
 }

@@ -11,9 +11,8 @@ public class StandardSqlNotNullConstraintPsStrategy implements NotNullConstraint
 
     @Override
     public PsDto handle(NotNullConstraintDefinition constraint, PreparedStatementRenderer renderer, AstContext ctx) {
-        // NotNull constraints are static DDL elements without parameters
-        // Use the SQL renderer from the PreparedStatementRenderer to ensure dialect consistency
-        String sql = constraint.accept(renderer.getSqlRenderer(), ctx);
-        return new PsDto(sql, List.of());
+        // NOT NULL constraints are static DDL elements without parameters
+        // Inline rendering logic from StandardSqlNotNullConstraintRenderStrategy
+        return new PsDto("NOT NULL", List.of());
     }
 }

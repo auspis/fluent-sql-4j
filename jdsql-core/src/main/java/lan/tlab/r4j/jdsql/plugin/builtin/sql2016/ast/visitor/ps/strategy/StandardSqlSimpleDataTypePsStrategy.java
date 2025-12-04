@@ -10,9 +10,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.SimpleDataTypePsStrategy;
 public class StandardSqlSimpleDataTypePsStrategy implements SimpleDataTypePsStrategy {
 
     @Override
-    public PsDto handle(SimpleDataType simpleDataType, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PsDto handle(SimpleDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
         // Simple data types are static DDL elements without parameters
-        // Just return the type name
-        return new PsDto(simpleDataType.name(), List.of());
+        // Inline rendering logic from StandardSqlSimpleDataTypeRenderStrategy
+        return new PsDto(type.name(), List.of());
     }
 }
