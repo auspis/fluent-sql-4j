@@ -18,8 +18,10 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlSelectStatementPsStrategyTest {
@@ -27,6 +29,8 @@ class StandardSqlSelectStatementPsStrategyTest {
     private final StandardSqlSelectStatementPsStrategy strategy = new StandardSqlSelectStatementPsStrategy();
     private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
+    private final DialectRenderer dialectRenderer = new DialectRenderer(
+            SqlRenderer.builder().build(), PreparedStatementRenderer.builder().build());
 
     @Test
     void star() {
@@ -132,7 +136,8 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .from(From.of(join))
                 .build();
 
-        PsDto psDto = strategy.handle(statement, renderer, ctx);
+        // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
+        PsDto psDto = dialectRenderer.renderPreparedStatement(statement);
         assertThat(psDto.sql())
                 .isEqualTo(
                         """
