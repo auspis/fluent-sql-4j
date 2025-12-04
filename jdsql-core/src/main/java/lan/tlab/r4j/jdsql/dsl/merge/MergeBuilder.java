@@ -177,12 +177,6 @@ public class MergeBuilder {
         return new WhenNotMatchedInsertBuilder(this, condition);
     }
 
-    public String build() {
-        validateState();
-        MergeStatement statement = getCurrentStatement();
-        return renderer.renderSql(statement);
-    }
-
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         MergeStatement statement = getCurrentStatement();
@@ -323,11 +317,6 @@ public class MergeBuilder {
             return this;
         }
 
-        public String build() {
-            commitAction();
-            return parent.build();
-        }
-
         public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
             commitAction();
             return parent.buildPreparedStatement(connection);
@@ -427,11 +416,6 @@ public class MergeBuilder {
         public WhenNotMatchedInsertBuilder whenNotMatched(Predicate condition) {
             commitAction();
             return parent.whenNotMatched(condition);
-        }
-
-        public String build() {
-            commitAction();
-            return parent.build();
         }
 
         public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
