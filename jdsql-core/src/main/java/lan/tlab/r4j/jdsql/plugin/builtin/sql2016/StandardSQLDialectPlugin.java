@@ -4,6 +4,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
 
 /**
  * Built-in plugin for the Standard SQL:2008 dialect.
@@ -102,8 +103,10 @@ public final class StandardSQLDialectPlugin {
     private static DialectRenderer createStandardSql2008Renderer() {
         SqlRenderer sqlRenderer = SqlRenderer.builder().build();
 
-        PreparedStatementRenderer psRenderer =
-                PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
+        PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+                .sqlRenderer(sqlRenderer)
+                .escapeStrategy(new StandardSqlEscapeStrategy())
+                .build();
 
         return new DialectRenderer(sqlRenderer, psRenderer);
     }
