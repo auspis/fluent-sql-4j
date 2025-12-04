@@ -124,7 +124,6 @@ public final class OracleDialectPlugin {
                 .build();
 
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(sqlRenderer)
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 

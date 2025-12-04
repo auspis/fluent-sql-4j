@@ -1,6 +1,5 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.Collections;
 import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
@@ -11,11 +10,8 @@ public class StandardSqlCreateTableStatementPsStrategy implements CreateTableSta
 
     @Override
     public PsDto handle(CreateTableStatement createTableStatement, PreparedStatementRenderer renderer, AstContext ctx) {
-        // For CREATE TABLE statements, we use the SQL renderer from the PreparedStatementRenderer
-        // This ensures we use the same dialect configuration
-        String sql = String.format(
-                "CREATE TABLE %s", createTableStatement.tableDefinition().accept(renderer.getSqlRenderer(), ctx));
-
-        return new PsDto(sql, Collections.emptyList());
+        PsDto tableDefinitionDto = createTableStatement.tableDefinition().accept(renderer, ctx);
+        String sql = "CREATE TABLE " + tableDefinitionDto.sql();
+        return new PsDto(sql, tableDefinitionDto.parameters());
     }
 }

@@ -25,10 +25,10 @@ public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPs
         String columnName = renderer.getEscapeStrategy().apply(columnDefinition.name());
         builder.append(columnName);
 
-        // Handle data type using the SQL renderer from the PreparedStatementRenderer
-        // This ensures we use the same dialect configuration
-        String typeString = columnDefinition.type().accept(renderer.getSqlRenderer(), ctx);
-        builder.append(" ").append(typeString);
+        // Handle data type - use PreparedStatementRenderer directly
+        PsDto typeDto = columnDefinition.type().accept(renderer, ctx);
+        builder.append(" ").append(typeDto.sql());
+        parameters.addAll(typeDto.parameters());
 
         // Handle constraints (NOT NULL, DEFAULT) - these may have parameters
         List<PsDto> constraintDtos = Stream.of(
