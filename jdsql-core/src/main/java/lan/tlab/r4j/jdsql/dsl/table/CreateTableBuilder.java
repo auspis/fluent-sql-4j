@@ -12,17 +12,13 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
-import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 
 public class CreateTableBuilder {
 
     private TableDefinition.TableDefinitionBuilder definitionBuilder;
-    private final DialectRenderer renderer;
     private List<ColumnDefinition> columns = new ArrayList<>();
 
-    public CreateTableBuilder(DialectRenderer renderer, String tableName) {
-        this.renderer = renderer;
+    public CreateTableBuilder(String tableName) {
         this.definitionBuilder = TableDefinition.builder().name(tableName);
     }
 
@@ -156,14 +152,5 @@ public class CreateTableBuilder {
             }
         }
         throw new IllegalArgumentException("Column not found: " + columnName);
-    }
-
-    public String build() {
-        TableDefinition.TableDefinitionBuilder finalBuilder = definitionBuilder;
-        if (!columns.isEmpty()) {
-            finalBuilder = finalBuilder.columns(columns);
-        }
-        CreateTableStatement statement = new CreateTableStatement(finalBuilder.build());
-        return renderer.renderSql(statement);
     }
 }

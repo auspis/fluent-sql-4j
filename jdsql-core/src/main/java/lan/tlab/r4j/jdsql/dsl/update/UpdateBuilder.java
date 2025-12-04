@@ -144,12 +144,6 @@ public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
         return statementBuilder.set(setItems).build();
     }
 
-    public String build() {
-        validateState();
-        UpdateStatement updateStatement = getCurrentStatement();
-        return renderer.renderSql(updateStatement);
-    }
-
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         UpdateStatement statement = getCurrentStatement();

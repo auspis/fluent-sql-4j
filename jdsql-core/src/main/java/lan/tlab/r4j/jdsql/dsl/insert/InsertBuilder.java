@@ -77,12 +77,6 @@ public class InsertBuilder {
         return this;
     }
 
-    public String build() {
-        validateState();
-        InsertStatement statement = getCurrentStatement();
-        return renderer.renderSql(statement);
-    }
-
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         InsertStatement statement = getCurrentStatement();
