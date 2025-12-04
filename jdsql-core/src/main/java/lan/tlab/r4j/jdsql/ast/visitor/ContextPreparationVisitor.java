@@ -111,13 +111,31 @@ public class ContextPreparationVisitor implements Visitor<AstContext> {
     @Override
     public AstContext visit(SelectStatement statement, AstContext ctx) {
         AstContext enriched = ctx;
-        enriched = statement.getSelect().accept(this, enriched);
-        enriched = statement.getFrom().accept(this, enriched);
-        enriched = statement.getWhere().accept(this, enriched);
-        enriched = statement.getGroupBy().accept(this, enriched);
-        enriched = statement.getHaving().accept(this, enriched);
-        enriched = statement.getOrderBy().accept(this, enriched);
-        enriched = statement.getFetch().accept(this, enriched);
+
+        // Visit all clauses and accumulate features
+        // Note: null objects won't add features since they have empty conditions/expressions
+        if (statement.getSelect() != null) {
+            enriched = statement.getSelect().accept(this, enriched);
+        }
+        if (statement.getFrom() != null) {
+            enriched = statement.getFrom().accept(this, enriched);
+        }
+        if (statement.getWhere() != null) {
+            enriched = statement.getWhere().accept(this, enriched);
+        }
+        if (statement.getGroupBy() != null) {
+            enriched = statement.getGroupBy().accept(this, enriched);
+        }
+        if (statement.getHaving() != null) {
+            enriched = statement.getHaving().accept(this, enriched);
+        }
+        if (statement.getOrderBy() != null) {
+            enriched = statement.getOrderBy().accept(this, enriched);
+        }
+        if (statement.getFetch() != null) {
+            enriched = statement.getFetch().accept(this, enriched);
+        }
+
         return enriched;
     }
 
@@ -142,9 +160,15 @@ public class ContextPreparationVisitor implements Visitor<AstContext> {
     @Override
     public AstContext visit(OnJoin onJoin, AstContext ctx) {
         AstContext enriched = ctx.withFeatures(AstContext.Feature.JOIN_ON);
+
+        // Visit left, right, and condition recursively
         enriched = onJoin.left().accept(this, enriched);
         enriched = onJoin.right().accept(this, enriched);
-        enriched = onJoin.onCondition().accept(this, enriched);
+
+        if (onJoin.onCondition() != null) {
+            enriched = onJoin.onCondition().accept(this, enriched);
+        }
+
         return enriched;
     }
 
@@ -156,7 +180,8 @@ public class ContextPreparationVisitor implements Visitor<AstContext> {
 
     @Override
     public AstContext visit(Where clause, AstContext ctx) {
-        if (clause.condition() == null || clause.condition() instanceof NullPredicate) {
+        if (clause.condition() == null
+                || clause.condition() instanceof lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate) {
             return ctx;
         }
         AstContext enriched = ctx.withFeatures(AstContext.Feature.WHERE);
@@ -178,7 +203,8 @@ public class ContextPreparationVisitor implements Visitor<AstContext> {
 
     @Override
     public AstContext visit(Having clause, AstContext ctx) {
-        if (clause.condition() == null || clause.condition() instanceof NullPredicate) {
+        if (clause.condition() == null
+                || clause.condition() instanceof lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate) {
             return ctx;
         }
         AstContext enriched = ctx.withFeatures(AstContext.Feature.HAVING);
