@@ -688,10 +688,15 @@ class PreparedStatementRendererTest {
                         new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
                 .from(From.of(join))
                 .build();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(stmt, new AstContext());
+        // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
+        var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
+                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
+                lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
+                        .build());
+        PsDto result = dialectRenderer.renderPreparedStatement(stmt);
         assertThat(result.sql())
-                .isEqualTo("SELECT \"id\", \"name\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\"");
+                .isEqualTo(
+                        "SELECT \"t1\".\"id\", \"t2\".\"name\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\"");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -711,11 +716,15 @@ class PreparedStatementRendererTest {
                 .from(From.of(join))
                 .where(Where.of(Comparison.gt(ColumnReference.of("t1", "id"), Literal.of(10))))
                 .build();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(stmt, new AstContext());
+        // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
+        var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
+                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
+                lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
+                        .build());
+        PsDto result = dialectRenderer.renderPreparedStatement(stmt);
         assertThat(result.sql())
                 .isEqualTo(
-                        "SELECT \"id\", \"name\" FROM \"t1\" LEFT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" WHERE \"id\" > ?");
+                        "SELECT \"t1\".\"id\", \"t2\".\"name\" FROM \"t1\" LEFT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" WHERE \"t1\".\"id\" > ?");
         assertThat(result.parameters()).containsExactly(10);
     }
 
@@ -735,11 +744,15 @@ class PreparedStatementRendererTest {
                 .from(From.of(join))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("t2", "name"))))
                 .build();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(stmt, new AstContext());
+        // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
+        var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
+                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
+                lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
+                        .build());
+        PsDto result = dialectRenderer.renderPreparedStatement(stmt);
         assertThat(result.sql())
                 .isEqualTo(
-                        "SELECT \"id\", \"name\" FROM \"t1\" RIGHT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" ORDER BY \"name\" ASC");
+                        "SELECT \"t1\".\"id\", \"t2\".\"name\" FROM \"t1\" RIGHT JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" ORDER BY \"t2\".\"name\" ASC");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -759,11 +772,15 @@ class PreparedStatementRendererTest {
                 .from(From.of(join))
                 .groupBy(GroupBy.of(ColumnReference.of("t1", "id")))
                 .build();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(stmt, new AstContext());
+        // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
+        var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
+                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
+                lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
+                        .build());
+        PsDto result = dialectRenderer.renderPreparedStatement(stmt);
         assertThat(result.sql())
                 .isEqualTo(
-                        "SELECT \"id\", \"name\" FROM \"t1\" FULL JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" GROUP BY \"id\"");
+                        "SELECT \"t1\".\"id\", \"t2\".\"name\" FROM \"t1\" FULL JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" GROUP BY \"t1\".\"id\"");
         assertThat(result.parameters()).isEmpty();
     }
 
@@ -808,11 +825,15 @@ class PreparedStatementRendererTest {
                         new ScalarExpressionProjection(ColumnReference.of("t3", "value"))))
                 .from(From.of(join2))
                 .build();
-        PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(stmt, new AstContext());
+        // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
+        var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
+                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
+                lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
+                        .build());
+        PsDto result = dialectRenderer.renderPreparedStatement(stmt);
         assertThat(result.sql())
                 .isEqualTo(
-                        "SELECT \"id\", \"name\", \"value\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" LEFT JOIN \"t3\" ON \"t2\".\"id\" = \"t3\".\"t2_id\"");
+                        "SELECT \"t1\".\"id\", \"t2\".\"name\", \"t3\".\"value\" FROM \"t1\" INNER JOIN \"t2\" ON \"t1\".\"id\" = \"t2\".\"t1_id\" LEFT JOIN \"t3\" ON \"t2\".\"id\" = \"t3\".\"t2_id\"");
         assertThat(result.parameters()).isEmpty();
     }
 
