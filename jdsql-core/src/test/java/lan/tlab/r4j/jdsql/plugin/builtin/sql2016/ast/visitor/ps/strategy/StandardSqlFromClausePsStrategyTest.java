@@ -84,7 +84,9 @@ class StandardSqlFromClausePsStrategyTest {
                 Comparison.eq(ColumnReference.of("User", "id"), ColumnReference.of("Order", "user_id")));
         From from = From.of(join);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        // Use context with JOIN_ON feature to enable column qualification
+        AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        PsDto result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql()).isEqualTo("\"User\" INNER JOIN \"Order\" ON \"User\".\"id\" = \"Order\".\"user_id\"");
         assertThat(result.parameters()).isEmpty();
@@ -101,7 +103,9 @@ class StandardSqlFromClausePsStrategyTest {
                 Comparison.eq(ColumnReference.of("User", "id"), ColumnReference.of("Profile", "user_id")));
         From from = From.of(join);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        // Use context with JOIN_ON feature to enable column qualification
+        AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        PsDto result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo("\"User\" LEFT JOIN \"Profile\" ON \"User\".\"id\" = \"Profile\".\"user_id\"");
@@ -119,7 +123,9 @@ class StandardSqlFromClausePsStrategyTest {
                 Comparison.eq(ColumnReference.of("User", "dept_id"), ColumnReference.of("Department", "id")));
         From from = From.of(join);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        // Use context with JOIN_ON feature to enable column qualification
+        AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        PsDto result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo("\"User\" RIGHT JOIN \"Department\" ON \"User\".\"dept_id\" = \"Department\".\"id\"");
@@ -137,7 +143,9 @@ class StandardSqlFromClausePsStrategyTest {
                 Comparison.eq(ColumnReference.of("User", "role_id"), ColumnReference.of("Role", "id")));
         From from = From.of(join);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        // Use context with JOIN_ON feature to enable column qualification
+        AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        PsDto result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql()).isEqualTo("\"User\" FULL JOIN \"Role\" ON \"User\".\"role_id\" = \"Role\".\"id\"");
         assertThat(result.parameters()).isEmpty();
@@ -164,7 +172,9 @@ class StandardSqlFromClausePsStrategyTest {
                 t1, OnJoin.JoinType.INNER, t2, Comparison.gt(ColumnReference.of("Order", "amount"), Literal.of(100)));
         From from = From.of(join);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        // Use context with JOIN_ON feature to enable column qualification
+        AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        PsDto result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql()).isEqualTo("\"User\" INNER JOIN \"Order\" ON \"Order\".\"amount\" > ?");
         assertThat(result.parameters()).containsExactly(100);
@@ -190,7 +200,9 @@ class StandardSqlFromClausePsStrategyTest {
 
         From from = From.of(join2);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        // Use context with JOIN_ON feature to enable column qualification
+        AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        PsDto result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo(
@@ -211,7 +223,9 @@ class StandardSqlFromClausePsStrategyTest {
 
         From from = From.of(table, join);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        // Use context with JOIN_ON feature to enable column qualification
+        AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        PsDto result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo(
