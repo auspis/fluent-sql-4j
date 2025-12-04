@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.functional.Result;
 import lan.tlab.r4j.jdsql.functional.Result.Failure;
@@ -250,19 +249,6 @@ public final class SqlDialectPluginRegistry {
         }
 
         return new Success<>(matchingPlugins.get(0).createDSL().getRenderer());
-    }
-
-    /**
-     * Gets a {@link SqlRenderer} for the specified dialect and version.
-     * <p>
-     * This is a convenience method that extracts the SQL renderer from the dialect renderer.
-     *
-     * @param dialect the dialect name
-     * @param version the version to match
-     * @return a {@link lan.tlab.r4j.jdsql.functional.Result} containing either the SQL renderer or an error message
-     */
-    public Result<SqlRenderer> getSqlRenderer(String dialect, String version) {
-        return getDialectRenderer(dialect, version).map(DialectRenderer::sqlRenderer);
     }
 
     /**
