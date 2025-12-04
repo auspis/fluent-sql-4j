@@ -178,6 +178,7 @@ public final class MysqlDialectPlugin {
 
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .sqlRenderer(sqlRenderer)
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .paginationStrategy(new MySqlFetchPsStrategy(sqlRenderer))
                 .customFunctionCallStrategy(new MysqlCustomFunctionCallPsStrategy())
                 .build();

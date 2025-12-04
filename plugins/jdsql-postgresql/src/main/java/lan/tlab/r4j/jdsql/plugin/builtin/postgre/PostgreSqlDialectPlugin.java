@@ -7,6 +7,7 @@ import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.postgre.ast.visitor.sql.strategy.expression.PostgreSqlCustomFunctionCallRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl.PostgreSqlDSL;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
 
 /**
  * Built-in plugin for the PostgreSQL dialect.
@@ -118,8 +119,10 @@ public final class PostgreSqlDialectPlugin {
                 .customFunctionCallStrategy(new PostgreSqlCustomFunctionCallRenderStrategy())
                 .build();
 
-        PreparedStatementRenderer psRenderer =
-                PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
+        PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+                .sqlRenderer(sqlRenderer)
+                .escapeStrategy(new StandardSqlEscapeStrategy())
+                .build();
 
         return new DialectRenderer(sqlRenderer, psRenderer);
     }
