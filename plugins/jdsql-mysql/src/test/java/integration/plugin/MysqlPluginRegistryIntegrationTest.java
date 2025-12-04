@@ -256,18 +256,13 @@ class MysqlPluginRegistryIntegrationTest {
         assertThat(psDto.sql())
                 .isEqualTo(
                         """
-            SELECT `users`.`age`, \
-            GROUP_CONCAT(`name` SEPARATOR ', ') AS names \
+            SELECT `age`, \
+            GROUP_CONCAT(`name` SEPARATOR ', ') AS `names` \
             FROM `users` \
-            GROUP BY `users`.`age` \
-            ORDER BY `users`.`age` ASC \
+            GROUP BY `age` \
+            ORDER BY `age` ASC \
             LIMIT 3 OFFSET 5\
             """);
-        // "SELECT `age`,
-        //        GROUP_CONCAT(`name` SEPARATOR ', ') AS `names`
-        //        FROM `users`
-        //        GROUP BY `age`
-        //        ORDER BY `age` ASC LIMIT 3 OFFSET 5"
     }
 
     @Test
