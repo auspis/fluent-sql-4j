@@ -6,12 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCustomFunctionCallPsStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.clause.MySqlFetchPsStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.clause.MySqlFetchRenderStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MySqlConcatRenderStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MysqlCustomFunctionCallRenderStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.expression.MysqlDateArithmeticRenderStrategy;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.sql.strategy.statement.MySqlMergeStatementRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 
@@ -165,25 +159,12 @@ public final class MysqlDialectPlugin {
      * @return a new {@link DialectRenderer} instance configured for MySQL, never {@code null}
      */
     private static DialectRenderer createMySqlRenderer() {
-        SqlRenderer sqlRenderer = SqlRenderer.builder()
-                .escapeStrategy(new MysqlEscapeStrategy())
-                .paginationStrategy(new MySqlFetchRenderStrategy())
-                .currentDateStrategy((functionCall1, sqlRenderer1, ctx1) -> "CURDATE()")
-                .currentDateTimeStrategy((functionCall1, sqlRenderer1, ctx1) -> "NOW()")
-                .dateArithmeticStrategy(new MysqlDateArithmeticRenderStrategy())
-                .concatStrategy(new MySqlConcatRenderStrategy())
-                .customFunctionCallStrategy(new MysqlCustomFunctionCallRenderStrategy())
-                .mergeStatementStrategy(new MySqlMergeStatementRenderStrategy())
-                .build();
-
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(sqlRenderer)
                 .escapeStrategy(new MysqlEscapeStrategy())
-                .paginationStrategy(new MySqlFetchPsStrategy(sqlRenderer))
                 .customFunctionCallStrategy(new MysqlCustomFunctionCallPsStrategy())
                 .build();
 
-        return new DialectRenderer(sqlRenderer, psRenderer);
+        return new DialectRenderer(psRenderer);
     }
 
     /**
