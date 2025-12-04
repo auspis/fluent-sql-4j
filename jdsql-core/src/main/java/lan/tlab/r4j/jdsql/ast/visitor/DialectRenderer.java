@@ -34,6 +34,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
  */
 public record DialectRenderer(SqlRenderer sqlRenderer, PreparedStatementRenderer psRenderer) {
 
+    private static final ContextPreparationVisitor CONTEXT_ANALYZER = new ContextPreparationVisitor();
+
     /**
      * Compact constructor with validation.
      *
@@ -51,7 +53,8 @@ public record DialectRenderer(SqlRenderer sqlRenderer, PreparedStatementRenderer
      * @return the SQL string representation
      */
     public String renderSql(Statement statement) {
-        return statement.accept(sqlRenderer, new AstContext());
+        AstContext enrichedCtx = statement.accept(CONTEXT_ANALYZER, new AstContext());
+        return statement.accept(sqlRenderer, enrichedCtx);
     }
 
     /**
@@ -61,6 +64,7 @@ public record DialectRenderer(SqlRenderer sqlRenderer, PreparedStatementRenderer
      * @return the PreparedStatement DTO with SQL and parameters
      */
     public PsDto renderPreparedStatement(Statement statement) {
-        return statement.accept(psRenderer, new AstContext());
+        AstContext enrichedCtx = statement.accept(CONTEXT_ANALYZER, new AstContext());
+        return statement.accept(psRenderer, enrichedCtx);
     }
 }
