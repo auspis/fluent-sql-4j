@@ -12,8 +12,13 @@ public class StandardSqlIndexDefinitionPsStrategy implements IndexDefinitionPsSt
     @Override
     public PsDto handle(IndexDefinition index, PreparedStatementRenderer renderer, AstContext ctx) {
         // Index definitions are static DDL elements without parameters
-        // Use the SQL renderer from the PreparedStatementRenderer to ensure dialect consistency
-        String sql = index.accept(renderer.getSqlRenderer(), ctx);
+        // Inline rendering logic from StandardSqlIndexDefinitionRenderStrategy
+        String sql = String.format(
+                "INDEX %s (%s)",
+                renderer.getEscapeStrategy().apply(index.name()),
+                index.columnNames().stream()
+                        .map(renderer.getEscapeStrategy()::apply)
+                        .collect(java.util.stream.Collectors.joining(", ")));
         return new PsDto(sql, List.of());
     }
 }
