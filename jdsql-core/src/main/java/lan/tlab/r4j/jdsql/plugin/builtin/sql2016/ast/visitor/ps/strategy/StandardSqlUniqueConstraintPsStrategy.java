@@ -12,8 +12,11 @@ public class StandardSqlUniqueConstraintPsStrategy implements UniqueConstraintPs
     @Override
     public PsDto handle(UniqueConstraintDefinition constraint, PreparedStatementRenderer renderer, AstContext ctx) {
         // Unique constraints are static DDL elements without parameters
-        // Use the SQL renderer from the PreparedStatementRenderer to ensure dialect consistency
-        String sql = constraint.accept(renderer.getSqlRenderer(), ctx);
+        // Inline rendering logic from StandardSqlUniqueConstraintRenderStrategy
+        String columns = constraint.columns().stream()
+                .map(c -> renderer.getEscapeStrategy().apply(c))
+                .collect(java.util.stream.Collectors.joining(", "));
+        String sql = String.format("UNIQUE (%s)", columns);
         return new PsDto(sql, List.of());
     }
 }
