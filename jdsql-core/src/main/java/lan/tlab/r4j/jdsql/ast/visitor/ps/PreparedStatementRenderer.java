@@ -1,5 +1,6 @@
 package lan.tlab.r4j.jdsql.ast.visitor.ps;
 
+import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
@@ -181,7 +182,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UniqueConstraintPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhereClausePsStrategy;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAggregateCallPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAggregationFunctionProjectionPsStrategy;
@@ -274,17 +274,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class PreparedStatementRenderer implements Visitor<PsDto> {
-    @Getter
-    @Default
-    private final SqlRenderer sqlRenderer = SqlRenderer.builder().build();
-
     @Default
     private final EscapeStrategy escapeStrategy = new StandardSqlEscapeStrategy();
 
@@ -939,37 +934,104 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(MergeUsing item, AstContext ctx) {
-        // Render as SQL for now
-        String sql = sqlRenderer.visit(item, ctx);
-        return new PsDto(sql, List.of());
+        return item.source().accept(this, ctx);
     }
 
     @Override
     public PsDto visit(AliasedTableExpression item, AstContext ctx) {
-        // Render as SQL for now
-        String sql = sqlRenderer.visit(item, ctx);
-        return new PsDto(sql, List.of());
+        List<Object> allParameters = new ArrayList<>();
+        StringBuilder sql = new StringBuilder();
+
+        PsDto exprDto = item.expression().accept(this, ctx);
+        allParameters.addAll(exprDto.parameters());
+
+        // Check if expression is a subquery (SelectStatement)
+        if (item.expression() instanceof lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement) {
+            sql.append("(").append(exprDto.sql()).append(")");
+        } else {
+            sql.append(exprDto.sql());
+        }
+
+        PsDto aliasDto = item.alias().accept(this, ctx);
+        allParameters.addAll(aliasDto.parameters());
+        if (!aliasDto.sql().isEmpty()) {
+            sql.append(" ").append(aliasDto.sql());
+        }
+
+        return new PsDto(sql.toString(), allParameters);
     }
 
     @Override
     public PsDto visit(WhenMatchedUpdate item, AstContext ctx) {
-        // Render as SQL for now
-        String sql = sqlRenderer.visit(item, ctx);
-        return new PsDto(sql, List.of());
+        List<Object> allParameters = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("WHEN MATCHED");
+
+        if (item.condition() != null) {
+            PsDto conditionDto = item.condition().accept(this, ctx);
+            allParameters.addAll(conditionDto.parameters());
+            sql.append(" AND ").append(conditionDto.sql());
+        }
+
+        sql.append(" THEN UPDATE SET ");
+
+        String updates = item.updateItems().stream()
+                .map(updateItem -> {
+                    PsDto updateDto = updateItem.accept(this, ctx);
+                    allParameters.addAll(updateDto.parameters());
+                    return updateDto.sql();
+                })
+                .collect(java.util.stream.Collectors.joining(", "));
+
+        sql.append(updates);
+
+        return new PsDto(sql.toString(), allParameters);
     }
 
     @Override
     public PsDto visit(WhenMatchedDelete item, AstContext ctx) {
-        // Render as SQL for now
-        String sql = sqlRenderer.visit(item, ctx);
-        return new PsDto(sql, List.of());
+        List<Object> allParameters = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("WHEN MATCHED");
+
+        if (item.condition() != null) {
+            PsDto conditionDto = item.condition().accept(this, ctx);
+            allParameters.addAll(conditionDto.parameters());
+            sql.append(" AND ").append(conditionDto.sql());
+        }
+
+        sql.append(" THEN DELETE");
+
+        return new PsDto(sql.toString(), allParameters);
     }
 
     @Override
     public PsDto visit(WhenNotMatchedInsert item, AstContext ctx) {
-        // Render as SQL for now
-        String sql = sqlRenderer.visit(item, ctx);
-        return new PsDto(sql, List.of());
+        List<Object> allParameters = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("WHEN NOT MATCHED");
+
+        if (item.condition() != null) {
+            PsDto conditionDto = item.condition().accept(this, ctx);
+            allParameters.addAll(conditionDto.parameters());
+            sql.append(" AND ").append(conditionDto.sql());
+        }
+
+        sql.append(" THEN INSERT");
+
+        if (!item.columns().isEmpty()) {
+            String columns = item.columns().stream()
+                    .map(col -> {
+                        PsDto colDto = col.accept(this, ctx);
+                        allParameters.addAll(colDto.parameters());
+                        return colDto.sql();
+                    })
+                    .collect(java.util.stream.Collectors.joining(", "));
+            sql.append(" (").append(columns).append(")");
+        }
+
+        PsDto insertDataDto = item.insertData().accept(this, ctx);
+        allParameters.addAll(insertDataDto.parameters());
+        sql.append(" ").append(insertDataDto.sql());
+
+        return new PsDto(sql.toString(), allParameters);
     }
 
     // Handle FromSource dispatch for FROM clause
