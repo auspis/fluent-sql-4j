@@ -4,7 +4,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.jdsql.plugin.builtin.oracle.ast.visitor.sql.strategy.expression.OracleExceptRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
 
 /**
@@ -118,16 +117,11 @@ public final class OracleDialectPlugin {
      * @return a new {@link DialectRenderer} instance configured for Oracle, never {@code null}
      */
     private static DialectRenderer createOracleRenderer() {
-        SqlRenderer sqlRenderer = SqlRenderer.builder()
-                .currentDateTimeStrategy((functionCall, sqlRenderer1, ctx) -> "SYSDATE()")
-                .exceptStrategy(new OracleExceptRenderStrategy())
-                .build();
-
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 
-        return new DialectRenderer(sqlRenderer, psRenderer);
+        return new DialectRenderer(psRenderer);
     }
 
     /**

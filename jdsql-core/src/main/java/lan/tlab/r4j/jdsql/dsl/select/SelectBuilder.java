@@ -400,12 +400,6 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return updateHaving(having -> SelectBuilder.combineHavingConditions(having, condition, combinator));
     }
 
-    public String build() {
-        validateState();
-        SelectStatement selectStatement = getCurrentStatement();
-        return renderer.renderSql(selectStatement);
-    }
-
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         SelectStatement statement = getCurrentStatement();

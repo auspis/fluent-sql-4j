@@ -95,11 +95,6 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
         return statementBuilder.build();
     }
 
-    public String build() {
-        DeleteStatement deleteStatement = getCurrentStatement();
-        return renderer.renderSql(deleteStatement);
-    }
-
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         DeleteStatement statement = getCurrentStatement();
         PsDto result = renderer.renderPreparedStatement(statement);

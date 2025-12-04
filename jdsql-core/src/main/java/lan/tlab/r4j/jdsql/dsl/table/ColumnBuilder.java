@@ -85,11 +85,6 @@ public class ColumnBuilder {
         return tableBuilder.defaultConstraint(value);
     }
 
-    public String build() {
-        buildAndAdd();
-        return tableBuilder.build();
-    }
-
     void buildColumn() {
         buildAndAdd();
     }
