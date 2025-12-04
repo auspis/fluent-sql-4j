@@ -269,6 +269,7 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUpdateItemPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUpdateStatementPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlWhereClausePsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -283,6 +284,9 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     @Getter
     @Default
     private final SqlRenderer sqlRenderer = SqlRenderer.builder().build();
+
+    @Default
+    private final EscapeStrategy escapeStrategy = new StandardSqlEscapeStrategy();
 
     @Default
     private final SelectClausePsStrategy selectClauseStrategy = new StandardSqlSelectClausePsStrategy();
@@ -555,7 +559,7 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Override
     public EscapeStrategy getEscapeStrategy() {
-        return sqlRenderer.getEscapeStrategy();
+        return escapeStrategy;
     }
 
     @Override

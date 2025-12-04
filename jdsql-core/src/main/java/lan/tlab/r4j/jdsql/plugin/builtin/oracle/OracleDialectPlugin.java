@@ -5,6 +5,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.oracle.ast.visitor.sql.strategy.expression.OracleExceptRenderStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
 
 /**
  * Built-in plugin for the Oracle Database dialect.
@@ -122,8 +123,10 @@ public final class OracleDialectPlugin {
                 .exceptStrategy(new OracleExceptRenderStrategy())
                 .build();
 
-        PreparedStatementRenderer psRenderer =
-                PreparedStatementRenderer.builder().sqlRenderer(sqlRenderer).build();
+        PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+                .sqlRenderer(sqlRenderer)
+                .escapeStrategy(new StandardSqlEscapeStrategy())
+                .build();
 
         return new DialectRenderer(sqlRenderer, psRenderer);
     }
