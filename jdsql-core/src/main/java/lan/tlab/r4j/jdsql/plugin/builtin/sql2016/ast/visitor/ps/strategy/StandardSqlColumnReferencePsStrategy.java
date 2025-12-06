@@ -17,7 +17,15 @@ public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsSt
             escapeStrategy = psRenderer.getEscapeStrategy();
         }
 
-        boolean qualify = ctx.hasFeature(AstContext.Feature.JOIN_ON) || ctx.hasFeature(AstContext.Feature.UNION);
+        // Asterisk (*) is a special SQL wildcard and should not be escaped
+        if ("*".equals(col.column())) {
+            return new PsDto("*", List.of());
+        }
+
+        // Qualify column references in JOIN, UNION, and SUBQUERY contexts to avoid ambiguity
+        boolean qualify = ctx.hasFeature(AstContext.Feature.JOIN_ON)
+                || ctx.hasFeature(AstContext.Feature.UNION)
+                || ctx.hasFeature(AstContext.Feature.SUBQUERY);
         String sql;
         if (qualify && !col.table().isBlank()) {
             sql = escapeStrategy.apply(col.table()) + "." + escapeStrategy.apply(col.column());
