@@ -1,7 +1,13 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.BehaviorKind;
@@ -16,35 +22,44 @@ import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class SelectBuilderJsonTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void jsonExistsBasicUsage() {
+    void jsonExistsBasicUsage() throws SQLException {
         JsonExists jsonExists = new JsonExists(ColumnReference.of("users", "profile"), Literal.of("$.email"));
 
         Select select = Select.of(
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonExists, "has_email"));
 
-        String result = new SelectBuilder(renderer, select).from("users").build();
+        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "users"."name", JSON_EXISTS("users"."profile", '$.email') AS has_email FROM "users"\
+                SELECT "name", JSON_EXISTS("profile", ?) AS "has_email" FROM "users"\
                 """);
+        verify(ps).setObject(1, "$.email");
     }
 
     @Test
-    void jsonExistsWithErrorBehavior() {
+    void jsonExistsWithErrorBehavior() throws SQLException {
         JsonExists jsonExists =
                 new JsonExists(ColumnReference.of("users", "profile"), Literal.of("$.email"), BehaviorKind.ERROR);
 
@@ -52,34 +67,37 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonExists, "has_email"));
 
-        String result = new SelectBuilder(renderer, select).from("users").build();
+        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "users"."name", JSON_EXISTS("users"."profile", '$.email' ERROR ON ERROR) AS has_email FROM "users"\
+                SELECT "name", JSON_EXISTS("profile", ? ERROR ON ERROR) AS "has_email" \
+                FROM "users"\
                 """);
+        verify(ps).setObject(1, "$.email");
     }
 
     @Test
-    void jsonValueBasicUsage() {
+    void jsonValueBasicUsage() throws SQLException {
         JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
         Select select = Select.of(
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        String result = new SelectBuilder(renderer, select).from("products").build();
+        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", JSON_VALUE("products"."data", '$.price') AS price FROM "products"\
+                SELECT "name", JSON_VALUE("data", ?) AS "price" FROM "products"\
                 """);
+        verify(ps).setObject(1, "$.price");
     }
 
     @Test
-    void jsonValueWithReturningType() {
+    void jsonValueWithReturningType() throws SQLException {
         JsonValue jsonValue =
                 new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"), "DECIMAL(10,2)");
 
@@ -87,17 +105,18 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        String result = new SelectBuilder(renderer, select).from("products").build();
+        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", JSON_VALUE("products"."data", '$.price' RETURNING DECIMAL(10,2)) AS price FROM "products"\
+                SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2)) AS "price" FROM "products"\
                 """);
+        verify(ps).setObject(1, "$.price");
     }
 
     @Test
-    void jsonValueWithDefaultBehavior() {
+    void jsonValueWithDefaultBehavior() throws SQLException {
         JsonValue jsonValue = new JsonValue(
                 ColumnReference.of("products", "data"),
                 Literal.of("$.discount"),
@@ -109,34 +128,36 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "discount"));
 
-        String result = new SelectBuilder(renderer, select).from("products").build();
+        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", JSON_VALUE("products"."data", '$.discount' RETURNING DECIMAL(10,2) DEFAULT 0.00 ON EMPTY) AS discount FROM "products"\
+                SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2) DEFAULT 0.00 ON EMPTY) AS "discount" FROM "products"\
                 """);
+        verify(ps).setObject(1, "$.discount");
     }
 
     @Test
-    void jsonQueryBasicUsage() {
+    void jsonQueryBasicUsage() throws SQLException {
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("users", "profile"), Literal.of("$.addresses"));
 
         Select select = Select.of(
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonQuery, "addresses"));
 
-        String result = new SelectBuilder(renderer, select).from("users").build();
+        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "users"."name", JSON_QUERY("users"."profile", '$.addresses') AS addresses FROM "users"\
+                SELECT "name", JSON_QUERY("profile", ?) AS "addresses" FROM "users"\
                 """);
+        verify(ps).setObject(1, "$.addresses");
     }
 
     @Test
-    void jsonQueryWithWrapperBehavior() {
+    void jsonQueryWithWrapperBehavior() throws SQLException {
         JsonQuery jsonQuery = new JsonQuery(
                 ColumnReference.of("products", "data"), Literal.of("$.tags"), null, WrapperBehavior.WITH_WRAPPER);
 
@@ -144,17 +165,18 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonQuery, "tags"));
 
-        String result = new SelectBuilder(renderer, select).from("products").build();
+        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", JSON_QUERY("products"."data", '$.tags' WITH WRAPPER) AS tags FROM "products"\
+                SELECT "name", JSON_QUERY("data", ? WITH WRAPPER) AS "tags" FROM "products"\
                 """);
+        verify(ps).setObject(1, "$.tags");
     }
 
     @Test
-    void jsonQueryWithAllOptions() {
+    void jsonQueryWithAllOptions() throws SQLException {
         JsonQuery jsonQuery = new JsonQuery(
                 ColumnReference.of("products", "data"),
                 Literal.of("$.reviews"),
@@ -167,17 +189,18 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "id")),
                 new ScalarExpressionProjection(jsonQuery, "reviews"));
 
-        String result = new SelectBuilder(renderer, select).from("products").build();
+        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."id", JSON_QUERY("products"."data", '$.reviews' RETURNING JSON WITH CONDITIONAL WRAPPER DEFAULT [] ON EMPTY) AS reviews FROM "products"\
+                SELECT "id", JSON_QUERY("data", ? RETURNING JSON WITH CONDITIONAL WRAPPER DEFAULT [] ON EMPTY) AS "reviews" FROM "products"\
                 """);
+        verify(ps).setObject(1, "$.reviews");
     }
 
     @Test
-    void multipleJsonFunctionsInSelect() {
+    void multipleJsonFunctionsInSelect() throws SQLException {
         JsonExists jsonExists = new JsonExists(ColumnReference.of("users", "profile"), Literal.of("$.email"));
 
         JsonValue jsonValue = new JsonValue(ColumnReference.of("users", "profile"), Literal.of("$.age"), "INT");
@@ -190,17 +213,23 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(jsonValue, "age"),
                 new ScalarExpressionProjection(jsonQuery, "addresses"));
 
-        String result = new SelectBuilder(renderer, select).from("users").build();
+        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "users"."name", JSON_EXISTS("users"."profile", '$.email') AS has_email, JSON_VALUE("users"."profile", '$.age' RETURNING INT) AS age, JSON_QUERY("users"."profile", '$.addresses') AS addresses FROM "users"\
+                SELECT "name", JSON_EXISTS("profile", ?) AS "has_email", \
+                JSON_VALUE("profile", ? RETURNING INT) AS "age", \
+                JSON_QUERY("profile", ?) AS "addresses" \
+                FROM "users"\
                 """);
+        verify(ps).setObject(1, "$.email");
+        verify(ps).setObject(2, "$.age");
+        verify(ps).setObject(3, "$.addresses");
     }
 
     @Test
-    void jsonFunctionWithWhereClause() {
+    void jsonFunctionWithWhereClause() throws SQLException {
         JsonValue jsonValue =
                 new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"), "DECIMAL(10,2)");
 
@@ -208,22 +237,25 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        String result = new SelectBuilder(renderer, select)
+        new SelectBuilder(renderer, select)
                 .from("products")
                 .where()
                 .column("category")
                 .eq("Electronics")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", JSON_VALUE("products"."data", '$.price' RETURNING DECIMAL(10,2)) AS price FROM "products" WHERE "products"."category" = 'Electronics'\
+                SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2)) AS "price" \
+                FROM "products" WHERE "category" = ?\
                 """);
+        verify(ps).setObject(1, "$.price");
+        verify(ps).setObject(2, "Electronics");
     }
 
     @Test
-    void jsonFunctionWithOrderBy() {
+    void jsonFunctionWithOrderBy() throws SQLException {
         JsonValue jsonValue =
                 new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.rating"), "DECIMAL(3,1)");
 
@@ -231,15 +263,13 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "rating"));
 
-        String result = new SelectBuilder(renderer, select)
-                .from("products")
-                .orderBy("name")
-                .build();
+        new SelectBuilder(renderer, select).from("products").orderBy("name").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", JSON_VALUE("products"."data", '$.rating' RETURNING DECIMAL(3,1)) AS rating FROM "products" ORDER BY "products"."name" ASC\
+                SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(3,1)) AS "rating" FROM "products" ORDER BY "name" ASC\
                 """);
+        verify(ps).setObject(1, "$.rating");
     }
 }
