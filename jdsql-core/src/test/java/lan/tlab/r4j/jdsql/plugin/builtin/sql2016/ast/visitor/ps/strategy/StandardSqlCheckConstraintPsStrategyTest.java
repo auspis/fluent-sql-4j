@@ -26,8 +26,8 @@ class StandardSqlCheckConstraintPsStrategyTest {
 
         PsDto result = strategy.handle(constraint, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo("CHECK (\"age\" > 18)");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.sql()).isEqualTo("CHECK (\"age\" > ?)");
+        assertThat(result.parameters()).containsExactly(18);
     }
 
     @Test
@@ -40,7 +40,7 @@ class StandardSqlCheckConstraintPsStrategyTest {
         assertThat(result.sql()).contains("CHECK");
         assertThat(result.sql()).contains("salary");
         assertThat(result.sql()).contains("BETWEEN");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.parameters()).containsExactly(1000, 10000);
     }
 
     @Test
