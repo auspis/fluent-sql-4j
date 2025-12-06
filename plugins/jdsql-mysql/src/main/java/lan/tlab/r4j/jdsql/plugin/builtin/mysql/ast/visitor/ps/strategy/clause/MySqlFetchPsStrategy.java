@@ -6,19 +6,18 @@ import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.FetchPsStrategy;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 
 public class MySqlFetchPsStrategy implements FetchPsStrategy {
 
-    private final SqlRenderer sqlRenderer;
-
-    public MySqlFetchPsStrategy(SqlRenderer sqlRenderer) {
-        this.sqlRenderer = sqlRenderer;
-    }
-
     @Override
     public PsDto handle(Fetch clause, PreparedStatementRenderer renderer, AstContext ctx) {
-        String sql = sqlRenderer.visit(clause, ctx);
+        // Inlined from MySqlFetchRenderStrategy
+        if (!clause.isActive()) {
+            return new PsDto("", List.of());
+        }
+        Integer offset = clause.offset();
+        Integer rows = clause.rows();
+        String sql = String.format("LIMIT %s OFFSET %s", rows, offset);
         return new PsDto(sql, List.of());
     }
 }
