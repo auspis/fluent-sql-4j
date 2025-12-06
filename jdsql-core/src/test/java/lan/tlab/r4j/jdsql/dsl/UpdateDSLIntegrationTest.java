@@ -1,46 +1,58 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 @IntegrationTest
 class UpdateDSLIntegrationTest {
 
     private DSL dsl;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         dsl = StandardSqlRendererFactory.dslStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void createsUpdateBuilderWithRenderer() {
-        String result = dsl.update("users")
-                .set("name", "John")
-                .where()
-                .column("id")
-                .eq(1)
-                .build();
+    void createsUpdateBuilderWithRenderer() throws SQLException {
+        dsl.update("users").set("name", "John").where().column("id").eq(1).buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("""
-                UPDATE "users" SET "name" = 'John' WHERE "users"."id" = 1""");
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
+                UPDATE "users" SET "name" = ? WHERE "id" = ?""");
+        verify(ps).setObject(1, "John");
+        verify(ps).setObject(2, 1);
     }
 
     @Test
-    void appliesRendererQuoting() {
-        String result = dsl.update("temp_table").set("status", "active").build();
+    void appliesRendererQuoting() throws SQLException {
+        dsl.update("temp_table").set("status", "active").buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("""
-                UPDATE "temp_table" SET "status" = 'active'""");
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
+                UPDATE "temp_table" SET "status" = ?""");
+        verify(ps).setObject(1, "active");
     }
 
     @Test
-    void fluentApiWithComplexConditions() {
-        String result = dsl.update("products")
+    void fluentApiWithComplexConditions() throws SQLException {
+        dsl.update("products")
                 .set("stock", 0)
                 .set("discontinued", true)
                 .where()
@@ -49,37 +61,42 @@ class UpdateDSLIntegrationTest {
                 .and()
                 .column("quantity")
                 .eq(0)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "products" SET "stock" = 0, "discontinued" = true WHERE ("products"."last_order_date" < '2023-01-01') AND ("products"."quantity" = 0)""");
+                UPDATE "products" SET "stock" = ?, "discontinued" = ? WHERE ("last_order_date" < ?) AND ("quantity" = ?)""");
+        verify(ps).setObject(1, 0);
+        verify(ps).setObject(2, true);
+        verify(ps).setObject(3, "2023-01-01");
+        verify(ps).setObject(4, 0);
     }
 
     @Test
-    void updateJsonColumn() {
+    void updateJsonColumn() throws SQLException {
         String settings = "{\"theme\":\"dark\",\"language\":\"it\",\"notifications\":true}";
 
-        String result = dsl.update("user_preferences")
+        dsl.update("user_preferences")
                 .set("settings", settings)
                 .where()
                 .column("user_id")
                 .eq(42)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
-                .isEqualTo(
-                        """
-                UPDATE "user_preferences" SET "settings" = '{"theme":"dark","language":"it","notifications":true}' WHERE "user_preferences"."user_id" = 42""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                UPDATE "user_preferences" SET "settings" = ? WHERE "user_id" = ?""");
+        verify(ps).setObject(1, settings);
+        verify(ps).setObject(2, 42);
     }
 
     @Test
-    void updateMultipleColumnsIncludingJson() {
+    void updateMultipleColumnsIncludingJson() throws SQLException {
         String profile = "{\"bio\":\"Software Engineer\",\"skills\":[\"Java\",\"SQL\",\"Git\"]}";
         String contacts = "{\"email\":\"dev@example.com\",\"linkedin\":\"linkedin.com/in/dev\"}";
 
-        String result = dsl.update("developers")
+        dsl.update("developers")
                 .set("full_name", "Marco Bianchi")
                 .set("profile_json", profile)
                 .set("contact_info", contacts)
@@ -91,11 +108,18 @@ class UpdateDSLIntegrationTest {
                 .and()
                 .column("status")
                 .eq("active")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "developers" SET "full_name" = 'Marco Bianchi', "profile_json" = '{"bio":"Software Engineer","skills":["Java","SQL","Git"]}', "contact_info" = '{"email":"dev@example.com","linkedin":"linkedin.com/in/dev"}', "is_available" = true, "updated_at" = '2025-11-08T12:00:00' WHERE ("developers"."developer_id" = 100) AND ("developers"."status" = 'active')""");
+                UPDATE "developers" SET "full_name" = ?, "profile_json" = ?, "contact_info" = ?, "is_available" = ?, "updated_at" = ? WHERE ("developer_id" = ?) AND ("status" = ?)""");
+        verify(ps).setObject(1, "Marco Bianchi");
+        verify(ps).setObject(2, profile);
+        verify(ps).setObject(3, contacts);
+        verify(ps).setObject(4, true);
+        verify(ps).setObject(5, "2025-11-08T12:00:00");
+        verify(ps).setObject(6, 100);
+        verify(ps).setObject(7, "active");
     }
 }
