@@ -2,7 +2,13 @@ package lan.tlab.r4j.jdsql.dsl.merge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
@@ -14,19 +20,27 @@ import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class MergeBuilderTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void basicMergeWithTableSource() {
-        String sql = new MergeBuilder(renderer, "target_table")
+    void basicMergeWithTableSource() throws SQLException {
+        new MergeBuilder(renderer, "target_table")
                 .as("tgt")
                 .using("source_table", "src")
                 .on("tgt.id", "src.id")
@@ -35,71 +49,75 @@ class MergeBuilderTest {
                 .whenNotMatched()
                 .set("id", ColumnReference.of("src", "id"))
                 .set("value", ColumnReference.of("src", "value"))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                        MERGE INTO "target_table" AS tgt \
-                        USING "source_table" AS src \
-                        ON "tgt"."id" = "src"."id" \
-                        WHEN MATCHED THEN UPDATE SET "value" = 'new_value' \
-                        WHEN NOT MATCHED THEN INSERT ("id", "value") VALUES ("src"."id", "src"."value")\
-                        """);
+                MERGE INTO "target_table" AS tgt \
+                USING "source_table" AS src \
+                ON "tgt"."id" = "src"."id" \
+                WHEN MATCHED THEN UPDATE SET "value" = ? \
+                WHEN NOT MATCHED THEN INSERT ("id", "value") VALUES ("src"."id", "src"."value")\
+                """);
+        verify(ps).setObject(1, "new_value");
     }
 
     @Test
-    void mergeWithSubquerySource() {
+    void mergeWithSubquerySource() throws SQLException {
         SelectStatement subquery = SelectStatement.builder().build();
 
-        String sql = new MergeBuilder(renderer, "target")
+        new MergeBuilder(renderer, "target")
                 .using(subquery, "src")
                 .on("target.id", "src.id")
                 .whenMatched()
                 .set("name", "updated")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                        MERGE INTO "target" \
-                        USING (SELECT * FROM ) AS src \
-                        ON "target"."id" = "src"."id" \
-                        WHEN MATCHED THEN UPDATE SET "name" = 'updated'\
-                        """);
+                MERGE INTO "target" \
+                USING (SELECT * FROM ) "src" \
+                ON "target"."id" = "src"."id" \
+                WHEN MATCHED THEN UPDATE SET "name" = ?\
+                """);
+        verify(ps).setObject(1, "updated");
     }
 
     @Test
-    void mergeWithConditionalActions() {
+    void mergeWithConditionalActions() throws SQLException {
         Predicate condition = Comparison.gt(ColumnReference.of("src", "value"), Literal.of(100));
 
-        String sql = new MergeBuilder(renderer, "target")
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched(condition)
                 .set("value", 200)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
-                        WHEN MATCHED AND "src"."value" > 100 THEN UPDATE SET "value" = 200\
+                        WHEN MATCHED AND "src"."value" > ? THEN UPDATE SET "value" = ?\
                         """);
+        verify(ps).setObject(1, 100);
+        verify(ps).setObject(2, 200);
     }
 
     @Test
-    void mergeWithDelete() {
-        String sql = new MergeBuilder(renderer, "target")
+    void mergeWithDelete() throws SQLException {
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
                 .delete()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
@@ -110,25 +128,26 @@ class MergeBuilderTest {
     }
 
     @Test
-    void mergeWithMultipleActions() {
-        String sql = new MergeBuilder(renderer, "target")
+    void mergeWithMultipleActions() throws SQLException {
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
                 .set("updated", true)
                 .whenNotMatched()
                 .set("id", ColumnReference.of("src", "id"))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
-                        WHEN MATCHED THEN UPDATE SET "updated" = true \
+                        WHEN MATCHED THEN UPDATE SET "updated" = ? \
                         WHEN NOT MATCHED THEN INSERT ("id") VALUES ("src"."id")\
                         """);
+        verify(ps).setObject(1, true);
     }
 
     @Test
@@ -150,7 +169,7 @@ class MergeBuilderTest {
         assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
                         .on("target.id", "src.id")
                         .whenMatchedThenUpdate(List.of(UpdateItem.of("val", Literal.of(1))))
-                        .build())
+                        .buildPreparedStatement(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("USING clause must be specified");
     }
@@ -160,7 +179,7 @@ class MergeBuilderTest {
         assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
                         .using("source")
                         .whenMatchedThenUpdate(List.of(UpdateItem.of("val", Literal.of(1))))
-                        .build())
+                        .buildPreparedStatement(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ON condition must be specified");
     }
@@ -170,7 +189,7 @@ class MergeBuilderTest {
         assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
                         .using("source")
                         .on("target.id", "source.id")
-                        .build())
+                        .buildPreparedStatement(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("At least one WHEN clause must be specified");
     }
@@ -182,35 +201,38 @@ class MergeBuilderTest {
                         .on("target.id", "source.id")
                         .whenNotMatchedThenInsert(
                                 List.of(ColumnReference.of("target", "id")), List.of(Literal.of(1), Literal.of(2)))
-                        .build())
+                        .buildPreparedStatement(connection))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Number of columns must match number of values");
     }
 
     @Test
-    void fluentApiWithMultipleSets() {
-        String sql = new MergeBuilder(renderer, "target")
+    void fluentApiWithMultipleSets() throws SQLException {
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
                 .set("name", "updated")
                 .set("status", "active")
                 .set("count", 100)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
-                        WHEN MATCHED THEN UPDATE SET "name" = 'updated', "status" = 'active', "count" = 100\
+                        WHEN MATCHED THEN UPDATE SET "name" = ?, "status" = ?, "count" = ?\
                         """);
+        verify(ps).setObject(1, "updated");
+        verify(ps).setObject(2, "active");
+        verify(ps).setObject(3, 100);
     }
 
     @Test
-    void fluentApiWithMixedTypes() {
-        String sql = new MergeBuilder(renderer, "target")
+    void fluentApiWithMixedTypes() throws SQLException {
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenNotMatched()
@@ -218,16 +240,20 @@ class MergeBuilderTest {
                 .set("age", 30)
                 .set("active", true)
                 .set("salary", 50000.50)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
-                        WHEN NOT MATCHED THEN INSERT ("name", "age", "active", "salary") VALUES ('John', 30, true, 50000.5)\
+                        WHEN NOT MATCHED THEN INSERT ("name", "age", "active", "salary") VALUES (?, ?, ?, ?)\
                         """);
+        verify(ps).setObject(1, "John");
+        verify(ps).setObject(2, 30);
+        verify(ps).setObject(3, true);
+        verify(ps).setObject(4, 50000.50);
     }
 
     @Test
@@ -236,7 +262,7 @@ class MergeBuilderTest {
                         .using("source")
                         .on("target.id", "source.id")
                         .whenMatched()
-                        .build())
+                        .buildPreparedStatement(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("At least one SET clause must be specified");
     }
@@ -247,7 +273,7 @@ class MergeBuilderTest {
                         .using("source")
                         .on("target.id", "source.id")
                         .whenNotMatched()
-                        .build())
+                        .buildPreparedStatement(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("At least one column must be specified");
     }
@@ -260,76 +286,78 @@ class MergeBuilderTest {
                         .whenMatched()
                         .set("name", "test")
                         .delete()
-                        .build())
+                        .buildPreparedStatement(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Cannot use delete() with SET clauses");
     }
 
     @Test
-    void fluentApiWithColumnReferences() {
-        String sql = new MergeBuilder(renderer, "target")
+    void fluentApiWithColumnReferences() throws SQLException {
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
                 .set("target.value", ColumnReference.of("src", "new_value"))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
-                        WHEN MATCHED THEN UPDATE SET "target"."value" = "src"."new_value"\
+                        WHEN MATCHED THEN UPDATE SET "value" = "src"."new_value"\
                         """);
     }
 
     @Test
-    void fluentApiDeleteWithCondition() {
+    void fluentApiDeleteWithCondition() throws SQLException {
         Predicate condition = Comparison.lt(ColumnReference.of("src", "value"), Literal.of(0));
 
-        String sql = new MergeBuilder(renderer, "target")
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched(condition)
                 .delete()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
-                        WHEN MATCHED AND "src"."value" < 0 THEN DELETE\
+                        WHEN MATCHED AND "src"."value" < ? THEN DELETE\
                         """);
+        verify(ps).setObject(1, 0);
     }
 
     @Test
-    void fluentApiInsertWithCondition() {
+    void fluentApiInsertWithCondition() throws SQLException {
         Predicate condition = Comparison.gt(ColumnReference.of("src", "value"), Literal.of(100));
 
-        String sql = new MergeBuilder(renderer, "target")
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenNotMatched(condition)
                 .set("id", ColumnReference.of("src", "id"))
                 .set("value", ColumnReference.of("src", "value"))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
-                        WHEN NOT MATCHED AND "src"."value" > 100 THEN INSERT ("id", "value") VALUES ("src"."id", "src"."value")\
+                        WHEN NOT MATCHED AND "src"."value" > ? THEN INSERT ("id", "value") VALUES ("src"."id", "src"."value")\
                         """);
+        verify(ps).setObject(1, 100);
     }
 
     @Test
-    void fluentApiWithDotNotationForColumnReferences() {
-        String sql = new MergeBuilder(renderer, "target")
+    void fluentApiWithDotNotationForColumnReferences() throws SQLException {
+        new MergeBuilder(renderer, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
@@ -340,9 +368,9 @@ class MergeBuilderTest {
                 .set("id", "src.id")
                 .set("name", "src.name")
                 .set("email", "src.email")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                         MERGE INTO "target" \
