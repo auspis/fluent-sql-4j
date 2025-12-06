@@ -174,8 +174,9 @@ public class ContextPreparationVisitor implements Visitor<AstContext> {
 
     @Override
     public AstContext visit(FromSubquery fromSubquery, AstContext ctx) {
+        AstContext enriched = ctx.withFeatures(AstContext.Feature.SUBQUERY);
         // Propagate features from inner subquery to outer context
-        return fromSubquery.getExpression().accept(this, ctx);
+        return fromSubquery.getExpression().accept(this, enriched);
     }
 
     @Override
