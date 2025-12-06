@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,17 +42,15 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void simpleTableWithPrimaryKey() throws SQLException {
-        String sql = dsl.createTable("test_users")
+        try (PreparedStatement ps = dsl.createTable("test_users")
                 .column("id")
                 .integer()
                 .notNull()
                 .column("name")
                 .varchar(100)
                 .primaryKey("id")
-                .build();
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+                .buildPreparedStatement(connection)) {
+            ps.execute();
         }
 
         assertThat(tableExists("test_users")).isTrue();
@@ -61,7 +60,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void tableWithMultipleColumns() throws SQLException {
-        String sql = dsl.createTable("products")
+        try (PreparedStatement ps = dsl.createTable("products")
                 .column("id")
                 .integer()
                 .notNull()
@@ -73,10 +72,8 @@ class CreateTableBuilderIntegrationTest {
                 .column("quantity")
                 .integer()
                 .primaryKey("id")
-                .build();
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+                .buildPreparedStatement(connection)) {
+            ps.execute();
         }
 
         assertThat(tableExists("products")).isTrue();
@@ -88,7 +85,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void tableWithDifferentDataTypes() throws SQLException {
-        String sql = dsl.createTable("mixed_types")
+        try (PreparedStatement ps = dsl.createTable("mixed_types")
                 .column("id")
                 .integer()
                 .notNull()
@@ -99,10 +96,8 @@ class CreateTableBuilderIntegrationTest {
                 .column("birth_date")
                 .date()
                 .primaryKey("id")
-                .build();
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+                .buildPreparedStatement(connection)) {
+            ps.execute();
         }
 
         assertThat(tableExists("mixed_types")).isTrue();
@@ -114,7 +109,7 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void tableWithCompositePrimaryKey() throws SQLException {
-        String sql = dsl.createTable("order_items")
+        try (PreparedStatement ps = dsl.createTable("order_items")
                 .column("order_id")
                 .integer()
                 .notNull()
@@ -124,10 +119,8 @@ class CreateTableBuilderIntegrationTest {
                 .column("quantity")
                 .integer()
                 .primaryKey("order_id", "item_id")
-                .build();
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+                .buildPreparedStatement(connection)) {
+            ps.execute();
         }
 
         assertThat(tableExists("order_items")).isTrue();
@@ -138,10 +131,9 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void convenienceMethodColumnIntegerPrimaryKey() throws SQLException {
-        String sql = dsl.createTable("simple").columnIntegerPrimaryKey("id").build();
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+        try (PreparedStatement ps =
+                dsl.createTable("simple").columnIntegerPrimaryKey("id").buildPreparedStatement(connection)) {
+            ps.execute();
         }
 
         assertThat(tableExists("simple")).isTrue();
@@ -150,13 +142,11 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void convenienceMethodColumnVarcharNotNull() throws SQLException {
-        String sql = dsl.createTable("text_table")
+        try (PreparedStatement ps = dsl.createTable("text_table")
                 .columnIntegerPrimaryKey("id")
                 .columnVarcharNotNull("name", 100)
-                .build();
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+                .buildPreparedStatement(connection)) {
+            ps.execute();
         }
 
         assertThat(tableExists("text_table")).isTrue();
@@ -166,13 +156,11 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void convenienceMethodColumnTimestampNotNull() throws SQLException {
-        String sql = dsl.createTable("timestamps")
+        try (PreparedStatement ps = dsl.createTable("timestamps")
                 .columnIntegerPrimaryKey("id")
                 .columnTimestampNotNull("created_at")
-                .build();
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+                .buildPreparedStatement(connection)) {
+            ps.execute();
         }
 
         assertThat(tableExists("timestamps")).isTrue();
@@ -182,17 +170,18 @@ class CreateTableBuilderIntegrationTest {
 
     @Test
     void insertDataAfterTableCreation() throws SQLException {
-        String sql = dsl.createTable("test_insert")
+        try (PreparedStatement ps = dsl.createTable("test_insert")
                 .column("id")
                 .integer()
                 .notNull()
                 .column("name")
                 .varchar(50)
                 .primaryKey("id")
-                .build();
+                .buildPreparedStatement(connection)) {
+            ps.execute();
+        }
 
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
             stmt.execute("INSERT INTO test_insert (id, name) VALUES (1, 'Test')");
 
             try (ResultSet rs = stmt.executeQuery("SELECT id, name FROM test_insert WHERE id = 1")) {
