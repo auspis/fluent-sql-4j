@@ -1,34 +1,47 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 @IntegrationTest
 class CreateTableDSLIntegrationTest {
 
     private DSL dsl;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         dsl = StandardSqlRendererFactory.dslStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void createsCreateTableBuilderWithRenderer() {
-        String result = dsl.createTable("users")
+    void createsCreateTableBuilderWithRenderer() throws SQLException {
+        dsl.createTable("users")
                 .column("id")
                 .integer()
                 .notNull()
                 .column("name")
                 .varchar(100)
                 .primaryKey("id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 CREATE TABLE "users" (\
@@ -39,17 +52,17 @@ class CreateTableDSLIntegrationTest {
     }
 
     @Test
-    void appliesRendererQuoting() {
-        String result =
-                dsl.createTable("temp_table").column("value").varchar(50).build();
+    void appliesRendererQuoting() throws SQLException {
+        dsl.createTable("temp_table").column("value").varchar(50).buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("""
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
                 CREATE TABLE "temp_table" ("value" VARCHAR(50))""");
     }
 
     @Test
-    void fluentApiWithConstraints() {
-        String result = dsl.createTable("products")
+    void fluentApiWithConstraints() throws SQLException {
+        dsl.createTable("products")
                 .column("id")
                 .integer()
                 .notNull()
@@ -59,9 +72,9 @@ class CreateTableDSLIntegrationTest {
                 .column("price")
                 .decimal(10, 2)
                 .primaryKey("id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 CREATE TABLE "products" (\
