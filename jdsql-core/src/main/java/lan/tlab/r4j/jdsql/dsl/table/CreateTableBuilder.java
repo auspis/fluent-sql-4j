@@ -1,5 +1,8 @@
 package lan.tlab.r4j.jdsql.dsl.table;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
@@ -12,13 +15,19 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
+import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
+import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.dsl.util.PsUtil;
 
 public class CreateTableBuilder {
 
     private TableDefinition.TableDefinitionBuilder definitionBuilder;
     private List<ColumnDefinition> columns = new ArrayList<>();
+    private DialectRenderer renderer;
 
-    public CreateTableBuilder(String tableName) {
+    public CreateTableBuilder(DialectRenderer renderer, String tableName) {
+        this.renderer = renderer;
         this.definitionBuilder = TableDefinition.builder().name(tableName);
     }
 
@@ -152,5 +161,15 @@ public class CreateTableBuilder {
             }
         }
         throw new IllegalArgumentException("Column not found: " + columnName);
+    }
+
+    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+        TableDefinition.TableDefinitionBuilder finalBuilder = definitionBuilder;
+        if (!columns.isEmpty()) {
+            finalBuilder = finalBuilder.columns(columns);
+        }
+        CreateTableStatement statement = new CreateTableStatement(finalBuilder.build());
+        PsDto psDto = renderer.renderPreparedStatement(statement);
+        return PsUtil.preparedStatement(psDto, connection);
     }
 }

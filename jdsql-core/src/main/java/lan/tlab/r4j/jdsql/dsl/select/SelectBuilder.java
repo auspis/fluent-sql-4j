@@ -36,6 +36,7 @@ import lan.tlab.r4j.jdsql.dsl.HavingConditionBuilder;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.dsl.SupportsWhere;
 import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
+import lan.tlab.r4j.jdsql.dsl.util.PsUtil;
 
 // TODO: Add support for SELECT AggregateCalls, subqueries, and other SQL features as needed.
 public class SelectBuilder implements SupportsWhere<SelectBuilder> {
@@ -403,13 +404,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         SelectStatement statement = getCurrentStatement();
-        PsDto result = renderer.renderPreparedStatement(statement);
-
-        PreparedStatement ps = connection.prepareStatement(result.sql());
-        for (int i = 0; i < result.parameters().size(); i++) {
-            ps.setObject(i + 1, result.parameters().get(i));
-        }
-        return ps;
+        PsDto psDto = renderer.renderPreparedStatement(statement);
+        return PsUtil.preparedStatement(psDto, connection);
     }
 
     private void validateState() {
