@@ -2,20 +2,33 @@ package lan.tlab.r4j.jdsql.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
-// TODO: add integration tests that actually run the prepared statements against a real database
 class SelectBuilderPreparedStatementTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
@@ -26,29 +39,31 @@ class SelectBuilderPreparedStatementTest {
                 .column("age")
                 .gt(20);
 
-        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(Exception.class);
+        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
-    void buildPreparedStatementCompilesWithoutError() {
-        SelectBuilder builder = new SelectBuilder(renderer, "name", "email")
+    void buildPreparedStatementCompilesWithoutError() throws SQLException {
+        PreparedStatement result = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .where()
                 .column("age")
                 .gte(18)
                 .and()
                 .column("status")
-                .eq("active");
+                .eq("active")
+                .buildPreparedStatement(connection);
 
-        assertThat(builder).isNotNull();
-
-        assertThat(builder.getClass().getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
+        assertThat(result).isSameAs(ps);
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("SELECT \"name\", \"email\" FROM \"users\" WHERE (\"age\" >= ?) AND (\"status\" = ?)");
+        verify(ps).setObject(1, 18);
+        verify(ps).setObject(2, "active");
     }
 
     @Test
-    void buildPreparedStatementWithJoinCompilesWithoutError() {
-        SelectBuilder builder = new SelectBuilder(renderer, "name", "email")
+    void buildPreparedStatementWithJoinCompilesWithoutError() throws SQLException {
+        PreparedStatement result = new SelectBuilder(renderer, "name", "email")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -56,11 +71,13 @@ class SelectBuilderPreparedStatementTest {
                 .on("u.id", "o.user_id")
                 .where()
                 .column("status")
-                .eq("active");
+                .eq("active")
+                .buildPreparedStatement(connection);
 
-        assertThat(builder).isNotNull();
-
-        assertThat(builder.getClass().getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
+        assertThat(result).isSameAs(ps);
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo(
+                        "SELECT \"u\".\"name\", \"u\".\"email\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" WHERE \"u\".\"status\" = ?");
+        verify(ps).setObject(1, "active");
     }
 }
