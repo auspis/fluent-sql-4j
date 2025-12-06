@@ -43,7 +43,7 @@ class UpdateBuilderJsonTest {
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
-                UPDATE "users" SET "metadata" = ? WHERE "users"."id" = ?""");
+                UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
         verify(ps).setObject(1, jsonValue);
         verify(ps).setObject(2, 1);
     }
@@ -64,7 +64,8 @@ class UpdateBuilderJsonTest {
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "user_settings" SET "username" = ?, "preferences" = ?, "updated_at" = ? WHERE "user_settings"."user_id" = ?""");
+                UPDATE "user_settings" SET "username" = ?, "preferences" = ?, "updated_at" = ? \
+                WHERE "user_id" = ?""");
         verify(ps).setObject(1, "alice");
         verify(ps).setObject(2, preferences);
         verify(ps).setObject(3, "2025-11-08T10:30:00");
@@ -84,9 +85,8 @@ class UpdateBuilderJsonTest {
                 .buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
-                UPDATE "profiles" SET "profile_data" = ? WHERE "profiles"."profile_id" = ?""");
+                .isEqualTo("""
+                UPDATE "profiles" SET "profile_data" = ? WHERE "profile_id" = ?""");
         verify(ps).setObject(1, profile);
         verify(ps).setObject(2, 100);
     }
@@ -102,7 +102,7 @@ class UpdateBuilderJsonTest {
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
-                UPDATE "users" SET "metadata" = ? WHERE "users"."id" = ?""");
+                UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
         verify(ps).setObject(1, null);
         verify(ps).setObject(2, 5);
     }
@@ -119,9 +119,8 @@ class UpdateBuilderJsonTest {
                 .buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
-                UPDATE "documents" SET "properties" = ? WHERE "documents"."doc_id" = ?""");
+                .isEqualTo("""
+                UPDATE "documents" SET "properties" = ? WHERE "doc_id" = ?""");
         verify(ps).setObject(1, emptyJson);
         verify(ps).setObject(2, 7);
     }
@@ -139,7 +138,7 @@ class UpdateBuilderJsonTest {
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
-                UPDATE "tags" SET "tag_list" = ? WHERE "tags"."item_id" = ?""");
+                UPDATE "tags" SET "tag_list" = ? WHERE "item_id" = ?""");
         verify(ps).setObject(1, emptyArray);
         verify(ps).setObject(2, 15);
     }
@@ -162,7 +161,7 @@ class UpdateBuilderJsonTest {
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "api_configs" SET "configuration" = ?, "last_modified" = ? WHERE ("api_configs"."api_name" = ?) AND ("api_configs"."version" >= ?)""");
+                UPDATE "api_configs" SET "configuration" = ?, "last_modified" = ? WHERE ("api_name" = ?) AND ("version" >= ?)""");
         verify(ps).setObject(1, config);
         verify(ps).setObject(2, "2025-11-08");
         verify(ps).setObject(3, "payment-service");
