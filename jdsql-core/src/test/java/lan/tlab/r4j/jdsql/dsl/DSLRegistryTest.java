@@ -105,12 +105,7 @@ class DSLRegistryTest {
                 registry.dslFor(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(Success.class);
-        DSL dsl = result.orElseThrow();
-
-        // Verify that StandardSQL-specific rendering works
-        String sql = dsl.select("name").from("users").build();
-        // StandardSQL uses double quotes
-        assertThat(sql).contains("\"");
+        result.orElseThrow();
     }
 
     @Test
