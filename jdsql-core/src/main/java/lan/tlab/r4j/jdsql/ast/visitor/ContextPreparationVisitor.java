@@ -327,7 +327,7 @@ public class ContextPreparationVisitor implements Visitor<AstContext> {
 
     @Override
     public AstContext visit(CreateTableStatement createTableStatement, AstContext ctx) {
-        return ctx;
+        return ctx.withFeatures(AstContext.Feature.DDL);
     }
 
     @Override

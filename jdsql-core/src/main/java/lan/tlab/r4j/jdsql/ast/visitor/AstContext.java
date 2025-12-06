@@ -13,7 +13,8 @@ public record AstContext(Set<Feature> features) {
         JOIN_ON,
         UNION,
         SUBQUERY,
-        WINDOW_FUNCTION
+        WINDOW_FUNCTION,
+        DDL
     }
 
     public AstContext(Feature... features) {
