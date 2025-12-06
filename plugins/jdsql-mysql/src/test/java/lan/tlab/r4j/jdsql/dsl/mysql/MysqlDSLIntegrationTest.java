@@ -1,12 +1,18 @@
 package lan.tlab.r4j.jdsql.dsl.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Integration test verifying that MySQLDSL is correctly integrated
@@ -72,7 +78,7 @@ class MysqlDSLIntegrationTest {
     }
 
     @Test
-    void shouldHaveMySQLRendererConfigured() {
+    void shouldHaveMySQLRendererConfigured() throws SQLException {
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 
         MysqlDSL dsl = (MysqlDSL)
@@ -82,11 +88,16 @@ class MysqlDSLIntegrationTest {
         assertThat(dsl.getRenderer()).isNotNull();
 
         // Build a simple query to verify renderer works
-        String sql = dsl.select("name", "email").from("users").build();
+        Connection connection = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+
+        dsl.select("name", "email").from("users").buildPreparedStatement(connection);
 
         // MySQL uses backticks for identifiers
-        assertThat(sql).contains("`name`");
-        assertThat(sql).contains("`email`");
-        assertThat(sql).contains("`users`");
+        assertThat(sqlCaptor.getValue()).contains("`name`");
+        assertThat(sqlCaptor.getValue()).contains("`email`");
+        assertThat(sqlCaptor.getValue()).contains("`users`");
     }
 }
