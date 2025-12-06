@@ -1,7 +1,12 @@
 package lan.tlab.r4j.jdsql.dsl.table;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
@@ -9,19 +14,27 @@ import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class CreateTableBuilderTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void createUserTable() {
-        String sql = new CreateTableBuilder(renderer, "User")
+    void createUserTable() throws SQLException {
+        new CreateTableBuilder(renderer, "User")
                 .column("id")
                 .integer()
                 .notNull()
@@ -35,9 +48,9 @@ class CreateTableBuilderTest {
                 .column("score")
                 .decimal(10, 2)
                 .primaryKey("id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                     CREATE TABLE "User" (\
@@ -51,94 +64,102 @@ class CreateTableBuilderTest {
     }
 
     @Test
-    void columnIntegerPrimaryKey() {
-        String sqlShortForm = new CreateTableBuilder(renderer, "Test")
-                .columnIntegerPrimaryKey("id")
-                .build();
+    void columnIntegerPrimaryKey() throws SQLException {
+        new CreateTableBuilder(renderer, "Test").columnIntegerPrimaryKey("id").buildPreparedStatement(connection);
+        String sqlShortForm = sqlCaptor.getValue();
         assertThat(sqlShortForm).contains("\"id\" INTEGER NOT NULL").contains("PRIMARY KEY (\"id\")");
 
-        String sqlLongForm = new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(renderer, "Test")
                 .column("id")
                 .integer()
                 .notNull()
                 .primaryKey("id")
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlLongForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
 
     @Test
-    void columnStringPrimaryKey() {
-        String sqlShortForm = new CreateTableBuilder(renderer, "Test")
+    void columnStringPrimaryKey() throws SQLException {
+        new CreateTableBuilder(renderer, "Test")
                 .columnStringPrimaryKey("code", 50)
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"code\" VARCHAR(50) NOT NULL").contains("PRIMARY KEY (\"code\")");
 
-        String sqlLongForm = new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(renderer, "Test")
                 .column("code")
                 .varchar(50)
                 .notNull()
                 .primaryKey("code")
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlLongForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
 
     @Test
-    void columnTimestampNotNull() {
-        String sqlShortForm = new CreateTableBuilder(renderer, "Test")
+    void columnTimestampNotNull() throws SQLException {
+        new CreateTableBuilder(renderer, "Test")
                 .columnTimestampNotNull("created_at")
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"created_at\" TIMESTAMP NOT NULL");
 
-        String sqlLongForm = new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(renderer, "Test")
                 .column("created_at")
                 .timestamp()
                 .notNull()
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlLongForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
 
     @Test
-    void columnVarcharNotNull() {
-        String sqlShortForm = new CreateTableBuilder(renderer, "Test")
+    void columnVarcharNotNull() throws SQLException {
+        new CreateTableBuilder(renderer, "Test")
                 .columnVarcharNotNull("name", 100)
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"name\" VARCHAR(100) NOT NULL");
 
-        String sqlLongForm = new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(renderer, "Test")
                 .column("name")
                 .varchar(100)
                 .notNull()
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlLongForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
 
     @Test
-    void columnDecimalNotNull() {
-        String sqlShortForm = new CreateTableBuilder(renderer, "Test")
+    void columnDecimalNotNull() throws SQLException {
+        new CreateTableBuilder(renderer, "Test")
                 .columnDecimalNotNull("price", 10, 2)
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"price\" DECIMAL(10, 2) NOT NULL");
 
-        String sqlLongForm = new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(renderer, "Test")
                 .column("price")
                 .decimal(10, 2)
                 .notNull()
-                .build();
+                .buildPreparedStatement(connection);
+        String sqlLongForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
 
     @Test
-    void allConvenienceMethodsTogether() {
-        String sql = new CreateTableBuilder(renderer, "Product")
+    void allConvenienceMethodsTogether() throws SQLException {
+        new CreateTableBuilder(renderer, "Product")
                 .column("id")
                 .integer()
                 .notNull()
@@ -155,9 +176,9 @@ class CreateTableBuilderTest {
                 .timestamp()
                 .notNull()
                 .primaryKey("id", "sku") // Explicit composite primary key
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("\"id\" INTEGER NOT NULL")
                 .contains("\"sku\" VARCHAR(20) NOT NULL")
                 .contains("\"name\" VARCHAR(100) NOT NULL")
@@ -167,8 +188,8 @@ class CreateTableBuilderTest {
     }
 
     @Test
-    void compositePrimaryKeyWithFluentApi() {
-        String sql = new CreateTableBuilder(renderer, "Orders")
+    void compositePrimaryKeyWithFluentApi() throws SQLException {
+        new CreateTableBuilder(renderer, "Orders")
                 .column("customer_id")
                 .integer()
                 .notNull()
@@ -177,9 +198,9 @@ class CreateTableBuilderTest {
                 .column("amount")
                 .decimal(10, 2)
                 .primaryKey("order_date", "customer_id") // Explicit order!
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("\"customer_id\" INTEGER NOT NULL")
                 .contains("\"order_date\" DATE")
                 .contains("\"amount\" DECIMAL(10, 2)")
@@ -187,59 +208,56 @@ class CreateTableBuilderTest {
     }
 
     @Test
-    void uniqueConstraint() {
-        String sql = new CreateTableBuilder(renderer, "Users")
+    void uniqueConstraint() throws SQLException {
+        new CreateTableBuilder(renderer, "Users")
                 .column("id")
                 .integer()
                 .notNull()
                 .column("email")
                 .varchar(255)
                 .unique()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("UNIQUE (\"email\")");
+        assertThat(sqlCaptor.getValue()).contains("UNIQUE (\"email\")");
     }
 
     @Test
-    void foreignKeyConstraint() {
-        String sql = new CreateTableBuilder(renderer, "Orders")
+    void foreignKeyConstraint() throws SQLException {
+        new CreateTableBuilder(renderer, "Orders")
                 .column("id")
                 .integer()
                 .notNull()
                 .column("customer_id")
                 .integer()
                 .foreignKey("customer", "id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("FOREIGN KEY (\"customer_id\") REFERENCES \"customer\" (\"id\")");
+        assertThat(sqlCaptor.getValue()).contains("FOREIGN KEY (\"customer_id\") REFERENCES \"customer\" (\"id\")");
     }
 
     @Test
-    void tableWithoutPrimaryKey() {
-        String sql = new CreateTableBuilder(renderer, "Log")
+    void tableWithoutPrimaryKey() throws SQLException {
+        new CreateTableBuilder(renderer, "Log")
                 .columnTimestampNotNull("timestamp")
                 .columnVarcharNotNull("message", 500)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("\"timestamp\" TIMESTAMP NOT NULL")
                 .contains("\"message\" VARCHAR(500) NOT NULL")
                 .doesNotContain("PRIMARY KEY");
     }
 
     @Test
-    void booleanColumn() {
-        String sql = new CreateTableBuilder(renderer, "Settings")
-                .column("enabled")
-                .bool()
-                .build();
+    void booleanColumn() throws SQLException {
+        new CreateTableBuilder(renderer, "Settings").column("enabled").bool().buildPreparedStatement(connection);
 
-        assertThat(sql).contains("\"enabled\" BOOLEAN");
+        assertThat(sqlCaptor.getValue()).contains("\"enabled\" BOOLEAN");
     }
 
     @Test
-    void mixedFluentAndConvenienceApis() {
-        String sql = new CreateTableBuilder(renderer, "Mixed")
+    void mixedFluentAndConvenienceApis() throws SQLException {
+        new CreateTableBuilder(renderer, "Mixed")
                 .columnIntegerPrimaryKey("id")
                 .column("description")
                 .varchar(255)
@@ -247,9 +265,9 @@ class CreateTableBuilderTest {
                 .column("created_at")
                 .timestamp()
                 .notNull()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("\"id\" INTEGER NOT NULL")
                 .contains("\"description\" VARCHAR(255) NOT NULL")
                 .contains("\"created_at\" TIMESTAMP NOT NULL")
@@ -257,8 +275,8 @@ class CreateTableBuilderTest {
     }
 
     @Test
-    void checkConstraint() {
-        String sql = new CreateTableBuilder(renderer, "People")
+    void checkConstraint() throws SQLException {
+        new CreateTableBuilder(renderer, "People")
                 .column("id")
                 .integer()
                 .notNull()
@@ -267,67 +285,67 @@ class CreateTableBuilderTest {
                 .column("name")
                 .varchar(100)
                 .check(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18)))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("CHECK (\"age\" > 18)");
+        assertThat(sqlCaptor.getValue()).contains("CHECK (\"age\" > 18)");
     }
 
     @Test
-    void defaultConstraint() {
-        String sql = new CreateTableBuilder(renderer, "Settings")
+    void defaultConstraint() throws SQLException {
+        new CreateTableBuilder(renderer, "Settings")
                 .column("id")
                 .integer()
                 .notNull()
                 .column("enabled")
                 .bool()
                 .defaultValue(Literal.of(true))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("DEFAULT true");
+        assertThat(sqlCaptor.getValue()).contains("DEFAULT true");
     }
 
     @Test
-    void singleIndex() {
-        String sql = new CreateTableBuilder(renderer, "Users")
+    void singleIndex() throws SQLException {
+        new CreateTableBuilder(renderer, "Users")
                 .column("id")
                 .integer()
                 .notNull()
                 .column("email")
                 .varchar(255)
                 .index("idx_email", "email")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("\"email\" VARCHAR(255)").contains("INDEX \"idx_email\" (\"email\")");
+        assertThat(sqlCaptor.getValue()).contains("\"email\" VARCHAR(255)").contains("INDEX \"idx_email\" (\"email\")");
     }
 
     @Test
-    void compositeIndex() {
-        String sql = new CreateTableBuilder(renderer, "Orders")
+    void compositeIndex() throws SQLException {
+        new CreateTableBuilder(renderer, "Orders")
                 .column("customer_id")
                 .integer()
                 .column("order_date")
                 .date()
                 .index("idx_order_customer", "order_date", "customer_id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("INDEX \"idx_order_customer\" (\"order_date\", \"customer_id\")");
+        assertThat(sqlCaptor.getValue()).contains("INDEX \"idx_order_customer\" (\"order_date\", \"customer_id\")");
     }
 
     @Test
-    void columnWithoutExplicitTypeUsesDefault() {
-        String sql = new CreateTableBuilder(renderer, "Test")
+    void columnWithoutExplicitTypeUsesDefault() throws SQLException {
+        new CreateTableBuilder(renderer, "Test")
                 .column("default_column")
                 .notNull()
-                .build();
+                .buildPreparedStatement(connection);
 
         // ColumnDefinition has a default of VARCHAR(255)
-        assertThat(sql).contains("\"default_column\" VARCHAR(255) NOT NULL");
+        assertThat(sqlCaptor.getValue()).contains("\"default_column\" VARCHAR(255) NOT NULL");
     }
 
     @Test
-    void primaryKeyWithExplicitOrderControl() {
+    void primaryKeyWithExplicitOrderControl() throws SQLException {
         // Demonstrates explicit control of the order of columns in the primary key
-        String sql = new CreateTableBuilder(renderer, "OrderItems")
+        new CreateTableBuilder(renderer, "OrderItems")
                 .column("item_id")
                 .integer()
                 .notNull()
@@ -337,9 +355,9 @@ class CreateTableBuilderTest {
                 .column("quantity")
                 .integer()
                 .primaryKey("order_id", "item_id") // Ordine esplicito: order_id prima di item_id
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("\"item_id\" INTEGER NOT NULL")
                 .contains("\"order_id\" INTEGER NOT NULL")
                 .contains("\"quantity\" INTEGER")
