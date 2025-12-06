@@ -146,6 +146,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LengthPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LikePsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LiteralPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeUsingPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ModPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.NotNullConstraintPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.NotPsStrategy;
@@ -181,6 +182,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UniqueConstraintPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhenMatchedDeletePsStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhenMatchedUpdatePsStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhenNotMatchedInsertPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhereClausePsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAggregateCallPsStrategy;
@@ -232,6 +236,7 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlLikePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlLiteralPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlMergeStatementPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlMergeUsingPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlModPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlNotNullConstraintPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlNotPsStrategy;
@@ -268,6 +273,9 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUniqueConstraintPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUpdateItemPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUpdateStatementPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlWhenMatchedDeletePsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlWhenMatchedUpdatePsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlWhenNotMatchedInsertPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlWhereClausePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
 import lombok.AccessLevel;
@@ -530,6 +538,19 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Default
     private final MergeStatementPsStrategy mergeStatementStrategy = new StandardSqlMergeStatementPsStrategy();
+
+    @Default
+    private final MergeUsingPsStrategy mergeUsingStrategy = new StandardSqlMergeUsingPsStrategy();
+
+    @Default
+    private final WhenMatchedUpdatePsStrategy whenMatchedUpdateStrategy = new StandardSqlWhenMatchedUpdatePsStrategy();
+
+    @Default
+    private final WhenMatchedDeletePsStrategy whenMatchedDeleteStrategy = new StandardSqlWhenMatchedDeletePsStrategy();
+
+    @Default
+    private final WhenNotMatchedInsertPsStrategy whenNotMatchedInsertStrategy =
+            new StandardSqlWhenNotMatchedInsertPsStrategy();
 
     @Default
     private final RowNumberPsStrategy rowNumberStrategy = new StandardSqlRowNumberPsStrategy();
@@ -934,7 +955,7 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(MergeUsing item, AstContext ctx) {
-        return item.source().accept(this, ctx);
+        return mergeUsingStrategy.handle(item, this, ctx);
     }
 
     @Override
@@ -963,75 +984,17 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(WhenMatchedUpdate item, AstContext ctx) {
-        List<Object> allParameters = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("WHEN MATCHED");
-
-        if (item.condition() != null) {
-            PsDto conditionDto = item.condition().accept(this, ctx);
-            allParameters.addAll(conditionDto.parameters());
-            sql.append(" AND ").append(conditionDto.sql());
-        }
-
-        sql.append(" THEN UPDATE SET ");
-
-        String updates = item.updateItems().stream()
-                .map(updateItem -> {
-                    PsDto updateDto = updateItem.accept(this, ctx);
-                    allParameters.addAll(updateDto.parameters());
-                    return updateDto.sql();
-                })
-                .collect(java.util.stream.Collectors.joining(", "));
-
-        sql.append(updates);
-
-        return new PsDto(sql.toString(), allParameters);
+        return whenMatchedUpdateStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(WhenMatchedDelete item, AstContext ctx) {
-        List<Object> allParameters = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("WHEN MATCHED");
-
-        if (item.condition() != null) {
-            PsDto conditionDto = item.condition().accept(this, ctx);
-            allParameters.addAll(conditionDto.parameters());
-            sql.append(" AND ").append(conditionDto.sql());
-        }
-
-        sql.append(" THEN DELETE");
-
-        return new PsDto(sql.toString(), allParameters);
+        return whenMatchedDeleteStrategy.handle(item, this, ctx);
     }
 
     @Override
     public PsDto visit(WhenNotMatchedInsert item, AstContext ctx) {
-        List<Object> allParameters = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("WHEN NOT MATCHED");
-
-        if (item.condition() != null) {
-            PsDto conditionDto = item.condition().accept(this, ctx);
-            allParameters.addAll(conditionDto.parameters());
-            sql.append(" AND ").append(conditionDto.sql());
-        }
-
-        sql.append(" THEN INSERT");
-
-        if (!item.columns().isEmpty()) {
-            String columns = item.columns().stream()
-                    .map(col -> {
-                        PsDto colDto = col.accept(this, ctx);
-                        allParameters.addAll(colDto.parameters());
-                        return colDto.sql();
-                    })
-                    .collect(java.util.stream.Collectors.joining(", "));
-            sql.append(" (").append(columns).append(")");
-        }
-
-        PsDto insertDataDto = item.insertData().accept(this, ctx);
-        allParameters.addAll(insertDataDto.parameters());
-        sql.append(" ").append(insertDataDto.sql());
-
-        return new PsDto(sql.toString(), allParameters);
+        return whenNotMatchedInsertStrategy.handle(item, this, ctx);
     }
 
     // Handle FromSource dispatch for FROM clause
