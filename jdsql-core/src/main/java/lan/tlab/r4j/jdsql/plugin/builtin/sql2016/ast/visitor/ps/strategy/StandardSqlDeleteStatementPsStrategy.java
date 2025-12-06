@@ -16,10 +16,12 @@ public class StandardSqlDeleteStatementPsStrategy implements DeleteStatementPsSt
         TableExpression table = stmt.table();
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
-        String tableName = table instanceof lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier t
-                ? t.name()
-                : table.toString();
-        sql.append("DELETE FROM ").append(tableName);
+
+        // Use renderer to properly escape table name
+        PsDto tableDto = table.accept(renderer, ctx);
+        sql.append("DELETE FROM ").append(tableDto.sql());
+        params.addAll(tableDto.parameters());
+
         Where where = stmt.where();
         if (where != null
                 && where.condition() != null
