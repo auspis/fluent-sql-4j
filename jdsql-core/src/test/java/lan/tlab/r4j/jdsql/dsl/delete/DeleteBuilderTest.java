@@ -2,7 +2,13 @@ package lan.tlab.r4j.jdsql.dsl.delete;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
@@ -15,74 +21,83 @@ import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class DeleteBuilderTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void ok() {
-        String result = new DeleteBuilder(renderer, "users")
+    void ok() throws SQLException {
+        new DeleteBuilder(renderer, "users")
                 .where()
                 .column("status")
                 .eq("inactive")
-                .build();
-        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"status\" = 'inactive'");
+                .buildPreparedStatement(connection);
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\" WHERE \"status\" = ?");
+        verify(ps).setObject(1, "inactive");
     }
 
     @Test
-    void noWhere() {
-        String result = new DeleteBuilder(renderer, "users").build();
-        assertThat(result).isEqualTo("DELETE FROM \"users\"");
+    void noWhere() throws SQLException {
+        new DeleteBuilder(renderer, "users").buildPreparedStatement(connection);
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\"");
     }
 
     @Test
-    void whereWithNumber() {
-        String result =
-                new DeleteBuilder(renderer, "users").where().column("id").eq(42).build();
-        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"id\" = 42");
+    void whereWithNumber() throws SQLException {
+        new DeleteBuilder(renderer, "users").where().column("id").eq(42).buildPreparedStatement(connection);
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\" WHERE \"id\" = ?");
+        verify(ps).setObject(1, 42);
     }
 
     @Test
-    void and() {
-        String result = new DeleteBuilder(renderer, "users")
+    void and() throws SQLException {
+        new DeleteBuilder(renderer, "users")
                 .where()
                 .column("status")
                 .eq("inactive")
                 .and()
                 .column("age")
                 .lt(18)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
-                .isEqualTo(
-                        "DELETE FROM \"users\" WHERE (\"users\".\"status\" = 'inactive') AND (\"users\".\"age\" < 18)");
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\" WHERE (\"status\" = ?) AND (\"age\" < ?)");
+        verify(ps).setObject(1, "inactive");
+        verify(ps).setObject(2, 18);
     }
 
     @Test
-    void or() {
-        String result = new DeleteBuilder(renderer, "users")
+    void or() throws SQLException {
+        new DeleteBuilder(renderer, "users")
                 .where()
                 .column("status")
                 .eq("deleted")
                 .or()
                 .column("status")
                 .eq("banned")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
-                .isEqualTo(
-                        "DELETE FROM \"users\" WHERE (\"users\".\"status\" = 'deleted') OR (\"users\".\"status\" = 'banned')");
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\" WHERE (\"status\" = ?) OR (\"status\" = ?)");
+        verify(ps).setObject(1, "deleted");
+        verify(ps).setObject(2, "banned");
     }
 
     @Test
-    void andOr() {
-        String result = new DeleteBuilder(renderer, "users")
+    void andOr() throws SQLException {
+        new DeleteBuilder(renderer, "users")
                 .where()
                 .column("status")
                 .eq("inactive")
@@ -92,38 +107,41 @@ class DeleteBuilderTest {
                 .or()
                 .column("role")
                 .eq("guest")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
-                .isEqualTo(
-                        "DELETE FROM \"users\" WHERE ((\"users\".\"status\" = 'inactive') AND (\"users\".\"age\" < 18)) OR (\"users\".\"role\" = 'guest')");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("DELETE FROM \"users\" WHERE ((\"status\" = ?) AND (\"age\" < ?)) OR (\"role\" = ?)");
+        verify(ps).setObject(1, "inactive");
+        verify(ps).setObject(2, 18);
+        verify(ps).setObject(3, "guest");
     }
 
     @Test
-    void isNull() {
-        String result = new DeleteBuilder(renderer, "users")
+    void isNull() throws SQLException {
+        new DeleteBuilder(renderer, "users")
                 .where()
                 .column("deleted_at")
                 .isNotNull()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"deleted_at\" IS NOT NULL");
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\" WHERE \"deleted_at\" IS NOT NULL");
     }
 
     @Test
-    void like() {
-        String result = new DeleteBuilder(renderer, "users")
+    void like() throws SQLException {
+        new DeleteBuilder(renderer, "users")
                 .where()
                 .column("email")
                 .like("%@temp.com")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("DELETE FROM \"users\" WHERE \"users\".\"email\" LIKE '%@temp.com'");
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\" WHERE \"email\" LIKE ?");
+        verify(ps).setObject(1, "%@temp.com");
     }
 
     @Test
-    void allComparisonOperators() {
-        String result = new DeleteBuilder(renderer, "products")
+    void allComparisonOperators() throws SQLException {
+        new DeleteBuilder(renderer, "products")
                 .where()
                 .column("price")
                 .gt(100)
@@ -139,11 +157,16 @@ class DeleteBuilderTest {
                 .and()
                 .column("category")
                 .ne("deprecated")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
-                        "DELETE FROM \"products\" WHERE ((((\"products\".\"price\" > 100) AND (\"products\".\"discount\" < 50)) AND (\"products\".\"rating\" >= 4)) AND (\"products\".\"stock\" <= 10)) AND (\"products\".\"category\" != 'deprecated')");
+                        "DELETE FROM \"products\" WHERE ((((\"price\" > ?) AND (\"discount\" < ?)) AND (\"rating\" >= ?)) AND (\"stock\" <= ?)) AND (\"category\" <> ?)");
+        verify(ps).setObject(1, 100);
+        verify(ps).setObject(2, 50);
+        verify(ps).setObject(3, 4);
+        verify(ps).setObject(4, 10);
+        verify(ps).setObject(5, "deprecated");
     }
 
     @Test
