@@ -25,7 +25,7 @@ class StandardSqlDeleteStatementPsStrategyTest {
         PsDto ps = renderer.visit(stmt, new AstContext());
         Assertions.assertThat(ps.sql())
                 .contains("DELETE FROM")
-                .contains("users")
+                .contains("\"users\"")
                 .contains("WHERE");
         Assertions.assertThat(ps.parameters()).containsExactly(42);
     }
@@ -36,7 +36,7 @@ class StandardSqlDeleteStatementPsStrategyTest {
         DeleteStatement stmt = DeleteStatement.builder().table(table).build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto ps = renderer.visit(stmt, new AstContext());
-        Assertions.assertThat(ps.sql()).isEqualTo("DELETE FROM users");
+        Assertions.assertThat(ps.sql()).isEqualTo("DELETE FROM \"users\"");
         Assertions.assertThat(ps.parameters()).isEmpty();
     }
 }
