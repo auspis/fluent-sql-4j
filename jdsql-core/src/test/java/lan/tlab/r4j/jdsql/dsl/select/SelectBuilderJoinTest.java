@@ -2,100 +2,111 @@ package lan.tlab.r4j.jdsql.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class SelectBuilderJoinTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void innerJoin() {
-        String sql = new SelectBuilder(renderer, "*")
+    void innerJoin() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT * FROM \"users\" INNER JOIN \"orders\" ON \"users\".\"id\" = \"orders\".\"user_id\"");
     }
 
     @Test
-    void leftJoin() {
-        String sql = new SelectBuilder(renderer, "*")
+    void leftJoin() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .leftJoin("profiles")
                 .on("users.id", "profiles.user_id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT * FROM \"users\" LEFT JOIN \"profiles\" ON \"users\".\"id\" = \"profiles\".\"user_id\"");
     }
 
     @Test
-    void rightJoin() {
-        String sql = new SelectBuilder(renderer, "*")
+    void rightJoin() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .rightJoin("departments")
                 .on("users.dept_id", "departments.id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT * FROM \"users\" RIGHT JOIN \"departments\" ON \"users\".\"dept_id\" = \"departments\".\"id\"");
     }
 
     @Test
-    void fullJoin() {
-        String sql = new SelectBuilder(renderer, "*")
+    void fullJoin() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .fullJoin("roles")
                 .on("users.role_id", "roles.id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo("SELECT * FROM \"users\" FULL JOIN \"roles\" ON \"users\".\"role_id\" = \"roles\".\"id\"");
     }
 
     @Test
-    void crossJoin() {
-        String sql = new SelectBuilder(renderer, "*")
-                .from("users")
-                .crossJoin("settings")
-                .build();
+    void crossJoin() throws SQLException {
+        new SelectBuilder(renderer, "*").from("users").crossJoin("settings").buildPreparedStatement(connection);
 
-        assertThat(sql).isEqualTo("SELECT * FROM \"users\" CROSS JOIN \"settings\"");
+        assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"users\" CROSS JOIN \"settings\"");
     }
 
     @Test
-    void innerJoinWithAlias() {
-        String sql = new SelectBuilder(renderer, "*")
+    void innerJoinWithAlias() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
                 .on("u.id", "o.user_id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT * FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\"");
     }
 
     @Test
-    void multipleJoins() {
-        String sql = new SelectBuilder(renderer, "*")
+    void multipleJoins() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -104,31 +115,31 @@ class SelectBuilderJoinTest {
                 .leftJoin("products")
                 .as("p")
                 .on("o.product_id", "p.id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT * FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" LEFT JOIN \"products\" AS p ON \"o\".\"product_id\" = \"p\".\"id\"");
     }
 
     @Test
-    void joinWithSelectedColumns() {
-        String sql = new SelectBuilder(renderer, "name", "email", "order_id")
+    void joinWithSelectedColumns() throws SQLException {
+        new SelectBuilder(renderer, "name", "email", "order_id")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
                 .on("u.id", "o.user_id")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT \"u\".\"name\", \"u\".\"email\", \"u\".\"order_id\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\"");
     }
 
     @Test
-    void joinWithWhereClause() {
-        String sql = new SelectBuilder(renderer, "*")
+    void joinWithWhereClause() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -137,45 +148,46 @@ class SelectBuilderJoinTest {
                 .where()
                 .column("status")
                 .eq("active")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
-                        "SELECT * FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" WHERE \"u\".\"status\" = 'active'");
+                        "SELECT * FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" WHERE \"u\".\"status\" = ?");
+        verify(ps).setObject(1, "active");
     }
 
     @Test
-    void joinWithOrderBy() {
-        String sql = new SelectBuilder(renderer, "*")
+    void joinWithOrderBy() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
                 .orderBy("created_at")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT * FROM \"users\" INNER JOIN \"orders\" ON \"users\".\"id\" = \"orders\".\"user_id\" ORDER BY \"users\".\"created_at\" ASC");
     }
 
     @Test
-    void joinWithFetchAndOffset() {
-        String sql = new SelectBuilder(renderer, "*")
+    void joinWithFetchAndOffset() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
                 .fetch(10)
                 .offset(5)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         "SELECT * FROM \"users\" INNER JOIN \"orders\" ON \"users\".\"id\" = \"orders\".\"user_id\" OFFSET 5 ROWS FETCH NEXT 10 ROWS ONLY");
     }
 
     @Test
-    void complexJoinQuery() {
-        String sql = new SelectBuilder(renderer, "name", "email", "order_total")
+    void complexJoinQuery() throws SQLException {
+        new SelectBuilder(renderer, "name", "email", "order_total")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -192,11 +204,13 @@ class SelectBuilderJoinTest {
                 .gt(100)
                 .orderByDesc("created_at")
                 .fetch(20)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
-                        "SELECT \"u\".\"name\", \"u\".\"email\", \"u\".\"order_total\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" LEFT JOIN \"payments\" AS p ON \"o\".\"id\" = \"p\".\"order_id\" WHERE (\"u\".\"status\" = 'completed') AND (\"u\".\"amount\" > 100) ORDER BY \"u\".\"created_at\" DESC OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY");
+                        "SELECT \"u\".\"name\", \"u\".\"email\", \"u\".\"order_total\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" LEFT JOIN \"payments\" AS p ON \"o\".\"id\" = \"p\".\"order_id\" WHERE (\"u\".\"status\" = ?) AND (\"u\".\"amount\" > ?) ORDER BY \"u\".\"created_at\" DESC FETCH NEXT 20 ROWS ONLY");
+        verify(ps).setObject(1, "completed");
+        verify(ps).setObject(2, 100);
     }
 
     @Test
