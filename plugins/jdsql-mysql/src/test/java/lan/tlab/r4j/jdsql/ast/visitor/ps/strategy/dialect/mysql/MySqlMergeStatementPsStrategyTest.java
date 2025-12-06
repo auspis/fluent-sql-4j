@@ -17,7 +17,6 @@ import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.statement.MySqlMergeStatementPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 import org.junit.jupiter.api.Test;
@@ -47,9 +46,7 @@ class MySqlMergeStatementPsStrategyTest {
 
         // TODO: use TestDialectRendererFactory
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
@@ -76,9 +73,7 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
@@ -107,9 +102,7 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PsDto result = strategy.handle(stmt, renderer, new AstContext());
@@ -135,12 +128,9 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
-                .sqlRenderer(SqlRenderer.builder()
-                        .escapeStrategy(new MysqlEscapeStrategy())
-                        .build())
+                .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
-
         assertThatThrownBy(() -> strategy.handle(stmt, renderer, new AstContext()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("MySQL MERGE requires a WHEN NOT MATCHED THEN INSERT clause");
