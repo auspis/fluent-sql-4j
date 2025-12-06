@@ -690,7 +690,6 @@ class PreparedStatementRendererTest {
                 .build();
         // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
         var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
-                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
                 lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
                         .build());
         PsDto result = dialectRenderer.renderPreparedStatement(stmt);
@@ -718,7 +717,6 @@ class PreparedStatementRendererTest {
                 .build();
         // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
         var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
-                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
                 lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
                         .build());
         PsDto result = dialectRenderer.renderPreparedStatement(stmt);
@@ -746,7 +744,6 @@ class PreparedStatementRendererTest {
                 .build();
         // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
         var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
-                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
                 lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
                         .build());
         PsDto result = dialectRenderer.renderPreparedStatement(stmt);
@@ -774,7 +771,6 @@ class PreparedStatementRendererTest {
                 .build();
         // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
         var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
-                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
                 lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
                         .build());
         PsDto result = dialectRenderer.renderPreparedStatement(stmt);
@@ -827,7 +823,6 @@ class PreparedStatementRendererTest {
                 .build();
         // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
         var dialectRenderer = new lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer(
-                lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer.builder().build(),
                 lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer.builder()
                         .build());
         PsDto result = dialectRenderer.renderPreparedStatement(stmt);
