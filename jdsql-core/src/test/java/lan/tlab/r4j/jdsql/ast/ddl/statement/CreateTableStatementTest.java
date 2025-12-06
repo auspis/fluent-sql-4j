@@ -1,4 +1,4 @@
-package lan.tlab.r4j.jdsql.dsl.table;
+package lan.tlab.r4j.jdsql.ast.ddl.statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,7 +8,6 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.NotNullConstra
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
-import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
@@ -19,7 +18,7 @@ import org.junit.jupiter.api.Test;
  * Unit test to verify that DDL context causes literals to be rendered inline
  * instead of as placeholders.
  */
-class CreateTableBuilderDDLContextTest {
+class CreateTableStatementTest {
 
     private DialectRenderer renderer;
 
