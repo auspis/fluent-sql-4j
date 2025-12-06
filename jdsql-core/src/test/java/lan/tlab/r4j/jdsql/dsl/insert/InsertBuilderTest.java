@@ -2,97 +2,118 @@ package lan.tlab.r4j.jdsql.dsl.insert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class InsertBuilderTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void insertWithDefaultValues() {
-        String sql = new InsertBuilder(renderer, "users").defaultValues().build();
+    void insertWithDefaultValues() throws SQLException {
+        new InsertBuilder(renderer, "users").defaultValues().buildPreparedStatement(connection);
 
-        assertThat(sql).isEqualTo("""
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
             INSERT INTO "users" DEFAULT VALUES\
             """);
     }
 
     @Test
-    void insertWithSingleColumnAndValue() {
-        String sql = new InsertBuilder(renderer, "users").set("name", "John").build();
+    void insertWithSingleColumnAndValue() throws SQLException {
+        new InsertBuilder(renderer, "users").set("name", "John").buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
-            INSERT INTO "users" ("users"."name") VALUES ('John')\
+            INSERT INTO "users" ("name") VALUES (?)\
             """);
+        verify(ps).setObject(1, "John");
     }
 
     @Test
-    void insertWithMultipleColumnsAndValues() {
-        String sql = new InsertBuilder(renderer, "users")
+    void insertWithMultipleColumnsAndValues() throws SQLException {
+        new InsertBuilder(renderer, "users")
                 .set("id", 1)
                 .set("name", "John")
                 .set("email", "john@example.com")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            INSERT INTO "users" ("users"."id", "users"."name", "users"."email") VALUES (1, 'John', 'john@example.com')\
+            INSERT INTO "users" ("id", "name", "email") VALUES (?, ?, ?)\
             """);
+        verify(ps).setObject(1, 1);
+        verify(ps).setObject(2, "John");
+        verify(ps).setObject(3, "john@example.com");
     }
 
     @Test
-    void insertWithNullValue() {
-        String sql = new InsertBuilder(renderer, "users")
+    void insertWithNullValue() throws SQLException {
+        new InsertBuilder(renderer, "users")
                 .set("name", "John")
                 .set("email", (String) null)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-            INSERT INTO "users" ("users"."name", "users"."email") VALUES ('John', null)\
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+            INSERT INTO "users" ("name", "email") VALUES (?, ?)\
             """);
+        verify(ps).setObject(1, "John");
+        verify(ps).setObject(2, null);
     }
 
     @Test
-    void insertWithBooleanValue() {
-        String sql = new InsertBuilder(renderer, "users")
+    void insertWithBooleanValue() throws SQLException {
+        new InsertBuilder(renderer, "users")
                 .set("name", "John")
                 .set("active", true)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-            INSERT INTO "users" ("users"."name", "users"."active") VALUES ('John', true)\
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+            INSERT INTO "users" ("name", "active") VALUES (?, ?)\
             """);
+        verify(ps).setObject(1, "John");
+        verify(ps).setObject(2, true);
     }
 
     @Test
-    void insertWithNumericValues() {
-        String sql = new InsertBuilder(renderer, "products")
+    void insertWithNumericValues() throws SQLException {
+        new InsertBuilder(renderer, "products")
                 .set("id", 1)
                 .set("price", 19.99)
                 .set("quantity", 100)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                        INSERT INTO "products" ("products"."id", "products"."price", "products"."quantity") VALUES (1, 19.99, 100)\
-                        """);
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                INSERT INTO "products" ("id", "price", "quantity") VALUES (?, ?, ?)""");
+        verify(ps).setObject(1, 1);
+        verify(ps).setObject(2, 19.99);
+        verify(ps).setObject(3, 100);
     }
 
     @Test
@@ -124,57 +145,41 @@ class InsertBuilderTest {
     }
 
     @Test
-    void insertWithMixedDataTypes() {
-        String sql = new InsertBuilder(renderer, "mixed_table")
+    void insertWithMixedDataTypes() throws SQLException {
+        new InsertBuilder(renderer, "mixed_table")
                 .set("text_col", "test")
                 .set("int_col", 42)
                 .set("bool_col", false)
                 .set("null_col", (String) null)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                        INSERT INTO "mixed_table" ("mixed_table"."text_col", "mixed_table"."int_col", "mixed_table"."bool_col", "mixed_table"."null_col") VALUES ('test', 42, false, null)\
-                        """);
+                INSERT INTO "mixed_table" ("text_col", "int_col", "bool_col", "null_col") VALUES (?, ?, ?, ?)""");
+        verify(ps).setObject(1, "test");
+        verify(ps).setObject(2, 42);
+        verify(ps).setObject(3, false);
+        verify(ps).setObject(4, null);
     }
 
     @Test
-    void insertWithDateValue() {
+    void insertWithDateValue() throws SQLException {
         LocalDate birthdate = LocalDate.of(1999, 1, 23);
-        String sql = new InsertBuilder(renderer, "users")
+        new InsertBuilder(renderer, "users")
                 .set("name", "John")
                 .set("birthdate", birthdate)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("INSERT INTO \"users\" (\"users\".\"name\", \"users\".\"birthdate\") VALUES ('John',");
+        assertThat(sqlCaptor.getValue()).isEqualTo("INSERT INTO \"users\" (\"name\", \"birthdate\") VALUES (?, ?)");
+        verify(ps).setObject(1, "John");
+        verify(ps).setObject(2, birthdate);
     }
 
     @Test
     void buildPreparedStatementRequiresConnection() {
         InsertBuilder builder = new InsertBuilder(renderer, "users").set("name", "John");
 
-        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(Exception.class);
-    }
-
-    @Test
-    void buildPreparedStatementCompilesWithoutError() {
-        InsertBuilder builder =
-                new InsertBuilder(renderer, "users").set("name", "John").set("email", "john@example.com");
-
-        assertThat(builder).isNotNull();
-
-        assertThat(builder.getClass().getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
-    }
-
-    @Test
-    void buildPreparedStatementWithDefaultValuesCompilesWithoutError() {
-        InsertBuilder builder = new InsertBuilder(renderer, "users").defaultValues();
-
-        assertThat(builder).isNotNull();
-
-        assertThat(builder.getClass().getDeclaredMethods())
-                .anyMatch(method -> method.getName().equals("buildPreparedStatement"));
+        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(NullPointerException.class);
     }
 }
