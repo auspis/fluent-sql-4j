@@ -1,54 +1,70 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 @IntegrationTest
 class DeleteDSLIntegrationTest {
 
     private DSL dsl;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         dsl = StandardSqlRendererFactory.dslStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void createsDeleteBuilderWithRenderer() {
-        String result = dsl.deleteFrom("users").where().column("id").eq(1).build();
+    void createsDeleteBuilderWithRenderer() throws SQLException {
+        dsl.deleteFrom("users").where().column("id").eq(1).buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("""
-                DELETE FROM "users" WHERE "users"."id" = 1""");
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
+                DELETE FROM "users" WHERE "id" = ?""");
+        verify(ps).setObject(1, 1);
     }
 
     @Test
-    void appliesRendererQuoting() {
-        String result = dsl.deleteFrom("temp_table").build();
+    void appliesRendererQuoting() throws SQLException {
+        dsl.deleteFrom("temp_table").buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("""
-                DELETE FROM "temp_table\"""");
+        assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"temp_table\"");
     }
 
     @Test
-    void fluentApiWithComplexConditions() {
-        String result = dsl.deleteFrom("orders")
+    void fluentApiWithComplexConditions() throws SQLException {
+        dsl.deleteFrom("orders")
                 .where()
                 .column("status")
                 .eq("cancelled")
                 .and()
                 .column("amount")
                 .gt(100)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 DELETE FROM "orders" \
-                WHERE ("orders"."status" = 'cancelled') \
-                AND ("orders"."amount" > 100)""");
+                WHERE ("status" = ?) \
+                AND ("amount" > ?)""");
+        verify(ps).setObject(1, "cancelled");
+        verify(ps).setObject(2, 100);
     }
 }
