@@ -1,7 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.oracle;
 
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
@@ -19,18 +18,6 @@ public final class OracleSqlRendererFactory {
 
     private OracleSqlRendererFactory() {
         // Utility class - prevent instantiation
-    }
-
-    /**
-     * Creates a {@link SqlRenderer} for Oracle Database dialect.
-     *
-     * @return SqlRenderer configured for Oracle 19c+
-     * @throws IllegalStateException if the Oracle plugin is not available
-     */
-    public static SqlRenderer oracle() {
-        return REGISTRY.getDialectRenderer(OracleDialectPlugin.DIALECT_NAME, OracleDialectPlugin.DIALECT_VERSION)
-                .orElseThrow()
-                .sqlRenderer();
     }
 
     /**
