@@ -1,7 +1,13 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
@@ -14,37 +20,48 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 @IntegrationTest
 class SelectDSLIntegrationTest {
 
     private DSL dsl;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         dsl = StandardSqlRendererFactory.dslStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void createsSelectBuilderWithRenderer() {
-        String result = dsl.select("name", "email").from("users").build();
+    void createsSelectBuilderWithRenderer() throws SQLException {
+        dsl.select("name", "email").from("users").buildPreparedStatement(connection);
 
-        assertThat(result).isEqualTo("""
-                SELECT "users"."name", "users"."email" FROM "users\"""");
-    }
-
-    @Test
-    void appliesRendererQuoting() {
-        String result = dsl.select("id", "value").from("temp_table").build();
-
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
-                SELECT "temp_table"."id", "temp_table"."value" FROM "temp_table\"""");
+                SELECT "name", "email" FROM "users"\
+                """);
     }
 
     @Test
-    void fluentApiWithComplexQuery() {
-        String result = dsl.select("name", "age")
+    void appliesRendererQuoting() throws SQLException {
+        dsl.select("id", "value").from("temp_table").buildPreparedStatement(connection);
+
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                SELECT "id", "value" FROM "temp_table"\
+                """);
+    }
+
+    @Test
+    void fluentApiWithComplexQuery() throws SQLException {
+        dsl.select("name", "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -54,21 +71,23 @@ class SelectDSLIntegrationTest {
                 .eq(true)
                 .orderBy("name")
                 .fetch(10)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "users"."name", "users"."age" \
+                SELECT "name", "age" \
                 FROM "users" \
-                WHERE ("users"."age" > 18) AND ("users"."active" = true) \
-                ORDER BY "users"."name" ASC \
-                OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY""");
+                WHERE ("age" > ?) AND ("active" = ?) \
+                ORDER BY "name" ASC \
+                FETCH NEXT 10 ROWS ONLY""");
+        verify(ps).setObject(1, 18);
+        verify(ps).setObject(2, true);
     }
 
     @Test
-    void jsonFunctionsWithFluentApi() {
-        String result = dsl.select()
+    void jsonFunctionsWithFluentApi() throws SQLException {
+        dsl.select()
                 .column("products", "name")
                 .jsonExists("products", "metadata", "$.tags")
                 .as("has_tags")
@@ -81,23 +100,27 @@ class SelectDSLIntegrationTest {
                 .where()
                 .column("category")
                 .eq("Electronics")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", \
-                JSON_EXISTS("products"."metadata", '$.tags') AS has_tags, \
-                JSON_VALUE("products"."metadata", '$.price' RETURNING DECIMAL(10,2)) AS price, \
-                JSON_QUERY("products"."metadata", '$.details') AS details \
+                SELECT "name", \
+                JSON_EXISTS("metadata", ?) AS "has_tags", \
+                JSON_VALUE("metadata", ? RETURNING DECIMAL(10,2)) AS "price", \
+                JSON_QUERY("metadata", ?) AS "details" \
                 FROM "products" \
-                WHERE "products"."category" = 'Electronics'\
+                WHERE "category" = ?\
                 """);
+        verify(ps).setObject(1, "$.tags");
+        verify(ps).setObject(2, "$.price");
+        verify(ps).setObject(3, "$.details");
+        verify(ps).setObject(4, "Electronics");
     }
 
     @Test
-    void jsonValueWithDefaultBehaviorFluentApi() {
-        String result = dsl.select()
+    void jsonValueWithDefaultBehaviorFluentApi() throws SQLException {
+        dsl.select()
                 .column("products", "id")
                 .column("products", "name")
                 .jsonValue("products", "data", "$.discount")
@@ -106,20 +129,21 @@ class SelectDSLIntegrationTest {
                 .as("discount")
                 .from("products")
                 .orderBy("name")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."id", "products"."name", \
-                JSON_VALUE("products"."data", '$.discount' RETURNING DECIMAL(5,2) DEFAULT 0.00 ON EMPTY) AS discount \
+                SELECT "id", "name", \
+                JSON_VALUE("data", ? RETURNING DECIMAL(5,2) DEFAULT 0.00 ON EMPTY) AS "discount" \
                 FROM "products" \
-                ORDER BY "products"."name" ASC\
+                ORDER BY "name" ASC\
                 """);
+        verify(ps).setObject(1, "$.discount");
     }
 
     @Test
-    void jsonFunctionsUsingExpressionApi() {
+    void jsonFunctionsUsingExpressionApi() throws SQLException {
         // Test the low-level expression API for custom JSON configurations
         JsonValue jsonDiscount = new JsonValue(
                 ColumnReference.of("products", "data"),
@@ -128,44 +152,45 @@ class SelectDSLIntegrationTest {
                 OnEmptyBehavior.defaultValue("0.00"),
                 null);
 
-        String result = dsl.select()
+        dsl.select()
                 .column("products", "name")
                 .expression(jsonDiscount, "discount")
                 .from("products")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", \
-                JSON_VALUE("products"."data", '$.discount' RETURNING DECIMAL(5,2) DEFAULT 0.00 ON EMPTY) AS discount \
+                SELECT "name", \
+                JSON_VALUE("data", ? RETURNING DECIMAL(5,2) DEFAULT 0.00 ON EMPTY) AS "discount" \
                 FROM "products"\
                 """);
+        verify(ps).setObject(1, "$.discount");
     }
 
     @Test
-    void windowFunctionRowNumberWithFluentApi() {
-        String result = dsl.select()
+    void windowFunctionRowNumberWithFluentApi() throws SQLException {
+        dsl.select()
                 .column("employees", "name")
                 .column("employees", "salary")
                 .rowNumber()
                 .orderByDesc("employees", "salary")
                 .as("rank")
                 .from("employees")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "employees"."name", "employees"."salary", \
-                ROW_NUMBER() OVER (ORDER BY "employees"."salary" DESC) AS rank \
+                SELECT "name", "salary", \
+                ROW_NUMBER() OVER (ORDER BY "salary" DESC) AS "rank" \
                 FROM "employees"\
                 """);
     }
 
     @Test
-    void windowFunctionRowNumberWithPartitionBy() {
-        String result = dsl.select()
+    void windowFunctionRowNumberWithPartitionBy() throws SQLException {
+        dsl.select()
                 .column("employees", "name")
                 .column("employees", "department")
                 .column("employees", "salary")
@@ -174,20 +199,20 @@ class SelectDSLIntegrationTest {
                 .orderByDesc("employees", "salary")
                 .as("dept_rank")
                 .from("employees")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "employees"."name", "employees"."department", "employees"."salary", \
-                ROW_NUMBER() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_rank \
+                SELECT "name", "department", "salary", \
+                ROW_NUMBER() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_rank" \
                 FROM "employees"\
                 """);
     }
 
     @Test
-    void windowFunctionRankAndDenseRank() {
-        String result = dsl.select()
+    void windowFunctionRankAndDenseRank() throws SQLException {
+        dsl.select()
                 .column("products", "name")
                 .column("products", "price")
                 .rank()
@@ -197,21 +222,21 @@ class SelectDSLIntegrationTest {
                 .orderByDesc("products", "price")
                 .as("price_dense_rank")
                 .from("products")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."name", "products"."price", \
-                RANK() OVER (ORDER BY "products"."price" DESC) AS price_rank, \
-                DENSE_RANK() OVER (ORDER BY "products"."price" DESC) AS price_dense_rank \
+                SELECT "name", "price", \
+                RANK() OVER (ORDER BY "price" DESC) AS "price_rank", \
+                DENSE_RANK() OVER (ORDER BY "price" DESC) AS "price_dense_rank" \
                 FROM "products"\
                 """);
     }
 
     @Test
-    void windowFunctionLagWithFluentApi() {
-        String result = dsl.select()
+    void windowFunctionLagWithFluentApi() throws SQLException {
+        dsl.select()
                 .column("sales", "sale_date")
                 .column("sales", "amount")
                 .lag("sales", "amount", 1)
@@ -221,22 +246,23 @@ class SelectDSLIntegrationTest {
                 .where()
                 .column("year")
                 .eq(2024)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "sales"."sale_date", "sales"."amount", \
-                LAG("sales"."amount", 1) OVER (ORDER BY "sales"."sale_date" ASC) AS previous_amount \
+                SELECT "sale_date", "amount", \
+                LAG("amount", 1) OVER (ORDER BY "sale_date" ASC) AS "previous_amount" \
                 FROM "sales" \
-                WHERE "sales"."year" = 2024\
+                WHERE "year" = ?\
                 """);
+        verify(ps).setObject(1, 2024);
     }
 
     @Test
-    void windowFunctionUsingExpressionApi() {
+    void windowFunctionUsingExpressionApi() throws SQLException {
         // Test the low-level expression API for custom window function configurations
-        String result = dsl.select()
+        dsl.select()
                 .column("employees", "name")
                 .expression(
                         WindowFunction.rowNumber(OverClause.builder()
@@ -244,40 +270,40 @@ class SelectDSLIntegrationTest {
                                 .build()),
                         "rank")
                 .from("employees")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "employees"."name", \
-                ROW_NUMBER() OVER (ORDER BY "employees"."salary" DESC) AS rank \
+                SELECT "name", \
+                ROW_NUMBER() OVER (ORDER BY "salary" DESC) AS "rank" \
                 FROM "employees"\
                 """);
     }
 
     @Test
-    void windowFunctionNtileWithFluentApi() {
-        String result = dsl.select()
+    void windowFunctionNtileWithFluentApi() throws SQLException {
+        dsl.select()
                 .column("employees", "name")
                 .column("employees", "salary")
                 .ntile(4)
                 .orderByDesc("employees", "salary")
                 .as("quartile")
                 .from("employees")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "employees"."name", "employees"."salary", \
-                NTILE(4) OVER (ORDER BY "employees"."salary" DESC) AS quartile \
+                SELECT "name", "salary", \
+                NTILE(4) OVER (ORDER BY "salary" DESC) AS "quartile" \
                 FROM "employees"\
                 """);
     }
 
     @Test
-    void windowFunctionLeadWithFluentApi() {
-        String result = dsl.select()
+    void windowFunctionLeadWithFluentApi() throws SQLException {
+        dsl.select()
                 .column("sales", "sale_date")
                 .lead("sales", "amount", 1)
                 .orderByAsc("sales", "sale_date")
@@ -287,21 +313,22 @@ class SelectDSLIntegrationTest {
                 .where()
                 .column("year")
                 .eq(2024)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "sales"."sale_date", \
-                LEAD("sales"."amount", 1) OVER (ORDER BY "sales"."sale_date" ASC) AS next_amount, "sales"."amount" \
+                SELECT "sale_date", \
+                LEAD("amount", 1) OVER (ORDER BY "sale_date" ASC) AS "next_amount", "amount" \
                 FROM "sales" \
-                WHERE "sales"."year" = 2024\
+                WHERE "year" = ?\
                 """);
+        verify(ps).setObject(1, 2024);
     }
 
     @Test
-    void windowFunctionWithComplexPartitioningAndOrdering() {
-        String result = dsl.select()
+    void windowFunctionWithComplexPartitioningAndOrdering() throws SQLException {
+        dsl.select()
                 .column("employees", "name")
                 .column("employees", "department")
                 .column("employees", "salary")
@@ -314,21 +341,21 @@ class SelectDSLIntegrationTest {
                 .orderByDesc("employees", "salary")
                 .as("dept_rank_with_gaps")
                 .from("employees")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "employees"."name", "employees"."department", "employees"."salary", \
-                ROW_NUMBER() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_rank, \
-                RANK() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_rank_with_gaps \
+                SELECT "name", "department", "salary", \
+                ROW_NUMBER() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_rank", \
+                RANK() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_rank_with_gaps" \
                 FROM "employees"\
                 """);
     }
 
     @Test
-    void innerJoinWithMultipleConditions() {
-        String result = dsl.select("name", "email", "created_at")
+    void innerJoinWithMultipleConditions() throws SQLException {
+        dsl.select("name", "email", "created_at")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -340,21 +367,23 @@ class SelectDSLIntegrationTest {
                 .and()
                 .column("email")
                 .like("%@example.com")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 SELECT "u"."name", "u"."email", "u"."created_at" \
                 FROM "users" AS u \
                 INNER JOIN "orders" AS o ON "u"."id" = "o"."user_id" \
-                WHERE ("u"."status" = 'active') AND ("u"."email" LIKE '%@example.com')\
+                WHERE ("u"."status" = ?) AND ("u"."email" LIKE ?)\
                 """);
+        verify(ps).setObject(1, "active");
+        verify(ps).setObject(2, "%@example.com");
     }
 
     @Test
-    void leftJoinWithWhereAndOrderBy() {
-        String result = dsl.select("name", "email")
+    void leftJoinWithWhereAndOrderBy() throws SQLException {
+        dsl.select("name", "email")
                 .from("users")
                 .as("u")
                 .leftJoin("profiles")
@@ -365,23 +394,24 @@ class SelectDSLIntegrationTest {
                 .eq(true)
                 .orderByDesc("created_at")
                 .fetch(10)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 SELECT "u"."name", "u"."email" \
                 FROM "users" AS u \
                 LEFT JOIN "profiles" AS p ON "u"."id" = "p"."user_id" \
-                WHERE "u"."active" = true \
+                WHERE "u"."active" = ? \
                 ORDER BY "u"."created_at" DESC \
-                OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY\
+                FETCH NEXT 10 ROWS ONLY\
                 """);
+        verify(ps).setObject(1, true);
     }
 
     @Test
-    void multipleJoinsWithGroupByHaving() {
-        String result = dsl.select("name", "city")
+    void multipleJoinsWithGroupByHaving() throws SQLException {
+        dsl.select("name", "city")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -396,24 +426,26 @@ class SelectDSLIntegrationTest {
                 .groupBy("name", "city")
                 .having("city")
                 .like("New%")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 SELECT "u"."name", "u"."city" \
                 FROM "users" AS u \
                 INNER JOIN "orders" AS o ON "u"."id" = "o"."user_id" \
                 LEFT JOIN "payments" AS p ON "o"."id" = "p"."order_id" \
-                WHERE "u"."status" = 'active' \
+                WHERE "u"."status" = ? \
                 GROUP BY "u"."name", "u"."city" \
-                HAVING "u"."city" LIKE 'New%'\
+                HAVING "u"."city" LIKE ?\
                 """);
+        verify(ps).setObject(1, "active");
+        verify(ps).setObject(2, "New%");
     }
 
     @Test
-    void rightJoinWithComplexWhereConditions() {
-        String result = dsl.select("dept_name", "budget", "location")
+    void rightJoinWithComplexWhereConditions() throws SQLException {
+        dsl.select("dept_name", "budget", "location")
                 .from("departments")
                 .as("d")
                 .rightJoin("employees")
@@ -429,22 +461,25 @@ class SelectDSLIntegrationTest {
                 .column("manager_id")
                 .isNull()
                 .orderByDesc("budget")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 SELECT "d"."dept_name", "d"."budget", "d"."location" \
                 FROM "departments" AS d \
                 RIGHT JOIN "employees" AS e ON "d"."id" = "e"."dept_id" \
-                WHERE ((("d"."budget" >= 50000) AND ("d"."budget" <= 100000)) AND ("d"."active" = true)) OR ("d"."manager_id" IS NULL) \
+                WHERE ((("d"."budget" >= ?) AND ("d"."budget" <= ?)) AND ("d"."active" = ?)) OR ("d"."manager_id" IS NULL) \
                 ORDER BY "d"."budget" DESC\
                 """);
+        verify(ps).setObject(1, 50000);
+        verify(ps).setObject(2, 100000);
+        verify(ps).setObject(3, true);
     }
 
     @Test
-    void groupByWithMultipleAggregationsAndHaving() {
-        String result = dsl.select("department", "COUNT(*)", "SUM(salary)", "AVG(age)")
+    void groupByWithMultipleAggregationsAndHaving() throws SQLException {
+        dsl.select("department", "COUNT(*)", "SUM(salary)", "AVG(age)")
                 .from("employees")
                 .as("e")
                 .where()
@@ -454,23 +489,25 @@ class SelectDSLIntegrationTest {
                 .having("department")
                 .like("Engineering%")
                 .orderBy("department")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "e"."department", "e"."COUNT(*)", "e"."SUM(salary)", "e"."AVG(age)" \
+                SELECT "department", "COUNT(*)", "SUM(salary)", "AVG(age)" \
                 FROM "employees" AS e \
-                WHERE "e"."status" = 'active' \
-                GROUP BY "e"."department" \
-                HAVING "e"."department" LIKE 'Engineering%' \
-                ORDER BY "e"."department" ASC\
+                WHERE "status" = ? \
+                GROUP BY "department" \
+                HAVING "department" LIKE ? \
+                ORDER BY "department" ASC\
                 """);
+        verify(ps).setObject(1, "active");
+        verify(ps).setObject(2, "Engineering%");
     }
 
     @Test
-    void groupByMultipleColumnsWithHavingComplexConditions() {
-        String result = dsl.select("region", "category", "COUNT(*)", "MAX(price)")
+    void groupByMultipleColumnsWithHavingComplexConditions() throws SQLException {
+        dsl.select("region", "category", "COUNT(*)", "MAX(price)")
                 .from("products")
                 .as("p")
                 .groupBy("region", "category")
@@ -480,22 +517,26 @@ class SelectDSLIntegrationTest {
                 .ne("discontinued")
                 .orderBy("region")
                 .orderBy("category")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "p"."region", "p"."category", "p"."COUNT(*)", "p"."MAX(price)" \
+                SELECT "region", "category", "COUNT(*)", "MAX(price)" \
                 FROM "products" AS p \
-                GROUP BY "p"."region", "p"."category" \
-                HAVING ("p"."region" IN('North', 'South', 'East')) AND ("p"."category" != 'discontinued') \
-                ORDER BY "p"."category" ASC\
+                GROUP BY "region", "category" \
+                HAVING ("region" IN (?, ?, ?)) AND ("category" <> ?) \
+                ORDER BY "category" ASC\
                 """);
+        verify(ps).setObject(1, "North");
+        verify(ps).setObject(2, "South");
+        verify(ps).setObject(3, "East");
+        verify(ps).setObject(4, "discontinued");
     }
 
     @Test
-    void groupByWithWhereHavingOrderByFetch() {
-        String result = dsl.select("customer_id", "COUNT(*)", "SUM(amount)", "AVG(quantity)")
+    void groupByWithWhereHavingOrderByFetch() throws SQLException {
+        dsl.select("customer_id", "COUNT(*)", "SUM(amount)", "AVG(quantity)")
                 .from("orders")
                 .as("o")
                 .where()
@@ -508,24 +549,28 @@ class SelectDSLIntegrationTest {
                 .lt(9999)
                 .orderByDesc("customer_id")
                 .fetch(10)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "o"."customer_id", "o"."COUNT(*)", "o"."SUM(amount)", "o"."AVG(quantity)" \
+                SELECT "customer_id", "COUNT(*)", "SUM(amount)", "AVG(quantity)" \
                 FROM "orders" AS o \
-                WHERE ("o"."order_date" >= '2023-01-01') AND ("o"."order_date" <= '2023-12-31') \
-                GROUP BY "o"."customer_id" \
-                HAVING ("o"."customer_id" > 1000) AND ("o"."customer_id" < 9999) \
-                ORDER BY "o"."customer_id" DESC \
-                OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY\
+                WHERE ("order_date" >= ?) AND ("order_date" <= ?) \
+                GROUP BY "customer_id" \
+                HAVING ("customer_id" > ?) AND ("customer_id" < ?) \
+                ORDER BY "customer_id" DESC \
+                FETCH NEXT 10 ROWS ONLY\
                 """);
+        verify(ps).setObject(1, LocalDate.of(2023, 1, 1));
+        verify(ps).setObject(2, LocalDate.of(2023, 12, 31));
+        verify(ps).setObject(3, 1000);
+        verify(ps).setObject(4, 9999);
     }
 
     @Test
-    void whereWithJsonValueComparison() {
-        String result = dsl.select("id", "name")
+    void whereWithJsonValueComparison() throws SQLException {
+        dsl.select("id", "name")
                 .from("users")
                 .where()
                 .jsonValue("profile", "$.city")
@@ -533,21 +578,25 @@ class SelectDSLIntegrationTest {
                 .and()
                 .jsonValue("profile", "$.age")
                 .gt(25)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "users"."id", "users"."name" \
+                SELECT "id", "name" \
                 FROM "users" \
-                WHERE (JSON_VALUE("users"."profile", '$.city') = 'Rome') \
-                AND (JSON_VALUE("users"."profile", '$.age') > 25)\
+                WHERE (JSON_VALUE("profile", ?) = ?) \
+                AND (JSON_VALUE("profile", ?) > ?)\
                 """);
+        verify(ps).setObject(1, "$.city");
+        verify(ps).setObject(2, "Rome");
+        verify(ps).setObject(3, "$.age");
+        verify(ps).setObject(4, 25);
     }
 
     @Test
-    void whereWithJsonExistsCondition() {
-        String result = dsl.select("product_id", "name", "price")
+    void whereWithJsonExistsCondition() throws SQLException {
+        dsl.select("product_id", "name", "price")
                 .from("products")
                 .where()
                 .jsonExists("metadata", "$.featured")
@@ -556,22 +605,25 @@ class SelectDSLIntegrationTest {
                 .column("active")
                 .eq(true)
                 .orderBy("name")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT "products"."product_id", "products"."name", "products"."price" \
+                SELECT "product_id", "name", "price" \
                 FROM "products" \
-                WHERE (JSON_EXISTS("products"."metadata", '$.featured') = true) \
-                AND ("products"."active" = true) \
-                ORDER BY "products"."name" ASC\
+                WHERE (JSON_EXISTS("metadata", ?) = ?) \
+                AND ("active" = ?) \
+                ORDER BY "name" ASC\
                 """);
+        verify(ps).setObject(1, "$.featured");
+        verify(ps).setObject(2, true);
+        verify(ps).setObject(3, true);
     }
 
     @Test
-    void whereWithMixedJsonFunctionsAndRegularColumns() {
-        String result = dsl.select("*")
+    void whereWithMixedJsonFunctionsAndRegularColumns() throws SQLException {
+        dsl.select("*")
                 .from("orders")
                 .as("o")
                 .where()
@@ -585,18 +637,23 @@ class SelectDSLIntegrationTest {
                 .notExists()
                 .orderByDesc("order_date")
                 .fetch(20)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
                 SELECT * \
                 FROM "orders" AS o \
-                WHERE (("o"."status" = 'completed') \
-                AND (JSON_VALUE("o"."details", '$.payment.method') = 'credit_card')) \
-                OR (JSON_EXISTS("o"."details", '$.discount') = false) \
-                ORDER BY "o"."order_date" DESC \
-                OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY\
+                WHERE (("status" = ?) \
+                AND (JSON_VALUE("details", ?) = ?)) \
+                OR (JSON_EXISTS("details", ?) = ?) \
+                ORDER BY "order_date" DESC \
+                FETCH NEXT 20 ROWS ONLY\
                 """);
+        verify(ps).setObject(1, "completed");
+        verify(ps).setObject(2, "$.payment.method");
+        verify(ps).setObject(3, "credit_card");
+        verify(ps).setObject(4, "$.discount");
+        verify(ps).setObject(5, false);
     }
 }
