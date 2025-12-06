@@ -1,5 +1,8 @@
 package lan.tlab.r4j.jdsql.dsl.table;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition;
@@ -83,6 +86,11 @@ public class ColumnBuilder {
     public CreateTableBuilder defaultValue(ScalarExpression value) {
         buildAndAdd();
         return tableBuilder.defaultConstraint(value);
+    }
+
+    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+        buildAndAdd();
+        return tableBuilder.buildPreparedStatement(connection);
     }
 
     void buildColumn() {
