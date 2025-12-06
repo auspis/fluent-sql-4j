@@ -1,5 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
+import java.util.Arrays;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
@@ -14,7 +15,7 @@ public class StandardSqlLiteralPsStrategy implements LiteralPsStrategy {
         if (ctx.hasFeature(AstContext.Feature.DDL)) {
             return new PsDto(formatLiteralValue(literal.value()), List.of());
         }
-        return new PsDto("?", List.of(literal.value()));
+        return new PsDto("?", Arrays.asList(literal.value()));
     }
 
     private String formatLiteralValue(Object value) {

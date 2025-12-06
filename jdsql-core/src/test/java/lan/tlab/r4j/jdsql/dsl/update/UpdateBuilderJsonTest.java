@@ -1,126 +1,154 @@
 package lan.tlab.r4j.jdsql.dsl.update;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class UpdateBuilderJsonTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void updateSingleJsonColumn() {
+    void updateSingleJsonColumn() throws SQLException {
         String jsonValue = "{\"status\":\"active\",\"lastLogin\":\"2025-11-08\"}";
 
-        String sql = new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(renderer, "users")
                 .set("metadata", jsonValue)
                 .where()
                 .column("id")
                 .eq(1)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                UPDATE "users" SET "metadata" = '{"status":"active","lastLogin":"2025-11-08"}' WHERE "users"."id" = 1""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                UPDATE "users" SET "metadata" = ? WHERE "users"."id" = ?""");
+        verify(ps).setObject(1, jsonValue);
+        verify(ps).setObject(2, 1);
     }
 
     @Test
-    void updateMultipleColumnsWithJson() {
+    void updateMultipleColumnsWithJson() throws SQLException {
         String preferences = "[\"notifications\",\"theme-dark\",\"auto-save\"]";
 
-        String sql = new UpdateBuilder(renderer, "user_settings")
+        new UpdateBuilder(renderer, "user_settings")
                 .set("username", "alice")
                 .set("preferences", preferences)
                 .set("updated_at", "2025-11-08T10:30:00")
                 .where()
                 .column("user_id")
                 .eq(42)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "user_settings" SET "username" = 'alice', "preferences" = '["notifications","theme-dark","auto-save"]', "updated_at" = '2025-11-08T10:30:00' WHERE "user_settings"."user_id" = 42""");
+                UPDATE "user_settings" SET "username" = ?, "preferences" = ?, "updated_at" = ? WHERE "user_settings"."user_id" = ?""");
+        verify(ps).setObject(1, "alice");
+        verify(ps).setObject(2, preferences);
+        verify(ps).setObject(3, "2025-11-08T10:30:00");
+        verify(ps).setObject(4, 42);
     }
 
     @Test
-    void updateNestedJsonObject() {
+    void updateNestedJsonObject() throws SQLException {
         String profile =
                 "{\"personal\":{\"firstName\":\"Mario\",\"lastName\":\"Rossi\"},\"contact\":{\"email\":\"mario@example.com\",\"phone\":\"+39123456789\"}}";
 
-        String sql = new UpdateBuilder(renderer, "profiles")
+        new UpdateBuilder(renderer, "profiles")
                 .set("profile_data", profile)
                 .where()
                 .column("profile_id")
                 .eq(100)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "profiles" SET "profile_data" = '{"personal":{"firstName":"Mario","lastName":"Rossi"},"contact":{"email":"mario@example.com","phone":"+39123456789"}}' WHERE "profiles"."profile_id" = 100""");
+                UPDATE "profiles" SET "profile_data" = ? WHERE "profiles"."profile_id" = ?""");
+        verify(ps).setObject(1, profile);
+        verify(ps).setObject(2, 100);
     }
 
     @Test
-    void updateJsonToNull() {
-        String sql = new UpdateBuilder(renderer, "users")
+    void updateJsonToNull() throws SQLException {
+        new UpdateBuilder(renderer, "users")
                 .set("metadata", (String) null)
                 .where()
                 .column("id")
                 .eq(5)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).isEqualTo("""
-                UPDATE "users" SET "metadata" = null WHERE "users"."id" = 5""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                UPDATE "users" SET "metadata" = ? WHERE "users"."id" = ?""");
+        verify(ps).setObject(1, null);
+        verify(ps).setObject(2, 5);
     }
 
     @Test
-    void updateEmptyJsonObject() {
+    void updateEmptyJsonObject() throws SQLException {
         String emptyJson = "{}";
 
-        String sql = new UpdateBuilder(renderer, "documents")
+        new UpdateBuilder(renderer, "documents")
                 .set("properties", emptyJson)
                 .where()
                 .column("doc_id")
                 .eq(7)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "documents" SET "properties" = '{}' WHERE "documents"."doc_id" = 7""");
+                UPDATE "documents" SET "properties" = ? WHERE "documents"."doc_id" = ?""");
+        verify(ps).setObject(1, emptyJson);
+        verify(ps).setObject(2, 7);
     }
 
     @Test
-    void updateEmptyJsonArray() {
+    void updateEmptyJsonArray() throws SQLException {
         String emptyArray = "[]";
 
-        String sql = new UpdateBuilder(renderer, "tags")
+        new UpdateBuilder(renderer, "tags")
                 .set("tag_list", emptyArray)
                 .where()
                 .column("item_id")
                 .eq(15)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
-                UPDATE "tags" SET "tag_list" = '[]' WHERE "tags"."item_id" = 15""");
+                UPDATE "tags" SET "tag_list" = ? WHERE "tags"."item_id" = ?""");
+        verify(ps).setObject(1, emptyArray);
+        verify(ps).setObject(2, 15);
     }
 
     @Test
-    void updateJsonWithComplexWhereConditions() {
+    void updateJsonWithComplexWhereConditions() throws SQLException {
         String config = "{\"timeout\":30,\"retries\":3,\"enabled\":true}";
 
-        String sql = new UpdateBuilder(renderer, "api_configs")
+        new UpdateBuilder(renderer, "api_configs")
                 .set("configuration", config)
                 .set("last_modified", "2025-11-08")
                 .where()
@@ -129,11 +157,15 @@ class UpdateBuilderJsonTest {
                 .and()
                 .column("version")
                 .gte("2.0")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                UPDATE "api_configs" SET "configuration" = '{"timeout":30,"retries":3,"enabled":true}', "last_modified" = '2025-11-08' WHERE ("api_configs"."api_name" = 'payment-service') AND ("api_configs"."version" >= '2.0')""");
+                UPDATE "api_configs" SET "configuration" = ?, "last_modified" = ? WHERE ("api_configs"."api_name" = ?) AND ("api_configs"."version" >= ?)""");
+        verify(ps).setObject(1, config);
+        verify(ps).setObject(2, "2025-11-08");
+        verify(ps).setObject(3, "payment-service");
+        verify(ps).setObject(4, "2.0");
     }
 }
