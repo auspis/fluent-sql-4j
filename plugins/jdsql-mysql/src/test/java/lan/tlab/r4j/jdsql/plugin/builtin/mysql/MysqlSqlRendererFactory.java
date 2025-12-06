@@ -1,7 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
@@ -19,19 +18,6 @@ public final class MysqlSqlRendererFactory {
 
     private MysqlSqlRendererFactory() {
         // Utility class - prevent instantiation
-    }
-
-    /**
-     * Creates a {@link SqlRenderer} for MySQL 8.x dialect.
-     *
-     * @return SqlRenderer configured for MySQL 8.x
-     * @throws IllegalStateException if the MySQL plugin is not available
-     *
-     */
-    public static SqlRenderer create() {
-        return REGISTRY.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
-                .orElseThrow()
-                .sqlRenderer();
     }
 
     /**
