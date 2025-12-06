@@ -1,7 +1,12 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.Expression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
@@ -13,20 +18,28 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 @IntegrationTest
 class MergeDSLIntegrationTest {
 
     private DSL dsl;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         dsl = StandardSqlRendererFactory.dslStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void basicMergeUsingTableSource() {
-        String sql = dsl.mergeInto("products")
+    void basicMergeUsingTableSource() throws SQLException {
+        dsl.mergeInto("products")
                 .as("p")
                 .using("new_products", "np")
                 .on("p.product_id", "np.product_id")
@@ -42,9 +55,9 @@ class MergeDSLIntegrationTest {
                                 (Expression) ColumnReference.of("np", "product_id"),
                                 (Expression) ColumnReference.of("np", "product_name"),
                                 (Expression) ColumnReference.of("np", "price")))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("MERGE INTO")
                 .contains("products")
                 .contains("USING")
@@ -58,7 +71,7 @@ class MergeDSLIntegrationTest {
     }
 
     @Test
-    void mergeWithSubquerySource() {
+    void mergeWithSubquerySource() throws SQLException {
         SelectStatement subquery = dsl.select("id", "name", "price")
                 .from("staging_products")
                 .where()
@@ -66,7 +79,7 @@ class MergeDSLIntegrationTest {
                 .eq("active")
                 .getCurrentStatement();
 
-        String sql = dsl.mergeInto("products")
+        dsl.mergeInto("products")
                 .as("p")
                 .using(subquery, "src")
                 .on("p.id", "src.id")
@@ -82,14 +95,17 @@ class MergeDSLIntegrationTest {
                                 (Expression) ColumnReference.of("src", "id"),
                                 (Expression) ColumnReference.of("src", "name"),
                                 (Expression) ColumnReference.of("src", "price")))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql).contains("MERGE INTO").contains("USING (SELECT").contains("ON");
+        assertThat(sqlCaptor.getValue())
+                .contains("MERGE INTO")
+                .contains("USING (SELECT")
+                .contains("ON");
     }
 
     @Test
-    void mergeWithConditionalUpdate() {
-        String sql = dsl.mergeInto("inventory")
+    void mergeWithConditionalUpdate() throws SQLException {
+        dsl.mergeInto("inventory")
                 .as("i")
                 .using("new_stock", "ns")
                 .on("i.product_id", "ns.product_id")
@@ -101,9 +117,9 @@ class MergeDSLIntegrationTest {
                         List.of(ColumnReference.of("i", "product_id"), ColumnReference.of("i", "quantity")),
                         List.of((Expression) ColumnReference.of("ns", "product_id"), (Expression)
                                 ColumnReference.of("ns", "quantity")))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("WHEN MATCHED AND")
                 .contains("THEN UPDATE")
                 .contains("WHEN MATCHED AND")
@@ -112,13 +128,13 @@ class MergeDSLIntegrationTest {
     }
 
     @Test
-    void mergeWithMultipleActionsShowsComplexScenario() {
+    void mergeWithMultipleActionsShowsComplexScenario() throws SQLException {
         // Scenario: Sync products from a source table
         // - If product exists and source has higher version, update it
         // - If product doesn't exist, insert it
         // - We use predicate on WHEN MATCHED to only update if source version is newer
 
-        String sql = dsl.mergeInto("target_products")
+        dsl.mergeInto("target_products")
                 .as("tgt")
                 .using("source_products", "src")
                 .on("tgt.sku", "src.sku")
@@ -139,9 +155,9 @@ class MergeDSLIntegrationTest {
                                 (Expression) ColumnReference.of("src", "name"),
                                 (Expression) ColumnReference.of("src", "price"),
                                 (Expression) ColumnReference.of("src", "version")))
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .contains("MERGE INTO \"target_products\"")
                 .contains("USING \"source_products\"")
                 .contains("ON \"tgt\".\"sku\" = \"src\".\"sku\"")
