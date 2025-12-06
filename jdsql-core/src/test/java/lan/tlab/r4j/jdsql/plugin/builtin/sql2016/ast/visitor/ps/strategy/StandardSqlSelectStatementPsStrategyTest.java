@@ -21,7 +21,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlSelectStatementPsStrategyTest {
@@ -29,8 +28,8 @@ class StandardSqlSelectStatementPsStrategyTest {
     private final StandardSqlSelectStatementPsStrategy strategy = new StandardSqlSelectStatementPsStrategy();
     private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
-    private final DialectRenderer dialectRenderer = new DialectRenderer(
-            SqlRenderer.builder().build(), PreparedStatementRenderer.builder().build());
+    private final DialectRenderer dialectRenderer =
+            new DialectRenderer(PreparedStatementRenderer.builder().build());
 
     @Test
     void star() {
