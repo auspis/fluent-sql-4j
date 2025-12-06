@@ -1,7 +1,13 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
@@ -14,18 +20,26 @@ import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class SelectBuilderWindowFunctionsTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void select_withRowNumber_generatesCorrectSql() {
+    void select_withRowNumber_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -37,17 +51,19 @@ class SelectBuilderWindowFunctionsTest {
                         "row_num"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", ROW_NUMBER() OVER (ORDER BY "employees"."salary" DESC) AS row_num FROM "employees"\
+            SELECT "employee_id", "name", "salary", \
+            ROW_NUMBER() OVER (ORDER BY "salary" DESC) AS "row_num" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withRowNumberPartitionBy_generatesCorrectSql() {
+    void select_withRowNumberPartitionBy_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -61,17 +77,19 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_row_num"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."department", "employees"."salary", ROW_NUMBER() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_row_num FROM "employees"\
+            SELECT "employee_id", "name", "department", "salary", \
+            ROW_NUMBER() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_row_num" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withRank_generatesCorrectSql() {
+    void select_withRank_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -83,17 +101,17 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_rank"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", RANK() OVER (ORDER BY "employees"."salary" DESC) AS salary_rank FROM "employees"\
+            SELECT "employee_id", "name", "salary", RANK() OVER (ORDER BY "salary" DESC) AS "salary_rank" FROM "employees"\
             """);
     }
 
     @Test
-    void select_withDenseRank_generatesCorrectSql() {
+    void select_withDenseRank_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -105,17 +123,17 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_dense_rank"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", DENSE_RANK() OVER (ORDER BY "employees"."salary" DESC) AS salary_dense_rank FROM "employees"\
+            SELECT "employee_id", "name", "salary", DENSE_RANK() OVER (ORDER BY "salary" DESC) AS "salary_dense_rank" FROM "employees"\
             """);
     }
 
     @Test
-    void select_withNtile_generatesCorrectSql() {
+    void select_withNtile_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -129,17 +147,17 @@ class SelectBuilderWindowFunctionsTest {
                         "quartile"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", NTILE(4) OVER (ORDER BY "employees"."salary" DESC) AS quartile FROM "employees"\
+            SELECT "employee_id", "name", "salary", NTILE(4) OVER (ORDER BY "salary" DESC) AS "quartile" FROM "employees"\
             """);
     }
 
     @Test
-    void select_withLag_generatesCorrectSql() {
+    void select_withLag_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -154,17 +172,17 @@ class SelectBuilderWindowFunctionsTest {
                         "prev_salary"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", LAG("employees"."salary", 1) OVER (ORDER BY "employees"."hire_date" ASC) AS prev_salary FROM "employees"\
+            SELECT "employee_id", "name", "salary", LAG("salary", 1) OVER (ORDER BY "hire_date" ASC) AS "prev_salary" FROM "employees"\
             """);
     }
 
     @Test
-    void select_withLagWithDefaultValue_generatesCorrectSql() {
+    void select_withLagWithDefaultValue_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -180,17 +198,18 @@ class SelectBuilderWindowFunctionsTest {
                         "prev_salary"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", LAG("employees"."salary", 1, 0) OVER (ORDER BY "employees"."hire_date" DESC) AS prev_salary FROM "employees"\
+            SELECT "employee_id", "name", "salary", LAG("salary", 1, ?) OVER (ORDER BY "hire_date" DESC) AS "prev_salary" FROM "employees"\
             """);
+        verify(ps).setObject(1, 0);
     }
 
     @Test
-    void select_withLead_generatesCorrectSql() {
+    void select_withLead_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -205,17 +224,17 @@ class SelectBuilderWindowFunctionsTest {
                         "next_salary"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", LEAD("employees"."salary", 1) OVER (ORDER BY "employees"."hire_date" DESC) AS next_salary FROM "employees"\
+            SELECT "employee_id", "name", "salary", LEAD("salary", 1) OVER (ORDER BY "hire_date" DESC) AS "next_salary" FROM "employees"\
             """);
     }
 
     @Test
-    void select_withLeadWithDefaultValue_generatesCorrectSql() {
+    void select_withLeadWithDefaultValue_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -231,17 +250,18 @@ class SelectBuilderWindowFunctionsTest {
                         "next_salary"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", LEAD("employees"."salary", 1, 0) OVER (ORDER BY "employees"."hire_date" DESC) AS next_salary FROM "employees"\
+            SELECT "employee_id", "name", "salary", LEAD("salary", 1, ?) OVER (ORDER BY "hire_date" DESC) AS "next_salary" FROM "employees"\
             """);
+        verify(ps).setObject(1, 0);
     }
 
     @Test
-    void select_withMultipleWindowFunctions_generatesCorrectSql() {
+    void select_withMultipleWindowFunctions_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -267,17 +287,21 @@ class SelectBuilderWindowFunctionsTest {
                         "quartile"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", ROW_NUMBER() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS row_num, RANK() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_rank, NTILE(4) OVER (ORDER BY "employees"."salary" DESC) AS quartile FROM "employees"\
+            SELECT "employee_id", "name", "salary", \
+            ROW_NUMBER() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "row_num", \
+            RANK() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_rank", \
+            NTILE(4) OVER (ORDER BY "salary" DESC) AS "quartile" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withRowNumberPartitionByOrderByAsc_generatesCorrectSql() {
+    void select_withRowNumberPartitionByOrderByAsc_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -291,17 +315,19 @@ class SelectBuilderWindowFunctionsTest {
                         "hire_order"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."department", "employees"."salary", ROW_NUMBER() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."hire_date" ASC) AS hire_order FROM "employees"\
+            SELECT "employee_id", "name", "department", "salary", \
+            ROW_NUMBER() OVER (PARTITION BY "department" ORDER BY "hire_date" ASC) AS "hire_order" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withRankPartitionByOrderByDesc_generatesCorrectSql() {
+    void select_withRankPartitionByOrderByDesc_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -314,17 +340,19 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_salary_rank"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", RANK() OVER (PARTITION BY "employees"."department" ORDER BY "employees"."salary" DESC) AS dept_salary_rank FROM "employees"\
+            SELECT "employee_id", "name", "salary", \
+            RANK() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_salary_rank" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withDenseRankOrderByAsc_generatesCorrectSql() {
+    void select_withDenseRankOrderByAsc_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -336,17 +364,18 @@ class SelectBuilderWindowFunctionsTest {
                         "hire_dense_rank"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", DENSE_RANK() OVER (ORDER BY "employees"."hire_date" ASC) AS hire_dense_rank FROM "employees"\
+            SELECT "employee_id", "name", "salary", DENSE_RANK() OVER (ORDER BY "hire_date" ASC) AS "hire_dense_rank" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withNtileWithDifferentBuckets_generatesCorrectSql() {
+    void select_withNtileWithDifferentBuckets_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -360,17 +389,18 @@ class SelectBuilderWindowFunctionsTest {
                         "decile"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", NTILE(10) OVER (ORDER BY "employees"."salary" DESC) AS decile FROM "employees"\
+            SELECT "employee_id", "name", "salary", NTILE(10) OVER (ORDER BY "salary" DESC) AS "decile" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withLagWithOffset2_generatesCorrectSql() {
+    void select_withLagWithOffset2_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -386,17 +416,19 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_two_back"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", LAG("employees"."salary", 2) OVER (PARTITION BY "employees"."department" ORDER BY "employees"."hire_date" ASC) AS salary_two_back FROM "employees"\
+            SELECT "employee_id", "name", "salary", \
+            LAG("salary", 2) OVER (PARTITION BY "department" ORDER BY "hire_date" ASC) AS "salary_two_back" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withLeadWithOffset3AndDefault_generatesCorrectSql() {
+    void select_withLeadWithOffset3AndDefault_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -413,17 +445,20 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_three_ahead"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."salary", LEAD("employees"."salary", 3, -1) OVER (PARTITION BY "employees"."department" ORDER BY "employees"."hire_date" ASC) AS salary_three_ahead FROM "employees"\
+            SELECT "employee_id", "name", "salary", \
+            LEAD("salary", 3, ?) OVER (PARTITION BY "department" ORDER BY "hire_date" ASC) AS "salary_three_ahead" \
+            FROM "employees"\
             """);
+        verify(ps).setObject(1, -1);
     }
 
     @Test
-    void select_withRowNumberOnlyOrderBy_generatesCorrectSql() {
+    void select_withRowNumberOnlyOrderBy_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -434,17 +469,17 @@ class SelectBuilderWindowFunctionsTest {
                         "id_order"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", ROW_NUMBER() OVER (ORDER BY "employees"."employee_id" ASC) AS id_order FROM "employees"\
+            SELECT "employee_id", "name", ROW_NUMBER() OVER (ORDER BY "employee_id" ASC) AS "id_order" FROM "employees"\
             """);
     }
 
     @Test
-    void select_withRankOnlyPartitionBy_generatesCorrectSql() {
+    void select_withRankOnlyPartitionBy_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "department")))
@@ -456,17 +491,18 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_rank_no_order"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."department", "employees"."salary", RANK() OVER (PARTITION BY "employees"."department") AS dept_rank_no_order FROM "employees"\
+            SELECT "employee_id", "department", "salary", RANK() OVER (PARTITION BY "department") AS "dept_rank_no_order" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withDenseRankPartitionByMultipleColumns_generatesCorrectSql() {
+    void select_withDenseRankPartitionByMultipleColumns_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "department")))
@@ -482,17 +518,19 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_job_rank"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."department", "employees"."job_title", "employees"."salary", DENSE_RANK() OVER (PARTITION BY "employees"."department", "employees"."job_title" ORDER BY "employees"."salary" DESC) AS dept_job_rank FROM "employees"\
+            SELECT "employee_id", "department", "job_title", "salary", \
+            DENSE_RANK() OVER (PARTITION BY "department", "job_title" ORDER BY "salary" DESC) AS "dept_job_rank" \
+            FROM "employees"\
             """);
     }
 
     @Test
-    void select_withNtilePartitionByOrderByMultipleColumns_generatesCorrectSql() {
+    void select_withNtilePartitionByOrderByMultipleColumns_generatesCorrectSql() throws SQLException {
         Select select = Select.builder()
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "employee_id")))
                 .projection(new ScalarExpressionProjection(ColumnReference.of("employees", "name")))
@@ -510,12 +548,14 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_hire_quintile"))
                 .build();
 
-        String result = new SelectBuilder(renderer, select).from("employees").build();
+        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
 
-        assertThat(result)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-            SELECT "employees"."employee_id", "employees"."name", "employees"."department", "employees"."salary", NTILE(5) OVER (PARTITION BY "employees"."department" ORDER BY "employees"."hire_date" ASC, "employees"."salary" DESC) AS dept_hire_quintile FROM "employees"\
+            SELECT "employee_id", "name", "department", "salary", \
+            NTILE(5) OVER (PARTITION BY "department" ORDER BY "hire_date" ASC, "salary" DESC) AS "dept_hire_quintile" \
+            FROM "employees"\
             """);
     }
 }

@@ -1,104 +1,117 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class WhereJsonFunctionBuilderTest {
 
     private DialectRenderer renderer;
+    private Connection connection;
+    private PreparedStatement ps;
+    private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        connection = mock(Connection.class);
+        ps = mock(PreparedStatement.class);
+        sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
     }
 
     @Test
-    void jsonValueStringComparison() {
-        // SELECT * FROM users WHERE JSON_VALUE(info, '$.city') = 'Rome'
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonValueStringComparison() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.city")
                 .eq("Rome")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                SELECT * FROM "users" WHERE JSON_VALUE("users"."info", '$.city') = 'Rome'""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                SELECT * FROM "users" WHERE JSON_VALUE("info", ?) = ?""");
+        verify(ps).setObject(1, "$.city");
+        verify(ps).setObject(2, "Rome");
     }
 
     @Test
-    void jsonValueNumberComparison() {
-        // SELECT * FROM users WHERE JSON_VALUE(info, '$.age') > 30
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonValueNumberComparison() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.age")
                 .gt(30)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
-                SELECT * FROM "users" WHERE JSON_VALUE("users"."info", '$.age') > 30""");
+                SELECT * FROM "users" WHERE JSON_VALUE("info", ?) > ?""");
+        verify(ps).setObject(1, "$.age");
+        verify(ps).setObject(2, 30);
     }
 
     @Test
-    void jsonExistsCondition() {
-        // SELECT * FROM users WHERE JSON_EXISTS(info, '$.email') = true
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonExistsCondition() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
                 .jsonExists("info", "$.email")
                 .exists()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                SELECT * FROM "users" WHERE JSON_EXISTS("users"."info", '$.email') = true""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                SELECT * FROM "users" WHERE JSON_EXISTS("info", ?) = ?""");
+        verify(ps).setObject(1, "$.email");
+        verify(ps).setObject(2, true);
     }
 
     @Test
-    void jsonNotExistsCondition() {
-        // SELECT * FROM users WHERE JSON_EXISTS(info, '$.phone') = false
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonNotExistsCondition() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
                 .jsonExists("info", "$.phone")
                 .notExists()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                SELECT * FROM "users" WHERE JSON_EXISTS("users"."info", '$.phone') = false""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                SELECT * FROM "users" WHERE JSON_EXISTS("info", ?) = ?""");
+        verify(ps).setObject(1, "$.phone");
+        verify(ps).setObject(2, false);
     }
 
     @Test
-    void jsonQueryIsNotNull() {
-        // SELECT * FROM products WHERE JSON_QUERY(data, '$.tags') IS NOT NULL
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonQueryIsNotNull() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("products")
                 .where()
                 .jsonQuery("data", "$.tags")
                 .isNotNull()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                SELECT * FROM "products" WHERE JSON_QUERY("products"."data", '$.tags') IS NOT NULL""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                SELECT * FROM "products" WHERE JSON_QUERY("data", ?) IS NOT NULL""");
+        verify(ps).setObject(1, "$.tags");
     }
 
     @Test
-    void jsonValueWithMultipleConditions() {
-        // SELECT * FROM users WHERE JSON_VALUE(info, '$.city') = 'Rome' AND active = true
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonValueWithMultipleConditions() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.city")
@@ -106,18 +119,20 @@ class WhereJsonFunctionBuilderTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT * FROM "users" WHERE (JSON_VALUE("users"."info", '$.city') = 'Rome') AND ("users"."active" = true)""");
+                SELECT * FROM "users" WHERE (JSON_VALUE("info", ?) = ?) AND ("active" = ?)""");
+        verify(ps).setObject(1, "$.city");
+        verify(ps).setObject(2, "Rome");
+        verify(ps).setObject(3, true);
     }
 
     @Test
-    void jsonValueWithOrCondition() {
-        // SELECT * FROM users WHERE JSON_VALUE(info, '$.status') = 'vip' OR JSON_VALUE(info, '$.status') = 'premium'
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonValueWithOrCondition() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.status")
@@ -125,18 +140,21 @@ class WhereJsonFunctionBuilderTest {
                 .or()
                 .jsonValue("info", "$.status")
                 .eq("premium")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT * FROM "users" WHERE (JSON_VALUE("users"."info", '$.status') = 'vip') OR (JSON_VALUE("users"."info", '$.status') = 'premium')""");
+                SELECT * FROM "users" WHERE (JSON_VALUE("info", ?) = ?) OR (JSON_VALUE("info", ?) = ?)""");
+        verify(ps).setObject(1, "$.status");
+        verify(ps).setObject(2, "vip");
+        verify(ps).setObject(3, "$.status");
+        verify(ps).setObject(4, "premium");
     }
 
     @Test
-    void jsonMixedConditionsNormalAndJson() {
-        // Mix normal columns and JSON functions
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonMixedConditionsNormalAndJson() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("orders")
                 .where()
                 .column("status")
@@ -147,44 +165,51 @@ class WhereJsonFunctionBuilderTest {
                 .and()
                 .jsonExists("data", "$.customer.email")
                 .exists()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
+        assertThat(sqlCaptor.getValue())
                 .isEqualTo(
                         """
-                SELECT * FROM "orders" WHERE (("orders"."status" = 'completed') AND (JSON_VALUE("orders"."data", '$.amount') >= 100)) AND (JSON_EXISTS("orders"."data", '$.customer.email') = true)""");
+                SELECT * FROM "orders" \
+                WHERE (("status" = ?) \
+                AND (JSON_VALUE("data", ?) >= ?)) \
+                AND (JSON_EXISTS("data", ?) = ?)""");
+        verify(ps).setObject(1, "completed");
+        verify(ps).setObject(2, "$.amount");
+        verify(ps).setObject(3, 100);
+        verify(ps).setObject(4, "$.customer.email");
+        verify(ps).setObject(5, true);
     }
 
     @Test
-    void jsonValueIsNull() {
-        // SELECT * FROM products WHERE JSON_VALUE(data, '$.discount') IS NULL
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonValueIsNull() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("products")
                 .where()
                 .jsonValue("data", "$.discount")
                 .isNull()
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                SELECT * FROM "products" WHERE JSON_VALUE("products"."data", '$.discount') IS NULL""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                SELECT * FROM "products" WHERE JSON_VALUE("data", ?) IS NULL""");
+        verify(ps).setObject(1, "$.discount");
     }
 
     @Test
-    void jsonValueWithTableAlias() {
-        // SELECT * FROM users AS u WHERE JSON_VALUE(u.info, '$.city') = 'Milan'
-        String sql = new SelectBuilder(renderer, "*")
+    void jsonValueWithTableAlias() throws SQLException {
+        new SelectBuilder(renderer, "*")
                 .from("users")
                 .as("u")
                 .where()
                 .jsonValue("u", "info", "$.city")
                 .eq("Milan")
-                .build();
+                .buildPreparedStatement(connection);
 
-        assertThat(sql)
-                .isEqualTo(
-                        """
-                SELECT * FROM "users" AS u WHERE JSON_VALUE("u"."info", '$.city') = 'Milan'""");
+        assertThat(sqlCaptor.getValue())
+                .isEqualTo("""
+                SELECT * FROM "users" AS u WHERE JSON_VALUE("info", ?) = ?""");
+        verify(ps).setObject(1, "$.city");
+        verify(ps).setObject(2, "Milan");
     }
 }
