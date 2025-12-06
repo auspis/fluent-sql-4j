@@ -4,8 +4,12 @@ import static lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin
 import static lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
@@ -20,6 +24,7 @@ import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Integration tests for StandardSQLDialectPlugin with SqlDialectRegistry and H2 database.
@@ -92,13 +97,6 @@ class StandardSQLDialectPluginIntegrationTest {
         DialectRenderer renderer = result.orElseThrow();
         DSL dsl = new DSL(renderer);
 
-        // Verify renderer works with real queries using the DSL
-        String sql = dsl.select("name", "email").from("users").build();
-        // DSL adds table references and quotes by default
-        assertThat(sql).contains("name");
-        assertThat(sql).contains("email");
-        assertThat(sql).contains("users");
-
         // Execute the query to verify it works with H2
         List<List<Object>> rows = ResultSetUtil.list(
                 dsl.select("name", "email").from("users").buildPreparedStatement(connection),
@@ -111,60 +109,59 @@ class StandardSQLDialectPluginIntegrationTest {
     }
 
     @Test
-    void shouldGenerateStandardSQLSyntax() {
-        // Get renderer from registry
+    void shouldGenerateStandardSQLSyntax() throws SQLException {
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPs = mock(PreparedStatement.class);
+        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(mockConnection.prepareStatement(sqlCaptor.capture())).thenReturn(mockPs);
+
         DialectRenderer renderer =
                 registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
         DSL dsl = new DSL(renderer);
 
         // Verify it generates standard SQL:2008 syntax for pagination using the DSL
-        String paginationSql = dsl.select("name")
-                .from("users")
-                .orderBy("name")
-                .offset(5)
-                .fetch(3)
-                .build();
+        dsl.select("name").from("users").orderBy("name").offset(5).fetch(3).buildPreparedStatement(mockConnection);
 
-        assertThat(paginationSql).contains("OFFSET 5 ROWS");
-        assertThat(paginationSql).contains("FETCH NEXT 3 ROWS ONLY");
+        assertThat(sqlCaptor.getValue()).contains("OFFSET 5 ROWS");
+        assertThat(sqlCaptor.getValue()).contains("FETCH NEXT 3 ROWS ONLY");
     }
 
     @Test
     void shouldUseRendererForDifferentDSLOperations() throws SQLException {
-        // Get renderer from registry
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPs = mock(PreparedStatement.class);
+        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(mockConnection.prepareStatement(sqlCaptor.capture())).thenReturn(mockPs);
+
         DialectRenderer renderer =
                 registry.getDialectRenderer("StandardSQL", "2008").orElseThrow();
         DSL dsl = new DSL(renderer);
+
         // Test SELECT with WHERE using the custom renderer
-        String selectSql = dsl.select("name", "age")
-                .from("users")
-                .where()
-                .column("age")
-                .gt(25)
-                .build();
-        assertThat(selectSql).contains("WHERE");
-        assertThat(selectSql).isNotEmpty();
+        dsl.select("name", "age").from("users").where().column("age").gt(25).buildPreparedStatement(mockConnection);
+        assertThat(sqlCaptor.getValue()).contains("WHERE");
+        assertThat(sqlCaptor.getValue()).isNotEmpty();
+        verify(mockPs).setObject(1, 25);
 
         // Test UPDATE using the custom renderer
-        String updateSql = dsl.update("users")
-                .set("age", 31)
-                .where()
-                .column("name")
-                .eq("John Doe")
-                .build();
-        assertThat(updateSql).contains("UPDATE");
-        assertThat(updateSql).contains("SET");
+        dsl.update("users").set("age", 31).where().column("name").eq("John Doe").buildPreparedStatement(mockConnection);
+        assertThat(sqlCaptor.getValue()).contains("UPDATE");
+        assertThat(sqlCaptor.getValue()).contains("SET");
+        verify(mockPs).setObject(1, 31);
+        verify(mockPs).setObject(2, "John Doe");
 
         // Test DELETE using the custom renderer
-        String deleteSql = dsl.deleteFrom("users").where().column("age").lt(18).build();
-        assertThat(deleteSql).contains("DELETE");
-        assertThat(deleteSql).contains("FROM");
+        dsl.deleteFrom("users").where().column("age").lt(18).buildPreparedStatement(mockConnection);
+        assertThat(sqlCaptor.getValue()).contains("DELETE");
+        assertThat(sqlCaptor.getValue()).contains("FROM");
+        verify(mockPs).setObject(1, 18);
 
         // Test INSERT using the custom renderer
-        String insertSql =
-                dsl.insertInto("users").set("name", "Test").set("age", 25).build();
-        assertThat(insertSql).contains("INSERT");
-        assertThat(insertSql).contains("INTO");
+        dsl.insertInto("users").set("name", "Test").set("age", 25).buildPreparedStatement(mockConnection);
+        assertThat(sqlCaptor.getValue()).contains("INSERT");
+        assertThat(sqlCaptor.getValue()).contains("INTO");
+        verify(mockPs).setObject(1, "Test");
+        verify(mockPs).setObject(2, 25);
     }
 
     @Test
