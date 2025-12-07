@@ -5,10 +5,14 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlFetchPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlMergeStatementPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCurrentDatePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCurrentDateTimePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCustomFunctionCallPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlDateArithmeticRenderStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlJsonExistsPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlJsonQueryPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlJsonValuePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 
@@ -167,6 +171,10 @@ public final class MysqlDialectPlugin {
                 .dateArithmeticStrategy(new MysqlDateArithmeticRenderStrategy())
                 .customFunctionCallStrategy(new MysqlCustomFunctionCallPsStrategy())
                 .paginationStrategy(new MySqlFetchPsStrategy())
+                .jsonExistsStrategy(new MysqlJsonExistsPsStrategy())
+                .jsonValueStrategy(new MysqlJsonValuePsStrategy())
+                .jsonQueryStrategy(new MysqlJsonQueryPsStrategy())
+                .mergeStatementStrategy(new MySqlMergeStatementPsStrategy())
                 .build();
 
         return new DialectRenderer(psRenderer);

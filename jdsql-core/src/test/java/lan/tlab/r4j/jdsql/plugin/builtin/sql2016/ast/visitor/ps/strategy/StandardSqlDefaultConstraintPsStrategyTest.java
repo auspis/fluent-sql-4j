@@ -22,8 +22,8 @@ class StandardSqlDefaultConstraintPsStrategyTest {
 
         PsDto result = strategy.handle(constraint, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo("DEFAULT 'default-value'");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.sql()).isEqualTo("DEFAULT ?");
+        assertThat(result.parameters()).containsExactly("default-value");
     }
 
     @Test
@@ -32,8 +32,8 @@ class StandardSqlDefaultConstraintPsStrategyTest {
 
         PsDto result = strategy.handle(constraint, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo("DEFAULT 42");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.sql()).isEqualTo("DEFAULT ?");
+        assertThat(result.parameters()).containsExactly(42);
     }
 
     @Test
@@ -42,8 +42,8 @@ class StandardSqlDefaultConstraintPsStrategyTest {
 
         PsDto result = strategy.handle(constraint, renderer, ctx);
 
-        assertThat(result.sql()).isEqualTo("DEFAULT null");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.sql()).isEqualTo("DEFAULT ?");
+        assertThat(result.parameters()).containsExactly((String) null);
     }
 
     @Test
