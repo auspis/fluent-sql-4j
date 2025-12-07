@@ -1141,12 +1141,12 @@ class PreparedStatementRendererTest {
                 DeleteStatement.builder().table(table).where(where).build();
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
         PsDto ps = renderer.visit(stmt, new AstContext());
-        assertThat(ps.sql()).isEqualTo("DELETE FROM users WHERE \"id\" = ?");
+        assertThat(ps.sql()).isEqualTo("DELETE FROM \"users\" WHERE \"id\" = ?");
         assertThat(ps.parameters()).containsExactly(42);
         // Delete senza where
         DeleteStatement stmtNoWhere = DeleteStatement.builder().table(table).build();
         PsDto psNoWhere = renderer.visit(stmtNoWhere, new AstContext());
-        assertThat(psNoWhere.sql()).isEqualTo("DELETE FROM users");
+        assertThat(psNoWhere.sql()).isEqualTo("DELETE FROM \"users\"");
         assertThat(psNoWhere.parameters()).isEmpty();
     }
 
@@ -1780,7 +1780,7 @@ class PreparedStatementRendererTest {
                 .build());
 
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(createTable, new AstContext());
+        PsDto result = renderer.visit(createTable, new AstContext(AstContext.Feature.DDL));
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("users");
@@ -1800,7 +1800,7 @@ class PreparedStatementRendererTest {
                 .build());
 
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(createTable, new AstContext());
+        PsDto result = renderer.visit(createTable, new AstContext(AstContext.Feature.DDL));
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("UNIQUE");
@@ -1842,7 +1842,7 @@ class PreparedStatementRendererTest {
                 .build());
 
         PreparedStatementRenderer renderer = new PreparedStatementRenderer();
-        PsDto result = renderer.visit(createTable, new AstContext());
+        PsDto result = renderer.visit(createTable, new AstContext(AstContext.Feature.DDL));
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("CHECK");
@@ -1858,8 +1858,8 @@ class PreparedStatementRendererTest {
 
         PsDto result = renderer.visit(constraint, new AstContext());
 
-        assertThat(result.sql()).isEqualTo("DEFAULT 'active'");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.sql()).isEqualTo("DEFAULT ?");
+        assertThat(result.parameters()).containsExactly("active");
     }
 
     @Test
