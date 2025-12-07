@@ -366,24 +366,24 @@ class PostgreSqlE2E {
             .dslFor("postgresql", "15.0.0")
             .orElseThrow();
 
-        String sql = dsl.select()
-            .column("department")
-            .expression(
-                dsl.stringAgg("name")
-                    .separator(", ")
-                    .orderBy("name")
-                    .build()
-            ).as("employees")
-            .from("employees")
-            .groupBy("department")
-            .build();
-
         try (Connection conn = DriverManager.getConnection(
                 postgres.getJdbcUrl(), 
                 postgres.getUsername(), 
-                postgres.getPassword());
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                postgres.getPassword())) {
+            
+            PreparedStatement ps = dsl.select()
+                .column("department")
+                .expression(
+                    dsl.stringAgg("name")
+                        .separator(", ")
+                        .orderBy("name")
+                        .build()
+                ).as("employees")
+                .from("employees")
+                .groupBy("department")
+                .buildPreparedStatement(conn);
+            
+            ResultSet rs = ps.executeQuery();
             // Verify results
         }
     }
