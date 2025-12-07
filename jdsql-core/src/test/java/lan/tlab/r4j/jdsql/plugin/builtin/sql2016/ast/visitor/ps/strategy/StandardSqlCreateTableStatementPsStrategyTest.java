@@ -23,7 +23,7 @@ class StandardSqlCreateTableStatementPsStrategyTest {
     void setUp() {
         strategy = new StandardSqlCreateTableStatementPsStrategy();
         visitor = PreparedStatementRenderer.builder().build();
-        ctx = new AstContext();
+        ctx = new AstContext(AstContext.Feature.DDL);
     }
 
     @Test
