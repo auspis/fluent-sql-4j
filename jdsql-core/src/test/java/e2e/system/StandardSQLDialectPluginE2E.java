@@ -94,13 +94,6 @@ class StandardSQLDialectPluginE2E {
         DialectRenderer renderer = result.orElseThrow();
         DSL dsl = new DSL(renderer);
 
-        // Verify renderer works with real queries using the DSL
-        String sql = dsl.select("name", "email").from("users").build();
-        // DSL adds table references and quotes by default
-        assertThat(sql).contains("name");
-        assertThat(sql).contains("email");
-        assertThat(sql).contains("users");
-
         // Execute the query to verify it works with H2
         List<List<Object>> rows = ResultSetUtil.list(
                 dsl.select("name", "email").from("users").buildPreparedStatement(connection),
@@ -113,22 +106,26 @@ class StandardSQLDialectPluginE2E {
     }
 
     @Test
-    void shouldGenerateStandardSQLSyntax() {
+    void shouldExecuteStandardSQLPagination() throws SQLException {
         // Get renderer from registry
         DialectRenderer renderer =
                 registry.getDialectRenderer(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
         DSL dsl = new DSL(renderer);
 
-        // Verify it generates standard SQL:2008 syntax for pagination using the DSL
-        String paginationSql = dsl.select("name")
-                .from("users")
-                .orderBy("name")
-                .offset(5)
-                .fetch(3)
-                .build();
+        // Execute standard SQL:2008 pagination (OFFSET/FETCH) and verify results
+        List<List<Object>> rows = ResultSetUtil.list(
+                dsl.select("name")
+                        .from("users")
+                        .orderBy("name")
+                        .offset(5)
+                        .fetch(3)
+                        .buildPreparedStatement(connection),
+                r -> List.of(r.getString("name")));
 
-        assertThat(paginationSql).contains("OFFSET 5 ROWS");
-        assertThat(paginationSql).contains("FETCH NEXT 3 ROWS ONLY");
+        // Verify OFFSET 5 and FETCH 3 returned correct users (ordered: Alice, Bob, Charlie, Diana, Eve, Frank, Grace,
+        // Henry, Jane Smith, John Doe)
+        assertThat(rows).hasSize(3);
+        assertThat(rows).extracting(r -> r.get(0)).containsExactly("Frank", "Grace", "Henry");
     }
 
     @Test
@@ -138,36 +135,57 @@ class StandardSQLDialectPluginE2E {
                 registry.getDialectRenderer("StandardSQL", "2008").orElseThrow();
         DSL dsl = new DSL(renderer);
 
-        // Test SELECT with WHERE using the custom renderer
-        String selectSql = dsl.select("name", "age")
-                .from("users")
-                .where()
-                .column("age")
-                .gt(25)
-                .build();
-        assertThat(selectSql).contains("WHERE");
-        assertThat(selectSql).isNotEmpty();
+        // Test SELECT with WHERE - execute and verify results
+        List<List<Object>> selectResults = ResultSetUtil.list(
+                dsl.select("name", "age")
+                        .from("users")
+                        .where()
+                        .column("age")
+                        .gt(25)
+                        .buildPreparedStatement(connection),
+                r -> List.of(r.getString("name"), r.getInt("age")));
+        assertThat(selectResults).isNotEmpty();
+        assertThat(selectResults).allMatch(row -> ((Integer) row.get(1)) > 25);
 
-        // Test UPDATE using the custom renderer
-        String updateSql = dsl.update("users")
+        // Test UPDATE - execute and verify affected rows
+        int updateCount = dsl.update("users")
                 .set("age", 31)
                 .where()
                 .column("name")
                 .eq("John Doe")
-                .build();
-        assertThat(updateSql).contains("UPDATE");
-        assertThat(updateSql).contains("SET");
+                .buildPreparedStatement(connection)
+                .executeUpdate();
+        assertThat(updateCount).isEqualTo(1);
 
-        // Test DELETE using the custom renderer
-        String deleteSql = dsl.deleteFrom("users").where().column("age").lt(18).build();
-        assertThat(deleteSql).contains("DELETE");
-        assertThat(deleteSql).contains("FROM");
+        // Test DELETE - execute and verify no error (age < 18 may not match any rows)
+        int deleteCount = dsl.deleteFrom("users")
+                .where()
+                .column("age")
+                .lt(18)
+                .buildPreparedStatement(connection)
+                .executeUpdate();
+        assertThat(deleteCount).isGreaterThanOrEqualTo(0);
 
-        // Test INSERT using the custom renderer
-        String insertSql =
-                dsl.insertInto("users").set("name", "Test").set("age", 25).build();
-        assertThat(insertSql).contains("INSERT");
-        assertThat(insertSql).contains("INTO");
+        // Test INSERT - execute and verify insertion
+        int insertCount = dsl.insertInto("users")
+                .set("id", 123456789)
+                .set("name", "Test")
+                .set("age", 25)
+                .buildPreparedStatement(connection)
+                .executeUpdate();
+        assertThat(insertCount).isEqualTo(1);
+
+        // Verify the inserted row exists
+        List<List<Object>> verifyInsert = ResultSetUtil.list(
+                dsl.select("name", "age")
+                        .from("users")
+                        .where()
+                        .column("name")
+                        .eq("Test")
+                        .buildPreparedStatement(connection),
+                r -> List.of(r.getString("name"), r.getInt("age")));
+        assertThat(verifyInsert).hasSize(1);
+        assertThat(verifyInsert.get(0)).containsExactly("Test", 25);
     }
 
     @Test
@@ -223,7 +241,7 @@ class StandardSQLDialectPluginE2E {
         }
 
         // Build and execute MERGE statement using DSL
-        String mergeSql = dsl.mergeInto("users")
+        int affectedRows = dsl.mergeInto("users")
                 .as("tgt")
                 .using("users_updates", "src")
                 .on("tgt.id", "src.id")
@@ -238,12 +256,10 @@ class StandardSQLDialectPluginE2E {
                 .set("email", "src.email")
                 .set("age", "src.age")
                 .set("active", "src.active")
-                .build();
+                .buildPreparedStatement(connection)
+                .executeUpdate();
 
-        try (var stmt = connection.createStatement()) {
-            int affectedRows = stmt.executeUpdate(mergeSql);
-            assertThat(affectedRows).isGreaterThanOrEqualTo(0);
-        }
+        assertThat(affectedRows).isGreaterThanOrEqualTo(0);
 
         // Verify John Doe was updated
         List<List<Object>> johnDoe = ResultSetUtil.list(

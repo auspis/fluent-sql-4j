@@ -113,7 +113,7 @@ class MysqlDSLE2E {
     void mergeStatementWithRealDatabase() throws SQLException {
         TestDatabaseUtil.createUsersUpdatesTableWithRecords(connection);
         // Build and execute MERGE statement using DSL
-        String mergeSql = dsl.mergeInto("users")
+        try (var ps = dsl.mergeInto("users")
                 .as("tgt")
                 .using("users_updates", "src")
                 .on("tgt.id", "src.id")
@@ -136,10 +136,8 @@ class MysqlDSLE2E {
                 .set("createdAt", "src.createdAt")
                 .set("address", "src.address")
                 .set("preferences", "src.preferences")
-                .build();
-
-        try (var stmt = connection.createStatement()) {
-            int affectedRows = stmt.executeUpdate(mergeSql);
+                .buildPreparedStatement(connection)) {
+            int affectedRows = ps.executeUpdate();
             // MySQL ON DUPLICATE KEY UPDATE returns affected rows count
             // 1 = inserted, 2 = updated (technically 1 deleted + 1 inserted in MySQL's logic)
             assertThat(affectedRows).isGreaterThan(0);
@@ -197,11 +195,6 @@ class MysqlDSLE2E {
         // prepared statement
         PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
         assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
-
-        // raw SQL
-        String sql = selectBuilder.build();
-        ps = connection.prepareStatement(sql);
-        assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
     }
 
     @Test
@@ -233,11 +226,6 @@ class MysqlDSLE2E {
 
         // prepared statement
         PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
-        assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
-
-        // raw SQL
-        String sql = selectBuilder.build();
-        ps = connection.prepareStatement(sql);
         assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
     }
 
