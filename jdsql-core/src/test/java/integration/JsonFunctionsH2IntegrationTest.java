@@ -18,8 +18,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterAll;
@@ -37,12 +36,12 @@ import org.junit.jupiter.api.TestInstance;
 class JsonFunctionsH2IntegrationTest {
 
     private Connection connection;
-    private SqlRenderer renderer;
+    private PreparedStatementRenderer renderer;
 
     @BeforeAll
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
-        renderer = StandardSqlRendererFactory.standardSql();
+        renderer = new PreparedStatementRenderer();
 
         // Use standard tables from TestDatabaseUtil
         TestDatabaseUtil.createUsersTable(connection);

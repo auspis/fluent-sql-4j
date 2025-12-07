@@ -2,10 +2,13 @@ package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
 import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlFetchPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCurrentDatePsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCurrentDateTimePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCustomFunctionCallPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlDateArithmeticRenderStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 
@@ -152,8 +155,6 @@ public final class MysqlDialectPlugin {
      *   <li>CURDATE() for current date</li>
      *   <li>NOW() for current timestamp</li>
      *   <li>DATE_ADD/DATE_SUB for date arithmetic</li>
-     *   <li>CONCAT() for string concatenation</li>
-     *   <li>LENGTH() for data length</li>
      * </ul>
      *
      * @return a new {@link DialectRenderer} instance configured for MySQL, never {@code null}
@@ -161,10 +162,11 @@ public final class MysqlDialectPlugin {
     private static DialectRenderer createMySqlRenderer() {
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
+                .currentDateStrategy(new MysqlCurrentDatePsStrategy())
+                .currentDateTimeStrategy(new MysqlCurrentDateTimePsStrategy())
+                .dateArithmeticStrategy(new MysqlDateArithmeticRenderStrategy())
                 .customFunctionCallStrategy(new MysqlCustomFunctionCallPsStrategy())
-                .paginationStrategy(
-                        new lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.clause
-                                .MySqlFetchPsStrategy())
+                .paginationStrategy(new MySqlFetchPsStrategy())
                 .build();
 
         return new DialectRenderer(psRenderer);
