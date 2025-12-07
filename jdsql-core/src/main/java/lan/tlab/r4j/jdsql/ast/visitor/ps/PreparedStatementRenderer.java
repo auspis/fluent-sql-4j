@@ -1,7 +1,5 @@
 package lan.tlab.r4j.jdsql.ast.visitor.ps;
 
-import java.util.ArrayList;
-import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Cast;
@@ -98,6 +96,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AggregateCallPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AliasedTableExpressionPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AndOrPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AsPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.BetweenPsStrategy;
@@ -189,6 +188,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhereClausePsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAggregateCallPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAggregationFunctionProjectionPsStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAliasedTableExpressionPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAndOrPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlAsPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlBetweenPsStrategy;
@@ -572,6 +572,10 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Default
     private final OverClausePsStrategy overClauseStrategy = new StandardSqlOverClausePsStrategy();
+
+    @Default
+    private final AliasedTableExpressionPsStrategy aliasedTableExpressionStrategy =
+            new StandardSqlAliasedTableExpressionPsStrategy();
 
     @Override
     public EscapeStrategy getEscapeStrategy() {
@@ -960,26 +964,7 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
 
     @Override
     public PsDto visit(AliasedTableExpression item, AstContext ctx) {
-        List<Object> allParameters = new ArrayList<>();
-        StringBuilder sql = new StringBuilder();
-
-        PsDto exprDto = item.expression().accept(this, ctx);
-        allParameters.addAll(exprDto.parameters());
-
-        // Check if expression is a subquery (SelectStatement)
-        if (item.expression() instanceof lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement) {
-            sql.append("(").append(exprDto.sql()).append(")");
-        } else {
-            sql.append(exprDto.sql());
-        }
-
-        PsDto aliasDto = item.alias().accept(this, ctx);
-        allParameters.addAll(aliasDto.parameters());
-        if (!aliasDto.sql().isEmpty()) {
-            sql.append(" ").append(aliasDto.sql());
-        }
-
-        return new PsDto(sql.toString(), allParameters);
+        return aliasedTableExpressionStrategy.handle(item, this, ctx);
     }
 
     @Override
