@@ -229,6 +229,92 @@ class MysqlDSLE2E {
         assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
     }
 
+    // JSON Functions E2E Tests
+    // Tests verify JSON functions work with real MySQL database using existing test data.
+    // Users 8, 9, 10 have JSON data in address and preferences columns.
+
+    @Test
+    void jsonExistsChecksPathInJson() throws SQLException {
+        // Users 8 (Frank), 9 (Grace), 10 (Henry) have address JSON with city field
+        List<String> names = ResultSetUtil.list(
+                dsl.select()
+                        .column("name")
+                        .from("users")
+                        .where()
+                        .jsonExists("address", "$.city")
+                        .exists()
+                        .orderBy("id")
+                        .buildPreparedStatement(connection),
+                r -> r.getString("name"));
+
+        assertThat(names).containsExactly("Frank", "Grace", "Henry");
+    }
+
+    @Test
+    void jsonValueExtractsCityFromAddress() throws SQLException {
+        // Extract city for user 8 (Frank - Milan)
+        List<String> cities = ResultSetUtil.list(
+                dsl.select()
+                        .jsonValue("address", "$.city")
+                        .as("city")
+                        .from("users")
+                        .where()
+                        .column("id")
+                        .eq(8)
+                        .buildPreparedStatement(connection),
+                r -> r.getString("city"));
+
+        assertThat(cities).containsExactly("Milan");
+    }
+
+    @Test
+    void jsonQueryExtractsFullObject() throws SQLException {
+        // Extract full address object for user 9 (Grace - Rome)
+        List<String> addresses = ResultSetUtil.list(
+                dsl.select()
+                        .jsonQuery("address", "$")
+                        .as("addr")
+                        .from("users")
+                        .where()
+                        .column("id")
+                        .eq(9)
+                        .buildPreparedStatement(connection),
+                r -> r.getString("addr"));
+
+        assertThat(addresses).hasSize(1);
+        String address = addresses.get(0);
+        assertThat(address).contains("Rome", "Via Torino 45", "00100", "Italy");
+    }
+
+    @Test
+    void complexJsonQueryWithMultipleFunctions() throws SQLException {
+        // Combine JSON_EXISTS, JSON_VALUE, WHERE with JSON conditions
+        RowMapper<List<String>> mapper = r -> List.of(r.getString("name"), r.getString("city"));
+
+        List<List<String>> results = ResultSetUtil.list(
+                dsl.select()
+                        .column("name")
+                        .jsonValue("address", "$.city")
+                        .as("city")
+                        .from("users")
+                        .where()
+                        .jsonValue("address", "$.city")
+                        .eq("Milan")
+                        .or()
+                        .jsonValue("address", "$.city")
+                        .eq("Rome")
+                        .orderBy("city")
+                        .buildPreparedStatement(connection),
+                mapper);
+
+        assertThat(results).hasSize(2);
+        assertThat(results)
+                .extracting(r -> r.get(0), r -> r.get(1))
+                .containsExactly(
+                        org.assertj.core.api.Assertions.tuple("Frank", "Milan"),
+                        org.assertj.core.api.Assertions.tuple("Grace", "Rome"));
+    }
+
     //  @Test
     //  void shouldExecuteMySQLGroupConcatFunctionWithPreparedStatement() throws SQLException {
     //      // Get DSL from registry
