@@ -214,6 +214,28 @@ This command will:
 
 Always run this before committing changes to ensure the CI/CD pipeline succeeds.
 
+## DSL Builder API
+
+All DSL builders (SelectBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder, MergeBuilder, CreateTableBuilder) use **only** `.buildPreparedStatement(Connection connection)` to generate SQL with automatic parameter binding.
+
+- **No `.build()` method**: The `.build()` method has been removed from all DML/DQL builders
+- **PreparedStatement only**: All builders return `PreparedStatement` with parameters already bound
+- **SQL Injection Prevention**: Parameter binding is automatic, preventing SQL injection attacks
+- **Connection Management**: The `Connection` parameter is required and must be managed by the caller (not closed automatically by builders)
+
+Example:
+
+```java
+// Correct usage
+PreparedStatement ps = dsl.select("name", "email")
+    .from("users")
+    .where("age").gt(18)
+    .buildPreparedStatement(connection);
+
+// execute query
+ResultSet rs = ps.executeQuery();
+```
+
 ## Additional Notes
 
 - The repository may contain scripts in `data/scripts/` for development automation

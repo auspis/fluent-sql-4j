@@ -41,7 +41,7 @@ MySQL's `GROUP_CONCAT` function aggregates strings with custom separators and or
 #### Basic Usage
 
 ```java
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("department")
     .expression(
         mysql.groupConcat("name")
@@ -50,7 +50,7 @@ String sql = mysql.select()
     ).as("employee_names")
     .from("employees")
     .groupBy("department")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -65,7 +65,7 @@ GROUP BY "employees"."department"
 #### Advanced Usage with DISTINCT and ORDER BY
 
 ```java
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("category")
     .expression(
         mysql.groupConcat("product_name")
@@ -76,7 +76,7 @@ String sql = mysql.select()
     ).as("top_products")
     .from("products")
     .groupBy("category")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -91,7 +91,7 @@ GROUP BY "products"."category"
 #### Complex Query Example
 
 ```java
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("department")
     .expression(
         mysql.groupConcat("name")
@@ -109,7 +109,7 @@ String sql = mysql.select()
         .column("employee_count")
         .gt(5)
     .orderBy("avg_salary DESC")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -131,7 +131,7 @@ You can use both standard SQL features and MySQL-specific functions:
 
 ```java
 // Use both standard window functions and MySQL GROUP_CONCAT
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("region")
     .rowNumber()
         .partitionBy("region")
@@ -147,7 +147,7 @@ String sql = mysql.select()
         .as("region_total")
     .from("stores")
     .groupBy("region")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**

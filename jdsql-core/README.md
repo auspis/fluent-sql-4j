@@ -111,7 +111,7 @@ The `MysqlDSL` extension adds MySQL-specific functionality:
 ```java
 DSL dsl = registry.dslFor("standardsql", "2008").orElseThrow();
 
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .column("name")
     .column("department")
     .rowNumber()
@@ -119,7 +119,7 @@ String sql = dsl.select()
         .orderByDesc("salary")
         .as("rank")
     .from("employees")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -134,7 +134,7 @@ FROM "employees"
 ### SELECT with JSON Functions
 
 ```java
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .column("user_id")
     .jsonValue("profile", "$.email")
         .returning("VARCHAR(255)")
@@ -142,7 +142,7 @@ String sql = dsl.select()
     .jsonExists("settings", "$.notifications")
         .as("has_notifications")
     .from("users")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -163,7 +163,7 @@ FROM "users"
 ```java
 MysqlDSL mysql = (MysqlDSL) registry.dslFor("mysql", "8.0.35").orElseThrow();
 
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("department")
     .expression(
         mysql.groupConcat("name")
@@ -172,7 +172,7 @@ String sql = mysql.select()
     ).as("employee_names")
     .from("employees")
     .groupBy("department")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -187,7 +187,7 @@ GROUP BY "employees"."department"
 ### GROUP_CONCAT - Advanced Usage with DISTINCT and ORDER BY
 
 ```java
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("category")
     .expression(
         mysql.groupConcat("product_name")
@@ -198,7 +198,7 @@ String sql = mysql.select()
     ).as("top_products")
     .from("products")
     .groupBy("category")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -213,7 +213,7 @@ GROUP BY "products"."category"
 ### GROUP_CONCAT - Complex Query Example
 
 ```java
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("department")
     .expression(
         mysql.groupConcat("name")
@@ -231,7 +231,7 @@ String sql = mysql.select()
         .column("employee_count")
         .gt(5)
     .orderBy("avg_salary DESC")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -251,7 +251,7 @@ ORDER BY avg_salary DESC
 
 ```java
 // Use both standard window functions and MySQL GROUP_CONCAT
-String sql = mysql.select()
+PreparedStatement ps = mysql.select()
     .column("region")
     .rowNumber()
         .partitionBy("region")
@@ -267,7 +267,7 @@ String sql = mysql.select()
         .as("region_total")
     .from("stores")
     .groupBy("region")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -292,7 +292,7 @@ The MERGE statement (also known as UPSERT) combines INSERT and UPDATE operations
 ```java
 DSL dsl = TestDialectRendererFactory.dslStandardSql2008();
 
-String sql = dsl.mergeInto("products")
+PreparedStatement ps = dsl.mergeInto("products")
     .as("p")
     .using("new_products", "np")
     .on("p.product_id", "np.product_id")
@@ -305,7 +305,7 @@ String sql = dsl.mergeInto("products")
         .set("name", ColumnReference.of("np", "name"))
         .set("price", ColumnReference.of("np", "price"))
         .set("created_at", LocalDateTime.now())
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -326,19 +326,19 @@ SelectStatement subquery = dsl.select("id", "name", "status")
     .where("status").eq("active")
     .getCurrentStatement();
 
-String sql = dsl.mergeInto("products")
+PreparedStatement ps = dsl.mergeInto("products")
     .using(subquery, "src")
     .on("products.id", "src.id")
     .whenMatched()
         .set("name", ColumnReference.of("src", "name"))
         .set("status", ColumnReference.of("src", "status"))
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 #### Conditional MERGE: Update or Delete Based on Condition
 
 ```java
-String sql = dsl.mergeInto("inventory")
+PreparedStatement ps = dsl.mergeInto("inventory")
     .using("stock_updates", "su")
     .on("inventory.product_id", "su.product_id")
     .whenMatched(Comparison.gt(ColumnReference.of("su", "quantity"), Literal.of(0)))
@@ -346,7 +346,7 @@ String sql = dsl.mergeInto("inventory")
         .set("last_updated", LocalDateTime.now())
     .whenMatched(Comparison.eq(ColumnReference.of("su", "quantity"), Literal.of(0)))
         .delete()
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 **Generated SQL:**
@@ -362,20 +362,20 @@ WHEN MATCHED AND "su"."quantity" = 0 THEN DELETE
 #### Simple MERGE: Insert Only
 
 ```java
-String sql = dsl.mergeInto("users")
+PreparedStatement ps = dsl.mergeInto("users")
     .using("new_signups", "ns")
     .on("users.email", "ns.email")
     .whenNotMatched()
         .set("email", ColumnReference.of("ns", "email"))
         .set("name", ColumnReference.of("ns", "name"))
         .set("created_at", LocalDateTime.now())
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 #### MERGE with Mixed Data Types
 
 ```java
-String sql = dsl.mergeInto("products")
+PreparedStatement ps = dsl.mergeInto("products")
     .using("updates", "u")
     .on("products.id", "u.id")
     .whenMatched()
@@ -383,7 +383,7 @@ String sql = dsl.mergeInto("products")
         .set("price", 29.99)                       // Number literal
         .set("active", true)                       // Boolean literal
         .set("stock", ColumnReference.of("u", "stock"))  // Column reference
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 ### Common Use Cases
