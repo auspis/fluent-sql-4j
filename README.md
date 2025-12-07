@@ -8,7 +8,7 @@ A type-safe SQL builder for Java with multi-dialect support through a plugin sys
 - ✅ Multi-dialect support (MySQL, PostgreSQL, Standard SQL)
 - ✅ Plugin architecture for custom dialects
 - ✅ Fluent DSL API
-- ✅ PreparedStatement support with automatic parameter binding
+- ✅ PreparedStatement support with automatic parameter binding and SQL injection prevention
 - ✅ Complex queries: JOINs, subqueries, window functions, aggregates
 - ✅ DDL operations: CREATE TABLE, ALTER, DROP
 - ✅ DML operations: SELECT, INSERT, UPDATE, DELETE, MERGE
@@ -42,19 +42,7 @@ PreparedStatement ps = dsl.insertInto("users")
     .buildPreparedStatement(connection);
 ```
 
-### Working with Multiple Dialects
-
-```java
-// MySQL uses backticks
-DSL mysqlDsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
-String mysqlSql = mysqlDsl.select("name").from("users").build();
-// → SELECT `users`.`name` FROM `users`
-
-// Standard SQL uses double quotes  
-DSL standardDsl = registry.dslFor("standardsql", "2008").orElseThrow();
-String standardSql = standardDsl.select("name").from("users").build();
-// → SELECT "users"."name" FROM "users"
-```
+**Note**: All builders use `.buildPreparedStatement(connection)` which automatically handles parameter binding, preventing SQL injection attacks. The `Connection` object must be managed by the caller (not closed automatically by the builder).
 
 For more examples, see the [DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md).
 

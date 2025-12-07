@@ -33,6 +33,35 @@ DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 ```
 
+## PreparedStatement and SQL Injection Prevention
+
+All DSL builders generate SQL with automatic parameter binding through `PreparedStatement`, providing built-in protection against SQL injection attacks:
+
+```java
+// User input is safely bound as a parameter, not concatenated into SQL
+String userInput = "'; DROP TABLE users; --";
+PreparedStatement ps = dsl.select("name", "email")
+    .from("users")
+    .where("name").eq(userInput)  // Safe: becomes a parameter (?)
+    .buildPreparedStatement(connection);
+```
+
+**Key Points:**
+
+- **Automatic Parameter Binding**: All values are bound as parameters (`?` placeholders)
+- **SQL Injection Prevention**: Values never concatenated directly into SQL strings
+- **Connection Management**: The `Connection` object must be provided and managed by your code
+- **Resource Cleanup**: Remember to close `PreparedStatement` and `Connection` when done (e.g., using try-with-resources)
+
+```java
+// Proper resource management
+try (Connection conn = dataSource.getConnection();
+     PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(conn);
+     ResultSet rs = ps.executeQuery()) {
+    // Process results
+}
+```
+
 ## CREATE TABLE
 
 Create tables with column definitions and constraints:
@@ -43,15 +72,15 @@ DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 
 // Simple table with primary key
-String sql = dsl.createTable("users")
+PreparedStatement ps = dsl.createTable("users")
     .column("id").integer().notNull()
     .column("name").varchar(100)
     .column("email").varchar(255)
     .primaryKey("id")
-    .build();
+    .buildPreparedStatement(connection);
 
 // Table with multiple data types
-String sql = dsl.createTable("products")
+PreparedStatement ps = dsl.createTable("products")
     .column("id").integer().notNull()
     .column("name").varchar(100).notNull()
     .column("price").decimal(10, 2)
@@ -60,7 +89,7 @@ String sql = dsl.createTable("products")
     .column("created_at").timestamp()
     .column("birth_date").date()
     .primaryKey("id")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 ## SELECT Queries
@@ -83,12 +112,11 @@ PreparedStatement ps = dsl.selectAll()
     .buildPreparedStatement(connection);
 
 // Column API with alias
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .column("name")
     .column("email").as("emailAddress")
     .from("users")
-    .build();
-// → SELECT `users`.`name`, `users`.`email` as emailAddress FROM `users`
+    .buildPreparedStatement(connection);
 ```
 
 ### WHERE Clause
@@ -141,62 +169,62 @@ DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 
 // INNER JOIN
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users")
     .innerJoin("orders")
     .on("users.id", "orders.user_id")
-    .build();
+    .buildPreparedStatement(connection);
 
 // LEFT JOIN
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users")
     .leftJoin("profiles")
     .on("users.id", "profiles.user_id")
-    .build();
+    .buildPreparedStatement(connection);
 
 // RIGHT JOIN
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users")
     .rightJoin("departments")
     .on("users.dept_id", "departments.id")
-    .build();
+    .buildPreparedStatement(connection);
 
 // FULL JOIN
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users")
     .fullJoin("roles")
     .on("users.role_id", "roles.id")
-    .build();
+    .buildPreparedStatement(connection);
 
 // CROSS JOIN
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users")
     .crossJoin("settings")
-    .build();
+    .buildPreparedStatement(connection);
 
 // JOIN with table aliases
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
     .on("u.id", "o.user_id")
-    .build();
+    .buildPreparedStatement(connection);
 
 // Multiple JOINs
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
     .on("u.id", "o.user_id")
     .leftJoin("products").as("p")
     .on("o.product_id", "p.id")
-    .build();
+    .buildPreparedStatement(connection);
 
 // JOIN with WHERE clause
-String sql = dsl.select("*")
+PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
     .on("u.id", "o.user_id")
     .where("status").eq("active")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 ### GROUP BY
@@ -349,51 +377,51 @@ DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("standardsql", "2008").orElseThrow();
 
 // COUNT all users
-String sql = dsl.select().countStar().from("users").build();
+PreparedStatement ps = dsl.select().countStar().from("users").buildPreparedStatement(connection);
 // → SELECT COUNT(*) FROM "users"
 
 // SUM with GROUP BY
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .sum("amount").as("total")
     .from("orders")
     .groupBy("customer_id")
-    .build();
+    .buildPreparedStatement(connection);
 // → SELECT SUM("orders"."amount") AS total FROM "orders" GROUP BY "orders"."customer_id"
 
 // AVG with HAVING clause
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .avg("salary")
     .from("employees")
     .groupBy("department")
     .having("department").ne("HR")
-    .build();
+    .buildPreparedStatement(connection);
 // → SELECT AVG("employees"."salary") FROM "employees" 
 //   GROUP BY "employees"."department" 
 //   HAVING "employees"."department" != 'HR'
 
 // COUNT DISTINCT with WHERE
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .countDistinct("email").as("unique_emails")
     .from("users")
     .where("active").eq(true)
-    .build();
+    .buildPreparedStatement(connection);
 // → SELECT COUNT(DISTINCT "users"."email") AS unique_emails 
 //   FROM "users" WHERE "users"."active" = true
 
 // Multiple aggregates
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .sum("score").as("total_score")
     .max("createdAt").as("latest")
     .from("users")
-    .build();
+    .buildPreparedStatement(connection);
 // → SELECT SUM("users"."score") AS total_score, MAX("users"."createdAt") AS latest FROM "users"
 
 // Table-qualified columns
-String sql = dsl.select()
+PreparedStatement ps = dsl.select()
     .sum("orders", "amount").as("total_amount")
     .from("users").as("u")
     .innerJoin("orders").as("o").on("u.id", "o.user_id")
-    .build();
+    .buildPreparedStatement(connection);
 // → SELECT SUM("orders"."amount") AS total_amount FROM "users" AS "u" 
 //   INNER JOIN "orders" AS "o" ON "u"."id" = "o"."user_id"
 ```
@@ -483,7 +511,7 @@ DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 
 // Basic MERGE with WHEN MATCHED and WHEN NOT MATCHED
-String sql = dsl.mergeInto("users")
+PreparedStatement ps = dsl.mergeInto("users")
     .as("tgt")
     .using("users_updates", "src")
     .on("tgt.id", "src.id")
@@ -494,10 +522,10 @@ String sql = dsl.mergeInto("users")
     .set("id", "src.id")
     .set("name", "src.name")
     .set("email", "src.email")
-    .build();
+    .buildPreparedStatement(connection);
 
 // MERGE with multiple columns
-String sql = dsl.mergeInto("users")
+PreparedStatement ps = dsl.mergeInto("users")
     .as("tgt")
     .using("users_updates", "src")
     .on("tgt.id", "src.id")
@@ -512,10 +540,10 @@ String sql = dsl.mergeInto("users")
     .set("email", "src.email")
     .set("age", "src.age")
     .set("active", "src.active")
-    .build();
+    .buildPreparedStatement(connection);
 
 // MERGE with additional columns (timestamps, etc.)
-String sql = dsl.mergeInto("users")
+PreparedStatement ps = dsl.mergeInto("users")
     .as("tgt")
     .using("users_updates", "src")
     .on("tgt.id", "src.id")
@@ -534,7 +562,7 @@ String sql = dsl.mergeInto("users")
     .set("active", "src.active")
     .set("birthdate", "src.birthdate")
     .set("createdAt", "src.createdAt")
-    .build();
+    .buildPreparedStatement(connection);
 ```
 
 ## See Also
