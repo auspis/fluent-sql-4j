@@ -9,27 +9,27 @@ import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 
 public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
     @Override
-    public PsDto handle(MergeStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(MergeStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
         List<Object> params = new ArrayList<>();
 
         // MERGE INTO target
-        PsDto targetDto = stmt.getTargetTable().accept(renderer, ctx);
+        PreparedStatementSpec targetDto = stmt.getTargetTable().accept(renderer, ctx);
         String sql = "MERGE INTO " + targetDto.sql();
         params.addAll(targetDto.parameters());
 
         // USING source
-        PsDto usingDto = stmt.getUsing().accept(renderer, ctx);
+        PreparedStatementSpec usingDto = stmt.getUsing().accept(renderer, ctx);
         sql += " USING " + usingDto.sql();
         params.addAll(usingDto.parameters());
 
         // ON condition - use JOIN_ON scope to qualify column references
         AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto onDto = stmt.getOnCondition().accept(renderer, onCtx);
+        PreparedStatementSpec onDto = stmt.getOnCondition().accept(renderer, onCtx);
         sql += " ON " + onDto.sql();
         params.addAll(onDto.parameters());
 
@@ -38,7 +38,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
             if (action instanceof WhenMatchedUpdate whenMatched) {
                 sql += " WHEN MATCHED";
                 if (whenMatched.condition() != null) {
-                    PsDto condDto = whenMatched.condition().accept(renderer, onCtx);
+                    PreparedStatementSpec condDto = whenMatched.condition().accept(renderer, onCtx);
                     sql += " AND " + condDto.sql();
                     params.addAll(condDto.parameters());
                 }
@@ -46,8 +46,8 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
 
                 List<String> updateClauses = new ArrayList<>();
                 for (var item : whenMatched.updateItems()) {
-                    PsDto colDto = item.column().accept(renderer, ctx);
-                    PsDto valDto = item.value().accept(renderer, onCtx);
+                    PreparedStatementSpec colDto = item.column().accept(renderer, ctx);
+                    PreparedStatementSpec valDto = item.value().accept(renderer, onCtx);
                     updateClauses.add(colDto.sql() + " = " + valDto.sql());
                     params.addAll(valDto.parameters());
                 }
@@ -56,7 +56,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
             } else if (action instanceof WhenNotMatchedInsert whenNotMatched) {
                 sql += " WHEN NOT MATCHED";
                 if (whenNotMatched.condition() != null) {
-                    PsDto condDto = whenNotMatched.condition().accept(renderer, onCtx);
+                    PreparedStatementSpec condDto = whenNotMatched.condition().accept(renderer, onCtx);
                     sql += " AND " + condDto.sql();
                     params.addAll(condDto.parameters());
                 }
@@ -65,7 +65,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
                 if (!whenNotMatched.columns().isEmpty()) {
                     List<String> columns = new ArrayList<>();
                     for (var col : whenNotMatched.columns()) {
-                        PsDto colDto = col.accept(renderer, ctx);
+                        PreparedStatementSpec colDto = col.accept(renderer, ctx);
                         columns.add(colDto.sql());
                     }
                     sql += " (" + String.join(", ", columns) + ")";
@@ -76,14 +76,15 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
                 if (whenNotMatched.insertData() instanceof InsertData.InsertValues insertValues) {
                     List<String> valueClauses = new ArrayList<>();
                     for (var expr : insertValues.valueExpressions()) {
-                        PsDto exprDto = expr.accept(renderer, onCtx);
+                        PreparedStatementSpec exprDto = expr.accept(renderer, onCtx);
                         valueClauses.add(exprDto.sql());
                         params.addAll(exprDto.parameters());
                     }
                     sql += " VALUES (" + String.join(", ", valueClauses) + ")";
                 } else {
                     // Fallback for other insert data types
-                    PsDto insertDto = whenNotMatched.insertData().accept(renderer, onCtx);
+                    PreparedStatementSpec insertDto =
+                            whenNotMatched.insertData().accept(renderer, onCtx);
                     sql += " VALUES (" + insertDto.sql() + ")";
                     params.addAll(insertDto.parameters());
                 }
@@ -91,7 +92,8 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
                 // WHEN MATCHED DELETE
                 sql += " WHEN MATCHED";
                 if (whenMatchedDelete.condition() != null) {
-                    PsDto condDto = whenMatchedDelete.condition().accept(renderer, onCtx);
+                    PreparedStatementSpec condDto =
+                            whenMatchedDelete.condition().accept(renderer, onCtx);
                     sql += " AND " + condDto.sql();
                     params.addAll(condDto.parameters());
                 }
@@ -102,6 +104,6 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
             }
         }
 
-        return new PsDto(sql, params);
+        return new PreparedStatementSpec(sql, params);
     }
 }

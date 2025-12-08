@@ -6,18 +6,18 @@ import java.util.stream.Collectors;
 import lan.tlab.r4j.jdsql.ast.common.predicate.In;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.InPsStrategy;
 
 public class StandardSqlInPsStrategy implements InPsStrategy {
     @Override
-    public PsDto handle(In in, Visitor<PsDto> renderer, AstContext ctx) {
-        PsDto expressionDto = in.expression().accept(renderer, ctx);
+    public PreparedStatementSpec handle(In in, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
+        PreparedStatementSpec expressionDto = in.expression().accept(renderer, ctx);
 
-        List<PsDto> valueDtos =
+        List<PreparedStatementSpec> valueDtos =
                 in.values().stream().map(value -> value.accept(renderer, ctx)).collect(Collectors.toList());
 
-        String valuesSql = valueDtos.stream().map(PsDto::sql).collect(Collectors.joining(", "));
+        String valuesSql = valueDtos.stream().map(PreparedStatementSpec::sql).collect(Collectors.joining(", "));
 
         String sql = expressionDto.sql() + " IN (" + valuesSql + ")";
 
@@ -25,6 +25,6 @@ public class StandardSqlInPsStrategy implements InPsStrategy {
         parameters.addAll(expressionDto.parameters());
         valueDtos.forEach(dto -> parameters.addAll(dto.parameters()));
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

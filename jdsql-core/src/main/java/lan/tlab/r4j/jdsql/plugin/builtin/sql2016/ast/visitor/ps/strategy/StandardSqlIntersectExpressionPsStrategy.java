@@ -5,15 +5,16 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.set.IntersectExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;
 
 public class StandardSqlIntersectExpressionPsStrategy implements IntersectExpressionPsStrategy {
 
     @Override
-    public PsDto handle(IntersectExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto leftDto = expression.leftSetExpression().accept(renderer, ctx);
-        PsDto rightDto = expression.rightSetExpression().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            IntersectExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
+        PreparedStatementSpec leftDto = expression.leftSetExpression().accept(renderer, ctx);
+        PreparedStatementSpec rightDto = expression.rightSetExpression().accept(renderer, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",
@@ -27,6 +28,6 @@ public class StandardSqlIntersectExpressionPsStrategy implements IntersectExpres
         parameters.addAll(leftDto.parameters());
         parameters.addAll(rightDto.parameters());
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

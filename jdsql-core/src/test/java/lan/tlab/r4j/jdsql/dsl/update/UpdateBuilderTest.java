@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,14 +25,14 @@ import org.mockito.ArgumentCaptor;
 
 class UpdateBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -41,7 +41,7 @@ class UpdateBuilderTest {
 
     @Test
     void singleSet() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("name", "John")
                 .where()
                 .column("id")
@@ -54,7 +54,7 @@ class UpdateBuilderTest {
 
     @Test
     void multipleSets() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("age", 30)
                 .where()
@@ -69,14 +69,14 @@ class UpdateBuilderTest {
 
     @Test
     void noWhere() throws SQLException {
-        new UpdateBuilder(renderer, "users").set("status", "active").buildPreparedStatement(connection);
+        new UpdateBuilder(specFactory, "users").set("status", "active").buildPreparedStatement(connection);
         assertThat(sqlCaptor.getValue()).isEqualTo("UPDATE \"users\" SET \"status\" = ?");
         verify(ps).setObject(1, "active");
     }
 
     @Test
     void whereWithNumber() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("age", 25)
                 .where()
                 .column("id")
@@ -89,7 +89,7 @@ class UpdateBuilderTest {
 
     @Test
     void and() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("status", "inactive")
                 .where()
                 .column("age")
@@ -108,7 +108,7 @@ class UpdateBuilderTest {
 
     @Test
     void or() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("status", "deleted")
                 .where()
                 .column("status")
@@ -127,7 +127,7 @@ class UpdateBuilderTest {
 
     @Test
     void andOr() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("status", "inactive")
                 .where()
                 .column("age")
@@ -150,7 +150,7 @@ class UpdateBuilderTest {
 
     @Test
     void isNull() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("deleted_at", (String) null)
                 .where()
                 .column("status")
@@ -163,7 +163,7 @@ class UpdateBuilderTest {
 
     @Test
     void like() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("status", "verified")
                 .where()
                 .column("email")
@@ -177,7 +177,7 @@ class UpdateBuilderTest {
 
     @Test
     void allComparisonOperators() throws SQLException {
-        new UpdateBuilder(renderer, "products")
+        new UpdateBuilder(specFactory, "products")
                 .set("discount", 20)
                 .where()
                 .column("price")
@@ -209,21 +209,21 @@ class UpdateBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> new UpdateBuilder(renderer, ""))
+        assertThatThrownBy(() -> new UpdateBuilder(specFactory, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> new UpdateBuilder(renderer, "users").set("", "value"))
+        assertThatThrownBy(() -> new UpdateBuilder(specFactory, "users").set("", "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void buildWithoutSetThrowsException() throws SQLException {
-        assertThatThrownBy(() -> new UpdateBuilder(renderer, "users")
+        assertThatThrownBy(() -> new UpdateBuilder(specFactory, "users")
                         .where()
                         .column("id")
                         .eq(1)

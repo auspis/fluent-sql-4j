@@ -5,18 +5,18 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.SelectStatementPsStrategy;
 
 public class StandardSqlSelectStatementPsStrategy implements SelectStatementPsStrategy {
     @Override
-    public PsDto handle(SelectStatement stmt, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(SelectStatement stmt, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         // SELECT ...
-        PsDto selectResult = stmt.getSelect().accept(renderer, ctx);
+        PreparedStatementSpec selectResult = stmt.getSelect().accept(renderer, ctx);
         // FROM ...
-        PsDto fromResult = stmt.getFrom().accept(renderer, ctx);
+        PreparedStatementSpec fromResult = stmt.getFrom().accept(renderer, ctx);
         // WHERE ... (optional)
-        PsDto whereResult = null;
+        PreparedStatementSpec whereResult = null;
         String whereClause = "";
         if (stmt.getWhere() != null && stmt.getWhere().condition() != null) {
             whereResult = stmt.getWhere().accept(renderer, ctx);
@@ -31,7 +31,7 @@ public class StandardSqlSelectStatementPsStrategy implements SelectStatementPsSt
             }
         }
         // GROUP BY ... (optional)
-        PsDto groupByResult = null;
+        PreparedStatementSpec groupByResult = null;
         String groupByClause = "";
         if (stmt.getGroupBy() != null
                 && !stmt.getGroupBy().groupingExpressions().isEmpty()) {
@@ -39,7 +39,7 @@ public class StandardSqlSelectStatementPsStrategy implements SelectStatementPsSt
             groupByClause = " GROUP BY " + groupByResult.sql();
         }
         // HAVING ... (optional, after GROUP BY)
-        PsDto havingResult = null;
+        PreparedStatementSpec havingResult = null;
         String havingClause = "";
         if (stmt.getHaving() != null && stmt.getHaving().condition() != null) {
             havingResult = stmt.getHaving().accept(renderer, ctx);
@@ -48,14 +48,14 @@ public class StandardSqlSelectStatementPsStrategy implements SelectStatementPsSt
             }
         }
         // ORDER BY ... (optional)
-        PsDto orderByResult = null;
+        PreparedStatementSpec orderByResult = null;
         String orderByClause = "";
         if (stmt.getOrderBy() != null && !stmt.getOrderBy().sortings().isEmpty()) {
             orderByResult = stmt.getOrderBy().accept(renderer, ctx);
             orderByClause = " ORDER BY " + orderByResult.sql();
         }
         // PAGINATION - delegate to proper pagination strategy
-        PsDto paginationResult = null;
+        PreparedStatementSpec paginationResult = null;
         String paginationClause = "";
         if (stmt.getFetch() != null && stmt.getFetch().isActive()) {
             paginationResult = stmt.getFetch().accept(renderer, ctx);
@@ -82,6 +82,6 @@ public class StandardSqlSelectStatementPsStrategy implements SelectStatementPsSt
         if (paginationResult != null) {
             allParams.addAll(paginationResult.parameters());
         }
-        return new PsDto(sql, allParams);
+        return new PreparedStatementSpec(sql, allParams);
     }
 }

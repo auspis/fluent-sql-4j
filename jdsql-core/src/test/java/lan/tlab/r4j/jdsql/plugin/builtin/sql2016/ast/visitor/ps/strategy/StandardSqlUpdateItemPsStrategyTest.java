@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class StandardSqlUpdateItemPsStrategyTest {
         var ctx = new AstContext();
 
         // when
-        PsDto result = strategy.handle(updateItem, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(updateItem, visitor, ctx);
 
         // then
         assertThat(result.sql()).isEqualTo("\"name\" = ?");
@@ -38,7 +38,7 @@ class StandardSqlUpdateItemPsStrategyTest {
         var ctx = new AstContext();
 
         // when
-        PsDto result = strategy.handle(updateItem, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(updateItem, visitor, ctx);
 
         // then
         assertThat(result.sql()).isEqualTo("\"email\" = ?");

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import org.junit.jupiter.api.Test;
 
@@ -12,29 +12,29 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldCreateValidPlugin() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(renderer));
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
 
         assertThat(plugin.dialectName()).isEqualTo("mysql");
         assertThat(plugin.dialectVersion()).isEqualTo("^8.0.0");
         assertThat(plugin.createDSL()).isNotNull();
-        assertThat(plugin.createDSL().getRenderer()).isEqualTo(renderer);
+        assertThat(plugin.createDSL().getSpecFactory()).isEqualTo(specFactory);
     }
 
     @Test
     void shouldRejectNullDialectName() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        assertThatThrownBy(() -> new SqlDialectPlugin(null, "^8.0.0", () -> new DSL(renderer)))
+        assertThatThrownBy(() -> new SqlDialectPlugin(null, "^8.0.0", () -> new DSL(specFactory)))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("Dialect name must not be null");
     }
 
     @Test
     void shouldRejectNullDialectVersion() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", null, () -> new DSL(renderer)))
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", null, () -> new DSL(specFactory)))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("Dialect version must not be null");
     }
@@ -48,14 +48,14 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldRejectBlankVersionRange() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "", () -> new DSL(renderer)))
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "", () -> new DSL(specFactory)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Dialect version must not be blank")
                 .hasMessageContaining("mysql");
 
-        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "   ", () -> new DSL(renderer)))
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "   ", () -> new DSL(specFactory)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Dialect version must not be blank")
                 .hasMessageContaining("mysql");
@@ -63,24 +63,24 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldAllowNonSemVerVersion() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
         // Non-SemVer versions like "2008" should be allowed for exact matching
-        SqlDialectPlugin plugin = new SqlDialectPlugin("standardsql", "2008", () -> new DSL(renderer));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("standardsql", "2008", () -> new DSL(specFactory));
 
         assertThat(plugin.dialectName()).isEqualTo("standardsql");
         assertThat(plugin.dialectVersion()).isEqualTo("2008");
-        assertThat(plugin.createDSL().getRenderer()).isEqualTo(renderer);
+        assertThat(plugin.createDSL().getSpecFactory()).isEqualTo(specFactory);
     }
 
     @Test
     void shouldAllowArbitraryVersionString() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
         // Arbitrary version strings should be allowed
-        SqlDialectPlugin plugin1 = new SqlDialectPlugin("customdb", "2011", () -> new DSL(renderer));
-        SqlDialectPlugin plugin2 = new SqlDialectPlugin("customdb", "v1", () -> new DSL(renderer));
-        SqlDialectPlugin plugin3 = new SqlDialectPlugin("customdb", "latest", () -> new DSL(renderer));
+        SqlDialectPlugin plugin1 = new SqlDialectPlugin("customdb", "2011", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin2 = new SqlDialectPlugin("customdb", "v1", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin3 = new SqlDialectPlugin("customdb", "latest", () -> new DSL(specFactory));
 
         assertThat(plugin1.dialectVersion()).isEqualTo("2011");
         assertThat(plugin2.dialectVersion()).isEqualTo("v1");
@@ -89,8 +89,8 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldHaveValueSemantics() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        java.util.function.Supplier<DSL> dslFactory = () -> new DSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        java.util.function.Supplier<DSL> dslFactory = () -> new DSL(specFactory);
 
         SqlDialectPlugin plugin1 = new SqlDialectPlugin("mysql", "^8.0.0", dslFactory);
         SqlDialectPlugin plugin2 = new SqlDialectPlugin("mysql", "^8.0.0", dslFactory);
@@ -102,8 +102,8 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldBeImmutable() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(renderer));
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
 
         // All fields are final by record definition
         assertThat(plugin.dialectName()).isEqualTo("mysql");
@@ -116,21 +116,21 @@ class SqlDialectPluginTest {
     @Test
     void shouldSupportMethodReferences() {
         // Record works well with functional programming
-        DialectRenderer renderer = mock(DialectRenderer.class);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(renderer));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
 
         DSL dsl1 = plugin.createDSL();
         DSL dsl2 = plugin.createDSL();
 
-        assertThat(dsl1.getRenderer()).isEqualTo(renderer);
-        assertThat(dsl2.getRenderer()).isEqualTo(renderer);
+        assertThat(dsl1.getSpecFactory()).isEqualTo(specFactory);
+        assertThat(dsl2.getSpecFactory()).isEqualTo(specFactory);
     }
 
     @Test
     void shouldHaveToString() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(renderer));
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
 
         String toString = plugin.toString();
 
@@ -141,19 +141,19 @@ class SqlDialectPluginTest {
 
     @Test
     void shouldCreateDSL() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(renderer));
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
 
         DSL dsl = plugin.createDSL();
 
         assertThat(dsl).isNotNull();
-        assertThat(dsl.getRenderer()).isEqualTo(renderer);
+        assertThat(dsl.getSpecFactory()).isEqualTo(specFactory);
     }
 
     @Test
     void shouldCreateNewDSLOnEachCall() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(renderer));
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
 
         DSL dsl1 = plugin.createDSL();
         DSL dsl2 = plugin.createDSL();

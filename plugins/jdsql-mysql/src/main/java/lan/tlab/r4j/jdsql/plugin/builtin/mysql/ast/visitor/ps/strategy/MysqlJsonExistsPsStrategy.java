@@ -5,7 +5,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonExists;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonExistsPsStrategy;
 
 /**
@@ -38,7 +38,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonExistsPsStrategy;
 public class MysqlJsonExistsPsStrategy implements JsonExistsPsStrategy {
 
     @Override
-    public PsDto handle(JsonExists jsonExists, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(JsonExists jsonExists, PreparedStatementRenderer renderer, AstContext ctx) {
         var documentResult = jsonExists.jsonDocument().accept(renderer, ctx);
         var pathResult = jsonExists.path().accept(renderer, ctx);
 
@@ -57,6 +57,6 @@ public class MysqlJsonExistsPsStrategy implements JsonExistsPsStrategy {
         // Note: ON ERROR behavior is ignored - MySQL does not support it
         // The function returns 1 if path exists, 0 if not, NULL if invalid
 
-        return new PsDto(sql.toString(), parameters);
+        return new PreparedStatementSpec(sql.toString(), parameters);
     }
 }

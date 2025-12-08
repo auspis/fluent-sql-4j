@@ -5,18 +5,19 @@ import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.TablePsStrategy;
 
 public class StandardSqlTablePsStrategy implements TablePsStrategy {
     @Override
-    public PsDto handle(TableIdentifier table, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            TableIdentifier table, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         PreparedStatementRenderer psRenderer = (PreparedStatementRenderer) renderer;
         String sql = psRenderer.getEscapeStrategy().apply(table.name());
         String alias = table.alias() != null ? table.alias().name() : null;
         if (alias != null && !alias.isBlank()) {
             sql += " AS " + alias;
         }
-        return new PsDto(sql, List.of());
+        return new PreparedStatementSpec(sql, List.of());
     }
 }

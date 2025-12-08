@@ -6,7 +6,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.interval.Interval;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlIntervalPsStrategyTest {
@@ -18,7 +18,7 @@ class StandardSqlIntervalPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(interval, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(interval, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("INTERVAL ? DAY");
         assertThat(result.parameters()).containsExactly(30);

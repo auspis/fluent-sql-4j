@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.oracle;
 
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
@@ -21,13 +21,13 @@ public final class OracleSqlRendererFactory {
     }
 
     /**
-     * Creates a complete {@link DialectRenderer} (SQL + PreparedStatement) for Oracle.
+     * Creates a complete {@link PreparedStatementSpecFactory} (SQL + PreparedStatement) for Oracle.
      *
-     * @return DialectRenderer configured for Oracle 19c+
+     * @return PreparedStatementSpecFactory configured for Oracle 19c+
      * @throws IllegalArgumentException if the Oracle plugin is not available
      */
-    public static DialectRenderer dialectRendererOracle() {
-        return REGISTRY.getDialectRenderer(OracleDialectPlugin.DIALECT_NAME, OracleDialectPlugin.DIALECT_VERSION)
+    public static PreparedStatementSpecFactory dialectRendererOracle() {
+        return REGISTRY.getSpecFactory(OracleDialectPlugin.DIALECT_NAME, OracleDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }
 

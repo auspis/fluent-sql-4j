@@ -16,14 +16,14 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ScalarSubqueryPsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlScalarSubqueryPsStrategyTest {
 
     private final ScalarSubqueryPsStrategy strategy = new StandardSqlScalarSubqueryPsStrategy();
-    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
 
     @Test
@@ -36,7 +36,7 @@ class StandardSqlScalarSubqueryPsStrategyTest {
         ScalarSubquery subquery =
                 ScalarSubquery.builder().tableExpression(innerSelect).build();
 
-        PsDto result = strategy.handle(subquery, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(subquery, specFactory, ctx);
 
         assertThat(result.sql()).startsWith("(");
         assertThat(result.sql()).endsWith(")");
@@ -56,7 +56,7 @@ class StandardSqlScalarSubqueryPsStrategyTest {
         ScalarSubquery subquery =
                 ScalarSubquery.builder().tableExpression(innerSelect).build();
 
-        PsDto result = strategy.handle(subquery, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(subquery, specFactory, ctx);
 
         assertThat(result.sql()).startsWith("(");
         assertThat(result.sql()).endsWith(")");
@@ -74,7 +74,7 @@ class StandardSqlScalarSubqueryPsStrategyTest {
         ScalarSubquery subquery =
                 ScalarSubquery.builder().tableExpression(innerSelect).build();
 
-        PsDto result = strategy.handle(subquery, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(subquery, specFactory, ctx);
 
         assertThat(result.sql()).contains("(SELECT ?");
         assertThat(result.sql()).endsWith(")");

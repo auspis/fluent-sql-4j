@@ -18,9 +18,9 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlSelectStatementPsStrategyTest {
@@ -28,8 +28,8 @@ class StandardSqlSelectStatementPsStrategyTest {
     private final StandardSqlSelectStatementPsStrategy strategy = new StandardSqlSelectStatementPsStrategy();
     private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
-    private final DialectRenderer dialectRenderer =
-            new DialectRenderer(PreparedStatementRenderer.builder().build());
+    private final PreparedStatementSpecFactory specFactory =
+            new PreparedStatementSpecFactory(PreparedStatementRenderer.builder().build());
 
     @Test
     void star() {
@@ -37,9 +37,9 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .from(From.of(new TableIdentifier("users")))
                 .build();
 
-        PsDto psDto = strategy.handle(statement, renderer, ctx);
-        assertThat(psDto.sql()).isEqualTo("SELECT * FROM \"users\"");
-        assertThat(psDto.parameters()).isEmpty();
+        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        assertThat(spec.sql()).isEqualTo("SELECT * FROM \"users\"");
+        assertThat(spec.parameters()).isEmpty();
     }
 
     @Test
@@ -51,11 +51,11 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .from(From.fromTable("users", "u"))
                 .build();
 
-        PsDto psDto = strategy.handle(statement, renderer, ctx);
-        assertThat(psDto.sql()).isEqualTo("""
+        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        assertThat(spec.sql()).isEqualTo("""
             SELECT \"id\", \"name\" FROM \"users\" AS u\
             """);
-        assertThat(psDto.parameters()).isEmpty();
+        assertThat(spec.parameters()).isEmpty();
     }
 
     @Test
@@ -67,15 +67,15 @@ class StandardSqlSelectStatementPsStrategyTest {
                         Comparison.eq(ColumnReference.of("products", "category"), Literal.of("electronics"))))
                 .build();
 
-        PsDto psDto = strategy.handle(statement, renderer, ctx);
-        assertThat(psDto.sql())
+        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        assertThat(spec.sql())
                 .isEqualTo(
                         """
             SELECT * FROM \"products\" \
             WHERE (\"price\" > ?) \
             AND (\"category\" = ?)\
             """);
-        assertThat(psDto.parameters()).containsExactly(50, "electronics");
+        assertThat(spec.parameters()).containsExactly(50, "electronics");
     }
 
     @Test
@@ -89,8 +89,8 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .having(Having.of(Comparison.gt(new CountStar(), Literal.of(10))))
                 .build();
 
-        PsDto psDto = strategy.handle(statement, renderer, ctx);
-        assertThat(psDto.sql())
+        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        assertThat(spec.sql())
                 .isEqualTo(
                         """
             SELECT \"department\", COUNT(*) \
@@ -98,7 +98,7 @@ class StandardSqlSelectStatementPsStrategyTest {
             GROUP BY \"department\" \
             HAVING COUNT(*) > ?\
             """);
-        assertThat(psDto.parameters()).containsExactly(10);
+        assertThat(spec.parameters()).containsExactly(10);
     }
 
     @Test
@@ -108,15 +108,15 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("orders", "orderDate"))))
                 .build();
 
-        PsDto psDto = strategy.handle(statement, renderer, ctx);
-        assertThat(psDto.sql())
+        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        assertThat(spec.sql())
                 .isEqualTo(
                         """
             SELECT * \
             FROM \"orders\" \
             ORDER BY \"orderDate\" DESC\
             """);
-        assertThat(psDto.parameters()).isEmpty();
+        assertThat(spec.parameters()).isEmpty();
     }
 
     @Test
@@ -135,15 +135,15 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .from(From.of(join))
                 .build();
 
-        // Use DialectRenderer to trigger context-aware rendering with ContextPreparationVisitor
-        PsDto psDto = dialectRenderer.renderPreparedStatement(statement);
-        assertThat(psDto.sql())
+        // Use PreparedStatementSpecFactory to trigger context-aware rendering with ContextPreparationVisitor
+        PreparedStatementSpec spec = specFactory.create(statement);
+        assertThat(spec.sql())
                 .isEqualTo(
                         """
             SELECT \"t1\".\"id\", \"t2\".\"name\" \
             FROM \"t1\" INNER JOIN \"t2\" \
             ON \"t1\".\"id\" = \"t2\".\"t1_id\"\
             """);
-        assertThat(psDto.parameters()).isEmpty();
+        assertThat(spec.parameters()).isEmpty();
     }
 }
