@@ -1,4 +1,4 @@
-package lan.tlab.r4j.jdsql.dsl;
+package lan.tlab.r4j.jdsql.dsl.clause;
 
 /**
  * Builder for WHERE clause that supports both regular column conditions and JSON functions.
