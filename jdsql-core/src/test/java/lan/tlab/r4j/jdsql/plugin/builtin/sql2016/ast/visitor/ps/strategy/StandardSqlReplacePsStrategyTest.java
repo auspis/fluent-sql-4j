@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Replace;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlReplacePsStrategyTest {
@@ -20,7 +20,7 @@ class StandardSqlReplacePsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(replace, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(replace, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("REPLACE(?, ?, ?)");
         assertThat(result.parameters()).containsExactly("Hello World", "World", "Universe");
@@ -33,7 +33,7 @@ class StandardSqlReplacePsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(replace, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(replace, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("REPLACE(\"email\", ?, ?)");
         assertThat(result.parameters()).containsExactly("@old.com", "@new.com");
@@ -49,7 +49,7 @@ class StandardSqlReplacePsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(replace, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(replace, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("REPLACE(\"text\", \"old_pattern\", \"new_pattern\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -63,7 +63,7 @@ class StandardSqlReplacePsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(replace, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(replace, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("REPLACE(?, \"search\", ?)");
         assertThat(result.parameters()).containsExactly("Test string", "replacement");

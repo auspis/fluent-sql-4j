@@ -12,7 +12,7 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +45,7 @@ class StandardSqlInsertSourcePsStrategyTest {
                 .build();
         InsertSource item = new InsertSource(UnionExpression.union(select1, select2));
 
-        PsDto result = strategy.handle(item, visitor, new AstContext());
+        PreparedStatementSpec result = strategy.handle(item, visitor, new AstContext());
         assertThat(result.sql())
                 .isEqualTo(
                         """
@@ -60,7 +60,7 @@ class StandardSqlInsertSourcePsStrategyTest {
     @Test
     void empty() {
         InsertSource item = new InsertSource(new NullSetExpression());
-        PsDto result = strategy.handle(item, visitor, new AstContext());
+        PreparedStatementSpec result = strategy.handle(item, visitor, new AstContext());
         assertThat(result.sql()).isEqualTo("");
         assertThat(result.parameters()).isEmpty();
         ;

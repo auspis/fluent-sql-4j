@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.select.SelectProjectionBuilder;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.builders.MysqlCoalesceBuilder;
@@ -36,8 +36,8 @@ public class MysqlSelectProjectionBuilder extends SelectProjectionBuilder<MysqlS
 
     private final MysqlDSL dsl;
 
-    public MysqlSelectProjectionBuilder(DialectRenderer renderer, MysqlDSL dsl) {
-        super(renderer);
+    public MysqlSelectProjectionBuilder(PreparedStatementSpecFactory specFactory, MysqlDSL dsl) {
+        super(specFactory);
         this.dsl = dsl;
     }
 

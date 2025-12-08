@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCall;
 import lan.tlab.r4j.jdsql.ast.common.predicate.IsNotNull;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void columnReference() {
         IsNotNull isNotNull = new IsNotNull(ColumnReference.of("User", "email"));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"email\" IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -39,7 +39,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void columnReferenceWithTablePrefix() {
         IsNotNull isNotNull = new IsNotNull(ColumnReference.of("Employee", "manager_id"));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"manager_id\" IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -49,7 +49,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void aggregateFunction() {
         IsNotNull isNotNull = new IsNotNull(AggregateCall.max(ColumnReference.of("Order", "total")));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("MAX(\"total\") IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -59,7 +59,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void countFunction() {
         IsNotNull isNotNull = new IsNotNull(AggregateCall.count(ColumnReference.of("User", "id")));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("COUNT(\"id\") IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -69,7 +69,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void sumFunction() {
         IsNotNull isNotNull = new IsNotNull(AggregateCall.sum(ColumnReference.of("Sale", "amount")));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("SUM(\"amount\") IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -79,7 +79,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void avgFunction() {
         IsNotNull isNotNull = new IsNotNull(AggregateCall.avg(ColumnReference.of("Product", "price")));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("AVG(\"price\") IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -89,7 +89,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void minFunction() {
         IsNotNull isNotNull = new IsNotNull(AggregateCall.min(ColumnReference.of("Transaction", "date")));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("MIN(\"date\") IS NOT NULL");
         assertThat(result.parameters()).isEmpty();
@@ -99,7 +99,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void literalExpression() {
         IsNotNull isNotNull = new IsNotNull(Literal.of("test"));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("? IS NOT NULL");
         assertThat(result.parameters()).containsExactly("test");
@@ -109,7 +109,7 @@ class StandardSqlIsNotNullPsStrategyTest {
     void numericLiteral() {
         IsNotNull isNotNull = new IsNotNull(Literal.of(42));
 
-        PsDto result = strategy.handle(isNotNull, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(isNotNull, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("? IS NOT NULL");
         assertThat(result.parameters()).containsExactly(42);
@@ -120,8 +120,8 @@ class StandardSqlIsNotNullPsStrategyTest {
         IsNotNull isNotNull1 = new IsNotNull(ColumnReference.of("User", "first_name"));
         IsNotNull isNotNull2 = new IsNotNull(ColumnReference.of("User", "last_name"));
 
-        PsDto result1 = strategy.handle(isNotNull1, visitor, ctx);
-        PsDto result2 = strategy.handle(isNotNull2, visitor, ctx);
+        PreparedStatementSpec result1 = strategy.handle(isNotNull1, visitor, ctx);
+        PreparedStatementSpec result2 = strategy.handle(isNotNull2, visitor, ctx);
 
         assertThat(result1.sql()).isEqualTo("\"first_name\" IS NOT NULL");
         assertThat(result1.parameters()).isEmpty();

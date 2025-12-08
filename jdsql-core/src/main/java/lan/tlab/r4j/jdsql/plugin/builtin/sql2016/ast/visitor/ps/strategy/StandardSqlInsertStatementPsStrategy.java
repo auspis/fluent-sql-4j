@@ -12,12 +12,12 @@ import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.dml.statement.InsertStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 
 public class StandardSqlInsertStatementPsStrategy implements InsertStatementPsStrategy {
     @Override
-    public PsDto handle(InsertStatement stmt, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(InsertStatement stmt, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         // TableIdentifier name
         TableIdentifier table = (TableIdentifier) stmt.table();
         String tableName = table.name();
@@ -26,9 +26,9 @@ public class StandardSqlInsertStatementPsStrategy implements InsertStatementPsSt
 
         if (data instanceof DefaultValues defaultValues) {
             // Handle DEFAULT VALUES case
-            PsDto dataResult = defaultValues.accept(renderer, ctx);
+            PreparedStatementSpec dataResult = defaultValues.accept(renderer, ctx);
             String sql = "INSERT INTO \"" + tableName + "\" " + dataResult.sql();
-            return new PsDto(sql, dataResult.parameters());
+            return new PreparedStatementSpec(sql, dataResult.parameters());
         } else if (data instanceof InsertValues values) {
             // Handle explicit values case
             // Column names
@@ -52,7 +52,7 @@ public class StandardSqlInsertStatementPsStrategy implements InsertStatementPsSt
                     .collect(Collectors.joining(", "));
 
             String sql = "INSERT INTO \"" + tableName + "\" (" + columnList + ") VALUES (" + placeholders + ")";
-            return new PsDto(sql, params);
+            return new PreparedStatementSpec(sql, params);
         } else {
             throw new UnsupportedOperationException("Unsupported InsertData type: " + data.getClass());
         }

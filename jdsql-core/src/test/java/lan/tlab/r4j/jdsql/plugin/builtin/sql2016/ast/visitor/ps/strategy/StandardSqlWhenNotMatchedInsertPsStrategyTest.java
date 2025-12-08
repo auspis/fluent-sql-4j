@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
         InsertValues insertData = InsertValues.of(Literal.of("New Name"), Literal.of(100));
         WhenNotMatchedInsert action = new WhenNotMatchedInsert(null, List.of(), insertData);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED THEN INSERT ?, ?");
         assertThat(result.parameters()).containsExactly("New Name", 100);
@@ -44,7 +44,7 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
         InsertValues insertData = InsertValues.of(Literal.of("Item"), Literal.of(250));
         WhenNotMatchedInsert action = new WhenNotMatchedInsert(null, columns, insertData);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED THEN INSERT (\"name\", \"amount\") ?, ?");
         assertThat(result.parameters()).containsExactly("Item", 250);
@@ -56,7 +56,7 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
         InsertValues insertData = InsertValues.of(Literal.of("High Priority"));
         WhenNotMatchedInsert action = new WhenNotMatchedInsert(condition, List.of(), insertData);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED AND \"priority\" > ? THEN INSERT ?");
         assertThat(result.parameters()).containsExactly(5, "High Priority");
@@ -70,7 +70,7 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
         InsertValues insertData = InsertValues.of(Literal.of(999), Literal.of("Test"), Literal.of(42.5));
         WhenNotMatchedInsert action = new WhenNotMatchedInsert(condition, columns, insertData);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql())
                 .isEqualTo("WHEN NOT MATCHED AND \"type\" = ? THEN INSERT (\"id\", \"name\", \"value\") ?, ?, ?");

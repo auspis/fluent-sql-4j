@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,14 +20,14 @@ import org.mockito.ArgumentCaptor;
 
 class WhereConditionBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -37,7 +37,7 @@ class WhereConditionBuilderTest {
     @Test
     void stringComparisons() throws SQLException {
         // Test string equality
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .where()
                 .column("name")
@@ -48,7 +48,7 @@ class WhereConditionBuilderTest {
         verify(ps).setObject(1, "John");
 
         // Test string inequality
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .where()
                 .column("name")
@@ -59,7 +59,7 @@ class WhereConditionBuilderTest {
         verify(ps).setObject(1, "Jane");
 
         // Test string comparisons
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .where()
                 .column("name")
@@ -69,7 +69,7 @@ class WhereConditionBuilderTest {
                 SELECT "name" FROM "users" WHERE "name" > ?""");
         verify(ps).setObject(1, "A");
 
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .where()
                 .column("name")
@@ -79,7 +79,7 @@ class WhereConditionBuilderTest {
                 SELECT "name" FROM "users" WHERE "name" < ?""");
         verify(ps).setObject(1, "Z");
 
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .where()
                 .column("name")
@@ -89,7 +89,7 @@ class WhereConditionBuilderTest {
                 SELECT "name" FROM "users" WHERE "name" >= ?""");
         verify(ps).setObject(1, "B");
 
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .where()
                 .column("name")
@@ -103,7 +103,7 @@ class WhereConditionBuilderTest {
     @Test
     void numberComparisons() throws SQLException {
         // Test integer operations
-        new SelectBuilder(renderer, "age")
+        new SelectBuilder(specFactory, "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -113,7 +113,7 @@ class WhereConditionBuilderTest {
                 SELECT "age" FROM "users" WHERE "age" = ?""");
         verify(ps).setObject(1, 25);
 
-        new SelectBuilder(renderer, "age")
+        new SelectBuilder(specFactory, "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -123,7 +123,7 @@ class WhereConditionBuilderTest {
                 SELECT "age" FROM "users" WHERE "age" <> ?""");
         verify(ps).setObject(1, 30);
 
-        new SelectBuilder(renderer, "age")
+        new SelectBuilder(specFactory, "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -133,7 +133,7 @@ class WhereConditionBuilderTest {
                 SELECT "age" FROM "users" WHERE "age" > ?""");
         verify(ps).setObject(1, 18);
 
-        new SelectBuilder(renderer, "age")
+        new SelectBuilder(specFactory, "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -144,7 +144,7 @@ class WhereConditionBuilderTest {
         verify(ps).setObject(1, 65);
 
         // Test double operations
-        new SelectBuilder(renderer, "salary")
+        new SelectBuilder(specFactory, "salary")
                 .from("employees")
                 .where()
                 .column("salary")
@@ -155,7 +155,7 @@ class WhereConditionBuilderTest {
                 SELECT "salary" FROM "employees" WHERE "salary" >= ?""");
         verify(ps).setObject(1, 50000.5);
 
-        new SelectBuilder(renderer, "salary")
+        new SelectBuilder(specFactory, "salary")
                 .from("employees")
                 .where()
                 .column("salary")
@@ -170,7 +170,7 @@ class WhereConditionBuilderTest {
     @Test
     void booleanComparisons() throws SQLException {
         // Test boolean equality
-        new SelectBuilder(renderer, "active")
+        new SelectBuilder(specFactory, "active")
                 .from("users")
                 .where()
                 .column("active")
@@ -182,7 +182,7 @@ class WhereConditionBuilderTest {
         verify(ps).setObject(1, true);
 
         // Test boolean inequality
-        new SelectBuilder(renderer, "active")
+        new SelectBuilder(specFactory, "active")
                 .from("users")
                 .where()
                 .column("active")
@@ -199,7 +199,7 @@ class WhereConditionBuilderTest {
         LocalDate date = LocalDate.of(2024, 3, 15);
 
         // Test LocalDate operations
-        new SelectBuilder(renderer, "birth_date")
+        new SelectBuilder(specFactory, "birth_date")
                 .from("users")
                 .where()
                 .column("birth_date")
@@ -209,7 +209,7 @@ class WhereConditionBuilderTest {
                 .isEqualTo("""
                 SELECT "birth_date" FROM "users" WHERE "birth_date" = ?""");
 
-        new SelectBuilder(renderer, "birth_date")
+        new SelectBuilder(specFactory, "birth_date")
                 .from("users")
                 .where()
                 .column("birth_date")
@@ -219,7 +219,7 @@ class WhereConditionBuilderTest {
                 .isEqualTo("""
                 SELECT "birth_date" FROM "users" WHERE "birth_date" > ?""");
 
-        new SelectBuilder(renderer, "birth_date")
+        new SelectBuilder(specFactory, "birth_date")
                 .from("users")
                 .where()
                 .column("birth_date")
@@ -236,7 +236,7 @@ class WhereConditionBuilderTest {
         LocalDateTime dateTime = LocalDateTime.of(2024, 3, 15, 10, 30, 45);
 
         // Test LocalDateTime operations
-        new SelectBuilder(renderer, "created_at")
+        new SelectBuilder(specFactory, "created_at")
                 .from("posts")
                 .where()
                 .column("created_at")
@@ -246,7 +246,7 @@ class WhereConditionBuilderTest {
                 .isEqualTo("""
                 SELECT "created_at" FROM "posts" WHERE "created_at" = ?""");
 
-        new SelectBuilder(renderer, "created_at")
+        new SelectBuilder(specFactory, "created_at")
                 .from("posts")
                 .where()
                 .column("created_at")
@@ -260,7 +260,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void likePatternMatching() throws SQLException {
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .where()
                 .column("name")
@@ -271,7 +271,7 @@ class WhereConditionBuilderTest {
                 SELECT "name" FROM "users" WHERE "name" LIKE ?""");
         verify(ps).setObject(1, "John%");
 
-        new SelectBuilder(renderer, "email")
+        new SelectBuilder(specFactory, "email")
                 .from("users")
                 .where()
                 .column("email")
@@ -286,7 +286,7 @@ class WhereConditionBuilderTest {
     @Test
     void nullChecks() throws SQLException {
         // Test IS NULL
-        new SelectBuilder(renderer, "email")
+        new SelectBuilder(specFactory, "email")
                 .from("users")
                 .where()
                 .column("email")
@@ -297,7 +297,7 @@ class WhereConditionBuilderTest {
                 SELECT "email" FROM "users" WHERE "email" IS NULL""");
 
         // Test IS NOT NULL
-        new SelectBuilder(renderer, "email")
+        new SelectBuilder(specFactory, "email")
                 .from("users")
                 .where()
                 .column("email")
@@ -313,7 +313,7 @@ class WhereConditionBuilderTest {
         // Test LocalDate between
         LocalDate startDate = LocalDate.of(2024, 1, 1);
         LocalDate endDate = LocalDate.of(2024, 12, 31);
-        new SelectBuilder(renderer, "birth_date")
+        new SelectBuilder(specFactory, "birth_date")
                 .from("users")
                 .where()
                 .column("birth_date")
@@ -329,7 +329,7 @@ class WhereConditionBuilderTest {
         // Test LocalDateTime between
         LocalDateTime startDateTime = LocalDateTime.of(2024, 3, 1, 0, 0, 0);
         LocalDateTime endDateTime = LocalDateTime.of(2024, 3, 31, 23, 59, 59);
-        new SelectBuilder(renderer, "created_at")
+        new SelectBuilder(specFactory, "created_at")
                 .from("posts")
                 .where()
                 .column("created_at")
@@ -343,7 +343,7 @@ class WhereConditionBuilderTest {
         verify(ps).setObject(2, endDateTime);
 
         // Test Number between
-        new SelectBuilder(renderer, "age")
+        new SelectBuilder(specFactory, "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -359,7 +359,7 @@ class WhereConditionBuilderTest {
     @Test
     void logicalOperators() throws SQLException {
         // Test AND with different types
-        new SelectBuilder(renderer, "name", "age")
+        new SelectBuilder(specFactory, "name", "age")
                 .from("users")
                 .where()
                 .column("name")
@@ -375,7 +375,7 @@ class WhereConditionBuilderTest {
         verify(ps).setObject(2, 25);
 
         // Test OR with different types
-        new SelectBuilder(renderer, "name", "age")
+        new SelectBuilder(specFactory, "name", "age")
                 .from("users")
                 .where()
                 .column("age")
@@ -394,7 +394,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void tableAliasSupport() throws SQLException {
-        new SelectBuilder(renderer, "name")
+        new SelectBuilder(specFactory, "name")
                 .from("users")
                 .as("u")
                 .where()
@@ -409,7 +409,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void inOperatorWithStrings() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("status")
@@ -426,7 +426,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void inOperatorWithNumbers() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .where()
                 .column("customer_id")
@@ -444,7 +444,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void inOperatorWithBooleans() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("active")
@@ -464,7 +464,7 @@ class WhereConditionBuilderTest {
         LocalDate date2 = LocalDate.of(2023, 6, 1);
         LocalDate date3 = LocalDate.of(2023, 12, 31);
 
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("events")
                 .where()
                 .column("event_date")
@@ -484,7 +484,7 @@ class WhereConditionBuilderTest {
         LocalDateTime dt1 = LocalDateTime.of(2023, 1, 1, 10, 0);
         LocalDateTime dt2 = LocalDateTime.of(2023, 6, 1, 15, 30);
 
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("logs")
                 .where()
                 .column("created_at")
@@ -500,7 +500,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void inOperatorWithAndCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .where()
                 .column("category")
@@ -521,7 +521,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void inOperatorWithOrCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("role")
@@ -541,7 +541,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void inOperatorEmptyValues_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .where()
                         .column("status")
@@ -552,7 +552,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void inOperatorNullValues_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .where()
                         .column("status")
@@ -563,7 +563,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueStringComparison() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("profile", "$.name")
@@ -579,7 +579,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueNumberComparison() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("profile", "$.age")
@@ -595,7 +595,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueNestedPathComparison() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("customers")
                 .where()
                 .jsonValue("details", "$.address.city")
@@ -611,7 +611,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueIsNull() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .where()
                 .jsonValue("metadata", "$.discount")
@@ -626,7 +626,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonExistsCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("settings")
                 .where()
                 .jsonExists("config", "$.theme")
@@ -642,7 +642,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonNotExistsCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("items")
                 .where()
                 .jsonExists("tags", "$.featured")
@@ -658,7 +658,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueWithMultipleConditions() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("profile", "$.verified")
@@ -679,7 +679,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueWithOrCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("role", "$.type")
@@ -701,7 +701,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonQueryIsNotNull() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("records")
                 .where()
                 .jsonQuery("content", "$.data.items")
@@ -716,7 +716,7 @@ class WhereConditionBuilderTest {
 
     @Test
     void jsonValueWithBetweenCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .where()
                 .jsonValue("metadata", "$.price")

@@ -5,15 +5,15 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 
 public class StandardSqlUpdateItemPsStrategy implements UpdateItemPsStrategy {
 
     @Override
-    public PsDto handle(UpdateItem item, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto columnDto = item.column().accept(renderer, ctx);
-        PsDto valueDto = item.value().accept(renderer, ctx);
+    public PreparedStatementSpec handle(UpdateItem item, PreparedStatementRenderer renderer, AstContext ctx) {
+        PreparedStatementSpec columnDto = item.column().accept(renderer, ctx);
+        PreparedStatementSpec valueDto = item.value().accept(renderer, ctx);
 
         String sql = String.format("%s = %s", columnDto.sql(), valueDto.sql());
 
@@ -21,6 +21,6 @@ public class StandardSqlUpdateItemPsStrategy implements UpdateItemPsStrategy {
         parameters.addAll(columnDto.parameters());
         parameters.addAll(valueDto.parameters());
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

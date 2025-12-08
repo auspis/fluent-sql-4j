@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedDelete;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class StandardSqlWhenMatchedDeletePsStrategyTest {
     void withoutCondition() {
         WhenMatchedDelete action = new WhenMatchedDelete(null);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN MATCHED THEN DELETE");
         assertThat(result.parameters()).isEmpty();
@@ -40,7 +40,7 @@ class StandardSqlWhenMatchedDeletePsStrategyTest {
         Comparison condition = Comparison.lt(ColumnReference.of("target", "quantity"), Literal.of(10));
         WhenMatchedDelete action = new WhenMatchedDelete(condition);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN MATCHED AND \"quantity\" < ? THEN DELETE");
         assertThat(result.parameters()).containsExactly(10);
@@ -51,7 +51,7 @@ class StandardSqlWhenMatchedDeletePsStrategyTest {
         Comparison condition = Comparison.eq(ColumnReference.of("target", "status"), Literal.of("inactive"));
         WhenMatchedDelete action = new WhenMatchedDelete(condition);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN MATCHED AND \"status\" = ? THEN DELETE");
         assertThat(result.parameters()).containsExactly("inactive");

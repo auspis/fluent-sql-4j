@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 
 /**
@@ -25,8 +25,8 @@ import lan.tlab.r4j.jdsql.dsl.DSL;
  */
 public class PostgreSqlDSL extends DSL {
 
-    public PostgreSqlDSL(DialectRenderer renderer) {
-        super(renderer);
+    public PostgreSqlDSL(PreparedStatementSpecFactory specFactory) {
+        super(specFactory);
     }
 
     /**

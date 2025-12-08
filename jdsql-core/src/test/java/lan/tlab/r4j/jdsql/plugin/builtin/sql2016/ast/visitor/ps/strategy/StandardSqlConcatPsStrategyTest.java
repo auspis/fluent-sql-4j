@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Concat;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class StandardSqlConcatPsStrategyTest {
         Concat concat = Concat.concat(Literal.of("Hello"), Literal.of("World"));
 
         // When
-        PsDto result = strategy.handle(concat, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(concat, visitor, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CONCAT(?, ?)");
@@ -43,7 +43,7 @@ class StandardSqlConcatPsStrategyTest {
         Concat concat = Concat.concat(Literal.of("Hello "), ColumnReference.of("users", "name"));
 
         // When
-        PsDto result = strategy.handle(concat, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(concat, visitor, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CONCAT(?, \"name\")");
@@ -56,7 +56,7 @@ class StandardSqlConcatPsStrategyTest {
         Concat concat = Concat.concatWithSeparator(" - ", Literal.of("First"), Literal.of("Second"));
 
         // When
-        PsDto result = strategy.handle(concat, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(concat, visitor, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CONCAT_WS(?, ?, ?)");
@@ -74,7 +74,7 @@ class StandardSqlConcatPsStrategyTest {
                 Literal.of("End"));
 
         // When
-        PsDto result = strategy.handle(concat, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(concat, visitor, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CONCAT(?, \"col1\", ?, \"col2\", ?)");
@@ -87,7 +87,7 @@ class StandardSqlConcatPsStrategyTest {
         Concat concat = Concat.concatWithSeparator(", ", Literal.of("One"), Literal.of("Two"), Literal.of("Three"));
 
         // When
-        PsDto result = strategy.handle(concat, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(concat, visitor, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CONCAT_WS(?, ?, ?, ?)");
