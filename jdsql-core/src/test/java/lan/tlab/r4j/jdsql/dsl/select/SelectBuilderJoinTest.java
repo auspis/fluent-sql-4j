@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +17,14 @@ import org.mockito.ArgumentCaptor;
 
 class SelectBuilderJoinTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -33,7 +33,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void innerJoin() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
@@ -46,7 +46,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void leftJoin() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .leftJoin("profiles")
                 .on("users.id", "profiles.user_id")
@@ -59,7 +59,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void rightJoin() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .rightJoin("departments")
                 .on("users.dept_id", "departments.id")
@@ -72,7 +72,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void fullJoin() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .fullJoin("roles")
                 .on("users.role_id", "roles.id")
@@ -84,14 +84,14 @@ class SelectBuilderJoinTest {
 
     @Test
     void crossJoin() throws SQLException {
-        new SelectBuilder(renderer, "*").from("users").crossJoin("settings").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, "*").from("users").crossJoin("settings").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"users\" CROSS JOIN \"settings\"");
     }
 
     @Test
     void innerJoinWithAlias() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -106,7 +106,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void multipleJoins() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -124,7 +124,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithSelectedColumns() throws SQLException {
-        new SelectBuilder(renderer, "name", "email", "order_id")
+        new SelectBuilder(specFactory, "name", "email", "order_id")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -139,7 +139,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithWhereClause() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -158,7 +158,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithOrderBy() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
@@ -172,7 +172,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithFetchAndOffset() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
@@ -187,7 +187,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void complexJoinQuery() throws SQLException {
-        new SelectBuilder(renderer, "name", "email", "order_total")
+        new SelectBuilder(specFactory, "name", "email", "order_total")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")
@@ -215,14 +215,14 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithoutFromThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").innerJoin("orders"))
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").innerJoin("orders"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified before adding a join");
     }
 
     @Test
     void joinWithEmptyLeftColumnThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .innerJoin("orders")
                         .on("", "orders.user_id"))
@@ -232,7 +232,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithEmptyRightColumnThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .innerJoin("orders")
                         .on("users.id", ""))
@@ -242,7 +242,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithEmptyAliasThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .innerJoin("orders")
                         .as(""))

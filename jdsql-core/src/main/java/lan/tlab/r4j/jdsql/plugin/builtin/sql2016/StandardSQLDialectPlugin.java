@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016;
 
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
@@ -36,11 +36,11 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * Result<DialectRenderer> result = registry.getRenderer("standardsql", "2008");
+ * Result<PreparedStatementSpecFactory> result = registry.getRenderer("standardsql", "2008");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
- * DialectRenderer renderer = plugin.createRenderer();
+ * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
  * }</pre>
  * <p>
  * <b>Version Matching:</b>
@@ -92,19 +92,19 @@ public final class StandardSQLDialectPlugin {
     }
 
     /**
-     * Creates a {@link DialectRenderer} for Standard SQL:2008.
+     * Creates a {@link PreparedStatementSpecFactory} for Standard SQL:2008.
      * <p>
      * This method creates both SQL and PreparedStatement renderers configured
      * for the SQL:2008 standard, ensuring consistency between the two.
      *
-     * @return a new DialectRenderer instance
+     * @return a new PreparedStatementSpecFactory instance
      */
-    private static DialectRenderer createStandardSql2008Renderer() {
+    private static PreparedStatementSpecFactory createStandardSql2008Renderer() {
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 
-        return new DialectRenderer(psRenderer);
+        return new PreparedStatementSpecFactory(psRenderer);
     }
 
     /**
@@ -128,7 +128,7 @@ public final class StandardSQLDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-     * DialectRenderer renderer = plugin.createRenderer();
+     * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
      * }</pre>
      *
      * @return the singleton Standard SQL:2008 dialect plugin instance, never {@code null}

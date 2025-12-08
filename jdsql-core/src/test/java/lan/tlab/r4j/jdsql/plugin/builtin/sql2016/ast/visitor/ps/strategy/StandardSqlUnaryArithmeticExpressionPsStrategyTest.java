@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class StandardSqlUnaryArithmeticExpressionPsStrategyTest {
     @Test
     void negationLiteral() {
         UnaryArithmeticExpression expression = ArithmeticExpression.negation(Literal.of(10));
-        PsDto result = strategy.handle(expression, visitor, new AstContext());
+        PreparedStatementSpec result = strategy.handle(expression, visitor, new AstContext());
         assertThat(result.sql()).isEqualTo("(-?)");
         assertThat(result.parameters()).containsExactly(10);
     }
@@ -34,7 +34,7 @@ class StandardSqlUnaryArithmeticExpressionPsStrategyTest {
     @Test
     void negationColumnReference() {
         UnaryArithmeticExpression expression = ArithmeticExpression.negation(ColumnReference.of("Customer", "score"));
-        PsDto result = strategy.handle(expression, visitor, new AstContext());
+        PreparedStatementSpec result = strategy.handle(expression, visitor, new AstContext());
         assertThat(result.sql()).isEqualTo("(-\"score\")");
         assertThat(result.parameters()).isEmpty();
     }
@@ -43,7 +43,7 @@ class StandardSqlUnaryArithmeticExpressionPsStrategyTest {
     void nestedNegation() {
         UnaryArithmeticExpression inner = ArithmeticExpression.negation(Literal.of(5));
         UnaryArithmeticExpression outer = ArithmeticExpression.negation(inner);
-        PsDto result = strategy.handle(outer, visitor, new AstContext());
+        PreparedStatementSpec result = strategy.handle(outer, visitor, new AstContext());
         assertThat(result.sql()).isEqualTo("(-(-?))");
         assertThat(result.parameters()).containsExactly(5);
     }

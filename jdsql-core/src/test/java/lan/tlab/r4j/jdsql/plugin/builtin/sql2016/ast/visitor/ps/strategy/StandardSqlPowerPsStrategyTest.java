@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.number.Power;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlPowerPsStrategyTest {
@@ -20,7 +20,7 @@ class StandardSqlPowerPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(power, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(power, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("POWER(?, ?)");
         assertThat(result.parameters()).containsExactly(2, 8);
@@ -33,7 +33,7 @@ class StandardSqlPowerPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(power, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(power, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("POWER(\"base\", ?)");
         assertThat(result.parameters()).containsExactly(3);
@@ -46,7 +46,7 @@ class StandardSqlPowerPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(power, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(power, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("POWER(\"base\", \"exponent\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -59,7 +59,7 @@ class StandardSqlPowerPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(power, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(power, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("POWER(?, \"log_level\")");
         assertThat(result.parameters()).containsExactly(10);

@@ -9,14 +9,14 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.CheckConstraintDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CheckConstraintPsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlCheckConstraintPsStrategyTest {
 
     private final CheckConstraintPsStrategy strategy = new StandardSqlCheckConstraintPsStrategy();
-    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
 
     @Test
@@ -24,7 +24,7 @@ class StandardSqlCheckConstraintPsStrategyTest {
         Comparison expression = Comparison.gt(ColumnReference.of("", "age"), Literal.of(18));
         CheckConstraintDefinition constraint = new CheckConstraintDefinition(expression);
 
-        PsDto result = strategy.handle(constraint, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(constraint, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("CHECK (\"age\" > ?)");
         assertThat(result.parameters()).containsExactly(18);
@@ -35,7 +35,7 @@ class StandardSqlCheckConstraintPsStrategyTest {
         Between expression = new Between(ColumnReference.of("", "salary"), Literal.of(1000), Literal.of(10000));
         CheckConstraintDefinition constraint = new CheckConstraintDefinition(expression);
 
-        PsDto result = strategy.handle(constraint, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(constraint, specFactory, ctx);
 
         assertThat(result.sql()).contains("CHECK");
         assertThat(result.sql()).contains("salary");
@@ -50,8 +50,8 @@ class StandardSqlCheckConstraintPsStrategyTest {
         CheckConstraintDefinition constraint1 = new CheckConstraintDefinition(expression1);
         CheckConstraintDefinition constraint2 = new CheckConstraintDefinition(expression2);
 
-        PsDto result1 = strategy.handle(constraint1, renderer, ctx);
-        PsDto result2 = strategy.handle(constraint2, renderer, ctx);
+        PreparedStatementSpec result1 = strategy.handle(constraint1, specFactory, ctx);
+        PreparedStatementSpec result2 = strategy.handle(constraint2, specFactory, ctx);
 
         assertThat(result1.sql()).isEqualTo(result2.sql());
         assertThat(result1.parameters()).isEqualTo(result2.parameters());

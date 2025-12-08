@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class StandardSqlLiteralPsStrategyTest {
     void stringLiteral() {
         Literal<String> literal = Literal.of("Hello World");
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly("Hello World");
@@ -39,7 +39,7 @@ class StandardSqlLiteralPsStrategyTest {
     void integerLiteral() {
         Literal<Number> literal = Literal.of(42);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(42);
@@ -49,7 +49,7 @@ class StandardSqlLiteralPsStrategyTest {
     void longLiteral() {
         var literal = Literal.of(123456789L);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(123456789L);
@@ -59,7 +59,7 @@ class StandardSqlLiteralPsStrategyTest {
     void doubleLiteral() {
         var literal = Literal.of(3.14159);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(3.14159);
@@ -69,7 +69,7 @@ class StandardSqlLiteralPsStrategyTest {
     void floatLiteral() {
         var literal = Literal.of(2.71f);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(2.71f);
@@ -79,7 +79,7 @@ class StandardSqlLiteralPsStrategyTest {
     void booleanTrueLiteral() {
         Literal<Boolean> literal = Literal.of(true);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(true);
@@ -89,7 +89,7 @@ class StandardSqlLiteralPsStrategyTest {
     void booleanFalseLiteral() {
         Literal<Boolean> literal = Literal.of(false);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(false);
@@ -100,7 +100,7 @@ class StandardSqlLiteralPsStrategyTest {
         BigDecimal value = new BigDecimal("999.99");
         var literal = Literal.of(value);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(value);
@@ -111,7 +111,7 @@ class StandardSqlLiteralPsStrategyTest {
         LocalDate date = LocalDate.of(2023, 12, 25);
         Literal<LocalDate> literal = Literal.of(date);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(date);
@@ -122,7 +122,7 @@ class StandardSqlLiteralPsStrategyTest {
         LocalDateTime dateTime = LocalDateTime.of(2023, 12, 25, 14, 30, 0);
         Literal<LocalDateTime> literal = Literal.of(dateTime);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(dateTime);
@@ -132,7 +132,7 @@ class StandardSqlLiteralPsStrategyTest {
     void emptyStringLiteral() {
         Literal<String> literal = Literal.of("");
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly("");
@@ -142,7 +142,7 @@ class StandardSqlLiteralPsStrategyTest {
     void stringWithSpecialCharacters() {
         Literal<String> literal = Literal.of("O'Reilly & Associates");
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly("O'Reilly & Associates");
@@ -152,7 +152,7 @@ class StandardSqlLiteralPsStrategyTest {
     void zeroInteger() {
         var literal = Literal.of(0);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(0);
@@ -162,7 +162,7 @@ class StandardSqlLiteralPsStrategyTest {
     void negativeInteger() {
         var literal = Literal.of(-42);
 
-        PsDto result = strategy.handle(literal, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(literal, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly(-42);
@@ -173,8 +173,8 @@ class StandardSqlLiteralPsStrategyTest {
         Literal<String> literal1 = Literal.of("first");
         Literal<String> literal2 = Literal.of("second");
 
-        PsDto result1 = strategy.handle(literal1, visitor, ctx);
-        PsDto result2 = strategy.handle(literal2, visitor, ctx);
+        PreparedStatementSpec result1 = strategy.handle(literal1, visitor, ctx);
+        PreparedStatementSpec result2 = strategy.handle(literal2, visitor, ctx);
 
         assertThat(result1.sql()).isEqualTo("?");
         assertThat(result1.parameters()).containsExactly("first");

@@ -5,15 +5,15 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.OnJoinPsStrategy;
 
 public class StandardSqlOnJoinPsStrategy implements OnJoinPsStrategy {
     @Override
-    public PsDto handle(OnJoin join, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(OnJoin join, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         // Visit left and right sources
-        PsDto leftResult = join.left().accept(renderer, ctx);
-        PsDto rightResult = join.right().accept(renderer, ctx);
+        PreparedStatementSpec leftResult = join.left().accept(renderer, ctx);
+        PreparedStatementSpec rightResult = join.right().accept(renderer, ctx);
         String joinType;
         switch (join.type()) {
             case INNER -> joinType = "INNER JOIN";
@@ -32,11 +32,11 @@ public class StandardSqlOnJoinPsStrategy implements OnJoinPsStrategy {
         if (join.type() != OnJoin.JoinType.CROSS) {
             if (join.onCondition() != null) {
                 // Use propagated context (already enriched with JOIN_ON by ContextPreparationVisitor)
-                PsDto onResult = join.onCondition().accept(renderer, ctx);
+                PreparedStatementSpec onResult = join.onCondition().accept(renderer, ctx);
                 sql.append(" ON ").append(onResult.sql());
                 params.addAll(onResult.parameters());
             }
         }
-        return new PsDto(sql.toString(), params);
+        return new PreparedStatementSpec(sql.toString(), params);
     }
 }

@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.From;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class StandardSqlFromClausePsStrategyTest {
         TableIdentifier table = new TableIdentifier("User");
         From from = From.of(table);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"User\"");
         assertThat(result.parameters()).isEmpty();
@@ -42,7 +42,7 @@ class StandardSqlFromClausePsStrategyTest {
     void singleTableWithAlias() {
         From from = From.fromTable("User", "u");
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"User\" AS u");
         assertThat(result.parameters()).isEmpty();
@@ -54,7 +54,7 @@ class StandardSqlFromClausePsStrategyTest {
         TableIdentifier table2 = new TableIdentifier("Order");
         From from = From.of(table1, table2);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"User\", \"Order\"");
         assertThat(result.parameters()).isEmpty();
@@ -67,7 +67,7 @@ class StandardSqlFromClausePsStrategyTest {
                 From.fromTable("Order", "o").sources().get(0),
                 From.fromTable("Product", "p").sources().get(0));
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"User\" AS u, \"Order\" AS o, \"Product\" AS p");
         assertThat(result.parameters()).isEmpty();
@@ -86,7 +86,7 @@ class StandardSqlFromClausePsStrategyTest {
 
         // Use context with JOIN_ON feature to enable column qualification
         AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto result = strategy.handle(from, visitor, joinCtx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql()).isEqualTo("\"User\" INNER JOIN \"Order\" ON \"User\".\"id\" = \"Order\".\"user_id\"");
         assertThat(result.parameters()).isEmpty();
@@ -105,7 +105,7 @@ class StandardSqlFromClausePsStrategyTest {
 
         // Use context with JOIN_ON feature to enable column qualification
         AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto result = strategy.handle(from, visitor, joinCtx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo("\"User\" LEFT JOIN \"Profile\" ON \"User\".\"id\" = \"Profile\".\"user_id\"");
@@ -125,7 +125,7 @@ class StandardSqlFromClausePsStrategyTest {
 
         // Use context with JOIN_ON feature to enable column qualification
         AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto result = strategy.handle(from, visitor, joinCtx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo("\"User\" RIGHT JOIN \"Department\" ON \"User\".\"dept_id\" = \"Department\".\"id\"");
@@ -145,7 +145,7 @@ class StandardSqlFromClausePsStrategyTest {
 
         // Use context with JOIN_ON feature to enable column qualification
         AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto result = strategy.handle(from, visitor, joinCtx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql()).isEqualTo("\"User\" FULL JOIN \"Role\" ON \"User\".\"role_id\" = \"Role\".\"id\"");
         assertThat(result.parameters()).isEmpty();
@@ -158,7 +158,7 @@ class StandardSqlFromClausePsStrategyTest {
         var join = new OnJoin(t1, OnJoin.JoinType.CROSS, t2, null);
         From from = From.of(join);
 
-        PsDto result = strategy.handle(from, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"User\" CROSS JOIN \"Settings\"");
         assertThat(result.parameters()).isEmpty();
@@ -174,7 +174,7 @@ class StandardSqlFromClausePsStrategyTest {
 
         // Use context with JOIN_ON feature to enable column qualification
         AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto result = strategy.handle(from, visitor, joinCtx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql()).isEqualTo("\"User\" INNER JOIN \"Order\" ON \"Order\".\"amount\" > ?");
         assertThat(result.parameters()).containsExactly(100);
@@ -202,7 +202,7 @@ class StandardSqlFromClausePsStrategyTest {
 
         // Use context with JOIN_ON feature to enable column qualification
         AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto result = strategy.handle(from, visitor, joinCtx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo(
@@ -225,7 +225,7 @@ class StandardSqlFromClausePsStrategyTest {
 
         // Use context with JOIN_ON feature to enable column qualification
         AstContext joinCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto result = strategy.handle(from, visitor, joinCtx);
+        PreparedStatementSpec result = strategy.handle(from, visitor, joinCtx);
 
         assertThat(result.sql())
                 .isEqualTo(

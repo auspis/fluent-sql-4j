@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Substring;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class StandardSqlSubstringPsStrategyTest {
     void substringWithLiteralsNoLength() {
         Substring substring = Substring.of(Literal.of("Hello World"), 7);
 
-        PsDto result = strategy.handle(substring, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(substring, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("SUBSTRING(?, ?)");
         assertThat(result.parameters()).containsExactly("Hello World", 7);
@@ -38,7 +38,7 @@ class StandardSqlSubstringPsStrategyTest {
     void substringWithLiteralsAndLength() {
         Substring substring = Substring.of(Literal.of("Hello World"), 1, 5);
 
-        PsDto result = strategy.handle(substring, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(substring, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("SUBSTRING(?, ?, ?)");
         assertThat(result.parameters()).containsExactly("Hello World", 1, 5);
@@ -48,7 +48,7 @@ class StandardSqlSubstringPsStrategyTest {
     void substringWithColumnNoLength() {
         Substring substring = Substring.of(ColumnReference.of("users", "name"), 2);
 
-        PsDto result = strategy.handle(substring, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(substring, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("SUBSTRING(\"name\", ?)");
         assertThat(result.parameters()).containsExactly(2);
@@ -58,7 +58,7 @@ class StandardSqlSubstringPsStrategyTest {
     void substringWithColumnAndLength() {
         Substring substring = Substring.of(ColumnReference.of("users", "email"), Literal.of(1), Literal.of(10));
 
-        PsDto result = strategy.handle(substring, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(substring, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("SUBSTRING(\"email\", ?, ?)");
         assertThat(result.parameters()).containsExactly(1, 10);
@@ -71,7 +71,7 @@ class StandardSqlSubstringPsStrategyTest {
                 Literal.of(1),
                 ColumnReference.of("settings", "excerpt_length"));
 
-        PsDto result = strategy.handle(substring, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(substring, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("SUBSTRING(\"content\", ?, \"excerpt_length\")");
         assertThat(result.parameters()).containsExactly(1);

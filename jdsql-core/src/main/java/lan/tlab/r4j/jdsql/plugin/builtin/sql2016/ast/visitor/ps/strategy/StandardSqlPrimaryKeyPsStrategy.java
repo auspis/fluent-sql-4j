@@ -4,19 +4,19 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.PrimaryKeyPsStrategy;
 
 public class StandardSqlPrimaryKeyPsStrategy implements PrimaryKeyPsStrategy {
 
     @Override
-    public PsDto handle(PrimaryKeyDefinition item, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(PrimaryKeyDefinition item, PreparedStatementRenderer renderer, AstContext ctx) {
         // Primary key constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlPrimaryKeyRenderStrategy
         String columns = item.columns().stream()
                 .map(c -> renderer.getEscapeStrategy().apply(c))
                 .collect(java.util.stream.Collectors.joining(", "));
         String sql = String.format("PRIMARY KEY (%s)", columns);
-        return new PsDto(sql, List.of());
+        return new PreparedStatementSpec(sql, List.of());
     }
 }

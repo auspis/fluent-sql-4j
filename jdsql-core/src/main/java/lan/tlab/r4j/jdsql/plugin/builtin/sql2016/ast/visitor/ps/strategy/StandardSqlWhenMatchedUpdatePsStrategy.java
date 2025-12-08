@@ -5,18 +5,18 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhenMatchedUpdatePsStrategy;
 
 public class StandardSqlWhenMatchedUpdatePsStrategy implements WhenMatchedUpdatePsStrategy {
 
     @Override
-    public PsDto handle(WhenMatchedUpdate item, PreparedStatementRenderer visitor, AstContext ctx) {
+    public PreparedStatementSpec handle(WhenMatchedUpdate item, PreparedStatementRenderer visitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("WHEN MATCHED");
 
         if (item.condition() != null) {
-            PsDto conditionDto = item.condition().accept(visitor, ctx);
+            PreparedStatementSpec conditionDto = item.condition().accept(visitor, ctx);
             allParameters.addAll(conditionDto.parameters());
             sql.append(" AND ").append(conditionDto.sql());
         }
@@ -25,7 +25,7 @@ public class StandardSqlWhenMatchedUpdatePsStrategy implements WhenMatchedUpdate
 
         String updates = item.updateItems().stream()
                 .map(updateItem -> {
-                    PsDto updateDto = updateItem.accept(visitor, ctx);
+                    PreparedStatementSpec updateDto = updateItem.accept(visitor, ctx);
                     allParameters.addAll(updateDto.parameters());
                     return updateDto.sql();
                 })
@@ -33,6 +33,6 @@ public class StandardSqlWhenMatchedUpdatePsStrategy implements WhenMatchedUpdate
 
         sql.append(updates);
 
-        return new PsDto(sql.toString(), allParameters);
+        return new PreparedStatementSpec(sql.toString(), allParameters);
     }
 }

@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBeha
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.WrapperBehavior;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonQueryPsStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -18,11 +18,12 @@ class StandardSqlJsonQueryPsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         JsonQueryPsStrategy strategy = new StandardSqlJsonQueryPsStrategy();
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
 
-        PsDto result = strategy.handle(jsonQuery, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonQuery, specFactory, new AstContext());
 
         assertThat(result.sql()).isEqualTo("JSON_QUERY(\"data\", ?)");
         assertThat(result.parameters()).containsExactly("$.tags");
@@ -30,7 +31,8 @@ class StandardSqlJsonQueryPsStrategyTest {
 
     @Test
     void withAllOptions() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         JsonQueryPsStrategy strategy = new StandardSqlJsonQueryPsStrategy();
         JsonQuery jsonQuery = new JsonQuery(
                 ColumnReference.of("products", "data"),
@@ -40,7 +42,7 @@ class StandardSqlJsonQueryPsStrategyTest {
                 OnEmptyBehavior.defaultValue("EMPTY ARRAY"),
                 BehaviorKind.NONE);
 
-        PsDto result = strategy.handle(jsonQuery, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonQuery, specFactory, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo("JSON_QUERY(\"data\", ? RETURNING JSON WITH WRAPPER DEFAULT EMPTY ARRAY ON EMPTY)");

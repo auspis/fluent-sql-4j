@@ -5,14 +5,14 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Like;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LikePsStrategy;
 
 public class StandardSqlLikePsStrategy implements LikePsStrategy {
 
     @Override
-    public PsDto handle(Like like, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto expressionDto = like.expression().accept(renderer, ctx);
+    public PreparedStatementSpec handle(Like like, PreparedStatementRenderer renderer, AstContext ctx) {
+        PreparedStatementSpec expressionDto = like.expression().accept(renderer, ctx);
 
         StringBuilder sql = new StringBuilder();
         sql.append(expressionDto.sql());
@@ -21,6 +21,6 @@ public class StandardSqlLikePsStrategy implements LikePsStrategy {
         List<Object> parameters = new ArrayList<>(expressionDto.parameters());
         parameters.add(like.pattern());
 
-        return new PsDto(sql.toString(), parameters);
+        return new PreparedStatementSpec(sql.toString(), parameters);
     }
 }

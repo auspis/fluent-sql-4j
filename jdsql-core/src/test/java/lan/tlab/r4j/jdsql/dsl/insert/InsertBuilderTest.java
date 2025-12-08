@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,14 +18,14 @@ import org.mockito.ArgumentCaptor;
 
 class InsertBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -34,7 +34,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithDefaultValues() throws SQLException {
-        new InsertBuilder(renderer, "users").defaultValues().buildPreparedStatement(connection);
+        new InsertBuilder(specFactory, "users").defaultValues().buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
             INSERT INTO "users" DEFAULT VALUES\
@@ -43,7 +43,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithSingleColumnAndValue() throws SQLException {
-        new InsertBuilder(renderer, "users").set("name", "John").buildPreparedStatement(connection);
+        new InsertBuilder(specFactory, "users").set("name", "John").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
@@ -54,7 +54,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithMultipleColumnsAndValues() throws SQLException {
-        new InsertBuilder(renderer, "users")
+        new InsertBuilder(specFactory, "users")
                 .set("id", 1)
                 .set("name", "John")
                 .set("email", "john@example.com")
@@ -72,7 +72,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithNullValue() throws SQLException {
-        new InsertBuilder(renderer, "users")
+        new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("email", (String) null)
                 .buildPreparedStatement(connection);
@@ -87,7 +87,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithBooleanValue() throws SQLException {
-        new InsertBuilder(renderer, "users")
+        new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("active", true)
                 .buildPreparedStatement(connection);
@@ -102,7 +102,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithNumericValues() throws SQLException {
-        new InsertBuilder(renderer, "products")
+        new InsertBuilder(specFactory, "products")
                 .set("id", 1)
                 .set("price", 19.99)
                 .set("quantity", 100)
@@ -118,35 +118,35 @@ class InsertBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> new InsertBuilder(renderer, ""))
+        assertThatThrownBy(() -> new InsertBuilder(specFactory, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidNullTableName() {
-        assertThatThrownBy(() -> new InsertBuilder(renderer, null))
+        assertThatThrownBy(() -> new InsertBuilder(specFactory, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidEmptyColumnName() {
-        assertThatThrownBy(() -> new InsertBuilder(renderer, "users").set("", "value"))
+        assertThatThrownBy(() -> new InsertBuilder(specFactory, "users").set("", "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void invalidNullColumnName() {
-        assertThatThrownBy(() -> new InsertBuilder(renderer, "users").set(null, "value"))
+        assertThatThrownBy(() -> new InsertBuilder(specFactory, "users").set(null, "value"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void insertWithMixedDataTypes() throws SQLException {
-        new InsertBuilder(renderer, "mixed_table")
+        new InsertBuilder(specFactory, "mixed_table")
                 .set("text_col", "test")
                 .set("int_col", 42)
                 .set("bool_col", false)
@@ -166,7 +166,7 @@ class InsertBuilderTest {
     @Test
     void insertWithDateValue() throws SQLException {
         LocalDate birthdate = LocalDate.of(1999, 1, 23);
-        new InsertBuilder(renderer, "users")
+        new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("birthdate", birthdate)
                 .buildPreparedStatement(connection);
@@ -178,7 +178,7 @@ class InsertBuilderTest {
 
     @Test
     void buildPreparedStatementRequiresConnection() {
-        InsertBuilder builder = new InsertBuilder(renderer, "users").set("name", "John");
+        InsertBuilder builder = new InsertBuilder(specFactory, "users").set("name", "John");
 
         assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(NullPointerException.class);
     }

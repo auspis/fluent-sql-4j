@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.PredicateExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 
@@ -51,8 +51,8 @@ public class MysqlDSL extends DSL {
      * @param renderer the MySQL dialect renderer
      * @throws NullPointerException if {@code renderer} is {@code null}
      */
-    public MysqlDSL(DialectRenderer renderer) {
-        super(renderer);
+    public MysqlDSL(PreparedStatementSpecFactory specFactory) {
+        super(specFactory);
     }
 
     /**
@@ -79,7 +79,7 @@ public class MysqlDSL extends DSL {
      */
     @Override
     public MysqlSelectProjectionBuilder select() {
-        return new MysqlSelectProjectionBuilder(renderer, this);
+        return new MysqlSelectProjectionBuilder(specFactory, this);
     }
 
     /**

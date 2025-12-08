@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import java.util.Objects;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.delete.DeleteBuilder;
 import lan.tlab.r4j.jdsql.dsl.insert.InsertBuilder;
 import lan.tlab.r4j.jdsql.dsl.merge.MergeBuilder;
@@ -20,13 +20,13 @@ import lan.tlab.r4j.jdsql.dsl.update.UpdateBuilder;
  */
 public class DSL {
 
-    protected final DialectRenderer renderer;
+    protected final PreparedStatementSpecFactory specFactory;
 
     /**
      * Creates a DSL instance configured for a specific SQL dialect.
      * <p>
      * This constructor is used by {@link DSLRegistry} to create dialect-specific
-     * DSL instances. It can also be used directly when you have a {@link DialectRenderer}
+     * DSL instances. It can also be used directly when you have a {@link PreparedStatementSpecFactory}
      * and want to create a DSL instance without going through the registry.
      * <p>
      * <b>Example usage via DSLRegistry (recommended):</b>
@@ -38,8 +38,8 @@ public class DSL {
      * <p>
      * <b>Example direct usage:</b>
      * <pre>{@code
-     * DialectRenderer renderer = ...; // obtain from SqlDialectPluginRegistry
-     * DSL dsl = new DSL(renderer);
+     * PreparedStatementSpecFactory specFactory = ...; // obtain from SqlDialectPluginRegistry
+     * DSL dsl = new DSL(specFactory);
      * String sql = dsl.select("name").from("users").build();
      * }</pre>
      *
@@ -47,51 +47,51 @@ public class DSL {
      * @throws NullPointerException if {@code renderer} is {@code null}
      * @see DSLRegistry
      */
-    public DSL(DialectRenderer renderer) {
-        this.renderer = Objects.requireNonNull(renderer, "DialectRenderer must not be null");
+    public DSL(PreparedStatementSpecFactory specFactory) {
+        this.specFactory = Objects.requireNonNull(specFactory, "PreparedStatementSpecFactory must not be null");
     }
 
     /**
-     * Returns the dialect renderer used by this DSL instance.
+     * Returns the spec factory used by this DSL instance.
      * <p>
-     * This method provides access to the underlying {@link DialectRenderer} for
-     * advanced use cases where direct access to the renderer is needed.
+     * This method provides access to the underlying {@link PreparedStatementSpecFactory} for
+     * advanced use cases where direct access to the factory is needed.
      *
-     * @return the dialect renderer, never {@code null}
+     * @return the spec factory, never {@code null}
      */
-    public DialectRenderer getRenderer() {
-        return renderer;
+    public PreparedStatementSpecFactory getSpecFactory() {
+        return specFactory;
     }
 
     public CreateTableBuilder createTable(String tableName) {
-        return new CreateTableBuilder(renderer, tableName);
+        return new CreateTableBuilder(specFactory, tableName);
     }
 
     public SelectProjectionBuilder<?> select() {
-        return new SelectProjectionBuilder<>(renderer);
+        return new SelectProjectionBuilder<>(specFactory);
     }
 
     public SelectBuilder select(String... columns) {
-        return new SelectBuilder(renderer, columns);
+        return new SelectBuilder(specFactory, columns);
     }
 
     public SelectBuilder selectAll() {
-        return new SelectBuilder(renderer, "*");
+        return new SelectBuilder(specFactory, "*");
     }
 
     public InsertBuilder insertInto(String tableName) {
-        return new InsertBuilder(renderer, tableName);
+        return new InsertBuilder(specFactory, tableName);
     }
 
     public DeleteBuilder deleteFrom(String tableName) {
-        return new DeleteBuilder(renderer, tableName);
+        return new DeleteBuilder(specFactory, tableName);
     }
 
     public UpdateBuilder update(String tableName) {
-        return new UpdateBuilder(renderer, tableName);
+        return new UpdateBuilder(specFactory, tableName);
     }
 
     public MergeBuilder mergeInto(String targetTableName) {
-        return new MergeBuilder(renderer, targetTableName);
+        return new MergeBuilder(specFactory, targetTableName);
     }
 }

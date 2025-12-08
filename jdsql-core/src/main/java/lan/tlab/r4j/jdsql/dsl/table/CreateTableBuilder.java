@@ -16,18 +16,18 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.util.PsUtil;
 
 public class CreateTableBuilder {
 
     private TableDefinition.TableDefinitionBuilder definitionBuilder;
     private List<ColumnDefinition> columns = new ArrayList<>();
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
 
-    public CreateTableBuilder(DialectRenderer renderer, String tableName) {
-        this.renderer = renderer;
+    public CreateTableBuilder(PreparedStatementSpecFactory specFactory, String tableName) {
+        this.specFactory = specFactory;
         this.definitionBuilder = TableDefinition.builder().name(tableName);
     }
 
@@ -169,7 +169,7 @@ public class CreateTableBuilder {
             finalBuilder = finalBuilder.columns(columns);
         }
         CreateTableStatement statement = new CreateTableStatement(finalBuilder.build());
-        PsDto psDto = renderer.renderPreparedStatement(statement);
-        return PsUtil.preparedStatement(psDto, connection);
+        PreparedStatementSpec spec = specFactory.create(statement);
+        return PsUtil.preparedStatement(spec, connection);
     }
 }

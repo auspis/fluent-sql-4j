@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Left;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlLeftPsStrategyTest {
@@ -20,7 +20,7 @@ class StandardSqlLeftPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(left, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(left, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LEFT(?, ?)");
         assertThat(result.parameters()).containsExactly("Hello World", 5);
@@ -33,7 +33,7 @@ class StandardSqlLeftPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(left, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(left, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LEFT(\"full_name\", ?)");
         assertThat(result.parameters()).containsExactly(3);
@@ -46,7 +46,7 @@ class StandardSqlLeftPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(left, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(left, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LEFT(?, \"name_length\")");
         assertThat(result.parameters()).containsExactly("Test String");
@@ -60,7 +60,7 @@ class StandardSqlLeftPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(left, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(left, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LEFT(\"description\", \"preview_length\")");
         assertThat(result.parameters()).isEqualTo(List.of());

@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.interva
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.interval.Interval.IntervalUnit;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlPreparedStatementRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,19 +18,19 @@ import org.junit.jupiter.api.Test;
 class MysqlDateArithmeticRenderStrategyTest {
 
     private MysqlDateArithmeticRenderStrategy strategy;
-    private PreparedStatementRenderer renderer;
+    private PreparedStatementRenderer specFactory;
 
     @BeforeEach
     public void setUp() {
         strategy = new MysqlDateArithmeticRenderStrategy();
-        renderer = MysqlPreparedStatementRendererFactory.create();
+        specFactory = MysqlPreparedStatementRendererFactory.create();
     }
 
     @Test
     void add() {
         DateArithmetic exp = DateArithmetic.addition(
                 ColumnReference.of("my_table", "start_date"), new Interval(Literal.of(7), IntervalUnit.DAY));
-        PsDto result = strategy.handle(exp, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(exp, specFactory, new AstContext());
         assertThat(result.sql()).isEqualTo("DATE_ADD(`start_date`, INTERVAL ? DAY)");
         assertThat(result.parameters()).containsExactly(7);
     }
@@ -41,7 +41,7 @@ class MysqlDateArithmeticRenderStrategyTest {
                 DateArithmetic.addition(
                         ColumnReference.of("my_table", "start_date"), new Interval(Literal.of(1), IntervalUnit.YEAR)),
                 new Interval(Literal.of(7), IntervalUnit.DAY));
-        PsDto result = strategy.handle(exp, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(exp, specFactory, new AstContext());
         assertThat(result.sql()).isEqualTo("DATE_ADD(DATE_ADD(`start_date`, INTERVAL ? YEAR), INTERVAL ? DAY)");
         assertThat(result.parameters()).containsExactly(1, 7);
     }
@@ -50,7 +50,7 @@ class MysqlDateArithmeticRenderStrategyTest {
     void subtract() {
         DateArithmetic exp = DateArithmetic.subtraction(
                 ColumnReference.of("my_table", "start_date"), new Interval(Literal.of(7), IntervalUnit.DAY));
-        PsDto result = strategy.handle(exp, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(exp, specFactory, new AstContext());
         assertThat(result.sql()).isEqualTo("DATE_SUB(`start_date`, INTERVAL ? DAY)");
         assertThat(result.parameters()).containsExactly(7);
     }
@@ -59,7 +59,7 @@ class MysqlDateArithmeticRenderStrategyTest {
     void subtract_currrentDate() {
         DateArithmetic exp =
                 DateArithmetic.subtraction(new CurrentDate(), new Interval(Literal.of(7), IntervalUnit.DAY));
-        PsDto result = strategy.handle(exp, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(exp, specFactory, new AstContext());
         assertThat(result.sql()).isEqualTo("DATE_SUB(CURDATE(), INTERVAL ? DAY)");
         assertThat(result.parameters()).containsExactly(7);
     }

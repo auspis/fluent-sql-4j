@@ -13,7 +13,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
@@ -27,12 +27,12 @@ import org.junit.jupiter.api.Test;
 class PreparedStatementRendererTest {
 
     private Connection connection;
-    private PreparedStatementRenderer renderer;
+    private PreparedStatementRenderer specFactory;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
-        renderer = new PreparedStatementRenderer();
+        specFactory = new PreparedStatementRenderer();
 
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
@@ -56,7 +56,7 @@ class PreparedStatementRendererTest {
 
         // Generate SQL and parameters using PreparedStatementRenderer
         AstContext context = new AstContext();
-        PsDto result = selectStmt.accept(renderer, context);
+        PreparedStatementSpec result = selectStmt.accept(specFactory, context);
 
         // Verify generated SQL and parameters
         assertThat(result.sql()).isEqualTo("SELECT * FROM \"users\" WHERE \"name\" = ?");

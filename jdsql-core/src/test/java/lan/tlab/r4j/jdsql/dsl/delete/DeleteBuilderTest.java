@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,14 +25,14 @@ import org.mockito.ArgumentCaptor;
 
 class DeleteBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -41,7 +41,7 @@ class DeleteBuilderTest {
 
     @Test
     void ok() throws SQLException {
-        new DeleteBuilder(renderer, "users")
+        new DeleteBuilder(specFactory, "users")
                 .where()
                 .column("status")
                 .eq("inactive")
@@ -52,20 +52,20 @@ class DeleteBuilderTest {
 
     @Test
     void noWhere() throws SQLException {
-        new DeleteBuilder(renderer, "users").buildPreparedStatement(connection);
+        new DeleteBuilder(specFactory, "users").buildPreparedStatement(connection);
         assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\"");
     }
 
     @Test
     void whereWithNumber() throws SQLException {
-        new DeleteBuilder(renderer, "users").where().column("id").eq(42).buildPreparedStatement(connection);
+        new DeleteBuilder(specFactory, "users").where().column("id").eq(42).buildPreparedStatement(connection);
         assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"users\" WHERE \"id\" = ?");
         verify(ps).setObject(1, 42);
     }
 
     @Test
     void and() throws SQLException {
-        new DeleteBuilder(renderer, "users")
+        new DeleteBuilder(specFactory, "users")
                 .where()
                 .column("status")
                 .eq("inactive")
@@ -81,7 +81,7 @@ class DeleteBuilderTest {
 
     @Test
     void or() throws SQLException {
-        new DeleteBuilder(renderer, "users")
+        new DeleteBuilder(specFactory, "users")
                 .where()
                 .column("status")
                 .eq("deleted")
@@ -97,7 +97,7 @@ class DeleteBuilderTest {
 
     @Test
     void andOr() throws SQLException {
-        new DeleteBuilder(renderer, "users")
+        new DeleteBuilder(specFactory, "users")
                 .where()
                 .column("status")
                 .eq("inactive")
@@ -118,7 +118,7 @@ class DeleteBuilderTest {
 
     @Test
     void isNull() throws SQLException {
-        new DeleteBuilder(renderer, "users")
+        new DeleteBuilder(specFactory, "users")
                 .where()
                 .column("deleted_at")
                 .isNotNull()
@@ -129,7 +129,7 @@ class DeleteBuilderTest {
 
     @Test
     void like() throws SQLException {
-        new DeleteBuilder(renderer, "users")
+        new DeleteBuilder(specFactory, "users")
                 .where()
                 .column("email")
                 .like("%@temp.com")
@@ -141,7 +141,7 @@ class DeleteBuilderTest {
 
     @Test
     void allComparisonOperators() throws SQLException {
-        new DeleteBuilder(renderer, "products")
+        new DeleteBuilder(specFactory, "products")
                 .where()
                 .column("price")
                 .gt(100)
@@ -171,14 +171,14 @@ class DeleteBuilderTest {
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> new DeleteBuilder(renderer, ""))
+        assertThatThrownBy(() -> new DeleteBuilder(specFactory, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Table name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> new DeleteBuilder(renderer, "users").where().column(""))
+        assertThatThrownBy(() -> new DeleteBuilder(specFactory, "users").where().column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }

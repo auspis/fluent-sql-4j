@@ -6,15 +6,16 @@ import lan.tlab.r4j.jdsql.ast.common.expression.set.UnionExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.set.UnionExpression.UnionType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 
 public class StandardSqlUnionExpressionPsStrategy implements UnionExpressionPsStrategy {
     @Override
-    public PsDto handle(UnionExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            UnionExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
 
-        PsDto leftPart = expression.left().accept(renderer, ctx);
-        PsDto rightPart = expression.right().accept(renderer, ctx);
+        PreparedStatementSpec leftPart = expression.left().accept(renderer, ctx);
+        PreparedStatementSpec rightPart = expression.right().accept(renderer, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",
@@ -26,6 +27,6 @@ public class StandardSqlUnionExpressionPsStrategy implements UnionExpressionPsSt
         parameters.addAll(leftPart.parameters());
         parameters.addAll(rightPart.parameters());
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

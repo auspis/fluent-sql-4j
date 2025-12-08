@@ -17,20 +17,20 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.UpdateStatement;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.dsl.SupportsWhere;
 import lan.tlab.r4j.jdsql.dsl.util.LiteralUtil;
 
 public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
     private UpdateStatement.UpdateStatementBuilder statementBuilder = UpdateStatement.builder();
-    private final DialectRenderer renderer;
+    private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier table;
     private final List<UpdateItem> setItems = new ArrayList<>();
 
-    public UpdateBuilder(DialectRenderer renderer, String tableName) {
-        this.renderer = renderer;
+    public UpdateBuilder(PreparedStatementSpecFactory specFactory, String tableName) {
+        this.specFactory = specFactory;
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
@@ -147,7 +147,7 @@ public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         UpdateStatement statement = getCurrentStatement();
-        PsDto result = renderer.renderPreparedStatement(statement);
+        PreparedStatementSpec result = specFactory.create(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {

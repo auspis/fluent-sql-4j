@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,14 @@ import org.mockito.ArgumentCaptor;
 
 class UpdateBuilderJsonTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -34,7 +34,7 @@ class UpdateBuilderJsonTest {
     void updateSingleJsonColumn() throws SQLException {
         String jsonValue = "{\"status\":\"active\",\"lastLogin\":\"2025-11-08\"}";
 
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("metadata", jsonValue)
                 .where()
                 .column("id")
@@ -52,7 +52,7 @@ class UpdateBuilderJsonTest {
     void updateMultipleColumnsWithJson() throws SQLException {
         String preferences = "[\"notifications\",\"theme-dark\",\"auto-save\"]";
 
-        new UpdateBuilder(renderer, "user_settings")
+        new UpdateBuilder(specFactory, "user_settings")
                 .set("username", "alice")
                 .set("preferences", preferences)
                 .set("updated_at", "2025-11-08T10:30:00")
@@ -77,7 +77,7 @@ class UpdateBuilderJsonTest {
         String profile =
                 "{\"personal\":{\"firstName\":\"Mario\",\"lastName\":\"Rossi\"},\"contact\":{\"email\":\"mario@example.com\",\"phone\":\"+39123456789\"}}";
 
-        new UpdateBuilder(renderer, "profiles")
+        new UpdateBuilder(specFactory, "profiles")
                 .set("profile_data", profile)
                 .where()
                 .column("profile_id")
@@ -93,7 +93,7 @@ class UpdateBuilderJsonTest {
 
     @Test
     void updateJsonToNull() throws SQLException {
-        new UpdateBuilder(renderer, "users")
+        new UpdateBuilder(specFactory, "users")
                 .set("metadata", (String) null)
                 .where()
                 .column("id")
@@ -111,7 +111,7 @@ class UpdateBuilderJsonTest {
     void updateEmptyJsonObject() throws SQLException {
         String emptyJson = "{}";
 
-        new UpdateBuilder(renderer, "documents")
+        new UpdateBuilder(specFactory, "documents")
                 .set("properties", emptyJson)
                 .where()
                 .column("doc_id")
@@ -129,7 +129,7 @@ class UpdateBuilderJsonTest {
     void updateEmptyJsonArray() throws SQLException {
         String emptyArray = "[]";
 
-        new UpdateBuilder(renderer, "tags")
+        new UpdateBuilder(specFactory, "tags")
                 .set("tag_list", emptyArray)
                 .where()
                 .column("item_id")
@@ -147,7 +147,7 @@ class UpdateBuilderJsonTest {
     void updateJsonWithComplexWhereConditions() throws SQLException {
         String config = "{\"timeout\":30,\"retries\":3,\"enabled\":true}";
 
-        new UpdateBuilder(renderer, "api_configs")
+        new UpdateBuilder(specFactory, "api_configs")
                 .set("configuration", config)
                 .set("last_modified", "2025-11-08")
                 .where()

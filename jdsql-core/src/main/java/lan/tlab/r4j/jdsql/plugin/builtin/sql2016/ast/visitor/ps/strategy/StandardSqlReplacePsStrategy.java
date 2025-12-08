@@ -5,16 +5,16 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Replace;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ReplacePsStrategy;
 
 public class StandardSqlReplacePsStrategy implements ReplacePsStrategy {
 
     @Override
-    public PsDto handle(Replace replace, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto expressionResult = replace.expression().accept(renderer, ctx);
-        PsDto oldSubstringResult = replace.oldSubstring().accept(renderer, ctx);
-        PsDto newSubstringResult = replace.newSubstring().accept(renderer, ctx);
+    public PreparedStatementSpec handle(Replace replace, PreparedStatementRenderer renderer, AstContext ctx) {
+        PreparedStatementSpec expressionResult = replace.expression().accept(renderer, ctx);
+        PreparedStatementSpec oldSubstringResult = replace.oldSubstring().accept(renderer, ctx);
+        PreparedStatementSpec newSubstringResult = replace.newSubstring().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(expressionResult.parameters());
@@ -24,6 +24,6 @@ public class StandardSqlReplacePsStrategy implements ReplacePsStrategy {
         String sql = String.format(
                 "REPLACE(%s, %s, %s)", expressionResult.sql(), oldSubstringResult.sql(), newSubstringResult.sql());
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

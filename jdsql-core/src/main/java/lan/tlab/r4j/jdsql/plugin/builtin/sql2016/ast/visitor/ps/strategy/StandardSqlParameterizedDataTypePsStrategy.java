@@ -4,13 +4,14 @@ import java.util.stream.Collectors;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 
 public class StandardSqlParameterizedDataTypePsStrategy implements ParameterizedDataTypePsStrategy {
 
     @Override
-    public PsDto handle(ParameterizedDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            ParameterizedDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
         var parameterResults = type.parameters().stream()
                 .map(param -> param.accept(renderer, ctx))
                 .collect(Collectors.toList());
@@ -19,10 +20,11 @@ public class StandardSqlParameterizedDataTypePsStrategy implements Parameterized
                 .flatMap(dto -> dto.parameters().stream())
                 .collect(Collectors.toList());
 
-        var parameterSql = parameterResults.stream().map(PsDto::sql).collect(Collectors.joining(", "));
+        var parameterSql =
+                parameterResults.stream().map(PreparedStatementSpec::sql).collect(Collectors.joining(", "));
 
         var sql = String.format("%s(%s)", type.name(), parameterSql);
 
-        return new PsDto(sql, combinedParameters);
+        return new PreparedStatementSpec(sql, combinedParameters);
     }
 }

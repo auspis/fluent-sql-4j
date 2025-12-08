@@ -5,18 +5,18 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhenNotMatchedInsertPsStrategy;
 
 public class StandardSqlWhenNotMatchedInsertPsStrategy implements WhenNotMatchedInsertPsStrategy {
 
     @Override
-    public PsDto handle(WhenNotMatchedInsert item, PreparedStatementRenderer visitor, AstContext ctx) {
+    public PreparedStatementSpec handle(WhenNotMatchedInsert item, PreparedStatementRenderer visitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("WHEN NOT MATCHED");
 
         if (item.condition() != null) {
-            PsDto conditionDto = item.condition().accept(visitor, ctx);
+            PreparedStatementSpec conditionDto = item.condition().accept(visitor, ctx);
             allParameters.addAll(conditionDto.parameters());
             sql.append(" AND ").append(conditionDto.sql());
         }
@@ -26,7 +26,7 @@ public class StandardSqlWhenNotMatchedInsertPsStrategy implements WhenNotMatched
         if (!item.columns().isEmpty()) {
             String columns = item.columns().stream()
                     .map(col -> {
-                        PsDto colDto = col.accept(visitor, ctx);
+                        PreparedStatementSpec colDto = col.accept(visitor, ctx);
                         allParameters.addAll(colDto.parameters());
                         return colDto.sql();
                     })
@@ -34,10 +34,10 @@ public class StandardSqlWhenNotMatchedInsertPsStrategy implements WhenNotMatched
             sql.append(" (").append(columns).append(")");
         }
 
-        PsDto insertDataDto = item.insertData().accept(visitor, ctx);
+        PreparedStatementSpec insertDataDto = item.insertData().accept(visitor, ctx);
         allParameters.addAll(insertDataDto.parameters());
         sql.append(" ").append(insertDataDto.sql());
 
-        return new PsDto(sql.toString(), allParameters);
+        return new PreparedStatementSpec(sql.toString(), allParameters);
     }
 }

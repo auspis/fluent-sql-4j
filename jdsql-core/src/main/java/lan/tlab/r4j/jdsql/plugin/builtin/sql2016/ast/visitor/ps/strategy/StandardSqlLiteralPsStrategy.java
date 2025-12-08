@@ -5,17 +5,17 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LiteralPsStrategy;
 
 public class StandardSqlLiteralPsStrategy implements LiteralPsStrategy {
     @Override
-    public PsDto handle(Literal<?> literal, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Literal<?> literal, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         // In DDL context, render literals inline instead of as placeholders
         if (ctx.hasFeature(AstContext.Feature.DDL)) {
-            return new PsDto(formatLiteralValue(literal.value()), List.of());
+            return new PreparedStatementSpec(formatLiteralValue(literal.value()), List.of());
         }
-        return new PsDto("?", Arrays.asList(literal.value()));
+        return new PreparedStatementSpec("?", Arrays.asList(literal.value()));
     }
 
     private String formatLiteralValue(Object value) {

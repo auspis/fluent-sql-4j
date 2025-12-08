@@ -7,15 +7,16 @@ import java.util.stream.Stream;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
 
 public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPsStrategy {
 
     @Override
-    public PsDto handle(ColumnDefinition columnDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            ColumnDefinition columnDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
         if (columnDefinition.equals(ColumnDefinition.nullObject())) {
-            return new PsDto("", List.of());
+            return new PreparedStatementSpec("", List.of());
         }
 
         StringBuilder builder = new StringBuilder();
@@ -26,27 +27,28 @@ public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPs
         builder.append(columnName);
 
         // Handle data type - use PreparedStatementRenderer directly
-        PsDto typeDto = columnDefinition.type().accept(renderer, ctx);
+        PreparedStatementSpec typeDto = columnDefinition.type().accept(renderer, ctx);
         builder.append(" ").append(typeDto.sql());
         parameters.addAll(typeDto.parameters());
 
         // Handle constraints (NOT NULL, DEFAULT) - these may have parameters
-        List<PsDto> constraintDtos = Stream.of(
+        List<PreparedStatementSpec> constraintDtos = Stream.of(
                         columnDefinition.notNullConstraint(), columnDefinition.defaultConstraint())
                 .filter(c -> c != null)
                 .map(c -> c.accept(renderer, ctx))
                 .collect(Collectors.toList());
 
         if (!constraintDtos.isEmpty()) {
-            String constraintsSql = constraintDtos.stream().map(PsDto::sql).collect(Collectors.joining(" "));
+            String constraintsSql =
+                    constraintDtos.stream().map(PreparedStatementSpec::sql).collect(Collectors.joining(" "));
 
             builder.append(" ").append(constraintsSql);
 
-            for (PsDto constraintDto : constraintDtos) {
+            for (PreparedStatementSpec constraintDto : constraintDtos) {
                 parameters.addAll(constraintDto.parameters());
             }
         }
 
-        return new PsDto(builder.toString().trim(), parameters);
+        return new PreparedStatementSpec(builder.toString().trim(), parameters);
     }
 }

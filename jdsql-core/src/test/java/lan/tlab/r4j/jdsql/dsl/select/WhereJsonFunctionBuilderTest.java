@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,14 @@ import org.mockito.ArgumentCaptor;
 
 class WhereJsonFunctionBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -32,7 +32,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonValueStringComparison() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.city")
@@ -48,7 +48,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonValueNumberComparison() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.age")
@@ -64,7 +64,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonExistsCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonExists("info", "$.email")
@@ -80,7 +80,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonNotExistsCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonExists("info", "$.phone")
@@ -96,7 +96,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonQueryIsNotNull() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .where()
                 .jsonQuery("data", "$.tags")
@@ -111,7 +111,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonValueWithMultipleConditions() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.city")
@@ -132,7 +132,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonValueWithOrCondition() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .jsonValue("info", "$.status")
@@ -154,7 +154,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonMixedConditionsNormalAndJson() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .where()
                 .column("status")
@@ -183,7 +183,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonValueIsNull() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .where()
                 .jsonValue("data", "$.discount")
@@ -198,7 +198,7 @@ class WhereJsonFunctionBuilderTest {
 
     @Test
     void jsonValueWithTableAlias() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .as("u")
                 .where()

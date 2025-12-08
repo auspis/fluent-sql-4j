@@ -5,18 +5,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlColumnReferencePsStrategyTest {
     private final ColumnReferencePsStrategy strategy = new StandardSqlColumnReferencePsStrategy();
-    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
 
     @Test
     void noTable() {
         ColumnReference col = ColumnReference.of("", "name");
-        PsDto dto = strategy.handle(col, renderer, new AstContext());
+        PreparedStatementSpec dto = strategy.handle(col, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("\"name\"");
         assertThat(dto.parameters()).isEmpty();
     }
@@ -24,7 +24,7 @@ class StandardSqlColumnReferencePsStrategyTest {
     @Test
     void table() {
         ColumnReference col = ColumnReference.of("Customer", "name");
-        PsDto dto = strategy.handle(col, renderer, new AstContext());
+        PreparedStatementSpec dto = strategy.handle(col, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("\"name\"");
         assertThat(dto.parameters()).isEmpty();
     }
@@ -33,7 +33,7 @@ class StandardSqlColumnReferencePsStrategyTest {
     void join() {
         ColumnReference col = ColumnReference.of("Customer", "name");
         AstContext ctx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto dto = strategy.handle(col, renderer, ctx);
+        PreparedStatementSpec dto = strategy.handle(col, specFactory, ctx);
         assertThat(dto.sql()).isEqualTo("\"Customer\".\"name\"");
         assertThat(dto.parameters()).isEmpty();
     }
@@ -42,7 +42,7 @@ class StandardSqlColumnReferencePsStrategyTest {
     void blankTableJoinOnContext() {
         ColumnReference col = ColumnReference.of("   ", "name");
         AstContext ctx = new AstContext(AstContext.Feature.JOIN_ON);
-        PsDto dto = strategy.handle(col, renderer, ctx);
+        PreparedStatementSpec dto = strategy.handle(col, specFactory, ctx);
         assertThat(dto.sql()).isEqualTo("\"name\"");
         assertThat(dto.parameters()).isEmpty();
     }
