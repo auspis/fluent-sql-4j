@@ -136,7 +136,7 @@ public final class MysqlDialectPlugin {
     public static final String DIALECT_VERSION = "^8.0.0";
 
     private static final SqlDialectPlugin INSTANCE =
-            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, MysqlDialectPlugin::createMySqlDSL);
+            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, MysqlDialectPlugin::createDSL);
 
     /**
      * Private constructor to prevent instantiation.
@@ -163,7 +163,7 @@ public final class MysqlDialectPlugin {
      *
      * @return a new {@link PreparedStatementSpecFactory} instance configured for MySQL, never {@code null}
      */
-    private static PreparedStatementSpecFactory createMySqlRenderer() {
+    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .currentDateStrategy(new MysqlCurrentDatePsStrategy())
@@ -197,8 +197,8 @@ public final class MysqlDialectPlugin {
      *
      * @return a new {@link lan.tlab.r4j.sql.dsl.mysql.MysqlDSL} instance configured for MySQL, never {@code null}
      */
-    private static DSL createMySqlDSL() {
-        return new MysqlDSL(createMySqlRenderer());
+    private static DSL createDSL() {
+        return new MysqlDSL(createPreparedStatementSpecFactory());
     }
 
     /**

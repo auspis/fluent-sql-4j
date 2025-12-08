@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lan.tlab.r4j.jdsql.functional.Result;
+import lan.tlab.r4j.jdsql.functional.Result.Failure;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
 /**
@@ -68,7 +69,7 @@ public final class DSLRegistry {
      */
     private DSLRegistry(SqlDialectPluginRegistry pluginRegistry) {
         this.pluginRegistry = Objects.requireNonNull(pluginRegistry, "SqlDialectPluginRegistry must not be null");
-        this.dslCache = new ConcurrentHashMap<>();
+        dslCache = new ConcurrentHashMap<>();
     }
 
     /**
@@ -110,7 +111,7 @@ public final class DSLRegistry {
      * @return a result containing the DSL instance, or a failure if the dialect is not supported
      */
     public Result<DSL> dslFor(String dialect) {
-        return dslFor(dialect, null);
+        return dslFor(dialect, "");
     }
 
     /**
@@ -159,57 +160,47 @@ public final class DSLRegistry {
         });
     }
 
-    /**
-     * Returns the set of all supported SQL dialects.
-     * <p>
-     * The returned set contains the names of all dialects that have at least one
-     * registered plugin. Dialect names are returned in their normalized form (lowercase).
-     *
-     * @return an immutable set of supported dialect names
-     */
+    public <T extends DSL> Result<T> dslFor(String dialect, Class<T> dslClass) {
+        return dslFor(dialect)
+                .fold(
+                        dsl -> dslClass.isInstance(dsl)
+                                ? new Result.Success<>(dslClass.cast(dsl))
+                                : new Result.Failure<>("No plugin found"),
+                        Failure::new);
+    }
+
+    public <T extends DSL> Result<T> dslFor(String dialect, String version, Class<T> dslClass) {
+        return dslFor(dialect, version)
+                .fold(
+                        dsl -> dslClass.isInstance(dsl)
+                                ? new Result.Success<>(dslClass.cast(dsl))
+                                : new Result.Failure<>("No plugin found"),
+                        Failure::new);
+    }
+
     public Set<String> getSupportedDialects() {
         return pluginRegistry.getSupportedDialects();
     }
 
-    /**
-     * Checks if a specific SQL dialect is supported by this registry.
-     * <p>
-     * The dialect name is matched case-insensitively.
-     *
-     * @param dialect the name of the SQL dialect to check
-     * @return {@code true} if the dialect is supported, {@code false} otherwise
-     */
     public boolean isSupported(String dialect) {
         return pluginRegistry.isSupported(dialect);
     }
 
-    /**
-     * Clears the internal DSL cache.
-     * <p>
-     * This method is useful for testing or when you want to force recreation
-     * of DSL instances after configuration changes.
-     */
     public void clearCache() {
         dslCache.clear();
     }
 
-    /**
-     * Returns the number of cached DSL instances.
-     * <p>
-     * This method is useful for monitoring cache usage and testing.
-     *
-     * @return the number of DSL instances currently in cache
-     */
     public int getCacheSize() {
         return dslCache.size();
     }
 
-    /**
-     * Builds a cache key from dialect and version.
-     */
     private String buildCacheKey(String dialect, String version) {
-        String normalizedDialect = dialect != null ? dialect.toLowerCase() : "null";
-        String normalizedVersion = version != null ? version : "*";
+        String normalizedDialect = isNotBlank(dialect) ? dialect.toLowerCase() : "null";
+        String normalizedVersion = isNotBlank(version) ? version : "*";
         return normalizedDialect + ":" + normalizedVersion;
+    }
+
+    private boolean isNotBlank(String dialect) {
+        return (dialect != null) && !dialect.isBlank();
     }
 }

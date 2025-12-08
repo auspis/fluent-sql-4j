@@ -8,13 +8,9 @@ import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
  * Test helper for creating SQL dialect plugins in tests.
  * Provides factory methods to simplify plugin creation with common test defaults.
  */
-public final class TestDialectPluginUtil {
+public final class SqlDialectPluginUtil {
 
-    public static final String TEST_DIALECT = "test-dialect";
-    public static final String OTHER_DIALECT = "other-dialect";
-    public static final String BASE_VERSION = "3.4.5";
-
-    private TestDialectPluginUtil() {}
+    private SqlDialectPluginUtil() {}
 
     /**
      * Creates a plugin with custom name, version and renderer.
@@ -28,13 +24,13 @@ public final class TestDialectPluginUtil {
      * Creates a plugin with default name, custom version and spec factory.
      */
     public static SqlDialectPlugin create(String dialectVersion, PreparedStatementSpecFactory specFactory) {
-        return create(TEST_DIALECT, dialectVersion, specFactory);
+        return create(TestDialectPlugin.DIALECT_NAME, dialectVersion, specFactory);
     }
 
     /**
      * Creates a plugin with default name, default version and custom spec factory.
      */
     public static SqlDialectPlugin create(PreparedStatementSpecFactory specFactory) {
-        return create(TEST_DIALECT, "^" + BASE_VERSION, specFactory);
+        return create(TestDialectPlugin.DIALECT_NAME, "^" + TestDialectPlugin.DIALECT_VERSION, specFactory);
     }
 }
