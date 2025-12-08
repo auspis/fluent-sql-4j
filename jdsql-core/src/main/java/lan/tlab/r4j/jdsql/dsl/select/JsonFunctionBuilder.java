@@ -1,13 +1,13 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.BehaviorKind;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonExists;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonQuery;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.WrapperBehavior;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.BehaviorKind;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonExists;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonQuery;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonValue;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.WrapperBehavior;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 
 /**
  * Fluent builder for JSON functions in SELECT projections.

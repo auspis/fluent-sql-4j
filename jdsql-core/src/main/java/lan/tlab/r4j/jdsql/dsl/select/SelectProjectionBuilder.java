@@ -2,9 +2,9 @@ package lan.tlab.r4j.jdsql.dsl.select;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.Projection;

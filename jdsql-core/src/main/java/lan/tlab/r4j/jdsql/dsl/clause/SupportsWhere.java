@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.dsl.clause;
 
 import java.util.function.Function;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 
 /**

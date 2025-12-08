@@ -1,8 +1,8 @@
 package lan.tlab.r4j.jdsql.ast.ddl.definition;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.set.TableExpression;
-import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.TableExpression;
+import lan.tlab.r4j.jdsql.ast.core.identifier.TableIdentifier;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
