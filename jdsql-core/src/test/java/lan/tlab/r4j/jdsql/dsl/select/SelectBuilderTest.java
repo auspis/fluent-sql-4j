@@ -17,7 +17,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
+import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package lan.tlab.r4j.jdsql.dsl;
+package lan.tlab.r4j.jdsql.dsl.clause;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,192 +17,190 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.jdsql.dsl.select.SelectBuilder;
 
 /**
- * Generic builder for WHERE conditions that can work with any builder type.
- *
- * @param <T> the parent builder type
+ * Builder for HAVING conditions in SELECT statements.
  */
-public class WhereConditionBuilder<T extends SupportsWhere<T>> {
-    private final T parent;
+public class HavingConditionBuilder {
+    private final SelectBuilder parent;
     private final String column;
     private final LogicalCombinator combinator;
 
-    public WhereConditionBuilder(T parent, String column, LogicalCombinator combinator) {
+    public HavingConditionBuilder(SelectBuilder parent, String column, LogicalCombinator combinator) {
         this.parent = parent;
         this.column = column;
         this.combinator = combinator;
     }
 
     // String comparisons
-    public T eq(String value) {
+    public SelectBuilder eq(String value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public T ne(String value) {
+    public SelectBuilder ne(String value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public T gt(String value) {
+    public SelectBuilder gt(String value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public T lt(String value) {
+    public SelectBuilder lt(String value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public T gte(String value) {
+    public SelectBuilder gte(String value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public T lte(String value) {
+    public SelectBuilder lte(String value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // Number comparisons
-    public T eq(Number value) {
+    public SelectBuilder eq(Number value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public T ne(Number value) {
+    public SelectBuilder ne(Number value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public T gt(Number value) {
+    public SelectBuilder gt(Number value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public T lt(Number value) {
+    public SelectBuilder lt(Number value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public T gte(Number value) {
+    public SelectBuilder gte(Number value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public T lte(Number value) {
+    public SelectBuilder lte(Number value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // Boolean comparisons
-    public T eq(Boolean value) {
+    public SelectBuilder eq(Boolean value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public T ne(Boolean value) {
+    public SelectBuilder ne(Boolean value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
     // LocalDate comparisons
-    public T eq(LocalDate value) {
+    public SelectBuilder eq(LocalDate value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public T ne(LocalDate value) {
+    public SelectBuilder ne(LocalDate value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public T gt(LocalDate value) {
+    public SelectBuilder gt(LocalDate value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public T lt(LocalDate value) {
+    public SelectBuilder lt(LocalDate value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public T gte(LocalDate value) {
+    public SelectBuilder gte(LocalDate value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public T lte(LocalDate value) {
+    public SelectBuilder lte(LocalDate value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // LocalDateTime comparisons
-    public T eq(LocalDateTime value) {
+    public SelectBuilder eq(LocalDateTime value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
 
-    public T ne(LocalDateTime value) {
+    public SelectBuilder ne(LocalDateTime value) {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    public T gt(LocalDateTime value) {
+    public SelectBuilder gt(LocalDateTime value) {
         return addCondition(Comparison.gt(getColumnRef(), Literal.of(value)));
     }
 
-    public T lt(LocalDateTime value) {
+    public SelectBuilder lt(LocalDateTime value) {
         return addCondition(Comparison.lt(getColumnRef(), Literal.of(value)));
     }
 
-    public T gte(LocalDateTime value) {
+    public SelectBuilder gte(LocalDateTime value) {
         return addCondition(Comparison.gte(getColumnRef(), Literal.of(value)));
     }
 
-    public T lte(LocalDateTime value) {
+    public SelectBuilder lte(LocalDateTime value) {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
     // String-specific operations
-    public T like(String pattern) {
+    public SelectBuilder like(String pattern) {
         return addCondition(new Like(getColumnRef(), pattern));
     }
 
     // Null checks
-    public T isNull() {
+    public SelectBuilder isNull() {
         return addCondition(new IsNull(getColumnRef()));
     }
 
-    public T isNotNull() {
+    public SelectBuilder isNotNull() {
         return addCondition(new IsNotNull(getColumnRef()));
     }
 
     // Convenience methods for date ranges
-    public T between(LocalDate startDate, LocalDate endDate) {
+    public SelectBuilder between(LocalDate startDate, LocalDate endDate) {
         Predicate condition = AndOr.and(
                 Comparison.gte(getColumnRef(), Literal.of(startDate)),
                 Comparison.lte(getColumnRef(), Literal.of(endDate)));
         return addCondition(condition);
     }
 
-    public T between(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public SelectBuilder between(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         Predicate condition = AndOr.and(
                 Comparison.gte(getColumnRef(), Literal.of(startDateTime)),
                 Comparison.lte(getColumnRef(), Literal.of(endDateTime)));
         return addCondition(condition);
     }
 
-    public T between(Number min, Number max) {
+    public SelectBuilder between(Number min, Number max) {
         Predicate condition = AndOr.and(
                 Comparison.gte(getColumnRef(), Literal.of(min)), Comparison.lte(getColumnRef(), Literal.of(max)));
         return addCondition(condition);
     }
 
     // Subquery comparisons
-    public T eq(SelectBuilder subquery) {
+    public SelectBuilder eq(SelectBuilder subquery) {
         return addCondition(Comparison.eq(getColumnRef(), toScalarSubquery(subquery)));
     }
 
-    public T ne(SelectBuilder subquery) {
+    public SelectBuilder ne(SelectBuilder subquery) {
         return addCondition(Comparison.ne(getColumnRef(), toScalarSubquery(subquery)));
     }
 
-    public T gt(SelectBuilder subquery) {
+    public SelectBuilder gt(SelectBuilder subquery) {
         return addCondition(Comparison.gt(getColumnRef(), toScalarSubquery(subquery)));
     }
 
-    public T lt(SelectBuilder subquery) {
+    public SelectBuilder lt(SelectBuilder subquery) {
         return addCondition(Comparison.lt(getColumnRef(), toScalarSubquery(subquery)));
     }
 
-    public T gte(SelectBuilder subquery) {
+    public SelectBuilder gte(SelectBuilder subquery) {
         return addCondition(Comparison.gte(getColumnRef(), toScalarSubquery(subquery)));
     }
 
-    public T lte(SelectBuilder subquery) {
+    public SelectBuilder lte(SelectBuilder subquery) {
         return addCondition(Comparison.lte(getColumnRef(), toScalarSubquery(subquery)));
     }
 
     // IN operator
-    public T in(String... values) {
+    public SelectBuilder in(String... values) {
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException("At least one value must be provided for IN clause");
         }
@@ -211,7 +209,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
                 Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
     }
 
-    public T in(Number... values) {
+    public SelectBuilder in(Number... values) {
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException("At least one value must be provided for IN clause");
         }
@@ -220,7 +218,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
                 Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
     }
 
-    public T in(Boolean... values) {
+    public SelectBuilder in(Boolean... values) {
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException("At least one value must be provided for IN clause");
         }
@@ -229,7 +227,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
                 Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
     }
 
-    public T in(LocalDate... values) {
+    public SelectBuilder in(LocalDate... values) {
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException("At least one value must be provided for IN clause");
         }
@@ -238,7 +236,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
                 Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
     }
 
-    public T in(LocalDateTime... values) {
+    public SelectBuilder in(LocalDateTime... values) {
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException("At least one value must be provided for IN clause");
         }
@@ -261,7 +259,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
                 .build();
     }
 
-    private T addCondition(Predicate condition) {
-        return parent.addWhereCondition(condition, combinator);
+    private SelectBuilder addCondition(Predicate condition) {
+        return parent.addHavingCondition(condition, combinator);
     }
 }
