@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.ast.dql.statement;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.set.TableExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.SetExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.TableExpression;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Fetch;
 import lan.tlab.r4j.jdsql.ast.dql.clause.From;
 import lan.tlab.r4j.jdsql.ast.dql.clause.GroupBy;
@@ -16,7 +17,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class SelectStatement implements DataQueryStatement, TableExpression {
+public class SelectStatement implements DataQueryStatement, TableExpression, SetExpression {
 
     @Default
     private final Select select = new Select();

@@ -1,10 +1,10 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCall;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCallImpl;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.CountDistinct;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.CountStar;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateCallImpl;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.CountDistinct;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.CountStar;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;

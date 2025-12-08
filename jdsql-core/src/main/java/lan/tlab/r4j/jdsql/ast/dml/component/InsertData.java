@@ -2,8 +2,8 @@ package lan.tlab.r4j.jdsql.ast.dml.component;
 
 import java.util.List;
 import java.util.stream.Stream;
-import lan.tlab.r4j.jdsql.ast.common.expression.Expression;
-import lan.tlab.r4j.jdsql.ast.common.expression.set.SetExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.Expression;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.SetExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitable;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;

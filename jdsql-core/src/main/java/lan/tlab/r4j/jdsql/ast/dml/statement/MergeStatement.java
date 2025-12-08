@@ -2,8 +2,8 @@ package lan.tlab.r4j.jdsql.ast.dml.statement;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.jdsql.ast.core.identifier.TableIdentifier;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeUsing;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;

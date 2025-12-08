@@ -1,8 +1,8 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.jdsql.ast.core.predicate.NullPredicate;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;

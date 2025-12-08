@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.set.TableExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.TableExpression;
 import lan.tlab.r4j.jdsql.ast.dml.statement.DeleteStatement;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
@@ -25,7 +25,7 @@ public class StandardSqlDeleteStatementPsStrategy implements DeleteStatementPsSt
         Where where = stmt.where();
         if (where != null
                 && where.condition() != null
-                && !(where.condition() instanceof lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate)) {
+                && !(where.condition() instanceof lan.tlab.r4j.jdsql.ast.core.predicate.NullPredicate)) {
             PreparedStatementSpec whereDto = where.accept(renderer, ctx);
             sql.append(" WHERE ").append(whereDto.sql());
             params.addAll(whereDto.parameters());

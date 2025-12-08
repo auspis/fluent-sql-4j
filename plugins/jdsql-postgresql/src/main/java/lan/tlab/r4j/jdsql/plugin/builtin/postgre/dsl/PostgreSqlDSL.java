@@ -3,10 +3,10 @@ package lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 

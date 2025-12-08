@@ -1,8 +1,8 @@
 package lan.tlab.r4j.jdsql.ast.ddl.definition;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.Expression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.expression.Expression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 

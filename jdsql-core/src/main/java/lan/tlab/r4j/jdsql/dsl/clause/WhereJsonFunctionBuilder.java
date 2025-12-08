@@ -1,16 +1,16 @@
 package lan.tlab.r4j.jdsql.dsl.clause;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.BehaviorKind;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonExists;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonQuery;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.jdsql.ast.common.predicate.IsNotNull;
-import lan.tlab.r4j.jdsql.ast.common.predicate.IsNull;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.BehaviorKind;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonExists;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonQuery;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonValue;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.core.predicate.IsNotNull;
+import lan.tlab.r4j.jdsql.ast.core.predicate.IsNull;
 
 /**
  * Fluent builder for JSON functions in WHERE conditions.
@@ -202,7 +202,7 @@ public class WhereJsonFunctionBuilder<T extends SupportsWhere<T>> {
         return new JsonQuery(jsonDocument, Literal.of(path), returningType, null, onEmptyBehavior, onErrorBehavior);
     }
 
-    private T addCondition(lan.tlab.r4j.jdsql.ast.common.predicate.Predicate condition) {
+    private T addCondition(lan.tlab.r4j.jdsql.ast.core.predicate.Predicate condition) {
         return parent.addWhereCondition(condition, combinator);
     }
 }

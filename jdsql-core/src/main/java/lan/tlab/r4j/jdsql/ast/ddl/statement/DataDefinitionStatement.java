@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.ast.ddl.statement;
 
-import lan.tlab.r4j.jdsql.ast.statement.Statement;
+import lan.tlab.r4j.jdsql.ast.core.statement.Statement;
 
 /**
  * Marker interface for Data Definition Language (DDL) statements.
