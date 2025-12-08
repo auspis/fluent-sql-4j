@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.projection.Projection;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.SelectClausePsStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ class StandardSqlSelectClausePsStrategyTest {
         @SuppressWarnings("unchecked")
         @Override
         public <T> T accept(Visitor<T> visitor, AstContext ctx) {
-            return (T) new PsDto(sql, params);
+            return (T) new PreparedStatementSpec(sql, params);
         }
     }
 
@@ -35,7 +35,7 @@ class StandardSqlSelectClausePsStrategyTest {
     void star() {
         SelectClausePsStrategy strategy = new StandardSqlSelectClausePsStrategy();
         Select select = Select.of();
-        PsDto result = strategy.handle(select, null, new AstContext());
+        PreparedStatementSpec result = strategy.handle(select, null, new AstContext());
         assertThat(result.sql()).isEqualTo("*");
         assertThat(result.parameters()).isEmpty();
     }
@@ -45,7 +45,7 @@ class StandardSqlSelectClausePsStrategyTest {
         SelectClausePsStrategy strategy = new StandardSqlSelectClausePsStrategy();
         Projection proj = new StubProjection("col1", List.of(42));
         Select select = Select.of(proj);
-        PsDto result = strategy.handle(select, null, new AstContext());
+        PreparedStatementSpec result = strategy.handle(select, null, new AstContext());
         assertThat(result.sql()).isEqualTo("col1");
         assertThat(result.parameters()).containsExactly(42);
     }
@@ -56,7 +56,7 @@ class StandardSqlSelectClausePsStrategyTest {
         Projection p1 = new StubProjection("col1", List.of(1));
         Projection p2 = new StubProjection("col2", List.of(2));
         Select select = Select.of(p1, p2);
-        PsDto result = strategy.handle(select, null, new AstContext());
+        PreparedStatementSpec result = strategy.handle(select, null, new AstContext());
         assertThat(result.sql()).isEqualTo("col1, col2");
         assertThat(result.parameters()).containsExactly(1, 2);
     }

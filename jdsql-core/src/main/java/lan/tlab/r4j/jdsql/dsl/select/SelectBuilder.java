@@ -30,8 +30,8 @@ import lan.tlab.r4j.jdsql.ast.dql.source.FromSource;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.HavingConditionBuilder;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.dsl.SupportsWhere;
@@ -41,12 +41,12 @@ import lan.tlab.r4j.jdsql.dsl.util.PsUtil;
 // TODO: Add support for SELECT AggregateCalls, subqueries, and other SQL features as needed.
 public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
-    private final DialectRenderer renderer;
+    private final PreparedStatementSpecFactory specFactory;
     private FromSource currentFromSource;
     private TableIdentifier baseTable;
 
-    public SelectBuilder(DialectRenderer renderer, String... columns) {
-        this.renderer = renderer;
+    public SelectBuilder(PreparedStatementSpecFactory specFactory, String... columns) {
+        this.specFactory = specFactory;
         if (columns != null && columns.length > 0) {
             statementBuilder = statementBuilder.select(Select.of(java.util.Arrays.stream(columns)
                     .map(column -> new ScalarExpressionProjection(ColumnReference.of("", column)))
@@ -54,8 +54,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         }
     }
 
-    public SelectBuilder(DialectRenderer renderer, Select select) {
-        this.renderer = renderer;
+    public SelectBuilder(PreparedStatementSpecFactory specFactory, Select select) {
+        this.specFactory = specFactory;
         if (select != null) {
             statementBuilder = statementBuilder.select(select);
         }
@@ -404,8 +404,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         SelectStatement statement = getCurrentStatement();
-        PsDto psDto = renderer.renderPreparedStatement(statement);
-        return PsUtil.preparedStatement(psDto, connection);
+        PreparedStatementSpec spec = specFactory.create(statement);
+        return PsUtil.preparedStatement(spec, connection);
     }
 
     private void validateState() {

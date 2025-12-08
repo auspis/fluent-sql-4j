@@ -15,21 +15,21 @@ import lan.tlab.r4j.jdsql.ast.dml.component.InsertData;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.DefaultValues;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.dml.statement.InsertStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.util.LiteralUtil;
 
 public class InsertBuilder {
-    private final DialectRenderer renderer;
+    private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier table;
     private final List<ColumnReference> columns = new ArrayList<>();
     private InsertData data = new DefaultValues();
 
-    public InsertBuilder(DialectRenderer renderer, String tableName) {
+    public InsertBuilder(PreparedStatementSpecFactory specFactory, String tableName) {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
-        this.renderer = renderer;
+        this.specFactory = specFactory;
         this.table = new TableIdentifier(tableName);
     }
 
@@ -80,7 +80,7 @@ public class InsertBuilder {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         InsertStatement statement = getCurrentStatement();
-        PsDto result = renderer.renderPreparedStatement(statement);
+        PreparedStatementSpec result = specFactory.create(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {

@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -17,11 +17,12 @@ class StandardSqlJsonValuePsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         JsonValuePsStrategy strategy = new StandardSqlJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
-        PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
         assertThat(result.sql()).isEqualTo("JSON_VALUE(\"data\", ?)");
         assertThat(result.parameters()).containsExactly("$.price");
@@ -29,7 +30,8 @@ class StandardSqlJsonValuePsStrategyTest {
 
     @Test
     void withAllOptions() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         JsonValuePsStrategy strategy = new StandardSqlJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(
                 ColumnReference.of("products", "data"),
@@ -38,7 +40,7 @@ class StandardSqlJsonValuePsStrategyTest {
                 OnEmptyBehavior.defaultValue("0.0"),
                 BehaviorKind.NONE);
 
-        PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
         assertThat(result.sql()).isEqualTo("JSON_VALUE(\"data\", ? RETURNING DECIMAL(10,2) DEFAULT 0.0 ON EMPTY)");
         assertThat(result.parameters()).containsExactly("$.price");

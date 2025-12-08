@@ -10,18 +10,18 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dml.statement.DeleteStatement;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.dsl.SupportsWhere;
 
 public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
     private DeleteStatement.DeleteStatementBuilder statementBuilder = DeleteStatement.builder();
-    private final DialectRenderer renderer;
+    private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier table;
 
-    public DeleteBuilder(DialectRenderer renderer, String tableName) {
-        this.renderer = renderer;
+    public DeleteBuilder(PreparedStatementSpecFactory specFactory, String tableName) {
+        this.specFactory = specFactory;
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
         }
@@ -97,7 +97,7 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
 
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         DeleteStatement statement = getCurrentStatement();
-        PsDto result = renderer.renderPreparedStatement(statement);
+        PreparedStatementSpec result = specFactory.create(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {

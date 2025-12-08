@@ -8,18 +8,19 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.BehaviorKin
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonExists;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlJsonExistsPsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         StandardSqlJsonExistsPsStrategy strategy = new StandardSqlJsonExistsPsStrategy();
         JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
-        PsDto result = strategy.handle(jsonExists, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonExists, specFactory, new AstContext());
 
         assertThat(result.sql()).isEqualTo("JSON_EXISTS(\"data\", ?)");
         assertThat(result.parameters()).containsExactly("$.price");
@@ -27,12 +28,13 @@ class StandardSqlJsonExistsPsStrategyTest {
 
     @Test
     void withOnErrorBehavior() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         StandardSqlJsonExistsPsStrategy strategy = new StandardSqlJsonExistsPsStrategy();
         JsonExists jsonExists =
                 new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);
 
-        PsDto result = strategy.handle(jsonExists, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonExists, specFactory, new AstContext());
 
         assertThat(result.sql()).isEqualTo("JSON_EXISTS(\"data\", ? ERROR ON ERROR)");
         assertThat(result.parameters()).containsExactly("$.price");

@@ -5,20 +5,20 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dql.clause.From;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.FromClausePsStrategy;
 
 public class StandardSqlFromClausePsStrategy implements FromClausePsStrategy {
     @Override
-    public PsDto handle(From clause, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(From clause, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         List<String> sqlParts = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var source : clause.sources()) {
-            PsDto res = source.accept(renderer, ctx);
+            PreparedStatementSpec res = source.accept(renderer, ctx);
             sqlParts.add(res.sql());
             params.addAll(res.parameters());
         }
         String sql = String.join(", ", sqlParts);
-        return new PsDto(sql, params);
+        return new PreparedStatementSpec(sql, params);
     }
 }

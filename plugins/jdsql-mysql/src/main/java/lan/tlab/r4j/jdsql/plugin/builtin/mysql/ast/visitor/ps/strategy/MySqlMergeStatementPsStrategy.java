@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 
 /**
@@ -19,7 +19,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
  */
 public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
     @Override
-    public PsDto handle(MergeStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(MergeStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
         List<Object> params = new ArrayList<>();
 
         // Find WHEN NOT MATCHED INSERT action (required for MySQL)
@@ -63,7 +63,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         if (insertAction.insertData() instanceof InsertData.InsertValues insertValues) {
             List<String> selectExprs = new ArrayList<>();
             for (var expr : insertValues.valueExpressions()) {
-                PsDto exprDto = expr.accept(renderer, selectCtx);
+                PreparedStatementSpec exprDto = expr.accept(renderer, selectCtx);
                 selectExprs.add(exprDto.sql());
                 params.addAll(exprDto.parameters());
             }
@@ -73,14 +73,14 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
             List<String> selectExprs = new ArrayList<>();
             for (var col : insertAction.columns()) {
                 ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.column());
-                PsDto colDto = sourceCol.accept(renderer, selectCtx);
+                PreparedStatementSpec colDto = sourceCol.accept(renderer, selectCtx);
                 selectExprs.add(colDto.sql());
             }
             sql += String.join(", ", selectExprs);
         }
 
         // FROM source
-        PsDto usingDto = stmt.getUsing().accept(renderer, ctx);
+        PreparedStatementSpec usingDto = stmt.getUsing().accept(renderer, ctx);
         sql += " FROM " + usingDto.sql();
         params.addAll(usingDto.parameters());
 
@@ -90,7 +90,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
 
             List<String> updateClauses = new ArrayList<>();
             for (UpdateItem item : updateAction.updateItems()) {
-                PsDto colDto = item.column().accept(renderer, ctx);
+                PreparedStatementSpec colDto = item.column().accept(renderer, ctx);
                 String columnName = colDto.sql();
 
                 // Check if value is a ColumnReference to use VALUES()
@@ -99,7 +99,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
                     updateClauses.add(columnName + " = VALUES(" + escapedColName + ")");
                 } else {
                     // For literals and other expressions, use parameterized value
-                    PsDto valDto = item.value().accept(renderer, ctx);
+                    PreparedStatementSpec valDto = item.value().accept(renderer, ctx);
                     updateClauses.add(columnName + " = " + valDto.sql());
                     params.addAll(valDto.parameters());
                 }
@@ -107,7 +107,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
             sql += String.join(", ", updateClauses);
         }
 
-        return new PsDto(sql, params);
+        return new PreparedStatementSpec(sql, params);
     }
 
     private String getSourceAlias(lan.tlab.r4j.jdsql.ast.common.expression.set.TableExpression source) {

@@ -8,8 +8,8 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.NotNullConstra
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,11 +20,11 @@ import org.junit.jupiter.api.Test;
  */
 class CreateTableStatementTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
 
     @BeforeEach
     void setUp() {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
     }
 
     @Test
@@ -47,7 +47,7 @@ class CreateTableStatementTest {
                 .build();
 
         CreateTableStatement stmt = new CreateTableStatement(tableDef);
-        PsDto result = renderer.renderPreparedStatement(stmt);
+        PreparedStatementSpec result = specFactory.create(stmt);
 
         // Verify that VARCHAR(100) is rendered with literal 100, not placeholder
         assertThat(result.sql()).contains("VARCHAR(100)");
@@ -75,7 +75,7 @@ class CreateTableStatementTest {
                 .build();
 
         CreateTableStatement stmt = new CreateTableStatement(tableDef);
-        PsDto result = renderer.renderPreparedStatement(stmt);
+        PreparedStatementSpec result = specFactory.create(stmt);
 
         // Verify that DECIMAL(10, 2) is rendered with literals, not placeholders
         assertThat(result.sql()).contains("DECIMAL(10, 2)");

@@ -5,15 +5,15 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.number.Mod;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ModPsStrategy;
 
 public class StandardSqlModPsStrategy implements ModPsStrategy {
 
     @Override
-    public PsDto handle(Mod mod, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto dividendResult = mod.dividend().accept(renderer, ctx);
-        PsDto divisorResult = mod.divisor().accept(renderer, ctx);
+    public PreparedStatementSpec handle(Mod mod, PreparedStatementRenderer renderer, AstContext ctx) {
+        PreparedStatementSpec dividendResult = mod.dividend().accept(renderer, ctx);
+        PreparedStatementSpec divisorResult = mod.divisor().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(dividendResult.parameters());
@@ -21,6 +21,6 @@ public class StandardSqlModPsStrategy implements ModPsStrategy {
 
         String sql = String.format("MOD(%s, %s)", dividendResult.sql(), divisorResult.sql());
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

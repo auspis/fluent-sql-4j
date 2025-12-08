@@ -3,10 +3,10 @@ package lan.tlab.r4j.jdsql.ast.visitor;
 import java.util.Objects;
 import lan.tlab.r4j.jdsql.ast.statement.Statement;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 /**
- * Orchestrates SQL statement rendering for a specific dialect.
+ * Factory for creating {@link PreparedStatementSpec} instances from SQL statements.
  * <p>
  * This class coordinates two-phase rendering:
  * <ol>
@@ -21,32 +21,32 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
  * PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
  *     .escapeStrategy(new MysqlEscapeStrategy())
  *     .build();
- * DialectRenderer renderer = new DialectRenderer(psRenderer);
+ * PreparedStatementSpecFactory specFactory = new PreparedStatementSpecFactory(psRenderer);
  *
- * // Render prepared statement DTO
- * PsDto psDto = renderer.renderPreparedStatement(selectStatement);
- * String sql = psDto.sql();
- * List<Object> params = psDto.parameters();
+ * // Create PreparedStatementSpec
+ * PreparedStatementSpec spec = specFactory.create(selectStatement);
+ * String sql = spec.sql();
+ * List<Object> params = spec.parameters();
  * }</pre>
  *
  * @param psRenderer the PreparedStatement renderer for this dialect
  * @since 1.0
  */
-public record DialectRenderer(PreparedStatementRenderer psRenderer) {
+public record PreparedStatementSpecFactory(PreparedStatementRenderer psRenderer) {
 
     private static final ContextPreparationVisitor CONTEXT_ANALYZER = new ContextPreparationVisitor();
 
-    public DialectRenderer {
+    public PreparedStatementSpecFactory {
         Objects.requireNonNull(psRenderer, "PreparedStatementRenderer must not be null");
     }
 
     /**
-     * Renders a statement as PreparedStatement DTO.
+     * Creates a PreparedStatementSpec from a SQL statement.
      *
      * @param statement the statement to render
-     * @return the PreparedStatement DTO with SQL and parameters
+     * @return the PreparedStatementSpec with SQL and parameters
      */
-    public PsDto renderPreparedStatement(Statement statement) {
+    public PreparedStatementSpec create(Statement statement) {
         AstContext enrichedCtx = statement.accept(CONTEXT_ANALYZER, new AstContext());
         return statement.accept(psRenderer, enrichedCtx);
     }

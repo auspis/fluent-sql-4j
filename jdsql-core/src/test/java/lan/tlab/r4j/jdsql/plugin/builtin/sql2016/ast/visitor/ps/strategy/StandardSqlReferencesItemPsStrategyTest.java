@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class StandardSqlReferencesItemPsStrategyTest {
         var ctx = new AstContext();
 
         // when
-        PsDto result = strategy.handle(referencesItem, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(referencesItem, visitor, ctx);
 
         // then
         assertThat(result.sql()).isEqualTo("REFERENCES \"users\" (\"id\")");
@@ -36,7 +36,7 @@ class StandardSqlReferencesItemPsStrategyTest {
         var ctx = new AstContext();
 
         // when
-        PsDto result = strategy.handle(referencesItem, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(referencesItem, visitor, ctx);
 
         // then
         assertThat(result.sql()).isEqualTo("REFERENCES \"users\" (\"tenant_id\", \"user_id\")");

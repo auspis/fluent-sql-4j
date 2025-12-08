@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.oracle;
 
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.StandardSqlEscapeStrategy;
@@ -34,11 +34,11 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * Result<DialectRenderer> result = registry.getRenderer("oracle", "19.0.0");
+ * Result<PreparedStatementSpecFactory> result = registry.getRenderer("oracle", "19.0.0");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = OracleDialectPlugin.instance();
- * DialectRenderer renderer = plugin.createRenderer();
+ * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
  * }</pre>
  * <p>
  * <b>Oracle-Specific Features Implemented:</b>
@@ -113,14 +113,14 @@ public final class OracleDialectPlugin {
      * <b>Note:</b> This is a minimal implementation. Additional Oracle-specific features
      * should be added as needed (see class-level TODOs).
      *
-     * @return a new {@link DialectRenderer} instance configured for Oracle, never {@code null}
+     * @return a new {@link PreparedStatementSpecFactory} instance configured for Oracle, never {@code null}
      */
-    private static DialectRenderer createOracleRenderer() {
+    private static PreparedStatementSpecFactory createOracleRenderer() {
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 
-        return new DialectRenderer(psRenderer);
+        return new PreparedStatementSpecFactory(psRenderer);
     }
 
     /**
@@ -144,7 +144,7 @@ public final class OracleDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = OracleDialectPlugin.instance();
-     * DialectRenderer renderer = plugin.createRenderer();
+     * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
      * }</pre>
      *
      * @return the singleton Oracle dialect plugin instance, never {@code null}

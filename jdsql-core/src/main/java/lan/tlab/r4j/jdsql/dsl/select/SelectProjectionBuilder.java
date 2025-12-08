@@ -9,15 +9,15 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.Projection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 
 public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>> {
-    private final DialectRenderer renderer;
+    private final PreparedStatementSpecFactory specFactory;
     private final List<Projection> projections;
     private Projection pendingProjection;
 
-    public SelectProjectionBuilder(DialectRenderer renderer) {
-        this.renderer = renderer;
+    public SelectProjectionBuilder(PreparedStatementSpecFactory specFactory) {
+        this.specFactory = specFactory;
         this.projections = new ArrayList<>();
         this.pendingProjection = null;
     }
@@ -401,7 +401,7 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
         }
 
         Select select = Select.of(projections.toArray(new Projection[0]));
-        SelectBuilder selectBuilder = new SelectBuilder(renderer, select);
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, select);
         return selectBuilder.from(tableName);
     }
 

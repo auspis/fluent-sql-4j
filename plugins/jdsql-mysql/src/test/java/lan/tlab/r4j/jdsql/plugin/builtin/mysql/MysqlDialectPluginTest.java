@@ -38,7 +38,7 @@ class MysqlDialectPluginTest {
         DSL dsl = plugin.createDSL();
 
         assertThat(dsl).isNotNull();
-        assertThat(dsl.getRenderer()).isNotNull();
+        assertThat(dsl.getSpecFactory()).isNotNull();
     }
 
     @Test
@@ -71,9 +71,9 @@ class MysqlDialectPluginTest {
 
         // Verify DSL is configured for MySQL
         assertThat(dsl).isNotNull();
-        assertThat(dsl.getRenderer()).isNotNull();
-        // The renderer should support MySQL-specific features
-        assertThat(dsl.getRenderer().toString()).isNotNull();
+        assertThat(dsl.getSpecFactory()).isNotNull();
+        // The specFactory should support MySQL-specific features
+        assertThat(dsl.getSpecFactory().toString()).isNotNull();
     }
 
     @Test
@@ -121,6 +121,6 @@ class MysqlDialectPluginTest {
 
         // Verify it returns MySQLDSL, not base DSL
         assertThat(dsl).isInstanceOf(lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL.class);
-        assertThat(dsl.getRenderer()).isNotNull();
+        assertThat(dsl.getSpecFactory()).isNotNull();
     }
 }

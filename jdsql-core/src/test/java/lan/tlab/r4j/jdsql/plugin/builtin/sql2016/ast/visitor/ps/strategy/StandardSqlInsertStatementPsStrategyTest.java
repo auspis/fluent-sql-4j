@@ -12,7 +12,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.dml.statement.InsertStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ class StandardSqlInsertStatementPsStrategyTest {
         InsertStatement stmt =
                 InsertStatement.builder().table(table).data(defaultValues).build();
 
-        PsDto result = strategy.handle(stmt, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(stmt, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("INSERT INTO \"User\" DEFAULT VALUES");
         assertThat(result.parameters()).isEmpty();
@@ -55,7 +55,7 @@ class StandardSqlInsertStatementPsStrategyTest {
                 .data(insertValues)
                 .build();
 
-        PsDto result = strategy.handle(stmt, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(stmt, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("INSERT INTO \"User\" (\"name\") VALUES (?)");
         assertThat(result.parameters()).containsExactly("John");
@@ -77,7 +77,7 @@ class StandardSqlInsertStatementPsStrategyTest {
                 .data(insertValues)
                 .build();
 
-        PsDto result = strategy.handle(stmt, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(stmt, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("INSERT INTO \"User\" (\"id\", \"name\", \"email\") VALUES (?, ?, ?)");
         assertThat(result.parameters()).containsExactly(1, "John", "john@example.com");
@@ -100,7 +100,7 @@ class StandardSqlInsertStatementPsStrategyTest {
                 .data(insertValues)
                 .build();
 
-        PsDto result = strategy.handle(stmt, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(stmt, visitor, ctx);
 
         assertThat(result.sql())
                 .isEqualTo("INSERT INTO \"Product\" (\"id\", \"name\", \"price\", \"active\") VALUES (?, ?, ?, ?)");
@@ -120,7 +120,7 @@ class StandardSqlInsertStatementPsStrategyTest {
                 .data(insertValues)
                 .build();
 
-        PsDto result = strategy.handle(stmt, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(stmt, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("INSERT INTO \"order_items\" (\"item_id\") VALUES (?)");
         assertThat(result.parameters()).containsExactly(42);

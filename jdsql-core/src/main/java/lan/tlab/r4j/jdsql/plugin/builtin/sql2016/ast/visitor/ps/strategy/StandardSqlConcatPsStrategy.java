@@ -6,19 +6,19 @@ import java.util.stream.Collectors;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Concat;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ConcatPsStrategy;
 
 public class StandardSqlConcatPsStrategy implements ConcatPsStrategy {
 
     @Override
-    public PsDto handle(Concat concat, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Concat concat, PreparedStatementRenderer renderer, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
 
         // Visit all expressions to get their SQL and parameters
         List<String> sqlExpressions = concat.stringExpressions().stream()
                 .map(expr -> {
-                    PsDto exprDto = expr.accept(renderer, ctx);
+                    PreparedStatementSpec exprDto = expr.accept(renderer, ctx);
                     allParameters.addAll(exprDto.parameters());
                     return exprDto.sql();
                 })
@@ -36,6 +36,6 @@ public class StandardSqlConcatPsStrategy implements ConcatPsStrategy {
             sql = "CONCAT_WS(?, " + String.join(", ", sqlExpressions) + ")";
         }
 
-        return new PsDto(sql, allParameters);
+        return new PreparedStatementSpec(sql, allParameters);
     }
 }

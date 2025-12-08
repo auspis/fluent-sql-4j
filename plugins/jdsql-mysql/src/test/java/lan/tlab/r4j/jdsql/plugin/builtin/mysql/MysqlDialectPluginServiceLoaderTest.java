@@ -72,6 +72,6 @@ class MysqlDialectPluginServiceLoaderTest {
 
         // Verify the DSL can be created
         assertThat(mysqlPlugin.createDSL()).isNotNull();
-        assertThat(mysqlPlugin.createDSL().getRenderer()).isNotNull();
+        assertThat(mysqlPlugin.createDSL().getSpecFactory()).isNotNull();
     }
 }

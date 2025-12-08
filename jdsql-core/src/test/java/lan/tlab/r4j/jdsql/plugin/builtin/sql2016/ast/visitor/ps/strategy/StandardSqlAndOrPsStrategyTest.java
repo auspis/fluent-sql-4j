@@ -8,20 +8,20 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlAndOrPsStrategyTest {
 
     private StandardSqlAndOrPsStrategy strategy;
-    private PreparedStatementRenderer renderer;
+    private PreparedStatementRenderer specFactory;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlAndOrPsStrategy();
-        renderer = new PreparedStatementRenderer();
+        specFactory = new PreparedStatementRenderer();
         ctx = new AstContext();
     }
 
@@ -31,7 +31,7 @@ class StandardSqlAndOrPsStrategyTest {
                 Comparison.eq(ColumnReference.of("User", "name"), Literal.of("John")),
                 Comparison.gt(ColumnReference.of("User", "age"), Literal.of(18)));
 
-        PsDto result = strategy.handle(andExpression, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(andExpression, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"name\" = ?) AND (\"age\" > ?)");
         assertThat(result.parameters()).containsExactly("John", 18);
@@ -43,7 +43,7 @@ class StandardSqlAndOrPsStrategyTest {
                 Comparison.eq(ColumnReference.of("User", "status"), Literal.of("active")),
                 Comparison.eq(ColumnReference.of("User", "status"), Literal.of("pending")));
 
-        PsDto result = strategy.handle(orExpression, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(orExpression, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"status\" = ?) OR (\"status\" = ?)");
         assertThat(result.parameters()).containsExactly("active", "pending");
@@ -56,7 +56,7 @@ class StandardSqlAndOrPsStrategyTest {
                 Comparison.lt(ColumnReference.of("User", "age"), Literal.of(65)),
                 Comparison.eq(ColumnReference.of("User", "status"), Literal.of("active")));
 
-        PsDto result = strategy.handle(andExpression, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(andExpression, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"age\" > ?) AND (\"age\" < ?) AND (\"status\" = ?)");
         assertThat(result.parameters()).containsExactly(18, 65, "active");
@@ -69,7 +69,7 @@ class StandardSqlAndOrPsStrategyTest {
                 Comparison.eq(ColumnReference.of("User", "role"), Literal.of("moderator")),
                 Comparison.eq(ColumnReference.of("User", "role"), Literal.of("editor")));
 
-        PsDto result = strategy.handle(orExpression, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(orExpression, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"role\" = ?) OR (\"role\" = ?) OR (\"role\" = ?)");
         assertThat(result.parameters()).containsExactly("admin", "moderator", "editor");
@@ -83,7 +83,7 @@ class StandardSqlAndOrPsStrategyTest {
 
         AndOr outerAnd = AndOr.and(Comparison.gt(ColumnReference.of("User", "age"), Literal.of(18)), innerOr);
 
-        PsDto result = strategy.handle(outerAnd, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(outerAnd, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"age\" > ?) AND ((\"role\" = ?) OR (\"role\" = ?))");
         assertThat(result.parameters()).containsExactly(18, "admin", "moderator");
@@ -97,7 +97,7 @@ class StandardSqlAndOrPsStrategyTest {
 
         AndOr outerOr = AndOr.or(Comparison.eq(ColumnReference.of("User", "role"), Literal.of("admin")), innerAnd);
 
-        PsDto result = strategy.handle(outerOr, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(outerOr, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"role\" = ?) OR ((\"age\" > ?) AND (\"verified\" = ?))");
         assertThat(result.parameters()).containsExactly("admin", 25, true);
@@ -115,7 +115,7 @@ class StandardSqlAndOrPsStrategyTest {
 
         AndOr complexExpression = AndOr.and(leftOr, rightAnd);
 
-        PsDto result = strategy.handle(complexExpression, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(complexExpression, specFactory, ctx);
 
         assertThat(result.sql())
                 .isEqualTo("((\"status\" = ?) OR (\"status\" = ?)) AND ((\"score\" > ?) AND (\"score\" < ?))");
@@ -129,7 +129,7 @@ class StandardSqlAndOrPsStrategyTest {
                 Comparison.gte(ColumnReference.of("User", "created_at"), Literal.of("2023-01-01")),
                 Comparison.lte(ColumnReference.of("User", "last_login"), Literal.of("2024-12-31")));
 
-        PsDto result = strategy.handle(andExpression, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(andExpression, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"status\" <> ?) AND (\"created_at\" >= ?) AND (\"last_login\" <= ?)");
         assertThat(result.parameters()).containsExactly("deleted", "2023-01-01", "2024-12-31");
@@ -142,7 +142,7 @@ class StandardSqlAndOrPsStrategyTest {
                 Comparison.gt(ColumnReference.of("User", "score"), Literal.of(500)),
                 Comparison.lt(ColumnReference.of("User", "days_inactive"), Literal.of(7)));
 
-        PsDto result = strategy.handle(orExpression, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(orExpression, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("(\"priority\" = ?) OR (\"score\" > ?) OR (\"days_inactive\" < ?)");
         assertThat(result.parameters()).containsExactly("high", 500, 7);

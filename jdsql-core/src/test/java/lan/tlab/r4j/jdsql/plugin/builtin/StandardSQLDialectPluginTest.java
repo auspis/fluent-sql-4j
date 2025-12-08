@@ -39,7 +39,7 @@ class StandardSQLDialectPluginTest {
         DSL dsl = plugin.createDSL();
 
         assertThat(dsl).isNotNull();
-        assertThat(dsl.getRenderer()).isNotNull();
+        assertThat(dsl.getSpecFactory()).isNotNull();
     }
 
     @Test
@@ -72,9 +72,9 @@ class StandardSQLDialectPluginTest {
 
         // Verify DSL is configured for standard SQL:2008
         assertThat(dsl).isNotNull();
-        assertThat(dsl.getRenderer()).isNotNull();
-        // The renderer should support standard SQL features
-        assertThat(dsl.getRenderer().toString()).isNotNull();
+        assertThat(dsl.getSpecFactory()).isNotNull();
+        // The specFactory should support standard SQL features
+        assertThat(dsl.getSpecFactory().toString()).isNotNull();
     }
 
     @Test

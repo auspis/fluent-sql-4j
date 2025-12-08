@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 
 /**
@@ -25,12 +25,13 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 public class MysqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsStrategy {
 
     @Override
-    public PsDto handle(CustomFunctionCall functionCall, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            CustomFunctionCall functionCall, PreparedStatementRenderer renderer, AstContext ctx) {
         List<Object> allParams = new ArrayList<>();
 
         String args = functionCall.arguments().stream()
                 .map(arg -> {
-                    PsDto argDto = arg.accept(renderer, ctx);
+                    PreparedStatementSpec argDto = arg.accept(renderer, ctx);
                     allParams.addAll(argDto.parameters());
                     return argDto.sql();
                 })
@@ -74,6 +75,6 @@ public class MysqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsSt
         }
 
         result.append(")");
-        return new PsDto(result.toString(), allParams);
+        return new PreparedStatementSpec(result.toString(), allParams);
     }
 }

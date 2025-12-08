@@ -5,13 +5,14 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.DateArithmetic;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 
 public class StandardSqlDateArithmeticPsStrategy implements DateArithmeticPsStrategy {
 
     @Override
-    public PsDto handle(DateArithmetic dateArithmetic, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            DateArithmetic dateArithmetic, PreparedStatementRenderer renderer, AstContext ctx) {
         var dateExpressionResult = dateArithmetic.dateExpression().accept(renderer, ctx);
         var intervalResult = dateArithmetic.interval().accept(renderer, ctx);
 
@@ -22,6 +23,6 @@ public class StandardSqlDateArithmeticPsStrategy implements DateArithmeticPsStra
         String operation = dateArithmetic.isAddition() ? "DATEADD" : "DATESUB";
         String sql = String.format("%s(%s, %s)", operation, intervalResult.sql(), dateExpressionResult.sql());
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

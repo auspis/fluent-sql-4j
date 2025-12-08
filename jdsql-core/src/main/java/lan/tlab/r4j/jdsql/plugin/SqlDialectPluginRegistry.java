@@ -9,7 +9,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.functional.Result;
@@ -182,22 +182,22 @@ public final class SqlDialectPluginRegistry {
     }
 
     /**
-     * Retrieves a {@link DialectRenderer} for the specified SQL dialect without version matching.
+     * Retrieves a {@link PreparedStatementSpecFactory} for the specified SQL dialect without version matching.
      * <p>
      * This method returns the first available plugin for the given dialect, regardless of version.
-     * If you need version-specific rendering, use {@link #getDialectRenderer(String, String)} instead.
+     * If you need version-specific rendering, use {@link #getSpecFactory(String, String)} instead.
      * <p>
      * The dialect name is matched case-insensitively.
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @return a result containing the renderer, or a failure if the dialect is not supported
      */
-    public Result<DialectRenderer> getRenderer(String dialect) {
-        return getDialectRenderer(dialect, null);
+    public Result<PreparedStatementSpecFactory> getRenderer(String dialect) {
+        return getSpecFactory(dialect, null);
     }
 
     /**
-     * Retrieves a {@link DialectRenderer} for the specified SQL dialect and version.
+     * Retrieves a {@link PreparedStatementSpecFactory} for the specified SQL dialect and version.
      * <p>
      * The renderer encapsulates both SQL and PreparedStatement rendering,
      * ensuring consistency between SQL generation and prepared statement creation.
@@ -216,19 +216,19 @@ public final class SqlDialectPluginRegistry {
      * <p>
      * <b>Example with SemVer:</b>
      * <pre>{@code
-     * Result<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
+     * Result<PreparedStatementSpecFactory> result = registry.getRenderer("mysql", "8.0.35");
      * }</pre>
      * <p>
      * <b>Example with non-SemVer:</b>
      * <pre>{@code
-     * Result<DialectRenderer> result = registry.getRenderer("standardsql", "2008");
+     * Result<PreparedStatementSpecFactory> result = registry.getRenderer("standardsql", "2008");
      * }</pre>
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @param version the database version, may be {@code null} to match any version
      * @return a result containing the renderer, or a failure if no matching plugin is found
      */
-    public Result<DialectRenderer> getDialectRenderer(String dialect, String version) {
+    public Result<PreparedStatementSpecFactory> getSpecFactory(String dialect, String version) {
         if (dialect == null) {
             return new Failure<>("Dialect name must not be null");
         }
@@ -248,7 +248,7 @@ public final class SqlDialectPluginRegistry {
             logMultipleMatches(dialect, version, matchingPlugins);
         }
 
-        return new Success<>(matchingPlugins.get(0).createDSL().getRenderer());
+        return new Success<>(matchingPlugins.get(0).createDSL().getSpecFactory());
     }
 
     /**
@@ -261,7 +261,7 @@ public final class SqlDialectPluginRegistry {
      * @return a {@link lan.tlab.r4j.jdsql.functional.Result} containing either the PS renderer or an error message
      */
     public Result<PreparedStatementRenderer> getPsRenderer(String dialect, String version) {
-        return getDialectRenderer(dialect, version).map(DialectRenderer::psRenderer);
+        return getSpecFactory(dialect, version).map(PreparedStatementSpecFactory::psRenderer);
     }
 
     /**
