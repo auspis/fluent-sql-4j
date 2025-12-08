@@ -1,4 +1,4 @@
-package lan.tlab.r4j.jdsql.dsl;
+package lan.tlab.r4j.jdsql.dsl.clause;
 
 import java.util.function.Function;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
