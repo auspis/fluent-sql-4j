@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.CurrentDate;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class StandardSqlCurrentDatePsStrategyTest {
         CurrentDate currentDate = new CurrentDate();
 
         // When
-        PsDto result = strategy.handle(currentDate, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(currentDate, visitor, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CURRENT_DATE");
@@ -41,8 +41,8 @@ class StandardSqlCurrentDatePsStrategyTest {
         CurrentDate currentDate = new CurrentDate();
 
         // When - multiple calls should return same result
-        PsDto result1 = strategy.handle(currentDate, visitor, ctx);
-        PsDto result2 = strategy.handle(currentDate, visitor, ctx);
+        PreparedStatementSpec result1 = strategy.handle(currentDate, visitor, ctx);
+        PreparedStatementSpec result2 = strategy.handle(currentDate, visitor, ctx);
 
         // Then
         assertThat(result1.sql()).isEqualTo("CURRENT_DATE");

@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.number.Round;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class StandardSqlRoundPsStrategyTest {
     void roundWithLiteralOnly() {
         Round round = Round.of(Literal.of(3.14159));
 
-        PsDto result = strategy.handle(round, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(round, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("ROUND(?)");
         assertThat(result.parameters()).containsExactly(3.14159);
@@ -38,7 +38,7 @@ class StandardSqlRoundPsStrategyTest {
     void roundWithLiteralAndDecimalPlaces() {
         Round round = new Round(Literal.of(3.14159), Literal.of(2));
 
-        PsDto result = strategy.handle(round, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(round, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("ROUND(?, ?)");
         assertThat(result.parameters()).containsExactly(3.14159, 2);
@@ -48,7 +48,7 @@ class StandardSqlRoundPsStrategyTest {
     void roundWithColumnOnly() {
         Round round = Round.of(ColumnReference.of("products", "price"));
 
-        PsDto result = strategy.handle(round, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(round, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("ROUND(\"price\")");
         assertThat(result.parameters()).isEmpty();
@@ -58,7 +58,7 @@ class StandardSqlRoundPsStrategyTest {
     void roundWithColumnAndDecimalPlaces() {
         Round round = Round.of(ColumnReference.of("products", "price"), 2);
 
-        PsDto result = strategy.handle(round, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(round, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("ROUND(\"price\", ?)");
         assertThat(result.parameters()).containsExactly(2);
@@ -68,7 +68,7 @@ class StandardSqlRoundPsStrategyTest {
     void roundWithMixedExpressions() {
         Round round = new Round(ColumnReference.of("orders", "amount"), Literal.of(3));
 
-        PsDto result = strategy.handle(round, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(round, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("ROUND(\"amount\", ?)");
         assertThat(result.parameters()).containsExactly(3);

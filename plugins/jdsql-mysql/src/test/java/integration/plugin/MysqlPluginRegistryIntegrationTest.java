@@ -3,7 +3,7 @@ package integration.plugin;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.functional.Result;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
@@ -52,47 +52,50 @@ class MysqlPluginRegistryIntegrationTest {
         SqlDialectPluginRegistry newRegistry = emptyRegistry.register(plugin);
 
         assertThat(newRegistry.isSupported(MysqlDialectPlugin.DIALECT_NAME)).isTrue();
-        Result<DialectRenderer> result = newRegistry.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
+        Result<PreparedStatementSpecFactory> result =
+                newRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
         assertThat(result).isInstanceOf(Result.Success.class);
     }
 
     @Test
     void getRenderer() {
-        Result<DialectRenderer> result = pluginRegistry.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
+        Result<PreparedStatementSpecFactory> result =
+                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
 
         assertThat(result).isInstanceOf(Result.Success.class);
-        DialectRenderer renderer = result.orElseThrow();
-        assertThat(renderer).isNotNull();
+        PreparedStatementSpecFactory specFactory = result.orElseThrow();
+        assertThat(specFactory).isNotNull();
     }
 
     @Test
     void versionMatching() {
         // Should match MySQL 8.x versions (using ^8.0.0 range)
-        Result<DialectRenderer> version800 =
-                pluginRegistry.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "8.0.0");
+        Result<PreparedStatementSpecFactory> version800 =
+                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.0");
         assertThat(version800).isInstanceOf(Result.Success.class);
 
-        Result<DialectRenderer> version8035 =
-                pluginRegistry.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
+        Result<PreparedStatementSpecFactory> version8035 =
+                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
         assertThat(version8035).isInstanceOf(Result.Success.class);
 
-        Result<DialectRenderer> version810 =
-                pluginRegistry.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "8.1.0");
+        Result<PreparedStatementSpecFactory> version810 =
+                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.1.0");
         assertThat(version810).isInstanceOf(Result.Success.class);
 
         // Should NOT match MySQL 5.7 or 9.0
-        Result<DialectRenderer> version57 =
-                pluginRegistry.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "5.7.42");
+        Result<PreparedStatementSpecFactory> version57 =
+                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "5.7.42");
         assertThat(version57).isInstanceOf(Result.Failure.class);
 
-        Result<DialectRenderer> version90 = pluginRegistry.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, "9.0.0");
+        Result<PreparedStatementSpecFactory> version90 =
+                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "9.0.0");
         assertThat(version90).isInstanceOf(Result.Failure.class);
     }
 
     @Test
     void getRendererWithoutVersion() {
         // When version is not specified, should return available plugin
-        Result<DialectRenderer> result = pluginRegistry.getRenderer(MysqlDialectPlugin.DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result = pluginRegistry.getRenderer(MysqlDialectPlugin.DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();

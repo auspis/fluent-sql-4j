@@ -6,14 +6,14 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.NullScalarExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.number.Round;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.RoundPsStrategy;
 
 public class StandardSqlRoundPsStrategy implements RoundPsStrategy {
 
     @Override
-    public PsDto handle(Round round, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto numericResult = round.numericExpression().accept(renderer, ctx);
+    public PreparedStatementSpec handle(Round round, PreparedStatementRenderer renderer, AstContext ctx) {
+        PreparedStatementSpec numericResult = round.numericExpression().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>(numericResult.parameters());
         String sql;
@@ -24,11 +24,11 @@ public class StandardSqlRoundPsStrategy implements RoundPsStrategy {
             sql = String.format("ROUND(%s)", numericResult.sql());
         } else {
             // ROUND with two parameters
-            PsDto decimalPlacesResult = round.decimalPlaces().accept(renderer, ctx);
+            PreparedStatementSpec decimalPlacesResult = round.decimalPlaces().accept(renderer, ctx);
             parameters.addAll(decimalPlacesResult.parameters());
             sql = String.format("ROUND(%s, %s)", numericResult.sql(), decimalPlacesResult.sql());
         }
 
-        return new PsDto(sql, parameters);
+        return new PreparedStatementSpec(sql, parameters);
     }
 }

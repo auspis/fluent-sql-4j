@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,14 +25,14 @@ import org.mockito.ArgumentCaptor;
 
 class SelectBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -42,7 +42,7 @@ class SelectBuilderTest {
     @Test
     void ok() throws SQLException {
         PreparedStatement result =
-                new SelectBuilder(renderer, "name", "email").from("users").buildPreparedStatement(connection);
+                new SelectBuilder(specFactory, "name", "email").from("users").buildPreparedStatement(connection);
 
         assertThat(result).isSameAs(ps);
         assertThat(sqlCaptor.getValue()).isEqualTo("SELECT \"name\", \"email\" FROM \"users\"");
@@ -54,7 +54,7 @@ class SelectBuilderTest {
     @Test
     void star() throws SQLException {
         PreparedStatement result =
-                new SelectBuilder(renderer, "*").from("products").buildPreparedStatement(connection);
+                new SelectBuilder(specFactory, "*").from("products").buildPreparedStatement(connection);
 
         assertThat(result).isSameAs(ps);
         assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"products\"");
@@ -62,7 +62,7 @@ class SelectBuilderTest {
 
     @Test
     void fromWithAlias() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "name", "email")
+        PreparedStatement result = new SelectBuilder(specFactory, "name", "email")
                 .from("users")
                 .as("u")
                 .where()
@@ -81,7 +81,7 @@ class SelectBuilderTest {
 
     @Test
     void where() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("age")
@@ -95,7 +95,7 @@ class SelectBuilderTest {
 
     @Test
     void and() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "name", "email")
+        PreparedStatement result = new SelectBuilder(specFactory, "name", "email")
                 .from("users")
                 .where()
                 .column("age")
@@ -119,7 +119,7 @@ class SelectBuilderTest {
 
     @Test
     void or() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("role")
@@ -137,7 +137,7 @@ class SelectBuilderTest {
 
     @Test
     void andOr() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("status")
@@ -160,7 +160,7 @@ class SelectBuilderTest {
 
     @Test
     void orderBy() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "name", "age")
+        PreparedStatement result = new SelectBuilder(specFactory, "name", "age")
                 .from("users")
                 .orderBy("name")
                 .buildPreparedStatement(connection);
@@ -171,7 +171,7 @@ class SelectBuilderTest {
 
     @Test
     void orderByDesc() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .orderByDesc("created_at")
                 .buildPreparedStatement(connection);
@@ -181,21 +181,21 @@ class SelectBuilderTest {
 
     @Test
     void fetch() throws SQLException {
-        new SelectBuilder(renderer, "*").from("users").fetch(10).buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, "*").from("users").fetch(10).buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"users\" FETCH NEXT 10 ROWS ONLY");
     }
 
     @Test
     void fetchWithOffset() throws SQLException {
-        new SelectBuilder(renderer, "*").from("users").fetch(10).offset(20).buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, "*").from("users").fetch(10).offset(20).buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"users\" OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY");
     }
 
     @Test
     void offsetBeforeFetch() throws SQLException {
-        PreparedStatement sql = new SelectBuilder(renderer, "*")
+        PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .offset(15)
                 .fetch(5)
@@ -211,7 +211,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetZero() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .fetch(5)
                 .offset(0)
@@ -223,7 +223,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetOverridesOnMultipleCalls() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .offset(10)
                 .offset(20)
@@ -236,7 +236,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetPreservedAcrossFetchChanges() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .fetch(10)
                 .offset(25)
@@ -249,7 +249,7 @@ class SelectBuilderTest {
 
     @Test
     void offsetPrecisionMaintained() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .offset(23)
                 .fetch(10)
@@ -261,7 +261,7 @@ class SelectBuilderTest {
 
     @Test
     void fullSelectQuery() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "name", "email", "age")
+        PreparedStatement result = new SelectBuilder(specFactory, "name", "email", "age")
                 .from("users")
                 .where()
                 .column("status")
@@ -293,7 +293,7 @@ class SelectBuilderTest {
 
     @Test
     void allComparisonOperators() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("products")
                 .where()
                 .column("price")
@@ -329,43 +329,48 @@ class SelectBuilderTest {
 
     @Test
     void fromNotSpecified() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").buildPreparedStatement(connection))
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").buildPreparedStatement(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified");
     }
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from(""))
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("TableIdentifier name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() ->
-                        new SelectBuilder(renderer, "*").from("users").where().column(""))
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
+                        .from("users")
+                        .where()
+                        .column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void invalidAlias() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("users").as(""))
+        assertThatThrownBy(
+                        () -> new SelectBuilder(specFactory, "*").from("users").as(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty");
     }
 
     @Test
     void invalidFetch() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("users").fetch(-1))
+        assertThatThrownBy(
+                        () -> new SelectBuilder(specFactory, "*").from("users").fetch(-1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Fetch rows must be positive, got: -1");
     }
 
     @Test
     void invalidOffset() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("users").offset(-5))
+        assertThatThrownBy(
+                        () -> new SelectBuilder(specFactory, "*").from("users").offset(-5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Offset must be non-negative, got: -5");
     }
@@ -443,13 +448,13 @@ class SelectBuilderTest {
 
     @Test
     void fromSubquery() throws SQLException {
-        SelectBuilder subquery = new SelectBuilder(renderer, "id", "name")
+        SelectBuilder subquery = new SelectBuilder(specFactory, "id", "name")
                 .from("users")
                 .where()
                 .column("age")
                 .gt(18);
 
-        new SelectBuilder(renderer, "*").from(subquery, "u").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, "*").from(subquery, "u").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -463,13 +468,13 @@ class SelectBuilderTest {
 
     @Test
     void fromSubqueryWithWhere() throws SQLException {
-        SelectBuilder subquery = new SelectBuilder(renderer, "id", "total")
+        SelectBuilder subquery = new SelectBuilder(specFactory, "id", "total")
                 .from("orders")
                 .where()
                 .column("status")
                 .eq("completed");
 
-        PreparedStatement sql = new SelectBuilder(renderer, "*")
+        PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from(subquery, "o")
                 .where()
                 .column("total")
@@ -490,13 +495,13 @@ class SelectBuilderTest {
 
     @Test
     void whereWithScalarSubquery() throws SQLException {
-        SelectBuilder subquery = new SelectBuilder(renderer, "*")
+        SelectBuilder subquery = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("age")
                 .gt(50);
 
-        PreparedStatement result = new SelectBuilder(renderer, "name")
+        PreparedStatement result = new SelectBuilder(specFactory, "name")
                 .from("employees")
                 .where()
                 .column("age")
@@ -515,9 +520,9 @@ class SelectBuilderTest {
 
     @Test
     void whereWithScalarSubqueryEquals() throws SQLException {
-        SelectBuilder maxAgeSubquery = new SelectBuilder(renderer, "*").from("users");
+        SelectBuilder maxAgeSubquery = new SelectBuilder(specFactory, "*").from("users");
 
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("employees")
                 .where()
                 .column("age")
@@ -535,30 +540,30 @@ class SelectBuilderTest {
 
     @Test
     void fromSubqueryNullSubquery() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from((SelectBuilder) null, "alias"))
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from((SelectBuilder) null, "alias"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Subquery cannot be null");
     }
 
     @Test
     void fromSubqueryNullAlias() {
-        SelectBuilder subquery = new SelectBuilder(renderer, "*").from("users");
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from(subquery, null))
+        SelectBuilder subquery = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from(subquery, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty for subquery");
     }
 
     @Test
     void fromSubqueryEmptyAlias() {
-        SelectBuilder subquery = new SelectBuilder(renderer, "*").from("users");
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from(subquery, ""))
+        SelectBuilder subquery = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from(subquery, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty for subquery");
     }
 
     @Test
     void havingWithSingleCondition() throws SQLException {
-        PreparedStatement sql = new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("age")
                 .having("age")
@@ -575,7 +580,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithAndCondition() throws SQLException {
-        PreparedStatement sql = new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("age")
                 .having("age")
@@ -597,7 +602,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithOrCondition() throws SQLException {
-        PreparedStatement sql = new SelectBuilder(renderer, "*")
+        PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("status")
                 .having("status")
@@ -621,7 +626,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithComplexConditions() throws SQLException {
-        PreparedStatement sql = new SelectBuilder(renderer, "*")
+        PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
                 .having("customer_id")
@@ -650,7 +655,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithWhereAndOrderBy() throws SQLException {
-        PreparedStatement sql = new SelectBuilder(renderer, "*")
+        PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("products")
                 .where()
                 .column("category")
@@ -677,7 +682,7 @@ class SelectBuilderTest {
 
     @Test
     void invalidHavingColumn() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
                         .having(""))
@@ -689,7 +694,7 @@ class SelectBuilderTest {
 
     @Test
     void havingStringComparisons() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category")
                 .having("category")
@@ -699,7 +704,7 @@ class SelectBuilderTest {
         assertThat(sqlCaptor.getValue()).contains("HAVING \"category\" = ?");
         verify(ps).setObject(1, "electronics");
 
-        ps = new SelectBuilder(renderer, "*")
+        ps = new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category")
                 .having("category")
@@ -713,7 +718,7 @@ class SelectBuilderTest {
     @Test
     void havingNumberComparisons() throws SQLException {
         // Test additional number comparison operators
-        PreparedStatement ps = new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("total")
                 .having("total")
@@ -722,7 +727,7 @@ class SelectBuilderTest {
 
         assertThat(sqlCaptor.getValue()).contains("HAVING \"total\" >= ?");
 
-        ps = new SelectBuilder(renderer, "*")
+        ps = new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("total")
                 .having("total")
@@ -734,7 +739,7 @@ class SelectBuilderTest {
 
     @Test
     void havingBooleanComparisons() throws SQLException {
-        PreparedStatement ps = new SelectBuilder(renderer, "*")
+        PreparedStatement ps = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("active")
                 .having("active")
@@ -744,7 +749,7 @@ class SelectBuilderTest {
         assertThat(sqlCaptor.getValue()).contains("HAVING \"active\" = ?");
         verify(ps).setObject(1, true);
 
-        ps = new SelectBuilder(renderer, "*")
+        ps = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("active")
                 .having("active")
@@ -757,7 +762,7 @@ class SelectBuilderTest {
 
     @Test
     void havingNullChecks() throws SQLException {
-        PreparedStatement ps = new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("email")
                 .having("email")
@@ -766,7 +771,7 @@ class SelectBuilderTest {
 
         assertThat(sqlCaptor.getValue()).contains("HAVING \"email\" IS NULL");
 
-        ps = new SelectBuilder(renderer, "*")
+        ps = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("email")
                 .having("email")
@@ -778,7 +783,7 @@ class SelectBuilderTest {
 
     @Test
     void havingBetweenNumbers() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("price")
                 .having("price")
@@ -793,7 +798,7 @@ class SelectBuilderTest {
 
     @Test
     void havingBetweenDates() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("order_date")
                 .having("order_date")
@@ -809,13 +814,13 @@ class SelectBuilderTest {
     @Test
     void havingSubqueryComparison() throws SQLException {
         // Create a simple subquery without aggregate functions
-        SelectBuilder subquery = new SelectBuilder(renderer, "budget")
+        SelectBuilder subquery = new SelectBuilder(specFactory, "budget")
                 .from("departments")
                 .where()
                 .column("active")
                 .eq(true);
 
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("departments")
                 .groupBy("budget")
                 .having("budget")
@@ -831,7 +836,7 @@ class SelectBuilderTest {
 
     @Test
     void havingWithNullSubquery_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
                         .having("age")
@@ -842,7 +847,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorWithStrings() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category")
                 .having("category")
@@ -857,7 +862,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorWithNumbers() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
                 .having("customer_id")
@@ -872,7 +877,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorWithBooleans() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("active")
                 .having("active")
@@ -885,7 +890,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorWithDates() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("events")
                 .groupBy("event_date")
                 .having("event_date")
@@ -899,7 +904,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorWithAndCondition() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category", "brand")
                 .having("category")
@@ -917,7 +922,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorWithOrCondition() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "*")
+        PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("status")
                 .having("status")
@@ -935,7 +940,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorEmptyValues_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
                         .having("age")
@@ -946,7 +951,7 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorNullValues_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*")
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
                         .having("age")
@@ -957,7 +962,7 @@ class SelectBuilderTest {
 
     @Test
     void countStar() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .countStar()
                 .from("users")
                 .buildPreparedStatement(connection);
@@ -970,7 +975,7 @@ class SelectBuilderTest {
 
     @Test
     void countStarWithAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .countStar()
                 .as("total")
                 .from("users")
@@ -984,7 +989,7 @@ class SelectBuilderTest {
 
     @Test
     void sum() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("amount")
                 .from("orders")
                 .buildPreparedStatement(connection);
@@ -997,7 +1002,7 @@ class SelectBuilderTest {
 
     @Test
     void sumWithAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("amount")
                 .as("total_amount")
                 .from("orders")
@@ -1012,7 +1017,7 @@ class SelectBuilderTest {
 
     @Test
     void avg() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .avg("score")
                 .from("students")
                 .buildPreparedStatement(connection);
@@ -1025,7 +1030,7 @@ class SelectBuilderTest {
 
     @Test
     void avgWithAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .avg("score")
                 .as("avg_score")
                 .from("students")
@@ -1039,7 +1044,7 @@ class SelectBuilderTest {
 
     @Test
     void count() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .count("id")
                 .from("users")
                 .buildPreparedStatement(connection);
@@ -1052,7 +1057,7 @@ class SelectBuilderTest {
 
     @Test
     void countWithAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .count("id")
                 .as("user_count")
                 .from("users")
@@ -1066,7 +1071,7 @@ class SelectBuilderTest {
 
     @Test
     void countDistinct() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .countDistinct("email")
                 .from("users")
                 .buildPreparedStatement(connection);
@@ -1079,7 +1084,7 @@ class SelectBuilderTest {
 
     @Test
     void countDistinctWithAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .countDistinct("email")
                 .as("unique_emails")
                 .from("users")
@@ -1094,7 +1099,7 @@ class SelectBuilderTest {
 
     @Test
     void max() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .max("price")
                 .from("products")
                 .buildPreparedStatement(connection);
@@ -1107,7 +1112,7 @@ class SelectBuilderTest {
 
     @Test
     void maxWithAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .max("price")
                 .as("max_price")
                 .from("products")
@@ -1121,7 +1126,7 @@ class SelectBuilderTest {
 
     @Test
     void min() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .min("price")
                 .from("products")
                 .buildPreparedStatement(connection);
@@ -1134,7 +1139,7 @@ class SelectBuilderTest {
 
     @Test
     void minWithAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .min("price")
                 .as("min_price")
                 .from("products")
@@ -1148,7 +1153,7 @@ class SelectBuilderTest {
 
     @Test
     void sumWithGroupBy() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("amount")
                 .from("orders")
                 .groupBy("customer_id")
@@ -1163,7 +1168,7 @@ class SelectBuilderTest {
 
     @Test
     void countWithWhere() throws SQLException {
-        new SelectProjectionBuilder<>(renderer)
+        new SelectProjectionBuilder<>(specFactory)
                 .countStar()
                 .from("users")
                 .where()
@@ -1180,7 +1185,7 @@ class SelectBuilderTest {
 
     @Test
     void avgWithGroupByAndHaving() throws SQLException {
-        new SelectProjectionBuilder<>(renderer)
+        new SelectProjectionBuilder<>(specFactory)
                 .avg("salary")
                 .from("employees")
                 .groupBy("department")
@@ -1201,7 +1206,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithoutAliases() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("score")
                 .max("createdAt")
                 .from("users")
@@ -1216,7 +1221,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithAliases() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("score")
                 .as("total_score")
                 .max("createdAt")
@@ -1234,7 +1239,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleAggregatesWithOneAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("score")
                 .max("createdAt")
                 .as("latest")
@@ -1251,7 +1256,7 @@ class SelectBuilderTest {
 
     @Test
     void column() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("name")
                 .from("users")
                 .buildPreparedStatement(connection);
@@ -1263,7 +1268,7 @@ class SelectBuilderTest {
 
     @Test
     void columnWithAlias() throws SQLException {
-        new SelectProjectionBuilder<>(renderer)
+        new SelectProjectionBuilder<>(specFactory)
                 .column("name")
                 .as("user_name")
                 .from("users")
@@ -1277,7 +1282,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumns() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("name")
                 .column("email")
                 .from("users")
@@ -1291,7 +1296,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumnsWithAliases() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("name")
                 .as("user_name")
                 .column("email")
@@ -1308,7 +1313,7 @@ class SelectBuilderTest {
 
     @Test
     void multipleColumnsWithOneAlias() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("name")
                 .column("email")
                 .as("user_email")
@@ -1324,7 +1329,7 @@ class SelectBuilderTest {
 
     @Test
     void tableQualifiedColumn() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("users", "name")
                 .from("users")
                 .buildPreparedStatement(connection);
@@ -1336,7 +1341,7 @@ class SelectBuilderTest {
 
     @Test
     void mixedColumnsAndAggregates() throws SQLException {
-        PreparedStatement result = new SelectProjectionBuilder<>(renderer)
+        PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("name")
                 .sum("score")
                 .as("total_score")

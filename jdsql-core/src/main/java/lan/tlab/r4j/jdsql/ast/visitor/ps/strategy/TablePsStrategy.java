@@ -3,8 +3,8 @@ package lan.tlab.r4j.jdsql.ast.visitor.ps.strategy;
 import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface TablePsStrategy {
-    PsDto handle(TableIdentifier table, Visitor<PsDto> visitor, AstContext ctx);
+    PreparedStatementSpec handle(TableIdentifier table, Visitor<PreparedStatementSpec> visitor, AstContext ctx);
 }

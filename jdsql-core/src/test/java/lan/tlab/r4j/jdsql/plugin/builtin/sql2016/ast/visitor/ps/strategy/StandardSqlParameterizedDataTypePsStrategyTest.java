@@ -7,21 +7,21 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlParameterizedDataTypePsStrategyTest {
 
     private final ParameterizedDataTypePsStrategy strategy = new StandardSqlParameterizedDataTypePsStrategy();
-    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
 
     @Test
     void varcharWithLiteralLength() {
         ParameterizedDataType dataType = new ParameterizedDataType("VARCHAR", List.of(Literal.of(255)));
 
-        PsDto result = strategy.handle(dataType, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(dataType, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("VARCHAR(?)");
         assertThat(result.parameters()).hasSize(1);
@@ -32,7 +32,7 @@ class StandardSqlParameterizedDataTypePsStrategyTest {
     void decimalWithPrecisionAndScale() {
         ParameterizedDataType dataType = new ParameterizedDataType("DECIMAL", List.of(Literal.of(10), Literal.of(2)));
 
-        PsDto result = strategy.handle(dataType, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(dataType, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("DECIMAL(?, ?)");
         assertThat(result.parameters()).hasSize(2);
@@ -44,7 +44,7 @@ class StandardSqlParameterizedDataTypePsStrategyTest {
     void charWithFixedLength() {
         ParameterizedDataType dataType = new ParameterizedDataType("CHAR", List.of(Literal.of(10)));
 
-        PsDto result = strategy.handle(dataType, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(dataType, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("CHAR(?)");
         assertThat(result.parameters()).hasSize(1);
@@ -55,7 +55,7 @@ class StandardSqlParameterizedDataTypePsStrategyTest {
     void numericWithPrecision() {
         ParameterizedDataType dataType = new ParameterizedDataType("NUMERIC", List.of(Literal.of(18)));
 
-        PsDto result = strategy.handle(dataType, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(dataType, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("NUMERIC(?)");
         assertThat(result.parameters()).hasSize(1);
@@ -67,7 +67,7 @@ class StandardSqlParameterizedDataTypePsStrategyTest {
         ParameterizedDataType dataType = new ParameterizedDataType(
                 "CUSTOM_TYPE", List.of(Literal.of("param1"), Literal.of(42), Literal.of(true)));
 
-        PsDto result = strategy.handle(dataType, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(dataType, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("CUSTOM_TYPE(?, ?, ?)");
         assertThat(result.parameters()).hasSize(3);
@@ -80,7 +80,7 @@ class StandardSqlParameterizedDataTypePsStrategyTest {
     void typeWithoutParameters() {
         ParameterizedDataType dataType = new ParameterizedDataType("SOME_TYPE", List.of());
 
-        PsDto result = strategy.handle(dataType, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(dataType, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("SOME_TYPE()");
         assertThat(result.parameters()).isEmpty();

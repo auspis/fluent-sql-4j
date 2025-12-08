@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.CharLength;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlCharLengthPsStrategyTest {
@@ -20,7 +20,7 @@ class StandardSqlCharLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(charLength, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(charLength, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("CHAR_LENGTH(?)");
         assertThat(result.parameters()).containsExactly("Hello World");
@@ -33,7 +33,7 @@ class StandardSqlCharLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(charLength, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(charLength, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("CHAR_LENGTH(\"email\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -46,7 +46,7 @@ class StandardSqlCharLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(charLength, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(charLength, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("CHAR_LENGTH(\"description\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -59,7 +59,7 @@ class StandardSqlCharLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(charLength, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(charLength, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("CHAR_LENGTH(\"username\")");
         assertThat(result.parameters()).isEqualTo(List.of());

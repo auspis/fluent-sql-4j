@@ -287,7 +287,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class PreparedStatementRenderer implements Visitor<PsDto> {
+public class PreparedStatementRenderer implements Visitor<PreparedStatementSpec> {
     @Default
     private final EscapeStrategy escapeStrategy = new StandardSqlEscapeStrategy();
 
@@ -583,462 +583,462 @@ public class PreparedStatementRenderer implements Visitor<PsDto> {
     }
 
     @Override
-    public PsDto visit(InsertStatement stmt, AstContext ctx) {
+    public PreparedStatementSpec visit(InsertStatement stmt, AstContext ctx) {
         return insertStatementStrategy.handle(stmt, this, ctx);
     }
 
     @Override
-    public PsDto visit(SelectStatement stmt, AstContext ctx) {
+    public PreparedStatementSpec visit(SelectStatement stmt, AstContext ctx) {
         return selectStatementStrategy.handle(stmt, this, ctx);
     }
 
     @Override
-    public PsDto visit(Select select, AstContext ctx) {
+    public PreparedStatementSpec visit(Select select, AstContext ctx) {
         return selectClauseStrategy.handle(select, this, ctx);
     }
 
     @Override
-    public PsDto visit(TableIdentifier table, AstContext ctx) {
+    public PreparedStatementSpec visit(TableIdentifier table, AstContext ctx) {
         return tableStrategy.handle(table, this, ctx);
     }
 
     @Override
-    public PsDto visit(ColumnReference col, AstContext ctx) {
+    public PreparedStatementSpec visit(ColumnReference col, AstContext ctx) {
         return columnReferenceStrategy.handle(col, this, ctx);
     }
 
     @Override
-    public PsDto visit(Comparison cmp, AstContext ctx) {
+    public PreparedStatementSpec visit(Comparison cmp, AstContext ctx) {
         return comparisonStrategy.handle(cmp, this, ctx);
     }
 
     @Override
-    public PsDto visit(Where where, AstContext ctx) {
+    public PreparedStatementSpec visit(Where where, AstContext ctx) {
         return whereClauseStrategy.handle(where, this, ctx);
     }
 
     @Override
-    public PsDto visit(Literal<?> literal, AstContext ctx) {
+    public PreparedStatementSpec visit(Literal<?> literal, AstContext ctx) {
         return literalStrategy.handle(literal, this, ctx);
     }
 
     @Override
-    public PsDto visit(UpdateStatement updateStatement, AstContext ctx) {
+    public PreparedStatementSpec visit(UpdateStatement updateStatement, AstContext ctx) {
         return updateStatementStrategy.handle(updateStatement, this, ctx);
     }
 
     @Override
-    public PsDto visit(DeleteStatement deleteStatement, AstContext ctx) {
+    public PreparedStatementSpec visit(DeleteStatement deleteStatement, AstContext ctx) {
         return deleteStatementStrategy.handle(deleteStatement, this, ctx);
     }
 
     @Override
-    public PsDto visit(MergeStatement mergeStatement, AstContext ctx) {
+    public PreparedStatementSpec visit(MergeStatement mergeStatement, AstContext ctx) {
         return mergeStatementStrategy.handle(mergeStatement, this, ctx);
     }
 
     @Override
-    public PsDto visit(CreateTableStatement createTableStatement, AstContext ctx) {
+    public PreparedStatementSpec visit(CreateTableStatement createTableStatement, AstContext ctx) {
         return createTableStatementStrategy.handle(createTableStatement, this, ctx);
     }
 
     @Override
-    public PsDto visit(AggregateCallProjection aggregationFunctionProjection, AstContext ctx) {
+    public PreparedStatementSpec visit(AggregateCallProjection aggregationFunctionProjection, AstContext ctx) {
         return aggregationFunctionProjectionStrategy.handle(aggregationFunctionProjection, this, ctx);
     }
 
     @Override
-    public PsDto visit(ScalarExpressionProjection scalarExpressionProjection, AstContext ctx) {
+    public PreparedStatementSpec visit(ScalarExpressionProjection scalarExpressionProjection, AstContext ctx) {
         return scalarExpressionProjectionStrategy.handle(scalarExpressionProjection, this, ctx);
     }
 
     @Override
-    public PsDto visit(From clause, AstContext ctx) {
+    public PreparedStatementSpec visit(From clause, AstContext ctx) {
         return fromClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
-    public PsDto visit(OnJoin join, AstContext ctx) {
+    public PreparedStatementSpec visit(OnJoin join, AstContext ctx) {
         return onJoinStrategy.handle(join, this, ctx);
     }
 
     @Override
-    public PsDto visit(FromSubquery fromSubquery, AstContext ctx) {
+    public PreparedStatementSpec visit(FromSubquery fromSubquery, AstContext ctx) {
         return fromSubqueryStrategy.handle(fromSubquery, this, ctx);
     }
 
     @Override
-    public PsDto visit(GroupBy clause, AstContext ctx) {
+    public PreparedStatementSpec visit(GroupBy clause, AstContext ctx) {
         return groupByClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
-    public PsDto visit(Having clause, AstContext ctx) {
+    public PreparedStatementSpec visit(Having clause, AstContext ctx) {
         return havingClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
-    public PsDto visit(OrderBy clause, AstContext ctx) {
+    public PreparedStatementSpec visit(OrderBy clause, AstContext ctx) {
         return orderByClauseStrategy.handle(clause, this, ctx);
     }
 
     @Override
-    public PsDto visit(Sorting sorting, AstContext ctx) {
+    public PreparedStatementSpec visit(Sorting sorting, AstContext ctx) {
         return sortingStrategy.handle(sorting, this, ctx);
     }
 
     @Override
-    public PsDto visit(Fetch clause, AstContext ctx) {
+    public PreparedStatementSpec visit(Fetch clause, AstContext ctx) {
         return paginationStrategy.handle(clause, this, ctx);
     }
 
     @Override
-    public PsDto visit(NullPredicate expression, AstContext ctx) {
+    public PreparedStatementSpec visit(NullPredicate expression, AstContext ctx) {
         return nullPredicateStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(Between expression, AstContext ctx) {
+    public PreparedStatementSpec visit(Between expression, AstContext ctx) {
         return betweenStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(In expression, AstContext ctx) {
+    public PreparedStatementSpec visit(In expression, AstContext ctx) {
         return inStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(AndOr expression, AstContext ctx) {
+    public PreparedStatementSpec visit(AndOr expression, AstContext ctx) {
         return andOrStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(Not expression, AstContext ctx) {
+    public PreparedStatementSpec visit(Not expression, AstContext ctx) {
         return notStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(BinaryArithmeticExpression expression, AstContext ctx) {
+    public PreparedStatementSpec visit(BinaryArithmeticExpression expression, AstContext ctx) {
         return binaryArithmeticExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(UnaryArithmeticExpression expression, AstContext ctx) {
+    public PreparedStatementSpec visit(UnaryArithmeticExpression expression, AstContext ctx) {
         return unaryArithmeticExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(Cast functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Cast functionCall, AstContext ctx) {
         return castStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Concat functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Concat functionCall, AstContext ctx) {
         return concatStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(CurrentDate functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(CurrentDate functionCall, AstContext ctx) {
         return currentDateStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(CurrentDateTime functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(CurrentDateTime functionCall, AstContext ctx) {
         return currentDateTimeStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(DateArithmetic functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(DateArithmetic functionCall, AstContext ctx) {
         return dateArithmeticStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(ExtractDatePart functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(ExtractDatePart functionCall, AstContext ctx) {
         return extractDatePartStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Left functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Left functionCall, AstContext ctx) {
         return leftStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Length functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Length functionCall, AstContext ctx) {
         return lengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(CharLength functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(CharLength functionCall, AstContext ctx) {
         return charLengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(CharacterLength functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(CharacterLength functionCall, AstContext ctx) {
         return characterLengthStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Mod functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Mod functionCall, AstContext ctx) {
         return modStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(NullScalarExpression expression, AstContext ctx) {
+    public PreparedStatementSpec visit(NullScalarExpression expression, AstContext ctx) {
         return nullScalarExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(Power functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Power functionCall, AstContext ctx) {
         return powerStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Replace functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Replace functionCall, AstContext ctx) {
         return replaceStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Round functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Round functionCall, AstContext ctx) {
         return roundStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Substring functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Substring functionCall, AstContext ctx) {
         return substringStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Trim functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Trim functionCall, AstContext ctx) {
         return trimStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(UnaryNumeric functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(UnaryNumeric functionCall, AstContext ctx) {
         return unaryNumericStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(UnaryString functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(UnaryString functionCall, AstContext ctx) {
         return unaryStringStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(JsonExists functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(JsonExists functionCall, AstContext ctx) {
         return jsonExistsStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(JsonQuery functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(JsonQuery functionCall, AstContext ctx) {
         return jsonQueryStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(JsonValue functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(JsonValue functionCall, AstContext ctx) {
         return jsonValueStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(NullSetExpression expression, AstContext ctx) {
+    public PreparedStatementSpec visit(NullSetExpression expression, AstContext ctx) {
         return nullSetExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(ExceptExpression expression, AstContext ctx) {
+    public PreparedStatementSpec visit(ExceptExpression expression, AstContext ctx) {
         return exceptExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(IntersectExpression expression, AstContext ctx) {
+    public PreparedStatementSpec visit(IntersectExpression expression, AstContext ctx) {
         return intersectExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(UnionExpression expression, AstContext ctx) {
+    public PreparedStatementSpec visit(UnionExpression expression, AstContext ctx) {
         return unionExpressionStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(Alias item, AstContext ctx) {
+    public PreparedStatementSpec visit(Alias item, AstContext ctx) {
         return asStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(UpdateItem item, AstContext ctx) {
+    public PreparedStatementSpec visit(UpdateItem item, AstContext ctx) {
         return updateItemStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(ReferencesItem item, AstContext ctx) {
+    public PreparedStatementSpec visit(ReferencesItem item, AstContext ctx) {
         return referencesItemStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(TableDefinition item, AstContext ctx) {
+    public PreparedStatementSpec visit(TableDefinition item, AstContext ctx) {
         return tableDefinitionStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(ColumnDefinition item, AstContext ctx) {
+    public PreparedStatementSpec visit(ColumnDefinition item, AstContext ctx) {
         return columnDefinitionStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(SimpleDataType type, AstContext ctx) {
+    public PreparedStatementSpec visit(SimpleDataType type, AstContext ctx) {
         return simpleDataTypeStrategy.handle(type, this, ctx);
     }
 
     @Override
-    public PsDto visit(ParameterizedDataType type, AstContext ctx) {
+    public PreparedStatementSpec visit(ParameterizedDataType type, AstContext ctx) {
         return parameterizedDataTypeStrategy.handle(type, this, ctx);
     }
 
     @Override
-    public PsDto visit(PrimaryKeyDefinition constraintDefinition, AstContext ctx) {
+    public PreparedStatementSpec visit(PrimaryKeyDefinition constraintDefinition, AstContext ctx) {
         return primaryKeyDefinitionStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(IndexDefinition constraintDefinition, AstContext ctx) {
+    public PreparedStatementSpec visit(IndexDefinition constraintDefinition, AstContext ctx) {
         return indexDefinitionStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(NotNullConstraintDefinition constraintDefinition, AstContext ctx) {
+    public PreparedStatementSpec visit(NotNullConstraintDefinition constraintDefinition, AstContext ctx) {
         return notNullConstraintDefinitionStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(UniqueConstraintDefinition constraintDefinition, AstContext ctx) {
+    public PreparedStatementSpec visit(UniqueConstraintDefinition constraintDefinition, AstContext ctx) {
         return uniqueConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(ForeignKeyConstraintDefinition constraintDefinition, AstContext ctx) {
+    public PreparedStatementSpec visit(ForeignKeyConstraintDefinition constraintDefinition, AstContext ctx) {
         return foreignKeyConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(CheckConstraintDefinition constraintDefinition, AstContext ctx) {
+    public PreparedStatementSpec visit(CheckConstraintDefinition constraintDefinition, AstContext ctx) {
         return checkConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(DefaultConstraintDefinition constraintDefinition, AstContext ctx) {
+    public PreparedStatementSpec visit(DefaultConstraintDefinition constraintDefinition, AstContext ctx) {
         return defaultConstraintStrategy.handle(constraintDefinition, this, ctx);
     }
 
     @Override
-    public PsDto visit(ScalarSubquery expression, AstContext ctx) {
+    public PreparedStatementSpec visit(ScalarSubquery expression, AstContext ctx) {
         return scalarSubqueryStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(Interval interval, AstContext ctx) {
+    public PreparedStatementSpec visit(Interval interval, AstContext ctx) {
         return intervalStrategy.handle(interval, this, ctx);
     }
 
     @Override
-    public PsDto visit(AggregateCall expression, AstContext ctx) {
+    public PreparedStatementSpec visit(AggregateCall expression, AstContext ctx) {
         return aggregateCallStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(InsertValues item, AstContext ctx) {
+    public PreparedStatementSpec visit(InsertValues item, AstContext ctx) {
         return insertValuesStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(InsertSource item, AstContext ctx) {
+    public PreparedStatementSpec visit(InsertSource item, AstContext ctx) {
         return insertSourceStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(DefaultValues item, AstContext ctx) {
+    public PreparedStatementSpec visit(DefaultValues item, AstContext ctx) {
         return defaultValuesStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(MergeUsing item, AstContext ctx) {
+    public PreparedStatementSpec visit(MergeUsing item, AstContext ctx) {
         return mergeUsingStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(AliasedTableExpression item, AstContext ctx) {
+    public PreparedStatementSpec visit(AliasedTableExpression item, AstContext ctx) {
         return aliasedTableExpressionStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(WhenMatchedUpdate item, AstContext ctx) {
+    public PreparedStatementSpec visit(WhenMatchedUpdate item, AstContext ctx) {
         return whenMatchedUpdateStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(WhenMatchedDelete item, AstContext ctx) {
+    public PreparedStatementSpec visit(WhenMatchedDelete item, AstContext ctx) {
         return whenMatchedDeleteStrategy.handle(item, this, ctx);
     }
 
     @Override
-    public PsDto visit(WhenNotMatchedInsert item, AstContext ctx) {
+    public PreparedStatementSpec visit(WhenNotMatchedInsert item, AstContext ctx) {
         return whenNotMatchedInsertStrategy.handle(item, this, ctx);
     }
 
     // Handle FromSource dispatch for FROM clause
-    public PsDto visit(FromSource source, AstContext ctx) {
+    public PreparedStatementSpec visit(FromSource source, AstContext ctx) {
         return source.accept(this, ctx);
     }
 
     @Override
-    public PsDto visit(Like expression, AstContext ctx) {
+    public PreparedStatementSpec visit(Like expression, AstContext ctx) {
         return likeStrategy.handle(expression, this, ctx);
     }
 
     @Override
-    public PsDto visit(IsNull expr, AstContext ctx) {
+    public PreparedStatementSpec visit(IsNull expr, AstContext ctx) {
         return isNullStrategy.handle(expr, this, ctx);
     }
 
     @Override
-    public PsDto visit(IsNotNull expr, AstContext ctx) {
+    public PreparedStatementSpec visit(IsNotNull expr, AstContext ctx) {
         return isNotNullStrategy.handle(expr, this, ctx);
     }
 
     @Override
-    public PsDto visit(RowNumber functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(RowNumber functionCall, AstContext ctx) {
         return rowNumberStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Rank functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Rank functionCall, AstContext ctx) {
         return rankStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(DenseRank functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(DenseRank functionCall, AstContext ctx) {
         return denseRankStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Ntile functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Ntile functionCall, AstContext ctx) {
         return ntileStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Lag functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Lag functionCall, AstContext ctx) {
         return lagStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(Lead functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(Lead functionCall, AstContext ctx) {
         return leadStrategy.handle(functionCall, this, ctx);
     }
 
     @Override
-    public PsDto visit(OverClause overClause, AstContext ctx) {
+    public PreparedStatementSpec visit(OverClause overClause, AstContext ctx) {
         return overClauseStrategy.handle(overClause, this, ctx);
     }
 
     @Override
-    public PsDto visit(CustomFunctionCall functionCall, AstContext ctx) {
+    public PreparedStatementSpec visit(CustomFunctionCall functionCall, AstContext ctx) {
         return customFunctionCallStrategy.handle(functionCall, this, ctx);
     }
 }

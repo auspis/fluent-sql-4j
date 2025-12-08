@@ -5,21 +5,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.UniqueConstraintDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UniqueConstraintPsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlUniqueConstraintPsStrategyTest {
 
     private final UniqueConstraintPsStrategy strategy = new StandardSqlUniqueConstraintPsStrategy();
-    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
     private final AstContext ctx = new AstContext();
 
     @Test
     void uniqueConstraintGeneratesCorrectSql() {
         UniqueConstraintDefinition constraint = new UniqueConstraintDefinition("id", "name");
 
-        PsDto result = strategy.handle(constraint, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(constraint, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("UNIQUE (\"id\", \"name\")");
         assertThat(result.parameters()).isEmpty();
@@ -29,7 +29,7 @@ class StandardSqlUniqueConstraintPsStrategyTest {
     void uniqueConstraintSingleColumn() {
         UniqueConstraintDefinition constraint = new UniqueConstraintDefinition("email");
 
-        PsDto result = strategy.handle(constraint, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(constraint, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("UNIQUE (\"email\")");
         assertThat(result.parameters()).isEmpty();
@@ -40,8 +40,8 @@ class StandardSqlUniqueConstraintPsStrategyTest {
         UniqueConstraintDefinition constraint1 = new UniqueConstraintDefinition("col1");
         UniqueConstraintDefinition constraint2 = new UniqueConstraintDefinition("col1");
 
-        PsDto result1 = strategy.handle(constraint1, renderer, ctx);
-        PsDto result2 = strategy.handle(constraint2, renderer, ctx);
+        PreparedStatementSpec result1 = strategy.handle(constraint1, specFactory, ctx);
+        PreparedStatementSpec result2 = strategy.handle(constraint2, specFactory, ctx);
 
         assertThat(result1.sql()).isEqualTo(result2.sql());
         assertThat(result1.parameters()).isEqualTo(result2.parameters());

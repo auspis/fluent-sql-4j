@@ -5,13 +5,13 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 
 public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsStrategy {
     @Override
-    public PsDto handle(ColumnReference col, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(ColumnReference col, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
         if (renderer instanceof PreparedStatementRenderer psRenderer) {
             escapeStrategy = psRenderer.getEscapeStrategy();
@@ -19,7 +19,7 @@ public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsSt
 
         // Asterisk (*) is a special SQL wildcard and should not be escaped
         if ("*".equals(col.column())) {
-            return new PsDto("*", List.of());
+            return new PreparedStatementSpec("*", List.of());
         }
 
         // Qualify column references in JOIN, UNION, and SUBQUERY contexts to avoid ambiguity
@@ -32,6 +32,6 @@ public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsSt
         } else {
             sql = escapeStrategy.apply(col.column());
         }
-        return new PsDto(sql, List.of());
+        return new PreparedStatementSpec(sql, List.of());
     }
 }

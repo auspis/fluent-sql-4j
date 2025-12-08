@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.DefaultValues;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class StandardSqlDefaultValuesPsStrategyTest {
     void defaultValues() {
         DefaultValues defaultValues = new DefaultValues();
 
-        PsDto result = strategy.handle(defaultValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(defaultValues, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("DEFAULT VALUES");
         assertThat(result.parameters()).isEmpty();
@@ -37,7 +37,7 @@ class StandardSqlDefaultValuesPsStrategyTest {
         DefaultValues defaultValues = new DefaultValues();
         AstContext differentCtx = new AstContext();
 
-        PsDto result = strategy.handle(defaultValues, visitor, differentCtx);
+        PreparedStatementSpec result = strategy.handle(defaultValues, visitor, differentCtx);
 
         assertThat(result.sql()).isEqualTo("DEFAULT VALUES");
         assertThat(result.parameters()).isEmpty();
@@ -48,8 +48,8 @@ class StandardSqlDefaultValuesPsStrategyTest {
         DefaultValues defaultValues1 = new DefaultValues();
         DefaultValues defaultValues2 = new DefaultValues();
 
-        PsDto result1 = strategy.handle(defaultValues1, visitor, ctx);
-        PsDto result2 = strategy.handle(defaultValues2, visitor, ctx);
+        PreparedStatementSpec result1 = strategy.handle(defaultValues1, visitor, ctx);
+        PreparedStatementSpec result2 = strategy.handle(defaultValues2, visitor, ctx);
 
         assertThat(result1.sql()).isEqualTo("DEFAULT VALUES");
         assertThat(result1.parameters()).isEmpty();

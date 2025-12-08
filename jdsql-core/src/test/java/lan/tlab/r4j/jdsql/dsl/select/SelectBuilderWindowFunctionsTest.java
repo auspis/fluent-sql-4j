@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.WindowFunction;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,14 +24,14 @@ import org.mockito.ArgumentCaptor;
 
 class SelectBuilderWindowFunctionsTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -51,7 +51,7 @@ class SelectBuilderWindowFunctionsTest {
                         "row_num"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -77,7 +77,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_row_num"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -101,7 +101,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_rank"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -123,7 +123,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_dense_rank"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -147,7 +147,7 @@ class SelectBuilderWindowFunctionsTest {
                         "quartile"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -172,7 +172,7 @@ class SelectBuilderWindowFunctionsTest {
                         "prev_salary"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -198,7 +198,7 @@ class SelectBuilderWindowFunctionsTest {
                         "prev_salary"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -224,7 +224,7 @@ class SelectBuilderWindowFunctionsTest {
                         "next_salary"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -250,7 +250,7 @@ class SelectBuilderWindowFunctionsTest {
                         "next_salary"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -287,7 +287,7 @@ class SelectBuilderWindowFunctionsTest {
                         "quartile"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -315,7 +315,7 @@ class SelectBuilderWindowFunctionsTest {
                         "hire_order"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -340,7 +340,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_salary_rank"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -364,7 +364,7 @@ class SelectBuilderWindowFunctionsTest {
                         "hire_dense_rank"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -389,7 +389,7 @@ class SelectBuilderWindowFunctionsTest {
                         "decile"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -416,7 +416,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_two_back"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -445,7 +445,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_three_ahead"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -469,7 +469,7 @@ class SelectBuilderWindowFunctionsTest {
                         "id_order"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -491,7 +491,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_rank_no_order"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -518,7 +518,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_job_rank"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -548,7 +548,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_hire_quintile"))
                 .build();
 
-        new SelectBuilder(renderer, select).from("employees").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
