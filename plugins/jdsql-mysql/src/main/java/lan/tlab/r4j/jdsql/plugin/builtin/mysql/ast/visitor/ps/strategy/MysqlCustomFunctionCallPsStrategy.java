@@ -3,7 +3,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;

@@ -3,10 +3,10 @@ package lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.plugin.builtin.postgre.PostgreSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

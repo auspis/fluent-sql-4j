@@ -29,7 +29,7 @@ import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
-MysqlDSL mysql = (MysqlDSL) registry.dslFor("mysql", "8.0.35").orElseThrow();
+MysqlDSL mysql = registry.dslFor("mysql", "8.0.35", MysqlDSL.class).orElseThrow();
 ```
 
 ## MySQL-Specific Features

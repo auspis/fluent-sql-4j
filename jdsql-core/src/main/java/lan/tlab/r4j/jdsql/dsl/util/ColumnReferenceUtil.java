@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.dsl.util;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 
 public final class ColumnReferenceUtil {
 

@@ -2,12 +2,12 @@ package lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.BehaviorKind;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonQuery;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.WrapperBehavior;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.BehaviorKind;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonQuery;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.OnEmptyBehavior;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.json.WrapperBehavior;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;

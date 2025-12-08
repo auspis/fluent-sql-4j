@@ -1,11 +1,11 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.builders;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.jdsql.ast.common.predicate.IsNotNull;
-import lan.tlab.r4j.jdsql.ast.common.predicate.IsNull;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.core.predicate.IsNotNull;
+import lan.tlab.r4j.jdsql.ast.core.predicate.IsNull;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 

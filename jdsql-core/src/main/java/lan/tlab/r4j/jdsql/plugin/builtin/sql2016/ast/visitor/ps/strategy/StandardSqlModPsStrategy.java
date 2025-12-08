@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.number.Mod;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.number.Mod;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
