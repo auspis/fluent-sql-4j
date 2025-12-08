@@ -1,9 +1,11 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+import java.util.List;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.functional.Result;
 import lan.tlab.r4j.jdsql.functional.Result.Failure;
@@ -11,22 +13,23 @@ import lan.tlab.r4j.jdsql.functional.Result.Success;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import lan.tlab.r4j.jdsql.plugin.util.TestDialectPluginUtil;
+import lan.tlab.r4j.jdsql.plugin.util.SqlDialectPluginUtil;
+import lan.tlab.r4j.jdsql.plugin.util.TestDialectDSL;
+import lan.tlab.r4j.jdsql.plugin.util.TestDialectPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class DSLRegistryTest {
 
-    private PreparedStatementSpecFactory mockRenderer;
-    private SqlDialectPlugin testPlugin;
+    private PreparedStatementSpecFactory preparedStatementSpecFactory;
     private SqlDialectPluginRegistry pluginRegistry;
     private DSLRegistry registry;
 
     @BeforeEach
     void setUp() {
-        mockRenderer = mock(PreparedStatementSpecFactory.class);
-        testPlugin = TestDialectPluginUtil.create(mockRenderer);
-        pluginRegistry = SqlDialectPluginRegistry.of(java.util.List.of(testPlugin));
+        preparedStatementSpecFactory = mock(PreparedStatementSpecFactory.class);
+        pluginRegistry = SqlDialectPluginRegistry.of(
+                List.of(TestDialectPlugin.instance(), SqlDialectPluginUtil.create(preparedStatementSpecFactory)));
         registry = DSLRegistry.of(pluginRegistry);
     }
 
@@ -52,20 +55,18 @@ class DSLRegistryTest {
 
     @Test
     void dslFor_withDialectOnly_shouldReturnSuccess() {
-        Result<DSL> result = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT);
+        Result<DSL> result = registry.dslFor(TestDialectPlugin.DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Success.class);
-        DSL dsl = result.orElseThrow();
-        assertThat(dsl).isNotNull();
+        assertThat(result.orElseThrow()).isNotNull();
     }
 
     @Test
     void dslFor_withDialectAndVersion_shouldReturnSuccess() {
-        Result<DSL> result = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT, TestDialectPluginUtil.BASE_VERSION);
+        Result<DSL> result = registry.dslFor(TestDialectPlugin.DIALECT_NAME, TestDialectPlugin.DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(Success.class);
-        DSL dsl = result.orElseThrow();
-        assertThat(dsl).isNotNull();
+        assertThat(result.orElseThrow()).isNotNull();
     }
 
     @Test
@@ -78,15 +79,43 @@ class DSLRegistryTest {
     }
 
     @Test
+    void dslFor_withDialectAndPluginClass_shouldReturnSuccess() {
+        Result<DSL> result = registry.dslFor(TestDialectPlugin.DIALECT_NAME, DSL.class);
+
+        assertThat(result).isInstanceOf(Success.class);
+        assertThat(result.orElseThrow()).isNotNull();
+    }
+
+    @Test
+    void dslFor_withDialectAndVersionAndPluginClass_shouldReturnSuccess() {
+        Result<TestDialectDSL> result = registry.dslFor(
+                TestDialectPlugin.DIALECT_NAME, TestDialectPlugin.DIALECT_VERSION, TestDialectDSL.class);
+
+        assertThat(result).isInstanceOf(Success.class);
+        assertThat(result.orElseThrow()).isNotNull();
+    }
+
+    @Test
+    void dslFor_withDialectAndVersionAndUnsupportedPluginClass__shouldReturnFailure() {
+        Result<TestDialectDSL> result = registry.dslFor(
+                StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION, TestDialectDSL.class);
+
+        assertThat(result)
+                .isInstanceOf(Failure.class)
+                .asInstanceOf(type(Failure.class))
+                .satisfies(failure -> assertThat(failure.message()).contains("No plugin found"));
+    }
+
+    @Test
     void dslFor_withVersionMismatch_shouldReturnFailure() {
-        Result<DSL> result = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT, "999.999.999");
+        Result<DSL> result = registry.dslFor(TestDialectPlugin.DIALECT_NAME, "999.999.999");
 
         assertThat(result).isInstanceOf(Failure.class);
     }
 
     @Test
     void dslFor_shouldReturnDSLWithConfiguredRenderer() {
-        Result<DSL> result = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT);
+        Result<DSL> result = registry.dslFor(TestDialectPlugin.DIALECT_NAME);
 
         DSL dsl = result.orElseThrow();
         // The DSL instance should use the configured renderer
@@ -110,8 +139,8 @@ class DSLRegistryTest {
 
     @Test
     void dslFor_multipleCalls_shouldReturnSameCachedDSLInstance() {
-        Result<DSL> result1 = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT);
-        Result<DSL> result2 = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT);
+        Result<DSL> result1 = registry.dslFor(TestDialectPlugin.DIALECT_NAME);
+        Result<DSL> result2 = registry.dslFor(TestDialectPlugin.DIALECT_NAME);
 
         DSL dsl1 = result1.orElseThrow();
         DSL dsl2 = result2.orElseThrow();
@@ -125,16 +154,14 @@ class DSLRegistryTest {
         // Setup two plugins with different versions
         PreparedStatementSpecFactory specFactory1 = mock(PreparedStatementSpecFactory.class);
         PreparedStatementSpecFactory specFactory2 = mock(PreparedStatementSpecFactory.class);
-        SqlDialectPlugin plugin1 =
-                TestDialectPluginUtil.create(TestDialectPluginUtil.TEST_DIALECT, "^3.0.0", specFactory1);
-        SqlDialectPlugin plugin2 =
-                TestDialectPluginUtil.create(TestDialectPluginUtil.TEST_DIALECT, "^1.7.0", specFactory2);
+        SqlDialectPlugin plugin1 = SqlDialectPluginUtil.create(TestDialectPlugin.DIALECT_NAME, "^3.0.0", specFactory1);
+        SqlDialectPlugin plugin2 = SqlDialectPluginUtil.create(TestDialectPlugin.DIALECT_NAME, "^1.7.0", specFactory2);
         SqlDialectPluginRegistry multiVersionRegistry =
                 SqlDialectPluginRegistry.of(java.util.List.of(plugin1, plugin2));
         DSLRegistry multiRegistry = DSLRegistry.of(multiVersionRegistry);
 
-        Result<DSL> result1 = multiRegistry.dslFor(TestDialectPluginUtil.TEST_DIALECT, "3.0.0");
-        Result<DSL> result2 = multiRegistry.dslFor(TestDialectPluginUtil.TEST_DIALECT, "1.7.0");
+        Result<DSL> result1 = multiRegistry.dslFor(TestDialectPlugin.DIALECT_NAME, "3.0.0");
+        Result<DSL> result2 = multiRegistry.dslFor(TestDialectPlugin.DIALECT_NAME, "1.7.0");
 
         DSL dsl1 = result1.orElseThrow();
         DSL dsl2 = result2.orElseThrow();
@@ -145,12 +172,12 @@ class DSLRegistryTest {
 
     @Test
     void getSupportedDialects_shouldReturnAllDialects() {
-        assertThat(registry.getSupportedDialects()).contains(TestDialectPluginUtil.TEST_DIALECT.toLowerCase());
+        assertThat(registry.getSupportedDialects()).contains(TestDialectPlugin.DIALECT_NAME.toLowerCase());
     }
 
     @Test
     void isSupported_withSupportedDialect_shouldReturnTrue() {
-        assertThat(registry.isSupported(TestDialectPluginUtil.TEST_DIALECT)).isTrue();
+        assertThat(registry.isSupported(TestDialectPlugin.DIALECT_NAME)).isTrue();
     }
 
     @Test
@@ -161,7 +188,7 @@ class DSLRegistryTest {
     @Test
     void clearCache_shouldRemoveAllCachedInstances() {
         // Create some cached instances
-        registry.dslFor(TestDialectPluginUtil.TEST_DIALECT).orElseThrow();
+        registry.dslFor(TestDialectPlugin.DIALECT_NAME).orElseThrow();
         assertThat(registry.getCacheSize()).isEqualTo(1);
 
         // Clear the cache
@@ -170,7 +197,7 @@ class DSLRegistryTest {
         assertThat(registry.getCacheSize()).isZero();
 
         // After clearing, should create new instance
-        DSL newDsl = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT).orElseThrow();
+        DSL newDsl = registry.dslFor(TestDialectPlugin.DIALECT_NAME).orElseThrow();
         assertThat(newDsl).isNotNull();
         assertThat(registry.getCacheSize()).isEqualTo(1);
     }
@@ -179,21 +206,19 @@ class DSLRegistryTest {
     void getCacheSize_shouldReturnCorrectSize() {
         assertThat(registry.getCacheSize()).isZero();
 
-        registry.dslFor(TestDialectPluginUtil.TEST_DIALECT).orElseThrow();
+        registry.dslFor(TestDialectPlugin.DIALECT_NAME).orElseThrow();
         assertThat(registry.getCacheSize()).isEqualTo(1);
 
-        registry.dslFor(TestDialectPluginUtil.TEST_DIALECT, TestDialectPluginUtil.BASE_VERSION)
+        registry.dslFor(TestDialectPlugin.DIALECT_NAME, TestDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
         assertThat(registry.getCacheSize()).isEqualTo(2);
     }
 
     @Test
     void cacheKey_shouldBeCaseInsensitive() {
-        DSL dsl1 = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT).orElseThrow();
-        DSL dsl2 = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT.toLowerCase())
-                .orElseThrow();
-        DSL dsl3 = registry.dslFor(TestDialectPluginUtil.TEST_DIALECT.toUpperCase())
-                .orElseThrow();
+        DSL dsl1 = registry.dslFor(TestDialectPlugin.DIALECT_NAME).orElseThrow();
+        DSL dsl2 = registry.dslFor(TestDialectPlugin.DIALECT_NAME.toLowerCase()).orElseThrow();
+        DSL dsl3 = registry.dslFor(TestDialectPlugin.DIALECT_NAME.toUpperCase()).orElseThrow();
 
         // All should return the same cached instance
         assertThat(dsl1).isSameAs(dsl2).isSameAs(dsl3);
