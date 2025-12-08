@@ -362,8 +362,8 @@ class PostgreSqlE2E {
     @Test
     void shouldExecuteStringAgg() throws SQLException {
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
-        PostgreSqlDSL dsl = (PostgreSqlDSL) registry
-            .dslFor("postgresql", "15.0.0")
+        PostgreSqlDSL dsl = registry
+            .dslFor("postgresql", "15.0.0", PostgreSqlDSL.class)
             .orElseThrow();
 
         try (Connection conn = DriverManager.getConnection(
@@ -610,8 +610,8 @@ class PostgreSqlE2E {
 
         // Test custom function
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
-        PostgreSqlDSL dsl = (PostgreSqlDSL) registry
-            .dslFor("postgresql", "15.0.0")
+        PostgreSqlDSL dsl = registry
+            .dslFor("postgresql", "15.0.0", PostgreSqlDSL.class)
             .orElseThrow();
 
         PreparedStatement ps = dsl.select()

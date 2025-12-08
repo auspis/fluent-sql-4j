@@ -3,17 +3,17 @@ package lan.tlab.r4j.jdsql.dsl.clause;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import lan.tlab.r4j.jdsql.ast.common.expression.Expression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarSubquery;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.jdsql.ast.common.predicate.In;
-import lan.tlab.r4j.jdsql.ast.common.predicate.IsNotNull;
-import lan.tlab.r4j.jdsql.ast.common.predicate.IsNull;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Like;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
-import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.expression.Expression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarSubquery;
+import lan.tlab.r4j.jdsql.ast.core.predicate.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.core.predicate.In;
+import lan.tlab.r4j.jdsql.ast.core.predicate.IsNotNull;
+import lan.tlab.r4j.jdsql.ast.core.predicate.IsNull;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Like;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.dsl.select.SelectBuilder;
 
 /**

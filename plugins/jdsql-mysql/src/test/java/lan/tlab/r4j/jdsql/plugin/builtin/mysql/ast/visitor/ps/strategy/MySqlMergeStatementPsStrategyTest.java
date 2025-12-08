@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.identifier.TableIdentifier;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenNotMatchedInsert;

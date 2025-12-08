@@ -2,12 +2,12 @@ package lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl;
 
 import java.util.List;
 import java.util.Map;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.PredicateExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.PredicateExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
