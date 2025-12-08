@@ -6,7 +6,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.dql.clause.GroupBy;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ class StandardSqlGroupByClausePsStrategyTest {
     void singleColumn() {
         GroupBy groupBy = GroupBy.of(ColumnReference.of("User", "department"));
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"department\"");
         assertThat(result.parameters()).isEmpty();
@@ -37,7 +37,7 @@ class StandardSqlGroupByClausePsStrategyTest {
     void multipleColumns() {
         GroupBy groupBy = GroupBy.of(ColumnReference.of("User", "department"), ColumnReference.of("User", "role"));
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"department\", \"role\"");
         assertThat(result.parameters()).isEmpty();
@@ -50,7 +50,7 @@ class StandardSqlGroupByClausePsStrategyTest {
                 ColumnReference.of("Order", "status"),
                 ColumnReference.of("Product", "category"));
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"department\", \"status\", \"category\"");
         assertThat(result.parameters()).isEmpty();
@@ -61,7 +61,7 @@ class StandardSqlGroupByClausePsStrategyTest {
         GroupBy groupBy =
                 GroupBy.of(ColumnReference.of("Employee", "department_id"), ColumnReference.of("Department", "name"));
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"department_id\", \"name\"");
         assertThat(result.parameters()).isEmpty();
@@ -75,7 +75,7 @@ class StandardSqlGroupByClausePsStrategyTest {
                 ColumnReference.of("Sales", "product_line"),
                 ColumnReference.of("Sales", "sales_rep"));
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"region\", \"quarter\", \"product_line\", \"sales_rep\"");
         assertThat(result.parameters()).isEmpty();
@@ -88,7 +88,7 @@ class StandardSqlGroupByClausePsStrategyTest {
         GroupBy groupBy =
                 GroupBy.of(ColumnReference.of("User", "department"), ColumnReference.of("User", "created_at"));
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"department\", \"created_at\"");
         assertThat(result.parameters()).isEmpty();
@@ -99,7 +99,7 @@ class StandardSqlGroupByClausePsStrategyTest {
         // Anche se non ha senso in SQL, testiamo che la strategia gestisca correttamente un GROUP BY vuoto
         GroupBy groupBy = GroupBy.of();
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("");
         assertThat(result.parameters()).isEmpty();
@@ -113,7 +113,7 @@ class StandardSqlGroupByClausePsStrategyTest {
                 ColumnReference.of("User", "first_name"),
                 ColumnReference.of("User", "middle_name"));
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"last_name\", \"first_name\", \"middle_name\"");
         assertThat(result.parameters()).isEmpty();
@@ -127,7 +127,7 @@ class StandardSqlGroupByClausePsStrategyTest {
                 ColumnReference.of("User", "role"),
                 ColumnReference.of("User", "department")); // duplicato
 
-        PsDto result = strategy.handle(groupBy, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(groupBy, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"department\", \"role\", \"department\"");
         assertThat(result.parameters()).isEmpty();

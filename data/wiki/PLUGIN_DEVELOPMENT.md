@@ -60,7 +60,7 @@ The JDSQL plugin system uses Java's ServiceLoader (SPI) mechanism for automatic 
 │                                                           │
 │  - dialectName: String                                   │
 │  - dialectVersion: String (semver regex)                 │
-│  - rendererFactory: Supplier<DialectRenderer>            │
+│  - rendererFactory: Supplier<PreparedStatementSpecFactory>            │
 │  - dslFactory: Supplier<DSL>                             │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -71,7 +71,7 @@ The JDSQL plugin system uses Java's ServiceLoader (SPI) mechanism for automatic 
 2. **SqlDialectPlugin**: Encapsulates dialect-specific configuration
 3. **SqlDialectPluginRegistry**: Central registry using ServiceLoader
 4. **DSLRegistry**: User-facing API for dialect selection
-5. **DialectRenderer**: Renders AST to SQL for specific dialect
+5. **PreparedStatementSpecFactory**: Renders AST to SQL for specific dialect
 
 ### Plugin Lifecycle
 
@@ -142,8 +142,8 @@ public final class PostgreSqlDialectPluginProvider implements SqlDialectPluginPr
             .build();
     }
 
-    private DialectRenderer createRenderer() {
-        return DialectRenderer.of(
+    private PreparedStatementSpecFactory createRenderer() {
+        return PreparedStatementSpecFactory.of(
             createSqlRenderer(),
             createPreparedStatementRenderer()
         );
@@ -244,11 +244,11 @@ Create dialect-specific DSL extensions:
 package lan.tlab.r4j.jdsql.plugin.builtin.postgresql.dsl;
 
 import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 
 public class PostgreSqlDSL extends DSL {
     
-    public PostgreSqlDSL(DialectRenderer renderer) {
+    public PostgreSqlDSL(PreparedStatementSpecFactory renderer) {
         super(renderer);
     }
     
@@ -339,8 +339,8 @@ class PostgreSqlDialectPluginIntegrationTest {
         SqlDialectPluginRegistry registry = 
             SqlDialectPluginRegistry.createWithServiceLoader();
 
-        Result<DialectRenderer> result = 
-            registry.getDialectRenderer("postgresql", "15.0.0");
+        Result<PreparedStatementSpecFactory> result = 
+            registry.getSpecFactory("postgresql", "15.0.0");
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
@@ -446,15 +446,15 @@ options.put("ORDER_BY", orderBy); // Can be modified externally
 
 ```java
 // ✅ GOOD: Clear error handling
-Result<DialectRenderer> result = registry.getDialectRenderer("unknown", "1.0");
-if (result instanceof Result.Failure<DialectRenderer> failure) {
+Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("unknown", "1.0");
+if (result instanceof Result.Failure<PreparedStatementSpecFactory> failure) {
     System.err.println("Error: " + failure.error());
     System.err.println("Supported dialects: " + registry.supportedDialects());
 }
 
 // ❌ BAD: Throwing generic exceptions
 try {
-    DialectRenderer renderer = registry.getDialectRenderer("unknown", "1.0").orElseThrow();
+    PreparedStatementSpecFactory renderer = registry.getSpecFactory("unknown", "1.0").orElseThrow();
 } catch (Exception e) {
     // Generic error, no context
 }

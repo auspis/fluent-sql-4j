@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class StandardSqlInsertValuesPsStrategyTest {
         List<Expression> values = List.of();
         InsertValues insertValues = new InsertValues(values);
 
-        PsDto result = strategy.handle(insertValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(insertValues, visitor, ctx);
 
         assertThat(result.sql()).isEmpty();
         assertThat(result.parameters()).isEmpty();
@@ -41,7 +41,7 @@ class StandardSqlInsertValuesPsStrategyTest {
         List<Expression> values = List.of(Literal.of("John"));
         InsertValues insertValues = new InsertValues(values);
 
-        PsDto result = strategy.handle(insertValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(insertValues, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?");
         assertThat(result.parameters()).containsExactly("John");
@@ -52,7 +52,7 @@ class StandardSqlInsertValuesPsStrategyTest {
         List<Expression> values = List.of(Literal.of(1), Literal.of("Alice"), Literal.of("alice@example.com"));
         InsertValues insertValues = new InsertValues(values);
 
-        PsDto result = strategy.handle(insertValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(insertValues, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?, ?, ?");
         assertThat(result.parameters()).containsExactly(1, "Alice", "alice@example.com");
@@ -64,7 +64,7 @@ class StandardSqlInsertValuesPsStrategyTest {
                 List.of(Literal.of(42), Literal.of("Widget"), Literal.of(99.99), Literal.of(true), Literal.of(false));
         InsertValues insertValues = new InsertValues(values);
 
-        PsDto result = strategy.handle(insertValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(insertValues, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?, ?, ?, ?, ?");
         assertThat(result.parameters()).containsExactly(42, "Widget", 99.99, true, false);
@@ -75,7 +75,7 @@ class StandardSqlInsertValuesPsStrategyTest {
         List<Expression> values = List.of(Literal.of("Hello"), Literal.of("World"), Literal.of("Test"));
         InsertValues insertValues = new InsertValues(values);
 
-        PsDto result = strategy.handle(insertValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(insertValues, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?, ?, ?");
         assertThat(result.parameters()).containsExactly("Hello", "World", "Test");
@@ -86,7 +86,7 @@ class StandardSqlInsertValuesPsStrategyTest {
         List<Expression> values = List.of(Literal.of(1), Literal.of(2L), Literal.of(3.14), Literal.of(4.56f));
         InsertValues insertValues = new InsertValues(values);
 
-        PsDto result = strategy.handle(insertValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(insertValues, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?, ?, ?, ?");
         assertThat(result.parameters()).containsExactly(1, 2L, 3.14, 4.56f);
@@ -97,7 +97,7 @@ class StandardSqlInsertValuesPsStrategyTest {
         List<Expression> values = List.of(Literal.of(true), Literal.of(false), Literal.of(true));
         InsertValues insertValues = new InsertValues(values);
 
-        PsDto result = strategy.handle(insertValues, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(insertValues, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("?, ?, ?");
         assertThat(result.parameters()).containsExactly(true, false, true);

@@ -5,15 +5,16 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.DateArithmetic;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 
 public class MysqlDateArithmeticRenderStrategy implements DateArithmeticPsStrategy {
 
     @Override
-    public PsDto handle(DateArithmetic dateArithmetic, PreparedStatementRenderer renderer, AstContext ctx) {
-        PsDto dateExprDto = dateArithmetic.dateExpression().accept(renderer, ctx);
-        PsDto valueDto = dateArithmetic.interval().value().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            DateArithmetic dateArithmetic, PreparedStatementRenderer renderer, AstContext ctx) {
+        PreparedStatementSpec dateExprDto = dateArithmetic.dateExpression().accept(renderer, ctx);
+        PreparedStatementSpec valueDto = dateArithmetic.interval().value().accept(renderer, ctx);
 
         String sql = String.format(
                 "%s(%s, INTERVAL %s %s)",
@@ -26,6 +27,6 @@ public class MysqlDateArithmeticRenderStrategy implements DateArithmeticPsStrate
         allParameters.addAll(dateExprDto.parameters());
         allParameters.addAll(valueDto.parameters());
 
-        return new PsDto(sql, allParameters);
+        return new PreparedStatementSpec(sql, allParameters);
     }
 }

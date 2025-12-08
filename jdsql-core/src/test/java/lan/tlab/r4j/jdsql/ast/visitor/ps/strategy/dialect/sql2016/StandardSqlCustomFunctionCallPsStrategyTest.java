@@ -9,19 +9,19 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCustomFunctionCallPsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlCustomFunctionCallPsStrategyTest {
     private final CustomFunctionCallPsStrategy strategy = new StandardSqlCustomFunctionCallPsStrategy();
-    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
 
     @Test
     void noArguments() {
         CustomFunctionCall function = new CustomFunctionCall("MY_FUNC", List.of(), Map.of());
-        PsDto dto = strategy.handle(function, renderer, new AstContext());
+        PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("MY_FUNC()");
         assertThat(dto.parameters()).isEmpty();
     }
@@ -30,7 +30,7 @@ class StandardSqlCustomFunctionCallPsStrategyTest {
     void singleArgument() {
         CustomFunctionCall function =
                 new CustomFunctionCall("UPPER", List.of(ColumnReference.of("", "name")), Map.of());
-        PsDto dto = strategy.handle(function, renderer, new AstContext());
+        PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("UPPER(\"name\")");
         assertThat(dto.parameters()).isEmpty();
     }
@@ -41,7 +41,7 @@ class StandardSqlCustomFunctionCallPsStrategyTest {
                 "CONCAT",
                 List.of(ColumnReference.of("", "first_name"), Literal.of(" "), ColumnReference.of("", "last_name")),
                 Map.of());
-        PsDto dto = strategy.handle(function, renderer, new AstContext());
+        PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("CONCAT(\"first_name\", ?, \"last_name\")");
         assertThat(dto.parameters()).containsExactly(" ");
     }
@@ -50,7 +50,7 @@ class StandardSqlCustomFunctionCallPsStrategyTest {
     void withParameters() {
         CustomFunctionCall function = new CustomFunctionCall(
                 "SUBSTR", List.of(ColumnReference.of("", "text"), Literal.of(1), Literal.of(10)), Map.of());
-        PsDto dto = strategy.handle(function, renderer, new AstContext());
+        PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("SUBSTR(\"text\", ?, ?)");
         assertThat(dto.parameters()).containsExactly(1, 10);
     }

@@ -5,7 +5,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 
 /**
@@ -42,7 +42,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 public class MysqlJsonValuePsStrategy implements JsonValuePsStrategy {
 
     @Override
-    public PsDto handle(JsonValue jsonValue, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(JsonValue jsonValue, PreparedStatementRenderer renderer, AstContext ctx) {
         var documentResult = jsonValue.jsonDocument().accept(renderer, ctx);
         var pathResult = jsonValue.path().accept(renderer, ctx);
 
@@ -60,6 +60,6 @@ public class MysqlJsonValuePsStrategy implements JsonValuePsStrategy {
         // Note: RETURNING, ON EMPTY, and ON ERROR are ignored - MySQL does not support them
         // If type conversion is needed, users should use CAST in the outer query
 
-        return new PsDto(sql.toString(), parameters);
+        return new PreparedStatementSpec(sql.toString(), parameters);
     }
 }

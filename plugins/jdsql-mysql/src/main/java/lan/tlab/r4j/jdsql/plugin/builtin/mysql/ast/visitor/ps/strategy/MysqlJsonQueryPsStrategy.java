@@ -5,7 +5,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonQuery;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonQueryPsStrategy;
 
 /**
@@ -41,7 +41,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonQueryPsStrategy;
 public class MysqlJsonQueryPsStrategy implements JsonQueryPsStrategy {
 
     @Override
-    public PsDto handle(JsonQuery jsonQuery, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(JsonQuery jsonQuery, PreparedStatementRenderer renderer, AstContext ctx) {
         var documentResult = jsonQuery.jsonDocument().accept(renderer, ctx);
         var pathResult = jsonQuery.path().accept(renderer, ctx);
 
@@ -59,6 +59,6 @@ public class MysqlJsonQueryPsStrategy implements JsonQueryPsStrategy {
         // Note: RETURNING, wrapper behavior, ON EMPTY, and ON ERROR are ignored
         // MySQL does not support these SQL:2016 features
 
-        return new PsDto(sql.toString(), parameters);
+        return new PreparedStatementSpec(sql.toString(), parameters);
     }
 }

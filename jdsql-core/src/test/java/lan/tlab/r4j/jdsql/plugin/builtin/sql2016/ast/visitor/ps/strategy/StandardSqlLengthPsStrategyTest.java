@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Length;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlLengthPsStrategyTest {
@@ -20,7 +20,7 @@ class StandardSqlLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(length, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(length, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LENGTH(?)");
         assertThat(result.parameters()).containsExactly("Hello World");
@@ -33,7 +33,7 @@ class StandardSqlLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(length, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(length, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LENGTH(\"email\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -46,7 +46,7 @@ class StandardSqlLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(length, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(length, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LENGTH(\"description\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -59,7 +59,7 @@ class StandardSqlLengthPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(length, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(length, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("LENGTH(\"product_name\")");
         assertThat(result.parameters()).isEqualTo(List.of());

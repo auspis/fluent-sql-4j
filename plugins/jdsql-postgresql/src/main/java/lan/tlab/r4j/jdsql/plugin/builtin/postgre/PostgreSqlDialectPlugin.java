@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.postgre;
 
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
@@ -46,11 +46,11 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * Result<DialectRenderer> result = registry.getRenderer("postgresql", "15.0.0");
+ * Result<PreparedStatementSpecFactory> result = registry.getRenderer("postgresql", "15.0.0");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
- * DialectRenderer renderer = plugin.createRenderer();
+ * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
  * }</pre>
  * <p>
  * <b>ServiceLoader Discovery:</b>
@@ -110,14 +110,14 @@ public final class PostgreSqlDialectPlugin {
      *   <li>AGE for interval calculation</li>
      * </ul>
      *
-     * @return a new {@link DialectRenderer} instance configured for PostgreSQL, never {@code null}
+     * @return a new {@link PreparedStatementSpecFactory} instance configured for PostgreSQL, never {@code null}
      */
-    private static DialectRenderer createPostgreSqlRenderer() {
+    private static PreparedStatementSpecFactory createPostgreSqlRenderer() {
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 
-        return new DialectRenderer(psRenderer);
+        return new PreparedStatementSpecFactory(psRenderer);
     }
 
     /**
@@ -154,7 +154,7 @@ public final class PostgreSqlDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
-     * DialectRenderer renderer = plugin.createRenderer();
+     * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
      * }</pre>
      *
      * @return the singleton PostgreSQL dialect plugin instance, never {@code null}

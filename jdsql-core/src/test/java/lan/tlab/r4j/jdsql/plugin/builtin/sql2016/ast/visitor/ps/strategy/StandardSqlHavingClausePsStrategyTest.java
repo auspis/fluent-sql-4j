@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Having;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,7 @@ class StandardSqlHavingClausePsStrategyTest {
     void nullCondition() {
         Having having = Having.nullObject();
 
-        PsDto result = strategy.handle(having, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(having, visitor, ctx);
 
         assertThat(result.sql()).isEmpty();
         assertThat(result.parameters()).isEmpty();
@@ -41,7 +41,7 @@ class StandardSqlHavingClausePsStrategyTest {
     void nullPredicate() {
         Having having = Having.of(new NullPredicate());
 
-        PsDto result = strategy.handle(having, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(having, visitor, ctx);
 
         assertThat(result.sql()).isEmpty();
         assertThat(result.parameters()).isEmpty();
@@ -51,7 +51,7 @@ class StandardSqlHavingClausePsStrategyTest {
     void simpleComparison() {
         Having having = Having.of(Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(1)));
 
-        PsDto result = strategy.handle(having, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(having, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("COUNT(\"id\") > ?");
         assertThat(result.parameters()).containsExactly(1);
@@ -62,7 +62,7 @@ class StandardSqlHavingClausePsStrategyTest {
         Having having =
                 Having.of(Comparison.gte(AggregateCall.sum(ColumnReference.of("Order", "amount")), Literal.of(1000)));
 
-        PsDto result = strategy.handle(having, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(having, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("SUM(\"amount\") >= ?");
         assertThat(result.parameters()).containsExactly(1000);
@@ -73,7 +73,7 @@ class StandardSqlHavingClausePsStrategyTest {
         Having having =
                 Having.of(Comparison.lt(AggregateCall.avg(ColumnReference.of("Product", "price")), Literal.of(50.0)));
 
-        PsDto result = strategy.handle(having, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(having, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("AVG(\"price\") < ?");
         assertThat(result.parameters()).containsExactly(50.0);

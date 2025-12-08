@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ class StandardSqlWhenMatchedUpdatePsStrategyTest {
                 UpdateItem.of("name", Literal.of("Updated Name")), UpdateItem.of("status", Literal.of("active")));
         WhenMatchedUpdate action = new WhenMatchedUpdate(null, updateItems);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN MATCHED THEN UPDATE SET \"name\" = ?, \"status\" = ?");
         assertThat(result.parameters()).containsExactly("Updated Name", "active");
@@ -45,7 +45,7 @@ class StandardSqlWhenMatchedUpdatePsStrategyTest {
         Comparison condition = Comparison.gt(ColumnReference.of("target", "price"), Literal.of(50.0));
         WhenMatchedUpdate action = new WhenMatchedUpdate(condition, updateItems);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN MATCHED AND \"price\" > ? THEN UPDATE SET \"price\" = ?");
         assertThat(result.parameters()).containsExactly(50.0, 99.99);
@@ -59,7 +59,7 @@ class StandardSqlWhenMatchedUpdatePsStrategyTest {
                 UpdateItem.of("col3", Literal.of(true)));
         WhenMatchedUpdate action = new WhenMatchedUpdate(null, updateItems);
 
-        PsDto result = strategy.handle(action, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("WHEN MATCHED THEN UPDATE SET \"col1\" = ?, \"col2\" = ?, \"col3\" = ?");
         assertThat(result.parameters()).containsExactly("value1", 100, true);

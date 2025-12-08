@@ -5,14 +5,14 @@ import java.util.stream.Collectors;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 
 public class StandardSqlReferencesItemPsStrategy implements ReferencesItemPsStrategy {
 
     @Override
-    public PsDto handle(ReferencesItem item, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(ReferencesItem item, PreparedStatementRenderer renderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
 
         String sql = String.format(
@@ -20,6 +20,6 @@ public class StandardSqlReferencesItemPsStrategy implements ReferencesItemPsStra
                 escapeStrategy.apply(item.table()),
                 item.columns().stream().map(escapeStrategy::apply).collect(Collectors.joining(", ")));
 
-        return new PsDto(sql, Collections.emptyList());
+        return new PreparedStatementSpec(sql, Collections.emptyList());
     }
 }

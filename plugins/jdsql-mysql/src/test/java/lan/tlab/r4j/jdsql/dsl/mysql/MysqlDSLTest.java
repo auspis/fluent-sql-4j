@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
 import org.junit.jupiter.api.Test;
@@ -14,17 +14,17 @@ class MysqlDSLTest {
 
     @Test
     void shouldExtendBaseDSL() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThat(dsl).isInstanceOf(DSL.class);
-        assertThat(dsl.getRenderer()).isEqualTo(renderer);
+        assertThat(dsl.getSpecFactory()).isEqualTo(specFactory);
     }
 
     @Test
     void shouldProvideGroupConcatMethod() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         Object result = dsl.groupConcat("name", ", ");
 
@@ -37,8 +37,8 @@ class MysqlDSLTest {
 
     @Test
     void groupConcatShouldRejectNullColumn() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.groupConcat(null, ", "))
                 .isInstanceOf(NullPointerException.class)
@@ -47,8 +47,8 @@ class MysqlDSLTest {
 
     @Test
     void groupConcatShouldRejectNullSeparator() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.groupConcat("name", null))
                 .isInstanceOf(NullPointerException.class)
@@ -57,8 +57,8 @@ class MysqlDSLTest {
 
     @Test
     void shouldProvideIfExprFluentAPI() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var selectBuilder = dsl.select();
         assertThat(selectBuilder).isNotNull();
@@ -81,8 +81,8 @@ class MysqlDSLTest {
 
     @Test
     void shouldProvideDateFormatFluentAPI() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var selectBuilder = dsl.select();
         assertThat(selectBuilder).isNotNull();
@@ -94,16 +94,16 @@ class MysqlDSLTest {
 
     @Test
     void ifExprShouldRejectNullColumnInWhen() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().ifExpr().when(null)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void ifExprShouldRejectNullValueInThen() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().ifExpr().when("age").gte(18).then(null))
                 .isInstanceOf(NullPointerException.class);
@@ -111,8 +111,8 @@ class MysqlDSLTest {
 
     @Test
     void ifExprShouldRejectNullValueInOtherwise() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() ->
                         dsl.select().ifExpr().when("age").gte(18).then("adult").otherwise(null))
@@ -121,24 +121,24 @@ class MysqlDSLTest {
 
     @Test
     void dateFormatShouldRejectNullColumn() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().dateFormat(null, "%Y-%m-%d")).isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void dateFormatShouldRejectNullFormat() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().dateFormat("birthdate", null)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void shouldProvideInheritedAggregateFunctions() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var builder = dsl.select().sum("amount").countDistinct("user_id");
 
@@ -147,8 +147,8 @@ class MysqlDSLTest {
 
     @Test
     void shouldProvideConcatBuilderFluentAPI() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var concatBuilder = dsl.select().concat();
 
@@ -157,8 +157,8 @@ class MysqlDSLTest {
 
     @Test
     void concatBuilderShouldBuildWithMultipleColumns() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var builder =
                 dsl.select().concat().column("first_name").column("last_name").as("full_name");
@@ -168,8 +168,8 @@ class MysqlDSLTest {
 
     @Test
     void concatBuilderShouldSupportTableQualifiedColumns() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var builder = dsl.select()
                 .concat()
@@ -183,8 +183,8 @@ class MysqlDSLTest {
 
     @Test
     void concatBuilderShouldRejectNullColumn() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().concat().column((String) null))
                 .isInstanceOf(NullPointerException.class)
@@ -193,8 +193,8 @@ class MysqlDSLTest {
 
     @Test
     void concatBuilderShouldRejectEmptyExpressionList() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().concat().as("result"))
                 .isInstanceOf(IllegalStateException.class)
@@ -203,8 +203,8 @@ class MysqlDSLTest {
 
     @Test
     void shouldProvideCoalesceBuilderFluentAPI() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var coalesceBuilder = dsl.select().coalesce();
 
@@ -213,8 +213,8 @@ class MysqlDSLTest {
 
     @Test
     void coalesceBuilderShouldBuildWithMultipleColumns() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var builder = dsl.select().coalesce().column("mobile").column("phone").as("contact");
 
@@ -223,8 +223,8 @@ class MysqlDSLTest {
 
     @Test
     void coalesceBuilderShouldSupportTableQualifiedColumns() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var builder = dsl.select()
                 .coalesce()
@@ -238,8 +238,8 @@ class MysqlDSLTest {
 
     @Test
     void coalesceBuilderShouldRejectNullColumn() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().coalesce().column((String) null))
                 .isInstanceOf(NullPointerException.class)
@@ -248,8 +248,8 @@ class MysqlDSLTest {
 
     @Test
     void coalesceBuilderShouldRequireAtLeastTwoExpressions() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().coalesce().column("column1").as("result"))
                 .isInstanceOf(IllegalStateException.class)
@@ -258,8 +258,8 @@ class MysqlDSLTest {
 
     @Test
     void shouldProvideIfnullFluentAPI() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         var builder = dsl.select().ifnull("email", "no-email");
 
@@ -268,8 +268,8 @@ class MysqlDSLTest {
 
     @Test
     void ifnullShouldRejectNullColumn() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().ifnull(null, "default"))
                 .isInstanceOf(NullPointerException.class)
@@ -278,8 +278,8 @@ class MysqlDSLTest {
 
     @Test
     void ifnullShouldRejectNullDefaultValue() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThatThrownBy(() -> dsl.select().ifnull("email", null))
                 .isInstanceOf(NullPointerException.class)
@@ -288,8 +288,8 @@ class MysqlDSLTest {
 
     @Test
     void shouldInheritAllBaseDSLMethods() {
-        DialectRenderer renderer = mock(DialectRenderer.class);
-        MysqlDSL dsl = new MysqlDSL(renderer);
+        PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
+        MysqlDSL dsl = new MysqlDSL(specFactory);
 
         assertThat(dsl.select("name")).isNotNull();
         assertThat(dsl.selectAll()).isNotNull();

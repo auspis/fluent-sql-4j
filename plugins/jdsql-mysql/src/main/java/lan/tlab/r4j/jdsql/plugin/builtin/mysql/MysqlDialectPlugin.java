@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
@@ -62,11 +62,11 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * Result<DialectRenderer> result = registry.getRenderer("mysql", "8.0.35");
+ * Result<PreparedStatementSpecFactory> result = registry.getRenderer("mysql", "8.0.35");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
- * DialectRenderer renderer = plugin.createRenderer();
+ * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
  * }</pre>
  * <p>
  * <b>Version Matching:</b>
@@ -161,9 +161,9 @@ public final class MysqlDialectPlugin {
      *   <li>DATE_ADD/DATE_SUB for date arithmetic</li>
      * </ul>
      *
-     * @return a new {@link DialectRenderer} instance configured for MySQL, never {@code null}
+     * @return a new {@link PreparedStatementSpecFactory} instance configured for MySQL, never {@code null}
      */
-    private static DialectRenderer createMySqlRenderer() {
+    private static PreparedStatementSpecFactory createMySqlRenderer() {
         PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .currentDateStrategy(new MysqlCurrentDatePsStrategy())
@@ -177,7 +177,7 @@ public final class MysqlDialectPlugin {
                 .mergeStatementStrategy(new MySqlMergeStatementPsStrategy())
                 .build();
 
-        return new DialectRenderer(psRenderer);
+        return new PreparedStatementSpecFactory(psRenderer);
     }
 
     /**
@@ -210,7 +210,7 @@ public final class MysqlDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-     * DialectRenderer renderer = plugin.createRenderer();
+     * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
      * }</pre>
      *
      * @return the singleton MySQL dialect plugin instance, never {@code null}

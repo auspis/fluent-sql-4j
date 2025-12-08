@@ -6,7 +6,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AliasedTableExpressionPsStrategy;
 
 /**
@@ -18,11 +18,12 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AliasedTableExpressionPsStrate
 public class StandardSqlAliasedTableExpressionPsStrategy implements AliasedTableExpressionPsStrategy {
 
     @Override
-    public PsDto handle(AliasedTableExpression item, PreparedStatementRenderer visitor, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            AliasedTableExpression item, PreparedStatementRenderer visitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
 
-        PsDto exprDto = item.expression().accept(visitor, ctx);
+        PreparedStatementSpec exprDto = item.expression().accept(visitor, ctx);
         allParameters.addAll(exprDto.parameters());
 
         // Check if expression is a subquery (SelectStatement)
@@ -32,12 +33,12 @@ public class StandardSqlAliasedTableExpressionPsStrategy implements AliasedTable
             sql.append(exprDto.sql());
         }
 
-        PsDto aliasDto = item.alias().accept(visitor, ctx);
+        PreparedStatementSpec aliasDto = item.alias().accept(visitor, ctx);
         allParameters.addAll(aliasDto.parameters());
         if (!aliasDto.sql().isEmpty()) {
             sql.append(" ").append(aliasDto.sql());
         }
 
-        return new PsDto(sql.toString(), allParameters);
+        return new PreparedStatementSpec(sql.toString(), allParameters);
     }
 }

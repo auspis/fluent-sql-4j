@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.aggregate.AggregateCall;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Like;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class StandardSqlLikePsStrategyTest {
     void columnReferenceWithPattern() {
         Like like = new Like(ColumnReference.of("User", "name"), "John%");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"name\" LIKE ?");
         assertThat(result.parameters()).containsExactly("John%");
@@ -39,7 +39,7 @@ class StandardSqlLikePsStrategyTest {
     void columnReferenceWithWildcardPattern() {
         Like like = new Like(ColumnReference.of("Product", "description"), "%widget%");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"description\" LIKE ?");
         assertThat(result.parameters()).containsExactly("%widget%");
@@ -49,7 +49,7 @@ class StandardSqlLikePsStrategyTest {
     void columnReferenceWithSuffixPattern() {
         Like like = new Like(ColumnReference.of("User", "email"), "%@example.com");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"email\" LIKE ?");
         assertThat(result.parameters()).containsExactly("%@example.com");
@@ -59,7 +59,7 @@ class StandardSqlLikePsStrategyTest {
     void columnReferenceWithExactPattern() {
         Like like = new Like(ColumnReference.of("Category", "code"), "TECH");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"code\" LIKE ?");
         assertThat(result.parameters()).containsExactly("TECH");
@@ -69,7 +69,7 @@ class StandardSqlLikePsStrategyTest {
     void columnReferenceWithSingleCharWildcard() {
         Like like = new Like(ColumnReference.of("User", "name"), "Jo_n");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"name\" LIKE ?");
         assertThat(result.parameters()).containsExactly("Jo_n");
@@ -79,7 +79,7 @@ class StandardSqlLikePsStrategyTest {
     void literalExpressionWithPattern() {
         Like like = new Like(Literal.of("test string"), "%string%");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("? LIKE ?");
         assertThat(result.parameters()).containsExactly("test string", "%string%");
@@ -89,7 +89,7 @@ class StandardSqlLikePsStrategyTest {
     void aggregateFunctionWithPattern() {
         Like like = new Like(AggregateCall.max(ColumnReference.of("User", "name")), "A%");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("MAX(\"name\") LIKE ?");
         assertThat(result.parameters()).containsExactly("A%");
@@ -99,7 +99,7 @@ class StandardSqlLikePsStrategyTest {
     void emptyPattern() {
         Like like = new Like(ColumnReference.of("User", "name"), "");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"name\" LIKE ?");
         assertThat(result.parameters()).containsExactly("");
@@ -109,7 +109,7 @@ class StandardSqlLikePsStrategyTest {
     void patternWithSpecialCharacters() {
         Like like = new Like(ColumnReference.of("User", "name"), "John's%");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"name\" LIKE ?");
         assertThat(result.parameters()).containsExactly("John's%");
@@ -119,7 +119,7 @@ class StandardSqlLikePsStrategyTest {
     void patternWithEscapeCharacters() {
         Like like = new Like(ColumnReference.of("File", "path"), "C:\\%");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"path\" LIKE ?");
         assertThat(result.parameters()).containsExactly("C:\\%");
@@ -130,8 +130,8 @@ class StandardSqlLikePsStrategyTest {
         Like like1 = new Like(ColumnReference.of("User", "first_name"), "A%");
         Like like2 = new Like(ColumnReference.of("User", "last_name"), "%son");
 
-        PsDto result1 = strategy.handle(like1, visitor, ctx);
-        PsDto result2 = strategy.handle(like2, visitor, ctx);
+        PreparedStatementSpec result1 = strategy.handle(like1, visitor, ctx);
+        PreparedStatementSpec result2 = strategy.handle(like2, visitor, ctx);
 
         assertThat(result1.sql()).isEqualTo("\"first_name\" LIKE ?");
         assertThat(result1.parameters()).containsExactly("A%");
@@ -143,7 +143,7 @@ class StandardSqlLikePsStrategyTest {
     void caseInsensitivePattern() {
         Like like = new Like(ColumnReference.of("User", "name"), "%JOHN%");
 
-        PsDto result = strategy.handle(like, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"name\" LIKE ?");
         assertThat(result.parameters()).containsExactly("%JOHN%");

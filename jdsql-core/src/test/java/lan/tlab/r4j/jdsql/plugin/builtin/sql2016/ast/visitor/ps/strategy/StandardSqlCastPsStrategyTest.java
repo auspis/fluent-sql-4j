@@ -7,20 +7,20 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlCastPsStrategyTest {
 
     private StandardSqlCastPsStrategy strategy;
-    private PreparedStatementRenderer renderer;
+    private PreparedStatementRenderer specFactory;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlCastPsStrategy();
-        renderer = new PreparedStatementRenderer();
+        specFactory = new PreparedStatementRenderer();
         ctx = new AstContext();
     }
 
@@ -30,7 +30,7 @@ class StandardSqlCastPsStrategyTest {
         Cast cast = Cast.of(Literal.of("hello"), "VARCHAR(100)");
 
         // When
-        PsDto result = strategy.handle(cast, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(cast, specFactory, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CAST(? AS VARCHAR(100))");
@@ -43,7 +43,7 @@ class StandardSqlCastPsStrategyTest {
         Cast cast = Cast.of(ColumnReference.of("users", "user_id"), "VARCHAR(50)");
 
         // When
-        PsDto result = strategy.handle(cast, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(cast, specFactory, ctx);
 
         // Then
         assertThat(result.sql()).isEqualTo("CAST(\"user_id\" AS VARCHAR(50))");
@@ -56,7 +56,7 @@ class StandardSqlCastPsStrategyTest {
         Cast intCast = Cast.of(Literal.of("123"), "INT");
 
         // When
-        PsDto intResult = strategy.handle(intCast, renderer, ctx);
+        PreparedStatementSpec intResult = strategy.handle(intCast, specFactory, ctx);
 
         // Then
         assertThat(intResult.sql()).isEqualTo("CAST(? AS INT)");
@@ -66,7 +66,7 @@ class StandardSqlCastPsStrategyTest {
         Cast dateCast = Cast.of(Literal.of("2023-01-01"), "DATE");
 
         // When
-        PsDto dateResult = strategy.handle(dateCast, renderer, ctx);
+        PreparedStatementSpec dateResult = strategy.handle(dateCast, specFactory, ctx);
 
         // Then
         assertThat(dateResult.sql()).isEqualTo("CAST(? AS DATE)");

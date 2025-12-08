@@ -6,7 +6,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.CurrentDateTime;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlCurrentDateTimePsStrategyTest {
@@ -18,7 +18,7 @@ class StandardSqlCurrentDateTimePsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(currentDateTime, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(currentDateTime, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("CURRENT_TIMESTAMP");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -31,7 +31,7 @@ class StandardSqlCurrentDateTimePsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(currentDateTime, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(currentDateTime, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("CURRENT_TIMESTAMP");
         assertThat(result.parameters()).isEmpty();

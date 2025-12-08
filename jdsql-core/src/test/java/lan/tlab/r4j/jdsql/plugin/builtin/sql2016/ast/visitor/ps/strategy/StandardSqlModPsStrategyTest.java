@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.number.Mod;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlModPsStrategyTest {
@@ -20,7 +20,7 @@ class StandardSqlModPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(mod, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("MOD(?, ?)");
         assertThat(result.parameters()).containsExactly(10, 3);
@@ -33,7 +33,7 @@ class StandardSqlModPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(mod, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("MOD(\"total\", ?)");
         assertThat(result.parameters()).containsExactly(100);
@@ -47,7 +47,7 @@ class StandardSqlModPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(mod, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("MOD(\"dividend\", \"divisor\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -60,7 +60,7 @@ class StandardSqlModPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(mod, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("MOD(?, \"page_size\")");
         assertThat(result.parameters()).containsExactly(25);

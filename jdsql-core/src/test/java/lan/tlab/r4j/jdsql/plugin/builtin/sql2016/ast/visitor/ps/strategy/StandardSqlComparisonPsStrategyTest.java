@@ -7,20 +7,20 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlComparisonPsStrategyTest {
 
     private StandardSqlComparisonPsStrategy strategy;
-    private PreparedStatementRenderer renderer;
+    private PreparedStatementRenderer specFactory;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlComparisonPsStrategy();
-        renderer = new PreparedStatementRenderer();
+        specFactory = new PreparedStatementRenderer();
         ctx = new AstContext();
     }
 
@@ -28,7 +28,7 @@ class StandardSqlComparisonPsStrategyTest {
     void equalsComparison() {
         Comparison comparison = Comparison.eq(ColumnReference.of("User", "name"), Literal.of("John"));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"name\" = ?");
         assertThat(result.parameters()).containsExactly("John");
@@ -38,7 +38,7 @@ class StandardSqlComparisonPsStrategyTest {
     void notEqualsComparison() {
         Comparison comparison = Comparison.ne(ColumnReference.of("User", "status"), Literal.of("deleted"));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"status\" <> ?");
         assertThat(result.parameters()).containsExactly("deleted");
@@ -48,7 +48,7 @@ class StandardSqlComparisonPsStrategyTest {
     void greaterThanComparison() {
         Comparison comparison = Comparison.gt(ColumnReference.of("User", "age"), Literal.of(18));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"age\" > ?");
         assertThat(result.parameters()).containsExactly(18);
@@ -58,7 +58,7 @@ class StandardSqlComparisonPsStrategyTest {
     void greaterThanOrEqualsComparison() {
         Comparison comparison = Comparison.gte(ColumnReference.of("Product", "price"), Literal.of(100.0));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"price\" >= ?");
         assertThat(result.parameters()).containsExactly(100.0);
@@ -68,7 +68,7 @@ class StandardSqlComparisonPsStrategyTest {
     void lessThanComparison() {
         Comparison comparison = Comparison.lt(ColumnReference.of("Order", "quantity"), Literal.of(50));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"quantity\" < ?");
         assertThat(result.parameters()).containsExactly(50);
@@ -78,7 +78,7 @@ class StandardSqlComparisonPsStrategyTest {
     void lessThanOrEqualsComparison() {
         Comparison comparison = Comparison.lte(ColumnReference.of("User", "score"), Literal.of(1000));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"score\" <= ?");
         assertThat(result.parameters()).containsExactly(1000);
@@ -89,7 +89,7 @@ class StandardSqlComparisonPsStrategyTest {
         Comparison comparison =
                 Comparison.eq(ColumnReference.of("User", "created_by"), ColumnReference.of("User", "updated_by"));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"created_by\" = \"updated_by\"");
         assertThat(result.parameters()).isEmpty();
@@ -99,7 +99,7 @@ class StandardSqlComparisonPsStrategyTest {
     void differentTablesColumnComparison() {
         Comparison comparison = Comparison.eq(ColumnReference.of("User", "id"), ColumnReference.of("Order", "user_id"));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"id\" = \"user_id\"");
         assertThat(result.parameters()).isEmpty();
@@ -109,7 +109,7 @@ class StandardSqlComparisonPsStrategyTest {
     void comparisonWithBooleanLiteral() {
         Comparison comparison = Comparison.eq(ColumnReference.of("User", "is_active"), Literal.of(true));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"is_active\" = ?");
         assertThat(result.parameters()).containsExactly(true);
@@ -119,7 +119,7 @@ class StandardSqlComparisonPsStrategyTest {
     void comparisonWithStringLiteral() {
         Comparison comparison = Comparison.eq(ColumnReference.of("User", "email"), Literal.of("test@example.com"));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"email\" = ?");
         assertThat(result.parameters()).containsExactly("test@example.com");
@@ -129,7 +129,7 @@ class StandardSqlComparisonPsStrategyTest {
     void comparisonWithIntegerLiteral() {
         Comparison comparison = Comparison.ne(ColumnReference.of("Product", "category_id"), Literal.of(42));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"category_id\" <> ?");
         assertThat(result.parameters()).containsExactly(42);
@@ -139,7 +139,7 @@ class StandardSqlComparisonPsStrategyTest {
     void comparisonWithDoubleLiteral() {
         Comparison comparison = Comparison.gt(ColumnReference.of("Product", "weight"), Literal.of(1.5));
 
-        PsDto result = strategy.handle(comparison, renderer, ctx);
+        PreparedStatementSpec result = strategy.handle(comparison, specFactory, ctx);
 
         assertThat(result.sql()).isEqualTo("\"weight\" > ?");
         assertThat(result.parameters()).containsExactly(1.5);
@@ -148,22 +148,22 @@ class StandardSqlComparisonPsStrategyTest {
     @Test
     void allComparisonOperators() {
         // Test all supported operators to ensure they map correctly
-        assertThat(strategy.handle(Comparison.eq(ColumnReference.of("t", "c"), Literal.of("test1")), renderer, ctx)
+        assertThat(strategy.handle(Comparison.eq(ColumnReference.of("t", "c"), Literal.of("test1")), specFactory, ctx)
                         .sql())
                 .contains(" = ");
-        assertThat(strategy.handle(Comparison.ne(ColumnReference.of("t", "c"), Literal.of("test2")), renderer, ctx)
+        assertThat(strategy.handle(Comparison.ne(ColumnReference.of("t", "c"), Literal.of("test2")), specFactory, ctx)
                         .sql())
                 .contains(" <> ");
-        assertThat(strategy.handle(Comparison.gt(ColumnReference.of("t", "c"), Literal.of("test3")), renderer, ctx)
+        assertThat(strategy.handle(Comparison.gt(ColumnReference.of("t", "c"), Literal.of("test3")), specFactory, ctx)
                         .sql())
                 .contains(" > ");
-        assertThat(strategy.handle(Comparison.gte(ColumnReference.of("t", "c"), Literal.of("test4")), renderer, ctx)
+        assertThat(strategy.handle(Comparison.gte(ColumnReference.of("t", "c"), Literal.of("test4")), specFactory, ctx)
                         .sql())
                 .contains(" >= ");
-        assertThat(strategy.handle(Comparison.lt(ColumnReference.of("t", "c"), Literal.of("test5")), renderer, ctx)
+        assertThat(strategy.handle(Comparison.lt(ColumnReference.of("t", "c"), Literal.of("test5")), specFactory, ctx)
                         .sql())
                 .contains(" < ");
-        assertThat(strategy.handle(Comparison.lte(ColumnReference.of("t", "c"), Literal.of("test6")), renderer, ctx)
+        assertThat(strategy.handle(Comparison.lte(ColumnReference.of("t", "c"), Literal.of("test6")), specFactory, ctx)
                         .sql())
                 .contains(" <= ");
     }

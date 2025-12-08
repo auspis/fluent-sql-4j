@@ -15,7 +15,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -42,9 +42,10 @@ class StandardSqlMergeStatementPsStrategyTest {
                                         Literal.of("new")))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
-        PsDto result = strategy.handle(stmt, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo(
@@ -67,9 +68,10 @@ class StandardSqlMergeStatementPsStrategyTest {
                         InsertData.InsertValues.of(ColumnReference.of("src", "id"), Literal.of("John")))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
-        PsDto result = strategy.handle(stmt, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo("MERGE INTO \"users\" "
@@ -93,9 +95,10 @@ class StandardSqlMergeStatementPsStrategyTest {
                                 InsertData.InsertValues.of(Literal.of(2), Literal.of("pending")))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder().build();
+        PreparedStatementRenderer specFactory =
+                PreparedStatementRenderer.builder().build();
         MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
-        PsDto result = strategy.handle(stmt, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo("MERGE INTO \"users\" "

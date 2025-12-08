@@ -4,15 +4,15 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.SimpleDataTypePsStrategy;
 
 public class StandardSqlSimpleDataTypePsStrategy implements SimpleDataTypePsStrategy {
 
     @Override
-    public PsDto handle(SimpleDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(SimpleDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
         // Simple data types are static DDL elements without parameters
         // Inline rendering logic from StandardSqlSimpleDataTypeRenderStrategy
-        return new PsDto(type.name(), List.of());
+        return new PreparedStatementSpec(type.name(), List.of());
     }
 }

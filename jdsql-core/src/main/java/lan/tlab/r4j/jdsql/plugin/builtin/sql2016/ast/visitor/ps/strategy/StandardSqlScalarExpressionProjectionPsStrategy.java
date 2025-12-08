@@ -5,14 +5,16 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 
 public class StandardSqlScalarExpressionProjectionPsStrategy implements ScalarExpressionProjectionPsStrategy {
     @Override
-    public PsDto handle(
-            ScalarExpressionProjection scalarExpressionProjection, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            ScalarExpressionProjection scalarExpressionProjection,
+            Visitor<PreparedStatementSpec> renderer,
+            AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
         if (renderer instanceof PreparedStatementRenderer psRenderer) {
             escapeStrategy = psRenderer.getEscapeStrategy();
@@ -21,12 +23,12 @@ public class StandardSqlScalarExpressionProjectionPsStrategy implements ScalarEx
         Expression expr = scalarExpressionProjection.expression();
         String alias = scalarExpressionProjection.as().name();
 
-        PsDto exprResult = expr.accept(renderer, ctx);
+        PreparedStatementSpec exprResult = expr.accept(renderer, ctx);
         String sql = exprResult.sql();
 
         if (!alias.isBlank()) {
             sql += " AS " + escapeStrategy.apply(alias);
         }
-        return new PsDto(sql, exprResult.parameters());
+        return new PreparedStatementSpec(sql, exprResult.parameters());
     }
 }

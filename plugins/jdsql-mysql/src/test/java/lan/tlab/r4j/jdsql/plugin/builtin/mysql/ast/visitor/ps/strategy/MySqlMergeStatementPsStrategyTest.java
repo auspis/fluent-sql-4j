@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -44,11 +44,11 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         // TODO: use TestDialectRendererFactory
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
-        PsDto result = strategy.handle(stmt, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo(
@@ -71,11 +71,11 @@ class MySqlMergeStatementPsStrategyTest {
                         InsertData.InsertValues.of(ColumnReference.of("src", "id"), Literal.of("John")))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
-        PsDto result = strategy.handle(stmt, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo(
@@ -100,11 +100,11 @@ class MySqlMergeStatementPsStrategyTest {
                                 InsertData.InsertValues.of(Literal.of(2), Literal.of("pending")))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
-        PsDto result = strategy.handle(stmt, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
         assertThat(result.sql())
                 .isEqualTo(
@@ -126,11 +126,11 @@ class MySqlMergeStatementPsStrategyTest {
                         List.of(new UpdateItem(ColumnReference.of("", "status"), Literal.of("active"))))))
                 .build();
 
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
-        assertThatThrownBy(() -> strategy.handle(stmt, renderer, new AstContext()))
+        assertThatThrownBy(() -> strategy.handle(stmt, specFactory, new AstContext()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("MySQL MERGE requires a WHEN NOT MATCHED THEN INSERT clause");
     }

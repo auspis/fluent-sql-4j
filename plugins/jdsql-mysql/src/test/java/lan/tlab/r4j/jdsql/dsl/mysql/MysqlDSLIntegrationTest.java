@@ -84,10 +84,10 @@ class MysqlDSLIntegrationTest {
         MysqlDSL dsl = (MysqlDSL)
                 registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
 
-        // Verify the renderer is not null and properly configured
-        assertThat(dsl.getRenderer()).isNotNull();
+        // Verify the specFactory is not null and properly configured
+        assertThat(dsl.getSpecFactory()).isNotNull();
 
-        // Build a simple query to verify renderer works
+        // Build a simple query to verify specFactory works
         Connection connection = mock(Connection.class);
         PreparedStatement ps = mock(PreparedStatement.class);
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);

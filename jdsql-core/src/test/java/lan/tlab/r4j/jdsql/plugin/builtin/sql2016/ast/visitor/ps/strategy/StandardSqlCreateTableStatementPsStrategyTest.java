@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ class StandardSqlCreateTableStatementPsStrategyTest {
                 .columns(List.of(ColumnDefinitionBuilder.integer("id").build()))
                 .build());
 
-        PsDto result = strategy.handle(createTable, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(createTable, visitor, ctx);
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("users");
@@ -50,7 +50,7 @@ class StandardSqlCreateTableStatementPsStrategyTest {
                         ColumnDefinitionBuilder.varchar("name").build()))
                 .build());
 
-        PsDto result = strategy.handle(createTable, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(createTable, visitor, ctx);
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("users");
@@ -66,7 +66,7 @@ class StandardSqlCreateTableStatementPsStrategyTest {
                 .columns(List.of(ColumnDefinitionBuilder.integer("id").build()))
                 .build());
 
-        PsDto result = strategy.handle(createTable, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(createTable, visitor, ctx);
 
         assertThat(result.sql()).startsWith("CREATE TABLE");
         assertThat(result.sql()).contains("myschema");

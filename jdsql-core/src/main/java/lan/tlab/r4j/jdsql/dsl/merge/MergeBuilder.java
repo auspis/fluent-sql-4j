@@ -24,22 +24,22 @@ import lan.tlab.r4j.jdsql.ast.dml.component.MergeUsing;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
 
 public class MergeBuilder {
-    private final DialectRenderer renderer;
+    private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier targetTable;
     private MergeUsing using;
     private Predicate onCondition;
     private final List<MergeAction> actions = new ArrayList<>();
 
-    public MergeBuilder(DialectRenderer renderer, String targetTableName) {
+    public MergeBuilder(PreparedStatementSpecFactory specFactory, String targetTableName) {
         if (targetTableName == null || targetTableName.trim().isEmpty()) {
             throw new IllegalArgumentException("Target table name cannot be null or empty");
         }
-        this.renderer = renderer;
+        this.specFactory = specFactory;
         targetTable = new TableIdentifier(targetTableName);
     }
 
@@ -180,7 +180,7 @@ public class MergeBuilder {
     public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
         validateState();
         MergeStatement statement = getCurrentStatement();
-        PsDto result = renderer.renderPreparedStatement(statement);
+        PreparedStatementSpec result = specFactory.create(statement);
 
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {

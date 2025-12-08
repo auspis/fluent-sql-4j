@@ -6,13 +6,13 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.BehaviorKin
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 
 public class StandardSqlJsonValuePsStrategy implements JsonValuePsStrategy {
 
     @Override
-    public PsDto handle(JsonValue jsonValue, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(JsonValue jsonValue, PreparedStatementRenderer renderer, AstContext ctx) {
         var documentResult = jsonValue.jsonDocument().accept(renderer, ctx);
         var pathResult = jsonValue.path().accept(renderer, ctx);
 
@@ -45,6 +45,6 @@ public class StandardSqlJsonValuePsStrategy implements JsonValuePsStrategy {
         }
 
         sql.append(")");
-        return new PsDto(sql.toString(), parameters);
+        return new PreparedStatementSpec(sql.toString(), parameters);
     }
 }

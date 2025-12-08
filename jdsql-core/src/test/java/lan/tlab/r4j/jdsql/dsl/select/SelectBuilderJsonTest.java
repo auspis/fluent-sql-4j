@@ -18,7 +18,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBeha
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.WrapperBehavior;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,14 +26,14 @@ import org.mockito.ArgumentCaptor;
 
 class SelectBuilderJsonTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -48,7 +48,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonExists, "has_email"));
 
-        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -67,7 +67,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonExists, "has_email"));
 
-        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -86,7 +86,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("products").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -105,7 +105,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("products").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -128,7 +128,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "discount"));
 
-        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("products").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -146,7 +146,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonQuery, "addresses"));
 
-        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -165,7 +165,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonQuery, "tags"));
 
-        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("products").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -189,7 +189,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "id")),
                 new ScalarExpressionProjection(jsonQuery, "reviews"));
 
-        new SelectBuilder(renderer, select).from("products").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("products").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -213,7 +213,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(jsonValue, "age"),
                 new ScalarExpressionProjection(jsonQuery, "addresses"));
 
-        new SelectBuilder(renderer, select).from("users").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(
@@ -237,7 +237,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        new SelectBuilder(renderer, select)
+        new SelectBuilder(specFactory, select)
                 .from("products")
                 .where()
                 .column("category")
@@ -263,7 +263,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "rating"));
 
-        new SelectBuilder(renderer, select).from("products").orderBy("name").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, select).from("products").orderBy("name").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo(

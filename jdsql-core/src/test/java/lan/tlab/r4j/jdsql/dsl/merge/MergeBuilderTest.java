@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,14 +24,14 @@ import org.mockito.ArgumentCaptor;
 
 class MergeBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -40,7 +40,7 @@ class MergeBuilderTest {
 
     @Test
     void basicMergeWithTableSource() throws SQLException {
-        new MergeBuilder(renderer, "target_table")
+        new MergeBuilder(specFactory, "target_table")
                 .as("tgt")
                 .using("source_table", "src")
                 .on("tgt.id", "src.id")
@@ -67,7 +67,7 @@ class MergeBuilderTest {
     void mergeWithSubquerySource() throws SQLException {
         SelectStatement subquery = SelectStatement.builder().build();
 
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using(subquery, "src")
                 .on("target.id", "src.id")
                 .whenMatched()
@@ -89,7 +89,7 @@ class MergeBuilderTest {
     void mergeWithConditionalActions() throws SQLException {
         Predicate condition = Comparison.gt(ColumnReference.of("src", "value"), Literal.of(100));
 
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched(condition)
@@ -110,7 +110,7 @@ class MergeBuilderTest {
 
     @Test
     void mergeWithDelete() throws SQLException {
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
@@ -129,7 +129,7 @@ class MergeBuilderTest {
 
     @Test
     void mergeWithMultipleActions() throws SQLException {
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
@@ -152,21 +152,21 @@ class MergeBuilderTest {
 
     @Test
     void throwsExceptionWhenTargetTableIsNull() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, null))
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Target table name cannot be null or empty");
     }
 
     @Test
     void throwsExceptionWhenTargetTableIsEmpty() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, ""))
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Target table name cannot be null or empty");
     }
 
     @Test
     void throwsExceptionWhenUsingNotSpecified() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .on("target.id", "src.id")
                         .whenMatchedThenUpdate(List.of(UpdateItem.of("val", Literal.of(1))))
                         .buildPreparedStatement(connection))
@@ -176,7 +176,7 @@ class MergeBuilderTest {
 
     @Test
     void throwsExceptionWhenOnConditionNotSpecified() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .whenMatchedThenUpdate(List.of(UpdateItem.of("val", Literal.of(1))))
                         .buildPreparedStatement(connection))
@@ -186,7 +186,7 @@ class MergeBuilderTest {
 
     @Test
     void throwsExceptionWhenNoActionsSpecified() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .on("target.id", "source.id")
                         .buildPreparedStatement(connection))
@@ -196,7 +196,7 @@ class MergeBuilderTest {
 
     @Test
     void throwsExceptionWhenColumnsAndValuesMismatch() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .on("target.id", "source.id")
                         .whenNotMatchedThenInsert(
@@ -208,7 +208,7 @@ class MergeBuilderTest {
 
     @Test
     void fluentApiWithMultipleSets() throws SQLException {
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
@@ -232,7 +232,7 @@ class MergeBuilderTest {
 
     @Test
     void fluentApiWithMixedTypes() throws SQLException {
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenNotMatched()
@@ -258,7 +258,7 @@ class MergeBuilderTest {
 
     @Test
     void fluentApiThrowsExceptionWhenUpdateWithoutSets() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .on("target.id", "source.id")
                         .whenMatched()
@@ -269,7 +269,7 @@ class MergeBuilderTest {
 
     @Test
     void fluentApiThrowsExceptionWhenInsertWithoutColumns() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .on("target.id", "source.id")
                         .whenNotMatched()
@@ -280,7 +280,7 @@ class MergeBuilderTest {
 
     @Test
     void fluentApiThrowsExceptionWhenDeleteWithUpdateItems() {
-        assertThatThrownBy(() -> new MergeBuilder(renderer, "target")
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .on("target.id", "source.id")
                         .whenMatched()
@@ -293,7 +293,7 @@ class MergeBuilderTest {
 
     @Test
     void fluentApiWithColumnReferences() throws SQLException {
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()
@@ -314,7 +314,7 @@ class MergeBuilderTest {
     void fluentApiDeleteWithCondition() throws SQLException {
         Predicate condition = Comparison.lt(ColumnReference.of("src", "value"), Literal.of(0));
 
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched(condition)
@@ -336,7 +336,7 @@ class MergeBuilderTest {
     void fluentApiInsertWithCondition() throws SQLException {
         Predicate condition = Comparison.gt(ColumnReference.of("src", "value"), Literal.of(100));
 
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenNotMatched(condition)
@@ -357,7 +357,7 @@ class MergeBuilderTest {
 
     @Test
     void fluentApiWithDotNotationForColumnReferences() throws SQLException {
-        new MergeBuilder(renderer, "target")
+        new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target.id", "src.id")
                 .whenMatched()

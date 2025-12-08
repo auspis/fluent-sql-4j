@@ -5,12 +5,12 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ComparisonPsStrategy;
 
 public class StandardSqlComparisonPsStrategy implements ComparisonPsStrategy {
     @Override
-    public PsDto handle(Comparison cmp, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Comparison cmp, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         String operator;
         switch (cmp.operator()) {
             case EQUALS -> operator = "=";
@@ -25,15 +25,15 @@ public class StandardSqlComparisonPsStrategy implements ComparisonPsStrategy {
         List<Object> params = new ArrayList<>();
 
         // Handle LHS (Left Hand Side)
-        PsDto lhsResult = cmp.lhs().accept(renderer, ctx.copy());
+        PreparedStatementSpec lhsResult = cmp.lhs().accept(renderer, ctx.copy());
         String lhs = lhsResult.sql();
         params.addAll(lhsResult.parameters());
 
         // Handle RHS (Right Hand Side)
-        PsDto rhsResult = cmp.rhs().accept(renderer, ctx);
+        PreparedStatementSpec rhsResult = cmp.rhs().accept(renderer, ctx);
         String rhsSql = rhsResult.sql();
         params.addAll(rhsResult.parameters());
 
-        return new PsDto(lhs + " " + operator + " " + rhsSql, params);
+        return new PreparedStatementSpec(lhs + " " + operator + " " + rhsSql, params);
     }
 }

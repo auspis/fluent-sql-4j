@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.CurrentDate;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlPreparedStatementRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class MysqlCurrentDatePsStrategyTest {
 
     @Test
     void ok() {
-        PsDto result = strategy.handle(new CurrentDate(), psRenderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(new CurrentDate(), psRenderer, new AstContext());
         assertThat(result.sql()).isEqualTo("CURDATE()");
         assertThat(result.parameters()).isEmpty();
     }

@@ -3,8 +3,9 @@ package lan.tlab.r4j.jdsql.ast.visitor.ps.strategy;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface BinaryArithmeticExpressionPsStrategy {
-    PsDto handle(BinaryArithmeticExpression expression, Visitor<PsDto> visitor, AstContext ctx);
+    PreparedStatementSpec handle(
+            BinaryArithmeticExpression expression, Visitor<PreparedStatementSpec> visitor, AstContext ctx);
 }
