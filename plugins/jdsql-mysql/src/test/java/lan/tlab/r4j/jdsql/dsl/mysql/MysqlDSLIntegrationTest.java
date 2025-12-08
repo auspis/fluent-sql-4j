@@ -66,8 +66,8 @@ class MysqlDSLIntegrationTest {
     @Test
     void mysqlDslHasStandardAndCustomMethodsToo() {
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
-        MysqlDSL mysqlDsl = (MysqlDSL)
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
+        MysqlDSL mysqlDsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, "8.0.35", MysqlDSL.class)
+                .orElseThrow();
 
         assertThat(mysqlDsl).isNotNull();
 
@@ -81,8 +81,8 @@ class MysqlDSLIntegrationTest {
     void shouldHaveMySQLRendererConfigured() throws SQLException {
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 
-        MysqlDSL dsl = (MysqlDSL)
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
+        MysqlDSL dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, "8.0.35", MysqlDSL.class)
+                .orElseThrow();
 
         // Verify the specFactory is not null and properly configured
         assertThat(dsl.getSpecFactory()).isNotNull();
