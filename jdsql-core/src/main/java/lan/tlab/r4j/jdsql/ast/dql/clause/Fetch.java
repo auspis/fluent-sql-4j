@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.ast.dql.clause;
 
 import java.util.Objects;
-import lan.tlab.r4j.jdsql.ast.common.clause.Clause;
+import lan.tlab.r4j.jdsql.ast.core.clause.Clause;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 

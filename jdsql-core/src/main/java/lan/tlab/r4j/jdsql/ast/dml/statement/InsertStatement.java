@@ -2,8 +2,8 @@ package lan.tlab.r4j.jdsql.ast.dml.statement;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.set.TableExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.TableExpression;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.DefaultValues;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;

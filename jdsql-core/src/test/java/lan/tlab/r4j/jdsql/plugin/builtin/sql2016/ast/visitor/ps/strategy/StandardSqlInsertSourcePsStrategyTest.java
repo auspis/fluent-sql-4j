@@ -2,9 +2,9 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.set.NullSetExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.set.UnionExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.NullSetExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.UnionExpression;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertSource;
 import lan.tlab.r4j.jdsql.ast.dql.clause.From;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Select;

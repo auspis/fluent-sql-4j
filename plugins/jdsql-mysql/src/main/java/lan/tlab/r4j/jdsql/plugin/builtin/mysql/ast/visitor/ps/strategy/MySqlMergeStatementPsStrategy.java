@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
@@ -110,10 +110,10 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         return new PreparedStatementSpec(sql, params);
     }
 
-    private String getSourceAlias(lan.tlab.r4j.jdsql.ast.common.expression.set.TableExpression source) {
-        if (source instanceof lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier tableId) {
+    private String getSourceAlias(lan.tlab.r4j.jdsql.ast.core.expression.set.TableExpression source) {
+        if (source instanceof lan.tlab.r4j.jdsql.ast.core.identifier.TableIdentifier tableId) {
             return tableId.getTableReference();
-        } else if (source instanceof lan.tlab.r4j.jdsql.ast.common.expression.set.AliasedTableExpression aliased) {
+        } else if (source instanceof lan.tlab.r4j.jdsql.ast.core.expression.set.AliasedTableExpression aliased) {
             return aliased.getTableReference();
         }
         return "src"; // fallback
