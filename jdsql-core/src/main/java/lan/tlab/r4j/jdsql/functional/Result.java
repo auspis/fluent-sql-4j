@@ -42,6 +42,39 @@ public sealed interface Result<T> {
     }
 
     /**
+     * Transforms this result into a single value by applying one of two functions.
+     * <p>
+     * This is the fundamental catamorphism for the Result type. It forces you to handle
+     * both the success and failure cases explicitly, returning a single unified type.
+     * <p>
+     * <b>Example usage:</b>
+     * <pre>{@code
+     * String message = registry.dslFor("mysql", "8.0.35")
+     *     .fold(
+     *         dsl -> "Successfully loaded: " + dsl.getDialect(),
+     *         error -> "Failed to load DSL: " + error
+     *     );
+     *
+     * int count = someOperation()
+     *     .fold(
+     *         success -> success.size(),
+     *         error -> 0
+     *     );
+     * }</pre>
+     *
+     * @param <U> the type of the result after folding
+     * @param onSuccess the function to apply if this is a Success
+     * @param onFailure the function to apply if this is a Failure
+     * @return the result of applying either onSuccess or onFailure
+     */
+    default <U> U fold(Function<T, U> onSuccess, Function<String, U> onFailure) {
+        return switch (this) {
+            case Success<T>(T value) -> onSuccess.apply(value);
+            case Failure<T>(String message) -> onFailure.apply(message);
+        };
+    }
+
+    /**
      * Executes a side-effect action on the success value without transforming the result.
      * <p>
      * This method is useful for logging or other side effects while maintaining the functional
