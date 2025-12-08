@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.ast.dql.projection;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.Expression;
-import lan.tlab.r4j.jdsql.ast.common.identifier.Alias;
+import lan.tlab.r4j.jdsql.ast.core.expression.Expression;
+import lan.tlab.r4j.jdsql.ast.core.identifier.Alias;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitable;
 
 public abstract class Projection implements Visitable {

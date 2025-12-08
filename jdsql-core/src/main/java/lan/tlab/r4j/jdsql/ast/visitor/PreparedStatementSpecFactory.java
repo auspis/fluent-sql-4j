@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.ast.visitor;
 
 import java.util.Objects;
-import lan.tlab.r4j.jdsql.ast.statement.Statement;
+import lan.tlab.r4j.jdsql.ast.core.statement.Statement;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 

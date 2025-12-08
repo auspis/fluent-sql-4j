@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-import lan.tlab.r4j.jdsql.ast.common.clause.Clause;
+import lan.tlab.r4j.jdsql.ast.core.clause.Clause;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 

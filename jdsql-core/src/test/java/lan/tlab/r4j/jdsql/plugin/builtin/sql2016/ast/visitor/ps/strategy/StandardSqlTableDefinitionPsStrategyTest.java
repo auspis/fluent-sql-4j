@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.jdsql.ast.core.identifier.TableIdentifier;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;

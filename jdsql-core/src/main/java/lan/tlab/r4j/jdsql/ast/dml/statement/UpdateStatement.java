@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.ast.dml.statement;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.set.TableExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.TableExpression;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;

@@ -2,8 +2,8 @@ package lan.tlab.r4j.jdsql.dsl.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
 
 /**
  * Utility class for creating Literal expressions from Java values.

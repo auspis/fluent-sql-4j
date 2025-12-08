@@ -9,12 +9,12 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
-import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
+import lan.tlab.r4j.jdsql.ast.core.predicate.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
+import lan.tlab.r4j.jdsql.ast.core.predicate.NullPredicate;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
@@ -267,7 +267,7 @@ class UpdateBuilderTest {
 
         assertThat(result.condition()).isInstanceOf(AndOr.class);
         AndOr andOr = (AndOr) result.condition();
-        assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.jdsql.ast.common.predicate.logical.LogicalOperator.OR);
+        assertThat(andOr.operator()).isEqualTo(lan.tlab.r4j.jdsql.ast.core.predicate.LogicalOperator.OR);
     }
 
     @Test

@@ -3,8 +3,8 @@ package lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.builders;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 
 /**

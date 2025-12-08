@@ -3,7 +3,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
+import lan.tlab.r4j.jdsql.ast.core.identifier.TableIdentifier;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;

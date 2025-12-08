@@ -1,9 +1,9 @@
 package lan.tlab.r4j.jdsql.ast.dql.clause;
 
-import lan.tlab.r4j.jdsql.ast.common.clause.Clause;
-import lan.tlab.r4j.jdsql.ast.common.predicate.NullPredicate;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
-import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.clause.Clause;
+import lan.tlab.r4j.jdsql.ast.core.predicate.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.predicate.NullPredicate;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 
