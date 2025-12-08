@@ -6,7 +6,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.EscapeStrategy;
 
 public class StandardSqlAggregationFunctionProjectionPsStrategy implements AggregationFunctionProjectionPsStrategy {
     @Override

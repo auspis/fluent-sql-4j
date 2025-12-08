@@ -32,9 +32,9 @@ import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
-import lan.tlab.r4j.jdsql.dsl.HavingConditionBuilder;
-import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
-import lan.tlab.r4j.jdsql.dsl.SupportsWhere;
+import lan.tlab.r4j.jdsql.dsl.clause.HavingConditionBuilder;
+import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
+import lan.tlab.r4j.jdsql.dsl.clause.SupportsWhere;
 import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
 import lan.tlab.r4j.jdsql.dsl.util.PsUtil;
 
@@ -242,8 +242,9 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
      *
      * @return a WHERE builder
      */
-    public lan.tlab.r4j.jdsql.dsl.WhereBuilder<SelectBuilder> where() {
-        return new lan.tlab.r4j.jdsql.dsl.WhereBuilder<>(this, lan.tlab.r4j.jdsql.dsl.LogicalCombinator.AND);
+    public lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<SelectBuilder> where() {
+        return new lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<>(
+                this, lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator.AND);
     }
 
     public SelectBuilder groupBy(String... columns) {
@@ -310,8 +311,9 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
      *
      * @return a WHERE builder with AND combinator
      */
-    public lan.tlab.r4j.jdsql.dsl.WhereBuilder<SelectBuilder> and() {
-        return new lan.tlab.r4j.jdsql.dsl.WhereBuilder<>(this, lan.tlab.r4j.jdsql.dsl.LogicalCombinator.AND);
+    public lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<SelectBuilder> and() {
+        return new lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<>(
+                this, lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator.AND);
     }
 
     /**
@@ -319,8 +321,9 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
      *
      * @return a WHERE builder with OR combinator
      */
-    public lan.tlab.r4j.jdsql.dsl.WhereBuilder<SelectBuilder> or() {
-        return new lan.tlab.r4j.jdsql.dsl.WhereBuilder<>(this, lan.tlab.r4j.jdsql.dsl.LogicalCombinator.OR);
+    public lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<SelectBuilder> or() {
+        return new lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<>(
+                this, lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator.OR);
     }
 
     // Functional WHERE updater
