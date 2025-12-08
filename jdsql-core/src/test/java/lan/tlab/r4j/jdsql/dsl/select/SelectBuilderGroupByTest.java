@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,14 @@ import org.mockito.ArgumentCaptor;
 
 class SelectBuilderGroupByTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -32,14 +32,17 @@ class SelectBuilderGroupByTest {
 
     @Test
     void singleColumn() throws SQLException {
-        new SelectBuilder(renderer, "*").from("orders").groupBy("customer_id").buildPreparedStatement(connection);
+        new SelectBuilder(specFactory, "*")
+                .from("orders")
+                .groupBy("customer_id")
+                .buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\"");
     }
 
     @Test
     void multipleColumns() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id", "product_id")
                 .buildPreparedStatement(connection);
@@ -49,7 +52,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withTableAlias() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .as("o")
                 .groupBy("customer_id", "product_id")
@@ -61,7 +64,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withQualifiedColumns() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("orders.customer_id", "orders.product_id")
                 .buildPreparedStatement(connection);
@@ -71,7 +74,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withAliasAndQualifiedColumns() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .as("o")
                 .groupBy("o.customer_id", "o.product_id")
@@ -83,7 +86,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withWhere() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .where()
                 .column("status")
@@ -97,7 +100,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withOrderBy() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
                 .orderBy("customer_id")
@@ -109,7 +112,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withJoin() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .as("o")
                 .innerJoin("customers")
@@ -125,7 +128,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withJoinWhereAndOrderBy() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .as("o")
                 .innerJoin("customers")
@@ -145,7 +148,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void withFetchAndOffset() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
                 .fetch(10)
@@ -158,7 +161,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void manyColumns() throws SQLException {
-        new SelectBuilder(renderer, "*")
+        new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id", "product_id", "region", "status", "payment_method")
                 .buildPreparedStatement(connection);
@@ -170,7 +173,7 @@ class SelectBuilderGroupByTest {
 
     @Test
     void complexQuery() throws SQLException {
-        new SelectBuilder(renderer, "customer_id", "product_id", "total")
+        new SelectBuilder(specFactory, "customer_id", "product_id", "total")
                 .from("orders")
                 .as("o")
                 .innerJoin("customers")
@@ -195,28 +198,32 @@ class SelectBuilderGroupByTest {
 
     @Test
     void noColumnsThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("orders").groupBy())
+        assertThatThrownBy(
+                        () -> new SelectBuilder(specFactory, "*").from("orders").groupBy())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one column must be specified for GROUP BY");
     }
 
     @Test
     void nullColumnsThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("orders").groupBy((String[]) null))
+        assertThatThrownBy(
+                        () -> new SelectBuilder(specFactory, "*").from("orders").groupBy((String[]) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one column must be specified for GROUP BY");
     }
 
     @Test
     void emptyColumnThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("orders").groupBy("customer_id", ""))
+        assertThatThrownBy(
+                        () -> new SelectBuilder(specFactory, "*").from("orders").groupBy("customer_id", ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void nullColumnInArrayThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(renderer, "*").from("orders").groupBy("customer_id", null))
+        assertThatThrownBy(
+                        () -> new SelectBuilder(specFactory, "*").from("orders").groupBy("customer_id", null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }

@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
@@ -21,13 +21,13 @@ public final class MysqlSqlRendererFactory {
     }
 
     /**
-     * Creates a complete {@link DialectRenderer} (SQL + PreparedStatement) for MySQL.
+     * Creates a complete {@link PreparedStatementSpecFactory} (SQL + PreparedStatement) for MySQL.
      *
-     * @return DialectRenderer configured for MySQL 8.x
+     * @return PreparedStatementSpecFactory configured for MySQL 8.x
      * @throws IllegalArgumentException if the MySQL plugin is not available
      */
-    public static DialectRenderer dialectRendererMysql() {
-        return REGISTRY.getDialectRenderer(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
+    public static PreparedStatementSpecFactory dialectRendererMysql() {
+        return REGISTRY.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }
 

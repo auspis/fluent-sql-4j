@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,14 +20,14 @@ import org.mockito.ArgumentCaptor;
  */
 class InsertBuilderJsonTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -37,7 +37,10 @@ class InsertBuilderJsonTest {
     @Test
     void insertJsonObjectLiteral() throws SQLException {
         String jsonValue = "{\"name\":\"John\",\"age\":30}";
-        new InsertBuilder(renderer, "users").set("id", 1).set("data", jsonValue).buildPreparedStatement(connection);
+        new InsertBuilder(specFactory, "users")
+                .set("id", 1)
+                .set("data", jsonValue)
+                .buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue())
                 .isEqualTo("""
@@ -49,7 +52,7 @@ class InsertBuilderJsonTest {
     @Test
     void insertJsonArrayLiteral() throws SQLException {
         String jsonArray = "[\"item1\",\"item2\",\"item3\"]";
-        new InsertBuilder(renderer, "products")
+        new InsertBuilder(specFactory, "products")
                 .set("id", 100)
                 .set("tags", jsonArray)
                 .buildPreparedStatement(connection);
@@ -64,7 +67,7 @@ class InsertBuilderJsonTest {
     @Test
     void insertNestedJsonObject() throws SQLException {
         String nestedJson = "{\"user\":{\"name\":\"Alice\",\"address\":{\"city\":\"NYC\"}}}";
-        new InsertBuilder(renderer, "documents")
+        new InsertBuilder(specFactory, "documents")
                 .set("doc_id", 42)
                 .set("content", nestedJson)
                 .buildPreparedStatement(connection);
@@ -79,7 +82,7 @@ class InsertBuilderJsonTest {
     @Test
     void insertMultipleColumnsWithJson() throws SQLException {
         String metadata = "{\"version\":\"1.0\",\"author\":\"admin\"}";
-        new InsertBuilder(renderer, "articles")
+        new InsertBuilder(specFactory, "articles")
                 .set("title", "Test Article")
                 .set("published", true)
                 .set("metadata", metadata)
@@ -98,7 +101,7 @@ class InsertBuilderJsonTest {
 
     @Test
     void insertJsonWithNullValue() throws SQLException {
-        new InsertBuilder(renderer, "settings")
+        new InsertBuilder(specFactory, "settings")
                 .set("key", "app_config")
                 .set("value", (String) null)
                 .buildPreparedStatement(connection);
@@ -113,7 +116,7 @@ class InsertBuilderJsonTest {
     @Test
     void insertEmptyJsonObject() throws SQLException {
         String emptyJson = "{}";
-        new InsertBuilder(renderer, "logs")
+        new InsertBuilder(specFactory, "logs")
                 .set("log_id", 999)
                 .set("details", emptyJson)
                 .buildPreparedStatement(connection);
@@ -128,7 +131,7 @@ class InsertBuilderJsonTest {
     @Test
     void insertEmptyJsonArray() throws SQLException {
         String emptyArray = "[]";
-        new InsertBuilder(renderer, "collections")
+        new InsertBuilder(specFactory, "collections")
                 .set("collection_id", 5)
                 .set("items", emptyArray)
                 .buildPreparedStatement(connection);

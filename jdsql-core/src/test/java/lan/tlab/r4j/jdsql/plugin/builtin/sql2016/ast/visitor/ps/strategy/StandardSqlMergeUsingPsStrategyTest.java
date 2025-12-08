@@ -6,7 +6,7 @@ import lan.tlab.r4j.jdsql.ast.common.identifier.TableIdentifier;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeUsing;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class StandardSqlMergeUsingPsStrategyTest {
         TableIdentifier sourceTable = new TableIdentifier("source_table", "src");
         MergeUsing mergeUsing = new MergeUsing(sourceTable);
 
-        PsDto result = strategy.handle(mergeUsing, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(mergeUsing, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"source_table\" AS src");
         assertThat(result.parameters()).isEmpty();
@@ -39,7 +39,7 @@ class StandardSqlMergeUsingPsStrategyTest {
         TableIdentifier sourceTable = new TableIdentifier("staging");
         MergeUsing mergeUsing = new MergeUsing(sourceTable);
 
-        PsDto result = strategy.handle(mergeUsing, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(mergeUsing, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("\"staging\"");
         assertThat(result.parameters()).isEmpty();

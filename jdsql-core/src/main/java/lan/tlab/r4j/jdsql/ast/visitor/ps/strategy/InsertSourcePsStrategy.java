@@ -3,8 +3,8 @@ package lan.tlab.r4j.jdsql.ast.visitor.ps.strategy;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertSource;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface InsertSourcePsStrategy {
-    PsDto handle(InsertSource insertSource, Visitor<PsDto> visitor, AstContext ctx);
+    PreparedStatementSpec handle(InsertSource insertSource, Visitor<PreparedStatementSpec> visitor, AstContext ctx);
 }

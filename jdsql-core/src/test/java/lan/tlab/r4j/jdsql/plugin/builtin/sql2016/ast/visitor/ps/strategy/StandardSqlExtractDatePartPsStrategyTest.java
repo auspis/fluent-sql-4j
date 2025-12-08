@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.datetime.ExtractDatePart;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlExtractDatePartPsStrategyTest {
@@ -20,7 +20,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(extractYear, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(extractYear, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("EXTRACT(YEAR FROM \"created_date\")");
         assertThat(result.parameters()).isEqualTo(List.of());
@@ -33,7 +33,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(extractMonth, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(extractMonth, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("EXTRACT(MONTH FROM ?)");
         assertThat(result.parameters()).containsExactly("2023-12-25");
@@ -46,7 +46,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(extractDay, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(extractDay, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("EXTRACT(DAY FROM \"event_date\")");
         assertThat(result.parameters()).isEmpty();
@@ -59,7 +59,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
         var visitor = new PreparedStatementRenderer();
         var ctx = new AstContext();
 
-        PsDto result = strategy.handle(extractYear, visitor, ctx);
+        PreparedStatementSpec result = strategy.handle(extractYear, visitor, ctx);
 
         assertThat(result.sql()).isEqualTo("EXTRACT(YEAR FROM ?)");
         assertThat(result.parameters()).containsExactly("2023-06-15");

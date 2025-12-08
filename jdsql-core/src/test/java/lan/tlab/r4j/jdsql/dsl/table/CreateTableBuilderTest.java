@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.common.predicate.Comparison;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,14 +18,14 @@ import org.mockito.ArgumentCaptor;
 
 class CreateTableBuilderTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -34,7 +34,7 @@ class CreateTableBuilderTest {
 
     @Test
     void createUserTable() throws SQLException {
-        new CreateTableBuilder(renderer, "User")
+        new CreateTableBuilder(specFactory, "User")
                 .column("id")
                 .integer()
                 .notNull()
@@ -65,11 +65,13 @@ class CreateTableBuilderTest {
 
     @Test
     void columnIntegerPrimaryKey() throws SQLException {
-        new CreateTableBuilder(renderer, "Test").columnIntegerPrimaryKey("id").buildPreparedStatement(connection);
+        new CreateTableBuilder(specFactory, "Test")
+                .columnIntegerPrimaryKey("id")
+                .buildPreparedStatement(connection);
         String sqlShortForm = sqlCaptor.getValue();
         assertThat(sqlShortForm).contains("\"id\" INTEGER NOT NULL").contains("PRIMARY KEY (\"id\")");
 
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .column("id")
                 .integer()
                 .notNull()
@@ -82,14 +84,14 @@ class CreateTableBuilderTest {
 
     @Test
     void columnStringPrimaryKey() throws SQLException {
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .columnStringPrimaryKey("code", 50)
                 .buildPreparedStatement(connection);
         String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"code\" VARCHAR(50) NOT NULL").contains("PRIMARY KEY (\"code\")");
 
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .column("code")
                 .varchar(50)
                 .notNull()
@@ -102,14 +104,14 @@ class CreateTableBuilderTest {
 
     @Test
     void columnTimestampNotNull() throws SQLException {
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .columnTimestampNotNull("created_at")
                 .buildPreparedStatement(connection);
         String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"created_at\" TIMESTAMP NOT NULL");
 
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .column("created_at")
                 .timestamp()
                 .notNull()
@@ -121,14 +123,14 @@ class CreateTableBuilderTest {
 
     @Test
     void columnVarcharNotNull() throws SQLException {
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .columnVarcharNotNull("name", 100)
                 .buildPreparedStatement(connection);
         String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"name\" VARCHAR(100) NOT NULL");
 
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .column("name")
                 .varchar(100)
                 .notNull()
@@ -140,14 +142,14 @@ class CreateTableBuilderTest {
 
     @Test
     void columnDecimalNotNull() throws SQLException {
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .columnDecimalNotNull("price", 10, 2)
                 .buildPreparedStatement(connection);
         String sqlShortForm = sqlCaptor.getValue();
 
         assertThat(sqlShortForm).contains("\"price\" DECIMAL(10, 2) NOT NULL");
 
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .column("price")
                 .decimal(10, 2)
                 .notNull()
@@ -159,7 +161,7 @@ class CreateTableBuilderTest {
 
     @Test
     void allConvenienceMethodsTogether() throws SQLException {
-        new CreateTableBuilder(renderer, "Product")
+        new CreateTableBuilder(specFactory, "Product")
                 .column("id")
                 .integer()
                 .notNull()
@@ -189,7 +191,7 @@ class CreateTableBuilderTest {
 
     @Test
     void compositePrimaryKeyWithFluentApi() throws SQLException {
-        new CreateTableBuilder(renderer, "Orders")
+        new CreateTableBuilder(specFactory, "Orders")
                 .column("customer_id")
                 .integer()
                 .notNull()
@@ -209,7 +211,7 @@ class CreateTableBuilderTest {
 
     @Test
     void uniqueConstraint() throws SQLException {
-        new CreateTableBuilder(renderer, "Users")
+        new CreateTableBuilder(specFactory, "Users")
                 .column("id")
                 .integer()
                 .notNull()
@@ -223,7 +225,7 @@ class CreateTableBuilderTest {
 
     @Test
     void foreignKeyConstraint() throws SQLException {
-        new CreateTableBuilder(renderer, "Orders")
+        new CreateTableBuilder(specFactory, "Orders")
                 .column("id")
                 .integer()
                 .notNull()
@@ -237,7 +239,7 @@ class CreateTableBuilderTest {
 
     @Test
     void tableWithoutPrimaryKey() throws SQLException {
-        new CreateTableBuilder(renderer, "Log")
+        new CreateTableBuilder(specFactory, "Log")
                 .columnTimestampNotNull("timestamp")
                 .columnVarcharNotNull("message", 500)
                 .buildPreparedStatement(connection);
@@ -250,14 +252,14 @@ class CreateTableBuilderTest {
 
     @Test
     void booleanColumn() throws SQLException {
-        new CreateTableBuilder(renderer, "Settings").column("enabled").bool().buildPreparedStatement(connection);
+        new CreateTableBuilder(specFactory, "Settings").column("enabled").bool().buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).contains("\"enabled\" BOOLEAN");
     }
 
     @Test
     void mixedFluentAndConvenienceApis() throws SQLException {
-        new CreateTableBuilder(renderer, "Mixed")
+        new CreateTableBuilder(specFactory, "Mixed")
                 .columnIntegerPrimaryKey("id")
                 .column("description")
                 .varchar(255)
@@ -276,7 +278,7 @@ class CreateTableBuilderTest {
 
     @Test
     void checkConstraint() throws SQLException {
-        new CreateTableBuilder(renderer, "People")
+        new CreateTableBuilder(specFactory, "People")
                 .column("id")
                 .integer()
                 .notNull()
@@ -292,7 +294,7 @@ class CreateTableBuilderTest {
 
     @Test
     void defaultConstraint() throws SQLException {
-        new CreateTableBuilder(renderer, "Settings")
+        new CreateTableBuilder(specFactory, "Settings")
                 .column("id")
                 .integer()
                 .notNull()
@@ -306,7 +308,7 @@ class CreateTableBuilderTest {
 
     @Test
     void singleIndex() throws SQLException {
-        new CreateTableBuilder(renderer, "Users")
+        new CreateTableBuilder(specFactory, "Users")
                 .column("id")
                 .integer()
                 .notNull()
@@ -320,7 +322,7 @@ class CreateTableBuilderTest {
 
     @Test
     void compositeIndex() throws SQLException {
-        new CreateTableBuilder(renderer, "Orders")
+        new CreateTableBuilder(specFactory, "Orders")
                 .column("customer_id")
                 .integer()
                 .column("order_date")
@@ -333,7 +335,7 @@ class CreateTableBuilderTest {
 
     @Test
     void columnWithoutExplicitTypeUsesDefault() throws SQLException {
-        new CreateTableBuilder(renderer, "Test")
+        new CreateTableBuilder(specFactory, "Test")
                 .column("default_column")
                 .notNull()
                 .buildPreparedStatement(connection);
@@ -345,7 +347,7 @@ class CreateTableBuilderTest {
     @Test
     void primaryKeyWithExplicitOrderControl() throws SQLException {
         // Demonstrates explicit control of the order of columns in the primary key
-        new CreateTableBuilder(renderer, "OrderItems")
+        new CreateTableBuilder(specFactory, "OrderItems")
                 .column("item_id")
                 .integer()
                 .notNull()

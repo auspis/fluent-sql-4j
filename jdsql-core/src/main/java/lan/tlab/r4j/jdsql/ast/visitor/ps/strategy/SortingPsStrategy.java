@@ -3,8 +3,8 @@ package lan.tlab.r4j.jdsql.ast.visitor.ps.strategy;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface SortingPsStrategy {
-    PsDto handle(Sorting sorting, Visitor<PsDto> visitor, AstContext ctx);
+    PreparedStatementSpec handle(Sorting sorting, Visitor<PreparedStatementSpec> visitor, AstContext ctx);
 }

@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.JsonValue;
 import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.json.OnEmptyBehavior;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -17,13 +17,13 @@ class MysqlJsonValuePsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(ColumnReference.of("users", "address"), Literal.of("$.city"));
 
-        PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
         assertThat(result.sql()).isEqualTo("JSON_UNQUOTE(JSON_EXTRACT(`address`, ?))");
         assertThat(result.parameters()).containsExactly("$.city");
@@ -31,13 +31,13 @@ class MysqlJsonValuePsStrategyTest {
 
     @Test
     void withTableQualifiedColumn() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
-        PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
         // PreparedStatementRenderer outputs only column name when no table context
         assertThat(result.sql()).isEqualTo("JSON_UNQUOTE(JSON_EXTRACT(`data`, ?))");
@@ -47,14 +47,14 @@ class MysqlJsonValuePsStrategyTest {
     @Test
     void withReturningTypeIsIgnored() {
         // MySQL does not support RETURNING - it should be ignored
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
         JsonValue jsonValue =
                 new JsonValue(ColumnReference.of("products", "price"), Literal.of("$.amount"), "DECIMAL(10,2)");
 
-        PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
         // RETURNING type should be ignored
         assertThat(result.sql()).isEqualTo("JSON_UNQUOTE(JSON_EXTRACT(`price`, ?))");
@@ -64,7 +64,7 @@ class MysqlJsonValuePsStrategyTest {
     @Test
     void withOnEmptyAndOnErrorBehaviorsAreIgnored() {
         // MySQL does not support ON EMPTY or ON ERROR - they should be ignored
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
@@ -75,7 +75,7 @@ class MysqlJsonValuePsStrategyTest {
                 OnEmptyBehavior.defaultValue("0.00"),
                 BehaviorKind.ERROR);
 
-        PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
         // ON EMPTY and ON ERROR should be ignored
         assertThat(result.sql()).isEqualTo("JSON_UNQUOTE(JSON_EXTRACT(`data`, ?))");
@@ -84,13 +84,13 @@ class MysqlJsonValuePsStrategyTest {
 
     @Test
     void withNestedJsonPath() {
-        PreparedStatementRenderer renderer = PreparedStatementRenderer.builder()
+        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(ColumnReference.of("orders", "metadata"), Literal.of("$.customer.name"));
 
-        PsDto result = strategy.handle(jsonValue, renderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
         assertThat(result.sql()).isEqualTo("JSON_UNQUOTE(JSON_EXTRACT(`metadata`, ?))");
         assertThat(result.parameters()).containsExactly("$.customer.name");

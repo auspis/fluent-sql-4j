@@ -6,12 +6,13 @@ import lan.tlab.r4j.jdsql.ast.common.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.InsertValuesPsStrategy;
 
 public class StandardSqlInsertValuesPsStrategy implements InsertValuesPsStrategy {
     @Override
-    public PsDto handle(InsertValues insertValues, Visitor<PsDto> renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            InsertValues insertValues, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         List<String> placeholders = new ArrayList<>();
         List<Object> params = new ArrayList<>();
         for (var expr : insertValues.valueExpressions()) {
@@ -25,6 +26,6 @@ public class StandardSqlInsertValuesPsStrategy implements InsertValuesPsStrategy
             }
         }
         String sql = String.join(", ", placeholders);
-        return new PsDto(sql, params);
+        return new PreparedStatementSpec(sql, params);
     }
 }

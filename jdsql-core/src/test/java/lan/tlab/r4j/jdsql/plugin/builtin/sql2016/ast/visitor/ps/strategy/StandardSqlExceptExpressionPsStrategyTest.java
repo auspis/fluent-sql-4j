@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.common.expression.set.ExceptExpression;
 import lan.tlab.r4j.jdsql.ast.common.expression.set.NullSetExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class StandardSqlExceptExpressionPsStrategyTest {
         var visitor = PreparedStatementRenderer.builder().build();
 
         // when
-        PsDto result = strategy.handle(expression, visitor, null);
+        PreparedStatementSpec result = strategy.handle(expression, visitor, null);
 
         // then
         assertThat(result.sql()).isEqualTo("(() EXCEPT ())");
@@ -34,7 +34,7 @@ class StandardSqlExceptExpressionPsStrategyTest {
         var visitor = PreparedStatementRenderer.builder().build();
 
         // when
-        PsDto result = strategy.handle(expression, visitor, null);
+        PreparedStatementSpec result = strategy.handle(expression, visitor, null);
 
         // then
         assertThat(result.sql()).isEqualTo("(() EXCEPT ALL ())");

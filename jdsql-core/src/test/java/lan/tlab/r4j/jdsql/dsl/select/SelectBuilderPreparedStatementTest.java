@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.ast.visitor.DialectRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +17,14 @@ import org.mockito.ArgumentCaptor;
 
 class SelectBuilderPreparedStatementTest {
 
-    private DialectRenderer renderer;
+    private PreparedStatementSpecFactory specFactory;
     private Connection connection;
     private PreparedStatement ps;
     private ArgumentCaptor<String> sqlCaptor;
 
     @BeforeEach
     void setUp() throws SQLException {
-        renderer = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -33,7 +33,7 @@ class SelectBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementRequiresConnection() {
-        SelectBuilder builder = new SelectBuilder(renderer, "*")
+        SelectBuilder builder = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("age")
@@ -44,7 +44,7 @@ class SelectBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementCompilesWithoutError() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "name", "email")
+        PreparedStatement result = new SelectBuilder(specFactory, "name", "email")
                 .from("users")
                 .where()
                 .column("age")
@@ -63,7 +63,7 @@ class SelectBuilderPreparedStatementTest {
 
     @Test
     void buildPreparedStatementWithJoinCompilesWithoutError() throws SQLException {
-        PreparedStatement result = new SelectBuilder(renderer, "name", "email")
+        PreparedStatement result = new SelectBuilder(specFactory, "name", "email")
                 .from("users")
                 .as("u")
                 .innerJoin("orders")

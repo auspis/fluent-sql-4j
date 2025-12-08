@@ -9,21 +9,22 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
 
 public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsStrategy {
 
     @Override
-    public PsDto handle(TableDefinition tableDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            TableDefinition tableDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
 
-        PsDto tableDto = tableDefinition.table().accept(renderer, ctx);
+        PreparedStatementSpec tableDto = tableDefinition.table().accept(renderer, ctx);
         allParameters.addAll(tableDto.parameters());
 
         String columnsSql = tableDefinition.columns().stream()
                 .map(c -> {
-                    PsDto columnDto = renderer.visit(c, ctx);
+                    PreparedStatementSpec columnDto = renderer.visit(c, ctx);
                     allParameters.addAll(columnDto.parameters());
                     return columnDto.sql();
                 })
@@ -34,7 +35,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
         String indexesSql = renderIndexes(tableDefinition.indexes(), renderer, ctx, allParameters);
 
         String sql = tableDto.sql() + " (" + columnsSql + primaryKeySql + constraintsSql + indexesSql + ")";
-        return new PsDto(sql, allParameters);
+        return new PreparedStatementSpec(sql, allParameters);
     }
 
     private String renderPrimaryKey(
@@ -45,7 +46,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
         if (primaryKey == null) {
             return "";
         }
-        PsDto pkDto = renderer.visit(primaryKey, ctx);
+        PreparedStatementSpec pkDto = renderer.visit(primaryKey, ctx);
         allParameters.addAll(pkDto.parameters());
         return ", " + pkDto.sql();
     }
@@ -60,7 +61,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
         }
         String constraintsSql = constraints.stream()
                 .map(c -> {
-                    PsDto constraintDto = c.accept(renderer, ctx);
+                    PreparedStatementSpec constraintDto = c.accept(renderer, ctx);
                     allParameters.addAll(constraintDto.parameters());
                     return constraintDto.sql();
                 })
@@ -78,7 +79,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
         }
         String indexesSql = indexes.stream()
                 .map(i -> {
-                    PsDto indexDto = renderer.visit(i, ctx);
+                    PreparedStatementSpec indexDto = renderer.visit(i, ctx);
                     allParameters.addAll(indexDto.parameters());
                     return indexDto.sql();
                 })
