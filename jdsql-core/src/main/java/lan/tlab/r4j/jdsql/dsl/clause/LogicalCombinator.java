@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.dsl.clause;
 
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
-import lan.tlab.r4j.jdsql.ast.common.predicate.logical.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.predicate.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 
 /**
  * Represents how to combine boolean expressions in WHERE clauses.

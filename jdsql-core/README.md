@@ -76,8 +76,8 @@ The SQL DSL provides a fluent, type-safe API for building SQL queries programmat
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("standardsql", "2008").orElseThrow();
 
-// Or for MySQL-specific features
-MysqlDSL mysql = (MysqlDSL) registry.dslFor("mysql", "8.0.35").orElseThrow();
+// Or for MySQL-specific features (type-safe, no casting required)
+MysqlDSL mysql = registry.dslFor("mysql", "8.0.35", MysqlDSL.class).orElseThrow();
 ```
 
 ### Standard SQL DSL Features
@@ -161,7 +161,7 @@ FROM "users"
 ### GROUP_CONCAT - Basic Usage
 
 ```java
-MysqlDSL mysql = (MysqlDSL) registry.dslFor("mysql", "8.0.35").orElseThrow();
+MysqlDSL mysql = registry.dslFor("mysql", "8.0.35", MysqlDSL.class).orElseThrow();
 
 PreparedStatement ps = mysql.select()
     .column("department")

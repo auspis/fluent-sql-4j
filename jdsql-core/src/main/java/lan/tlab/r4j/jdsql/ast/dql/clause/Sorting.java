@@ -1,6 +1,6 @@
 package lan.tlab.r4j.jdsql.ast.dql.clause;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitable;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;

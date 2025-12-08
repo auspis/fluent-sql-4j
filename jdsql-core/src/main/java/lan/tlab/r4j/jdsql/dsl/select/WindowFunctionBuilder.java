@@ -2,16 +2,16 @@ package lan.tlab.r4j.jdsql.dsl.select;
 
 import java.util.ArrayList;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.DenseRank;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.Lag;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.Lead;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.Ntile;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.OverClause;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.Rank;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.RowNumber;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.window.WindowFunction;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.DenseRank;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.Lag;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.Lead;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.Ntile;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.OverClause;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.Rank;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.RowNumber;
+import lan.tlab.r4j.jdsql.ast.core.expression.window.WindowFunction;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 
 /**

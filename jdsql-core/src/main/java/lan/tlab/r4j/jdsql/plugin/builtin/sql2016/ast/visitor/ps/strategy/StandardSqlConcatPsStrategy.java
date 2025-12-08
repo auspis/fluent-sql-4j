@@ -3,7 +3,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.function.string.Concat;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.string.Concat;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;

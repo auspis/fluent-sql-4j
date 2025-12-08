@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.jdsql.ast.common.expression.set.NullSetExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.set.NullSetExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 

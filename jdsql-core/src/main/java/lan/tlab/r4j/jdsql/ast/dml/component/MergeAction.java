@@ -1,8 +1,8 @@
 package lan.tlab.r4j.jdsql.ast.dml.component;
 
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.common.expression.scalar.ColumnReference;
-import lan.tlab.r4j.jdsql.ast.common.predicate.Predicate;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitable;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
