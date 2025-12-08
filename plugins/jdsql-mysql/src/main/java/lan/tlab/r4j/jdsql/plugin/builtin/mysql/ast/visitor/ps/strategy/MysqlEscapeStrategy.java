@@ -1,6 +1,6 @@
-package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape;
+package lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.EscapeStrategy;
 
 public class MysqlEscapeStrategy implements EscapeStrategy {
 

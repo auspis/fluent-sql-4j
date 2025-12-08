@@ -91,7 +91,7 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.EscapeStrategy;
 
 public interface Visitor<T> {
 
