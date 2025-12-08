@@ -6,10 +6,15 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PsDto;
 
 /**
- * Encapsulates the PreparedStatement renderer for a specific SQL dialect.
+ * Orchestrates SQL statement rendering for a specific dialect.
  * <p>
- * This class provides consistent SQL generation with proper parameter binding
- * for prepared statements, ensuring SQL injection prevention and optimal performance.
+ * This class coordinates two-phase rendering:
+ * <ol>
+ *   <li><b>Context preparation</b>: Analyzes the AST to enrich context with metadata (e.g., JOIN detection)</li>
+ *   <li><b>SQL generation</b>: Delegates to {@link PreparedStatementRenderer} for dialect-specific rendering</li>
+ * </ol>
+ * <p>
+ * This separation ensures rendering strategies receive the necessary context without managing it themselves.
  * <p>
  * <b>Example usage:</b>
  * <pre>{@code
@@ -31,11 +36,6 @@ public record DialectRenderer(PreparedStatementRenderer psRenderer) {
 
     private static final ContextPreparationVisitor CONTEXT_ANALYZER = new ContextPreparationVisitor();
 
-    /**
-     * Compact constructor with validation.
-     *
-     * @throws NullPointerException if psRenderer is {@code null}
-     */
     public DialectRenderer {
         Objects.requireNonNull(psRenderer, "PreparedStatementRenderer must not be null");
     }
