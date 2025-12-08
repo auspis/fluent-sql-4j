@@ -12,8 +12,8 @@ import lan.tlab.r4j.jdsql.ast.dml.statement.DeleteStatement;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
-import lan.tlab.r4j.jdsql.dsl.LogicalCombinator;
-import lan.tlab.r4j.jdsql.dsl.SupportsWhere;
+import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
+import lan.tlab.r4j.jdsql.dsl.clause.SupportsWhere;
 
 public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
     private DeleteStatement.DeleteStatementBuilder statementBuilder = DeleteStatement.builder();
@@ -34,8 +34,8 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
      *
      * @return a WHERE builder
      */
-    public lan.tlab.r4j.jdsql.dsl.WhereBuilder<DeleteBuilder> where() {
-        return new lan.tlab.r4j.jdsql.dsl.WhereBuilder<>(this, LogicalCombinator.AND);
+    public lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<DeleteBuilder> where() {
+        return new lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<>(this, LogicalCombinator.AND);
     }
 
     /**
@@ -43,8 +43,8 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
      *
      * @return a WHERE builder with AND combinator
      */
-    public lan.tlab.r4j.jdsql.dsl.WhereBuilder<DeleteBuilder> and() {
-        return new lan.tlab.r4j.jdsql.dsl.WhereBuilder<>(this, LogicalCombinator.AND);
+    public lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<DeleteBuilder> and() {
+        return new lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<>(this, LogicalCombinator.AND);
     }
 
     /**
@@ -52,8 +52,8 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
      *
      * @return a WHERE builder with OR combinator
      */
-    public lan.tlab.r4j.jdsql.dsl.WhereBuilder<DeleteBuilder> or() {
-        return new lan.tlab.r4j.jdsql.dsl.WhereBuilder<>(this, LogicalCombinator.OR);
+    public lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<DeleteBuilder> or() {
+        return new lan.tlab.r4j.jdsql.dsl.clause.WhereBuilder<>(this, LogicalCombinator.OR);
     }
 
     @Override

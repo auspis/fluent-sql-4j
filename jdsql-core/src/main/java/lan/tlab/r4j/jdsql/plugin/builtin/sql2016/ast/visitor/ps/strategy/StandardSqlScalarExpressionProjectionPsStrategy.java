@@ -6,8 +6,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.EscapeStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ScalarExpressionProjectionPsStrategy;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
 
 public class StandardSqlScalarExpressionProjectionPsStrategy implements ScalarExpressionProjectionPsStrategy {
     @Override
