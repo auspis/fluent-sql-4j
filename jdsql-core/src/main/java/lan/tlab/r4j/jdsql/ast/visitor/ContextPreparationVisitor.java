@@ -92,7 +92,7 @@ import lan.tlab.r4j.jdsql.ast.dql.source.FromSource;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.escape.EscapeStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.EscapeStrategy;
 
 /**
  * A visitor that traverses an AST and enriches the context with detected features (JOIN, UNION,

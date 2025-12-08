@@ -10,11 +10,11 @@ import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCurr
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCurrentDateTimePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCustomFunctionCallPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlDateArithmeticRenderStrategy;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlEscapeStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlJsonExistsPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlJsonQueryPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlJsonValuePsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.sql.strategy.escape.MysqlEscapeStrategy;
 
 /**
  * Built-in plugin for the MySQL dialect.
