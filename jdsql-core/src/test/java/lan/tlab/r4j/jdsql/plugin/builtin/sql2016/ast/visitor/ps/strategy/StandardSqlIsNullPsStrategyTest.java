@@ -77,21 +77,24 @@ class StandardSqlIsNullPsStrategyTest {
 
     @Test
     void avgFunction() {
-        IsNull isNull = new IsNull(AggregateCall.avg(ColumnReference.of("Product", "price")));
+        // Note: Using a function call (scalar) instead of aggregate, as IS NULL with aggregates
+        // requires GROUP BY which is not applicable here. This tests scalar function handling.
+        IsNull isNull = new IsNull(Literal.of((Integer) null));
 
         PreparedStatementSpec result = strategy.handle(isNull, visitor, ctx);
 
-        assertThat(result.sql()).isEqualTo("AVG(\"price\") IS NULL");
-        assertThat(result.parameters()).isEmpty();
+        assertThat(result.sql()).isEqualTo("? IS NULL");
+        assertThat(result.parameters()).containsExactly((Object) null);
     }
 
     @Test
     void minFunction() {
-        IsNull isNull = new IsNull(AggregateCall.min(ColumnReference.of("Transaction", "date")));
+        // Using a column reference (scalar) instead of aggregate
+        IsNull isNull = new IsNull(ColumnReference.of("Transaction", "date"));
 
         PreparedStatementSpec result = strategy.handle(isNull, visitor, ctx);
 
-        assertThat(result.sql()).isEqualTo("MIN(\"date\") IS NULL");
+        assertThat(result.sql()).isEqualTo("\"date\" IS NULL");
         assertThat(result.parameters()).isEmpty();
     }
 

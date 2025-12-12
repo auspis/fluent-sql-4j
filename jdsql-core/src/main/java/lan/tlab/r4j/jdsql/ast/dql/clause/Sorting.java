@@ -1,11 +1,25 @@
 package lan.tlab.r4j.jdsql.ast.dql.clause;
 
+import lan.tlab.r4j.jdsql.ast.core.expression.ValueExpression;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateExpression;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitable;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 
-public record Sorting(ScalarExpression expression, SortOrder sortOrder) implements Visitable {
+/**
+ * Represents a sorting specification in an ORDER BY clause.
+ *
+ * <p>A sorting specification can be either:
+ * <ul>
+ *   <li>A {@link ScalarExpression}: column references, literals, functions, etc.
+ *   <li>An {@link AggregateExpression}: aggregate functions like SUM(), AVG(), etc.
+ * </ul>
+ *
+ * <p>The {@link #expression} is a {@link ValueExpression} which encompasses both scalar and
+ * aggregate expressions. Predicates and set expressions are NOT allowed in ORDER BY.
+ */
+public record Sorting(ValueExpression expression, SortOrder sortOrder) implements Visitable {
 
     public enum SortOrder {
         ASC("ASC"),
@@ -27,11 +41,23 @@ public record Sorting(ScalarExpression expression, SortOrder sortOrder) implemen
         return new Sorting(expression, SortOrder.ASC);
     }
 
+    public static Sorting asc(AggregateExpression expression) {
+        return new Sorting(expression, SortOrder.ASC);
+    }
+
     public static Sorting desc(ScalarExpression expression) {
         return new Sorting(expression, SortOrder.DESC);
     }
 
+    public static Sorting desc(AggregateExpression expression) {
+        return new Sorting(expression, SortOrder.DESC);
+    }
+
     public static Sorting by(ScalarExpression expression) {
+        return new Sorting(expression, SortOrder.DEFAULT);
+    }
+
+    public static Sorting by(AggregateExpression expression) {
         return new Sorting(expression, SortOrder.DEFAULT);
     }
 
