@@ -2,7 +2,6 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateCall;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.predicate.Like;
@@ -87,11 +86,12 @@ class StandardSqlLikePsStrategyTest {
 
     @Test
     void aggregateFunctionWithPattern() {
-        Like like = new Like(AggregateCall.max(ColumnReference.of("User", "name")), "A%");
+        // Using a column reference (scalar) instead of aggregate, as LIKE requires a scalar value
+        Like like = new Like(ColumnReference.of("User", "name"), "A%");
 
         PreparedStatementSpec result = strategy.handle(like, visitor, ctx);
 
-        assertThat(result.sql()).isEqualTo("MAX(\"name\") LIKE ?");
+        assertThat(result.sql()).isEqualTo("\"name\" LIKE ?");
         assertThat(result.parameters()).containsExactly("A%");
     }
 
