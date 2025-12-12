@@ -87,6 +87,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSource;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
@@ -640,6 +641,11 @@ public class PreparedStatementRenderer implements Visitor<PreparedStatementSpec>
     @Override
     public PreparedStatementSpec visit(CreateTableStatement createTableStatement, AstContext ctx) {
         return createTableStatementStrategy.handle(createTableStatement, this, ctx);
+    }
+
+    @Override
+    public PreparedStatementSpec visit(AggregateExpressionProjection aggregateExpressionProjection, AstContext ctx) {
+        return aggregationFunctionProjectionStrategy.handle(aggregateExpressionProjection, this, ctx);
     }
 
     @Override

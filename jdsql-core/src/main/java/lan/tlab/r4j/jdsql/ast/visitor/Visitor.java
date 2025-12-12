@@ -87,6 +87,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
@@ -111,6 +112,8 @@ public interface Visitor<T> {
 
     // clause
     T visit(Select clause, AstContext ctx);
+
+    T visit(AggregateExpressionProjection aggregateExpressionProjection, AstContext ctx);
 
     T visit(AggregateCallProjection aggregationFunctionProjection, AstContext ctx);
 

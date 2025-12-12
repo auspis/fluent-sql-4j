@@ -3,7 +3,7 @@ package lan.tlab.r4j.jdsql.dsl.clause;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import lan.tlab.r4j.jdsql.ast.core.expression.Expression;
+import lan.tlab.r4j.jdsql.ast.core.expression.ValueExpression;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarSubquery;
@@ -208,7 +208,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         }
         return addCondition(new In(
                 getColumnRef(),
-                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+                Arrays.stream(values).map(v -> (ValueExpression) Literal.of(v)).toList()));
     }
 
     public T in(Number... values) {
@@ -217,7 +217,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         }
         return addCondition(new In(
                 getColumnRef(),
-                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+                Arrays.stream(values).map(v -> (ValueExpression) Literal.of(v)).toList()));
     }
 
     public T in(Boolean... values) {
@@ -226,7 +226,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         }
         return addCondition(new In(
                 getColumnRef(),
-                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+                Arrays.stream(values).map(v -> (ValueExpression) Literal.of(v)).toList()));
     }
 
     public T in(LocalDate... values) {
@@ -235,7 +235,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         }
         return addCondition(new In(
                 getColumnRef(),
-                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+                Arrays.stream(values).map(v -> (ValueExpression) Literal.of(v)).toList()));
     }
 
     public T in(LocalDateTime... values) {
@@ -244,7 +244,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         }
         return addCondition(new In(
                 getColumnRef(),
-                Arrays.stream(values).map(v -> (Expression) Literal.of(v)).toList()));
+                Arrays.stream(values).map(v -> (ValueExpression) Literal.of(v)).toList()));
     }
 
     // Helper methods

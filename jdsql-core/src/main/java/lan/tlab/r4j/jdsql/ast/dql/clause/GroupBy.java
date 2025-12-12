@@ -5,11 +5,33 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import lan.tlab.r4j.jdsql.ast.core.clause.Clause;
-import lan.tlab.r4j.jdsql.ast.core.expression.Expression;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 
-public record GroupBy(List<Expression> groupingExpressions) implements Clause {
+/**
+ * Represents a GROUP BY clause in a SELECT statement.
+ *
+ * <p>GROUP BY accepts only {@link ScalarExpression scalar expressions} (column references,
+ * literals, arithmetic expressions, functions, etc.) to define the grouping key.
+ *
+ * <p>This type safety prevents aggregate expressions (COUNT, SUM, AVG, etc.) from being used
+ * in GROUP BY, which would generate invalid SQL like {@code GROUP BY SUM(amount)}.
+ *
+ * <p>Examples:
+ * <ul>
+ *   <li>{@code GROUP BY department} - column reference
+ *   <li>{@code GROUP BY YEAR(order_date)} - function call
+ *   <li>{@code GROUP BY department, region} - multiple columns
+ * </ul>
+ *
+ * <p>Invalid (prevented by type system):
+ * <ul>
+ *   <li>{@code GROUP BY SUM(amount)} - ❌ aggregate expression not allowed
+ *   <li>{@code GROUP BY COUNT(*)} - ❌ aggregate expression not allowed
+ * </ul>
+ */
+public record GroupBy(List<ScalarExpression> groupingExpressions) implements Clause {
 
     public GroupBy {
         if (groupingExpressions == null) {
@@ -21,11 +43,11 @@ public record GroupBy(List<Expression> groupingExpressions) implements Clause {
         return new GroupBy(null);
     }
 
-    public static GroupBy of(Expression... expressions) {
+    public static GroupBy of(ScalarExpression... expressions) {
         return of(Stream.of(expressions).toList());
     }
 
-    public static GroupBy of(List<Expression> expressions) {
+    public static GroupBy of(List<ScalarExpression> expressions) {
         return new GroupBy(expressions);
     }
 
