@@ -5,7 +5,20 @@ import lan.tlab.r4j.jdsql.ast.core.identifier.Alias;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
 
-public class AggregateCallProjection extends Projection {
+/**
+ * Represents a projection with an {@link AggregateCall}.
+ *
+ * <p>This is a specialized version of {@link AggregateExpressionProjection} specifically for
+ * {@link AggregateCall} expressions (COUNT, SUM, AVG, MAX, MIN, and their variants like
+ * COUNT(DISTINCT ...)).
+ *
+ * <p>Example:
+ * <pre>
+ *   SELECT COUNT(*) AS cnt, SUM(amount) AS total
+ *   // -> AggregateCallProjection for COUNT(*) and SUM(amount)
+ * </pre>
+ */
+public class AggregateCallProjection extends AggregateExpressionProjection {
 
     public AggregateCallProjection(AggregateCall expression) {
         super(expression);
