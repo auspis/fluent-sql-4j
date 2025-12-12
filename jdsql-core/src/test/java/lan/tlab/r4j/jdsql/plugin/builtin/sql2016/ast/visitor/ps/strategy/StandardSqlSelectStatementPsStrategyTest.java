@@ -14,6 +14,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.OrderBy;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
+import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
@@ -83,7 +84,7 @@ class StandardSqlSelectStatementPsStrategyTest {
         SelectStatement statement = SelectStatement.builder()
                 .select(Select.of(
                         new ScalarExpressionProjection(ColumnReference.of("employees", "department")),
-                        new ScalarExpressionProjection(new CountStar())))
+                        new AggregateCallProjection(new CountStar())))
                 .from(From.fromTable("employees"))
                 .groupBy(GroupBy.of(ColumnReference.of("employees", "department")))
                 .having(Having.of(Comparison.gt(new CountStar(), Literal.of(10))))
