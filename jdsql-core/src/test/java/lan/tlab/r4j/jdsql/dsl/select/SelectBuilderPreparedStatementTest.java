@@ -1,34 +1,27 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class SelectBuilderPreparedStatementTest {
 
     private PreparedStatementSpecFactory specFactory;
-    private Connection connection;
-    private PreparedStatement ps;
-    private ArgumentCaptor<String> sqlCaptor;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
-        connection = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        sqlCaptor = ArgumentCaptor.forClass(String.class);
-        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        sqlCaptureHelper = new SqlCaptureHelper();
     }
 
     @Test
@@ -52,13 +45,13 @@ class SelectBuilderPreparedStatementTest {
                 .and()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(result).isSameAs(ps);
-        assertThat(sqlCaptor.getValue())
+        assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT \"name\", \"email\" FROM \"users\" WHERE (\"age\" >= ?) AND (\"status\" = ?)");
-        verify(ps).setObject(1, 18);
-        verify(ps).setObject(2, "active");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 18);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "active");
     }
 
     @Test
@@ -72,12 +65,12 @@ class SelectBuilderPreparedStatementTest {
                 .where()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(result).isSameAs(ps);
-        assertThat(sqlCaptor.getValue())
+        assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         "SELECT \"u\".\"name\", \"u\".\"email\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" WHERE \"u\".\"status\" = ?");
-        verify(ps).setObject(1, "active");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "active");
     }
 }
