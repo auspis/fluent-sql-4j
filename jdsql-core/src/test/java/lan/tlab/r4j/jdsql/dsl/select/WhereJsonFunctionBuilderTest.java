@@ -1,33 +1,24 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class WhereJsonFunctionBuilderTest {
 
     private PreparedStatementSpecFactory specFactory;
-    private Connection connection;
-    private PreparedStatement ps;
-    private ArgumentCaptor<String> sqlCaptor;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
-        connection = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        sqlCaptor = ArgumentCaptor.forClass(String.class);
-        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        sqlCaptureHelper = new SqlCaptureHelper();
     }
 
     @Test
@@ -37,13 +28,13 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("info", "$.city")
                 .eq("Rome")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_VALUE("info", ?) = ?""");
-        verify(ps).setObject(1, "$.city");
-        verify(ps).setObject(2, "Rome");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.city");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "Rome");
     }
 
     @Test
@@ -53,13 +44,13 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("info", "$.age")
                 .gt(30)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_VALUE("info", ?) > ?""");
-        verify(ps).setObject(1, "$.age");
-        verify(ps).setObject(2, 30);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.age");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 30);
     }
 
     @Test
@@ -69,13 +60,13 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonExists("info", "$.email")
                 .exists()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_EXISTS("info", ?) = ?""");
-        verify(ps).setObject(1, "$.email");
-        verify(ps).setObject(2, true);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.email");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, true);
     }
 
     @Test
@@ -85,13 +76,13 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonExists("info", "$.phone")
                 .notExists()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_EXISTS("info", ?) = ?""");
-        verify(ps).setObject(1, "$.phone");
-        verify(ps).setObject(2, false);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.phone");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, false);
     }
 
     @Test
@@ -101,12 +92,12 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonQuery("data", "$.tags")
                 .isNotNull()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 SELECT * FROM "products" WHERE JSON_QUERY("data", ?) IS NOT NULL""");
-        verify(ps).setObject(1, "$.tags");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.tags");
     }
 
     @Test
@@ -119,15 +110,15 @@ class WhereJsonFunctionBuilderTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                 SELECT * FROM "users" WHERE (JSON_VALUE("info", ?) = ?) AND ("active" = ?)""");
-        verify(ps).setObject(1, "$.city");
-        verify(ps).setObject(2, "Rome");
-        verify(ps).setObject(3, true);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.city");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "Rome");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, true);
     }
 
     @Test
@@ -140,16 +131,16 @@ class WhereJsonFunctionBuilderTest {
                 .or()
                 .jsonValue("info", "$.status")
                 .eq("premium")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                 SELECT * FROM "users" WHERE (JSON_VALUE("info", ?) = ?) OR (JSON_VALUE("info", ?) = ?)""");
-        verify(ps).setObject(1, "$.status");
-        verify(ps).setObject(2, "vip");
-        verify(ps).setObject(3, "$.status");
-        verify(ps).setObject(4, "premium");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.status");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "vip");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "$.status");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, "premium");
     }
 
     @Test
@@ -165,20 +156,20 @@ class WhereJsonFunctionBuilderTest {
                 .and()
                 .jsonExists("data", "$.customer.email")
                 .exists()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                 SELECT * FROM "orders" \
                 WHERE (("status" = ?) \
                 AND (JSON_VALUE("data", ?) >= ?)) \
                 AND (JSON_EXISTS("data", ?) = ?)""");
-        verify(ps).setObject(1, "completed");
-        verify(ps).setObject(2, "$.amount");
-        verify(ps).setObject(3, 100);
-        verify(ps).setObject(4, "$.customer.email");
-        verify(ps).setObject(5, true);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "completed");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "$.amount");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, "$.customer.email");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(5, true);
     }
 
     @Test
@@ -188,12 +179,12 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("data", "$.discount")
                 .isNull()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 SELECT * FROM "products" WHERE JSON_VALUE("data", ?) IS NULL""");
-        verify(ps).setObject(1, "$.discount");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.discount");
     }
 
     @Test
@@ -204,12 +195,12 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("u", "info", "$.city")
                 .eq("Milan")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 SELECT * FROM "users" AS u WHERE JSON_VALUE("info", ?) = ?""");
-        verify(ps).setObject(1, "$.city");
-        verify(ps).setObject(2, "Milan");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.city");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "Milan");
     }
 }
