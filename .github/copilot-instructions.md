@@ -199,6 +199,72 @@ The project uses a structured test pyramid with three main categories:
 - **Integration tests**: Place in `jdsql-core/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
 - **E2E tests**: Place in `jdsql-core/src/test/java/e2e/system/` with `@E2ETest` annotation
 
+## Test Helper and Assertion Utilities
+
+The project provides helper and utility classes to reduce boilerplate in mocked JDBC tests:
+
+### MockedConnectionHelper (Helper Class)
+
+**Location**: `test-support/src/main/java/lan/tlab/r4j/jdsql/test/helper/MockedConnectionHelper.java`
+
+**Purpose**: Encapsulates common JDBC mock setup (Connection, PreparedStatement, SQL ArgumentCaptor).
+
+**Usage** (in unit and integration tests with mocks):
+
+```java
+class MyBuilderTest {
+    private MockedConnectionHelper mockHelper;
+
+    @BeforeEach
+    void setUp() throws SQLException {
+        mockHelper = new MockedConnectionHelper();  // All mocks created automatically
+    }
+
+    @Test
+    void myTest() throws SQLException {
+        builder.buildPreparedStatement(mockHelper.getConnection());
+        assertThatSql(mockHelper.getSql()).contains("SELECT");
+        verify(mockHelper.getPreparedStatement()).setObject(1, value);
+    }
+}
+```
+
+**When to use**:
+- Writing unit tests for SQL builders (SelectBuilder, InsertBuilder, etc.)
+- Writing integration tests with mock JDBC (no real database)
+- **Do NOT use** for integration tests with real H2/database - use `TestDatabaseUtil` instead
+
+### SqlAssert (Custom AssertJ Assertion)
+
+**Location**: `test-support/src/main/java/lan/tlab/r4j/jdsql/test/SqlAssert.java`
+
+**Purpose**: Fluent assertions for SQL strings, similar to JsonAssert.
+
+**Usage**:
+
+```java
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
+
+assertThatSql(sql)
+    .isEqualTo("SELECT \"name\" FROM \"users\"")
+    .contains("WHERE")
+    .containsInOrder("SELECT", "FROM", "WHERE")
+    .isEqualToNormalizingWhitespace("SELECT   \"name\"   FROM   \"users\"");
+```
+
+**Available methods**: `isEqualTo()`, `isEqualToNormalizingWhitespace()`, `contains()`, `containsAll()`, `containsInOrder()`, `doesNotContain()`, `startsWith()`, `endsWith()`
+
+### Benefits
+
+- **~50% boilerplate reduction**: Eliminate repetitive mock setup code
+- **Fluent SQL assertions**: More readable than `assertThat(sqlCaptor.getValue()).contains(...)`
+- **Composition over inheritance**: No rigid test base classes needed
+
+### Related Documentation
+
+- **Full guide**: `jdsql-core/data/test-helpers-usage-guide.md`
+- **Example**: `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/select/SelectBuilderRefactoredExampleTest.java`
+
 ## Code Formatting
 
 **IMPORTANT**: Before each commit, you must run `./mvnw spotless:apply` to format the code correctly. This prevents pipeline failures due to formatting issues.
