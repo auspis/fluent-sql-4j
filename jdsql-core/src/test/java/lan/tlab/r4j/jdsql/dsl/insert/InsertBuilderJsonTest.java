@@ -1,18 +1,14 @@
 package lan.tlab.r4j.jdsql.dsl.insert;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * Unit tests for InsertBuilder with JSON values.
@@ -21,17 +17,12 @@ import org.mockito.ArgumentCaptor;
 class InsertBuilderJsonTest {
 
     private PreparedStatementSpecFactory specFactory;
-    private Connection connection;
-    private PreparedStatement ps;
-    private ArgumentCaptor<String> sqlCaptor;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
-        connection = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        sqlCaptor = ArgumentCaptor.forClass(String.class);
-        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        sqlCaptureHelper = new SqlCaptureHelper();
     }
 
     @Test
@@ -40,13 +31,13 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "users")
                 .set("id", 1)
                 .set("data", jsonValue)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 INSERT INTO "users" ("id", "data") VALUES (?, ?)""");
-        verify(ps).setObject(1, 1);
-        verify(ps).setObject(2, jsonValue);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, jsonValue);
     }
 
     @Test
@@ -55,13 +46,13 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "products")
                 .set("id", 100)
                 .set("tags", jsonArray)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 INSERT INTO "products" ("id", "tags") VALUES (?, ?)""");
-        verify(ps).setObject(1, 100);
-        verify(ps).setObject(2, jsonArray);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, jsonArray);
     }
 
     @Test
@@ -70,13 +61,13 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "documents")
                 .set("doc_id", 42)
                 .set("content", nestedJson)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 INSERT INTO "documents" ("doc_id", "content") VALUES (?, ?)""");
-        verify(ps).setObject(1, 42);
-        verify(ps).setObject(2, nestedJson);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 42);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, nestedJson);
     }
 
     @Test
@@ -87,16 +78,16 @@ class InsertBuilderJsonTest {
                 .set("published", true)
                 .set("metadata", metadata)
                 .set("view_count", 0)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                 INSERT INTO "articles" ("title", "published", "metadata", "view_count") VALUES (?, ?, ?, ?)""");
-        verify(ps).setObject(1, "Test Article");
-        verify(ps).setObject(2, true);
-        verify(ps).setObject(3, metadata);
-        verify(ps).setObject(4, 0);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Test Article");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, true);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, metadata);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, 0);
     }
 
     @Test
@@ -104,13 +95,13 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "settings")
                 .set("key", "app_config")
                 .set("value", (String) null)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 INSERT INTO "settings" ("key", "value") VALUES (?, ?)""");
-        verify(ps).setObject(1, "app_config");
-        verify(ps).setObject(2, null);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "app_config");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, null);
     }
 
     @Test
@@ -119,13 +110,13 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "logs")
                 .set("log_id", 999)
                 .set("details", emptyJson)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 INSERT INTO "logs" ("log_id", "details") VALUES (?, ?)""");
-        verify(ps).setObject(1, 999);
-        verify(ps).setObject(2, emptyJson);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 999);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, emptyJson);
     }
 
     @Test
@@ -134,12 +125,12 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "collections")
                 .set("collection_id", 5)
                 .set("items", emptyArray)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 INSERT INTO "collections" ("collection_id", "items") VALUES (?, ?)""");
-        verify(ps).setObject(1, 5);
-        verify(ps).setObject(2, emptyArray);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 5);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, emptyArray);
     }
 }
