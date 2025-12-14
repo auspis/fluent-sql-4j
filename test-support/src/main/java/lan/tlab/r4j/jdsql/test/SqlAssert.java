@@ -1,5 +1,6 @@
 package lan.tlab.r4j.jdsql.test;
 
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.assertj.core.api.AbstractAssert;
 
 /**
@@ -24,12 +25,22 @@ public class SqlAssert extends AbstractAssert<SqlAssert, String> {
     }
 
     /**
+     * Create a new SqlAssert instance for the given SqlCaptureHelper.
+     *
+     * @param actual the actual SqlCaptureHelper to assert
+     * @return a new SqlAssert instance
+     */
+    public static SqlAssert assertThatSql(SqlCaptureHelper actual) {
+        return assertThatSql(actual.getSql());
+    }
+
+    /**
      * Create a new SqlAssert instance for the given SQL string.
      *
      * @param actual the actual SQL string to assert
      * @return a new SqlAssert instance
      */
-    public static SqlAssert assertThatSql(String actual) {
+    private static SqlAssert assertThatSql(String actual) {
         return new SqlAssert(actual);
     }
 
