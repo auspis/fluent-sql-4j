@@ -1,55 +1,50 @@
 package lan.tlab.r4j.jdsql.dsl.insert;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class InsertBuilderTest {
 
     private PreparedStatementSpecFactory specFactory;
-    private Connection connection;
-    private PreparedStatement ps;
-    private ArgumentCaptor<String> sqlCaptor;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
-        connection = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        sqlCaptor = ArgumentCaptor.forClass(String.class);
-        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        sqlCaptureHelper = new SqlCaptureHelper();
     }
 
     @Test
     void insertWithDefaultValues() throws SQLException {
-        new InsertBuilder(specFactory, "users").defaultValues().buildPreparedStatement(connection);
+        new InsertBuilder(specFactory, "users")
+                .defaultValues()
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" DEFAULT VALUES\
             """);
     }
 
     @Test
     void insertWithSingleColumnAndValue() throws SQLException {
-        new InsertBuilder(specFactory, "users").set("name", "John").buildPreparedStatement(connection);
+        new InsertBuilder(specFactory, "users")
+                .set("name", "John")
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
             INSERT INTO "users" ("name") VALUES (?)\
             """);
-        verify(ps).setObject(1, "John");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
     }
 
     @Test
@@ -58,16 +53,16 @@ class InsertBuilderTest {
                 .set("id", 1)
                 .set("name", "John")
                 .set("email", "john@example.com")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
             INSERT INTO "users" ("id", "name", "email") VALUES (?, ?, ?)\
             """);
-        verify(ps).setObject(1, 1);
-        verify(ps).setObject(2, "John");
-        verify(ps).setObject(3, "john@example.com");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "John");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "john@example.com");
     }
 
     @Test
@@ -75,14 +70,14 @@ class InsertBuilderTest {
         new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("email", (String) null)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
             INSERT INTO "users" ("name", "email") VALUES (?, ?)\
             """);
-        verify(ps).setObject(1, "John");
-        verify(ps).setObject(2, null);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, null);
     }
 
     @Test
@@ -90,14 +85,14 @@ class InsertBuilderTest {
         new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("active", true)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
             INSERT INTO "users" ("name", "active") VALUES (?, ?)\
             """);
-        verify(ps).setObject(1, "John");
-        verify(ps).setObject(2, true);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, true);
     }
 
     @Test
@@ -106,14 +101,14 @@ class InsertBuilderTest {
                 .set("id", 1)
                 .set("price", 19.99)
                 .set("quantity", 100)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 INSERT INTO "products" ("id", "price", "quantity") VALUES (?, ?, ?)""");
-        verify(ps).setObject(1, 1);
-        verify(ps).setObject(2, 19.99);
-        verify(ps).setObject(3, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 19.99);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 100);
     }
 
     @Test
@@ -151,16 +146,16 @@ class InsertBuilderTest {
                 .set("int_col", 42)
                 .set("bool_col", false)
                 .set("null_col", (String) null)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                 INSERT INTO "mixed_table" ("text_col", "int_col", "bool_col", "null_col") VALUES (?, ?, ?, ?)""");
-        verify(ps).setObject(1, "test");
-        verify(ps).setObject(2, 42);
-        verify(ps).setObject(3, false);
-        verify(ps).setObject(4, null);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "test");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 42);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, false);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, null);
     }
 
     @Test
@@ -169,11 +164,11 @@ class InsertBuilderTest {
         new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("birthdate", birthdate)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).isEqualTo("INSERT INTO \"users\" (\"name\", \"birthdate\") VALUES (?, ?)");
-        verify(ps).setObject(1, "John");
-        verify(ps).setObject(2, birthdate);
+        assertThatSql(sqlCaptureHelper).isEqualTo("INSERT INTO \"users\" (\"name\", \"birthdate\") VALUES (?, ?)");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, birthdate);
     }
 
     @Test

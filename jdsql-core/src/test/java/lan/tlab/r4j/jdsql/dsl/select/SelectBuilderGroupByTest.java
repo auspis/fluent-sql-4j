@@ -1,33 +1,24 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class SelectBuilderGroupByTest {
 
     private PreparedStatementSpecFactory specFactory;
-    private Connection connection;
-    private PreparedStatement ps;
-    private ArgumentCaptor<String> sqlCaptor;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
-        connection = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        sqlCaptor = ArgumentCaptor.forClass(String.class);
-        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        sqlCaptureHelper = new SqlCaptureHelper();
     }
 
     @Test
@@ -35,9 +26,9 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\"");
+        assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\"");
     }
 
     @Test
@@ -45,9 +36,9 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id", "product_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
+        assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
     }
 
     @Test
@@ -56,9 +47,9 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .as("o")
                 .groupBy("customer_id", "product_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" AS o GROUP BY \"customer_id\", \"product_id\"");
     }
 
@@ -67,9 +58,9 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("orders.customer_id", "orders.product_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
+        assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
     }
 
     @Test
@@ -78,9 +69,9 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .as("o")
                 .groupBy("o.customer_id", "o.product_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" AS o GROUP BY \"customer_id\", \"product_id\"");
     }
 
@@ -92,9 +83,9 @@ class SelectBuilderGroupByTest {
                 .column("status")
                 .eq("completed")
                 .groupBy("customer_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" WHERE \"status\" = ? GROUP BY \"customer_id\"");
     }
 
@@ -104,9 +95,9 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .groupBy("customer_id")
                 .orderBy("customer_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\" ORDER BY \"customer_id\" ASC");
     }
 
@@ -119,9 +110,9 @@ class SelectBuilderGroupByTest {
                 .as("c")
                 .on("o.customer_id", "c.id")
                 .groupBy("c.id", "c.name")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         "SELECT * FROM \"orders\" AS o INNER JOIN \"customers\" AS c ON \"o\".\"customer_id\" = \"c\".\"id\" GROUP BY \"c\".\"id\", \"c\".\"name\"");
     }
@@ -139,9 +130,9 @@ class SelectBuilderGroupByTest {
                 .eq("completed")
                 .groupBy("c.id")
                 .orderBy("c.id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         "SELECT * FROM \"orders\" AS o INNER JOIN \"customers\" AS c ON \"o\".\"customer_id\" = \"c\".\"id\" WHERE \"o\".\"status\" = ? GROUP BY \"c\".\"id\" ORDER BY \"o\".\"c.id\" ASC");
     }
@@ -153,9 +144,9 @@ class SelectBuilderGroupByTest {
                 .groupBy("customer_id")
                 .fetch(10)
                 .offset(5)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\" OFFSET 5 ROWS FETCH NEXT 10 ROWS ONLY");
     }
 
@@ -164,9 +155,9 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id", "product_id", "region", "status", "payment_method")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         "SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\", \"region\", \"status\", \"payment_method\"");
     }
@@ -189,9 +180,9 @@ class SelectBuilderGroupByTest {
                 .orderByDesc("total")
                 .fetch(20)
                 .offset(10)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         "SELECT \"o\".\"customer_id\", \"o\".\"product_id\", \"o\".\"total\" FROM \"orders\" AS o INNER JOIN \"customers\" AS c ON \"o\".\"customer_id\" = \"c\".\"id\" WHERE (\"o\".\"status\" = ?) AND (\"o\".\"total\" > ?) GROUP BY \"o\".\"customer_id\", \"o\".\"product_id\" ORDER BY \"o\".\"total\" DESC OFFSET 10 ROWS FETCH NEXT 20 ROWS ONLY");
     }
