@@ -1,33 +1,24 @@
 package lan.tlab.r4j.jdsql.dsl.update;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class UpdateBuilderJsonTest {
 
     private PreparedStatementSpecFactory specFactory;
-    private Connection connection;
-    private PreparedStatement ps;
-    private ArgumentCaptor<String> sqlCaptor;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
-        connection = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        sqlCaptor = ArgumentCaptor.forClass(String.class);
-        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        sqlCaptureHelper = new SqlCaptureHelper();
     }
 
     @Test
@@ -39,13 +30,13 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("id")
                 .eq(1)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
-        verify(ps).setObject(1, jsonValue);
-        verify(ps).setObject(2, 1);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, jsonValue);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 1);
     }
 
     @Test
@@ -59,17 +50,17 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("user_id")
                 .eq(42)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                 UPDATE "user_settings" SET "username" = ?, "preferences" = ?, "updated_at" = ? \
                 WHERE "user_id" = ?""");
-        verify(ps).setObject(1, "alice");
-        verify(ps).setObject(2, preferences);
-        verify(ps).setObject(3, "2025-11-08T10:30:00");
-        verify(ps).setObject(4, 42);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "alice");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, preferences);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "2025-11-08T10:30:00");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, 42);
     }
 
     @Test
@@ -82,13 +73,13 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("profile_id")
                 .eq(100)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 UPDATE "profiles" SET "profile_data" = ? WHERE "profile_id" = ?""");
-        verify(ps).setObject(1, profile);
-        verify(ps).setObject(2, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, profile);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 100);
     }
 
     @Test
@@ -98,13 +89,13 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("id")
                 .eq(5)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
-        verify(ps).setObject(1, null);
-        verify(ps).setObject(2, 5);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, null);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 5);
     }
 
     @Test
@@ -116,13 +107,13 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("doc_id")
                 .eq(7)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 UPDATE "documents" SET "properties" = ? WHERE "doc_id" = ?""");
-        verify(ps).setObject(1, emptyJson);
-        verify(ps).setObject(2, 7);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, emptyJson);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 7);
     }
 
     @Test
@@ -134,13 +125,13 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("item_id")
                 .eq(15)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo("""
                 UPDATE "tags" SET "tag_list" = ? WHERE "item_id" = ?""");
-        verify(ps).setObject(1, emptyArray);
-        verify(ps).setObject(2, 15);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, emptyArray);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 15);
     }
 
     @Test
@@ -156,15 +147,15 @@ class UpdateBuilderJsonTest {
                 .and()
                 .column("version")
                 .gte("2.0")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                 UPDATE "api_configs" SET "configuration" = ?, "last_modified" = ? WHERE ("api_name" = ?) AND ("version" >= ?)""");
-        verify(ps).setObject(1, config);
-        verify(ps).setObject(2, "2025-11-08");
-        verify(ps).setObject(3, "payment-service");
-        verify(ps).setObject(4, "2.0");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, config);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "2025-11-08");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "payment-service");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, "2.0");
     }
 }
