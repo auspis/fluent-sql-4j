@@ -8,13 +8,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
-import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
+import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-@IntegrationTest
-class CreateTableDSLIntegrationTest {
+@ComponentTest
+class CreateTableDSLComponentTest {
 
     private DSL dsl;
     private Connection connection;
