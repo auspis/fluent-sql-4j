@@ -1,35 +1,27 @@
 package lan.tlab.r4j.jdsql.dsl.table;
 
+import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class CreateTableBuilderTest {
 
     private PreparedStatementSpecFactory specFactory;
-    private Connection connection;
-    private PreparedStatement ps;
-    private ArgumentCaptor<String> sqlCaptor;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
-        connection = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        sqlCaptor = ArgumentCaptor.forClass(String.class);
-        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        sqlCaptureHelper = new SqlCaptureHelper();
     }
 
     @Test
@@ -48,9 +40,9 @@ class CreateTableBuilderTest {
                 .column("score")
                 .decimal(10, 2)
                 .primaryKey("id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
                         """
                     CREATE TABLE "User" (\
@@ -67,8 +59,8 @@ class CreateTableBuilderTest {
     void columnIntegerPrimaryKey() throws SQLException {
         new CreateTableBuilder(specFactory, "Test")
                 .columnIntegerPrimaryKey("id")
-                .buildPreparedStatement(connection);
-        String sqlShortForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlShortForm = sqlCaptureHelper.getSql();
         assertThat(sqlShortForm).contains("\"id\" INTEGER NOT NULL").contains("PRIMARY KEY (\"id\")");
 
         new CreateTableBuilder(specFactory, "Test")
@@ -76,8 +68,8 @@ class CreateTableBuilderTest {
                 .integer()
                 .notNull()
                 .primaryKey("id")
-                .buildPreparedStatement(connection);
-        String sqlLongForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlLongForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
@@ -86,8 +78,8 @@ class CreateTableBuilderTest {
     void columnStringPrimaryKey() throws SQLException {
         new CreateTableBuilder(specFactory, "Test")
                 .columnStringPrimaryKey("code", 50)
-                .buildPreparedStatement(connection);
-        String sqlShortForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlShortForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).contains("\"code\" VARCHAR(50) NOT NULL").contains("PRIMARY KEY (\"code\")");
 
@@ -96,8 +88,8 @@ class CreateTableBuilderTest {
                 .varchar(50)
                 .notNull()
                 .primaryKey("code")
-                .buildPreparedStatement(connection);
-        String sqlLongForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlLongForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
@@ -106,8 +98,8 @@ class CreateTableBuilderTest {
     void columnTimestampNotNull() throws SQLException {
         new CreateTableBuilder(specFactory, "Test")
                 .columnTimestampNotNull("created_at")
-                .buildPreparedStatement(connection);
-        String sqlShortForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlShortForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).contains("\"created_at\" TIMESTAMP NOT NULL");
 
@@ -115,8 +107,8 @@ class CreateTableBuilderTest {
                 .column("created_at")
                 .timestamp()
                 .notNull()
-                .buildPreparedStatement(connection);
-        String sqlLongForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlLongForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
@@ -125,8 +117,8 @@ class CreateTableBuilderTest {
     void columnVarcharNotNull() throws SQLException {
         new CreateTableBuilder(specFactory, "Test")
                 .columnVarcharNotNull("name", 100)
-                .buildPreparedStatement(connection);
-        String sqlShortForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlShortForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).contains("\"name\" VARCHAR(100) NOT NULL");
 
@@ -134,8 +126,8 @@ class CreateTableBuilderTest {
                 .column("name")
                 .varchar(100)
                 .notNull()
-                .buildPreparedStatement(connection);
-        String sqlLongForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlLongForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
@@ -144,8 +136,8 @@ class CreateTableBuilderTest {
     void columnDecimalNotNull() throws SQLException {
         new CreateTableBuilder(specFactory, "Test")
                 .columnDecimalNotNull("price", 10, 2)
-                .buildPreparedStatement(connection);
-        String sqlShortForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlShortForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).contains("\"price\" DECIMAL(10, 2) NOT NULL");
 
@@ -153,8 +145,8 @@ class CreateTableBuilderTest {
                 .column("price")
                 .decimal(10, 2)
                 .notNull()
-                .buildPreparedStatement(connection);
-        String sqlLongForm = sqlCaptor.getValue();
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        String sqlLongForm = sqlCaptureHelper.getSql();
 
         assertThat(sqlShortForm).isEqualTo(sqlLongForm);
     }
@@ -178,9 +170,9 @@ class CreateTableBuilderTest {
                 .timestamp()
                 .notNull()
                 .primaryKey("id", "sku") // Explicit composite primary key
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .contains("\"id\" INTEGER NOT NULL")
                 .contains("\"sku\" VARCHAR(20) NOT NULL")
                 .contains("\"name\" VARCHAR(100) NOT NULL")
@@ -200,9 +192,9 @@ class CreateTableBuilderTest {
                 .column("amount")
                 .decimal(10, 2)
                 .primaryKey("order_date", "customer_id") // Explicit order!
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .contains("\"customer_id\" INTEGER NOT NULL")
                 .contains("\"order_date\" DATE")
                 .contains("\"amount\" DECIMAL(10, 2)")
@@ -218,9 +210,9 @@ class CreateTableBuilderTest {
                 .column("email")
                 .varchar(255)
                 .unique()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).contains("UNIQUE (\"email\")");
+        assertThatSql(sqlCaptureHelper).contains("UNIQUE (\"email\")");
     }
 
     @Test
@@ -232,9 +224,9 @@ class CreateTableBuilderTest {
                 .column("customer_id")
                 .integer()
                 .foreignKey("customer", "id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).contains("FOREIGN KEY (\"customer_id\") REFERENCES \"customer\" (\"id\")");
+        assertThatSql(sqlCaptureHelper).contains("FOREIGN KEY (\"customer_id\") REFERENCES \"customer\" (\"id\")");
     }
 
     @Test
@@ -242,9 +234,9 @@ class CreateTableBuilderTest {
         new CreateTableBuilder(specFactory, "Log")
                 .columnTimestampNotNull("timestamp")
                 .columnVarcharNotNull("message", 500)
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .contains("\"timestamp\" TIMESTAMP NOT NULL")
                 .contains("\"message\" VARCHAR(500) NOT NULL")
                 .doesNotContain("PRIMARY KEY");
@@ -252,9 +244,12 @@ class CreateTableBuilderTest {
 
     @Test
     void booleanColumn() throws SQLException {
-        new CreateTableBuilder(specFactory, "Settings").column("enabled").bool().buildPreparedStatement(connection);
+        new CreateTableBuilder(specFactory, "Settings")
+                .column("enabled")
+                .bool()
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).contains("\"enabled\" BOOLEAN");
+        assertThatSql(sqlCaptureHelper).contains("\"enabled\" BOOLEAN");
     }
 
     @Test
@@ -267,9 +262,9 @@ class CreateTableBuilderTest {
                 .column("created_at")
                 .timestamp()
                 .notNull()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .contains("\"id\" INTEGER NOT NULL")
                 .contains("\"description\" VARCHAR(255) NOT NULL")
                 .contains("\"created_at\" TIMESTAMP NOT NULL")
@@ -287,9 +282,9 @@ class CreateTableBuilderTest {
                 .column("name")
                 .varchar(100)
                 .check(Comparison.gt(ColumnReference.of("", "age"), Literal.of(18)))
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).contains("CHECK (\"age\" > 18)");
+        assertThatSql(sqlCaptureHelper).contains("CHECK (\"age\" > 18)");
     }
 
     @Test
@@ -301,9 +296,9 @@ class CreateTableBuilderTest {
                 .column("enabled")
                 .bool()
                 .defaultValue(Literal.of(true))
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).contains("DEFAULT true");
+        assertThatSql(sqlCaptureHelper).contains("DEFAULT true");
     }
 
     @Test
@@ -315,9 +310,9 @@ class CreateTableBuilderTest {
                 .column("email")
                 .varchar(255)
                 .index("idx_email", "email")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).contains("\"email\" VARCHAR(255)").contains("INDEX \"idx_email\" (\"email\")");
+        assertThatSql(sqlCaptureHelper).contains("\"email\" VARCHAR(255)").contains("INDEX \"idx_email\" (\"email\")");
     }
 
     @Test
@@ -328,9 +323,9 @@ class CreateTableBuilderTest {
                 .column("order_date")
                 .date()
                 .index("idx_order_customer", "order_date", "customer_id")
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue()).contains("INDEX \"idx_order_customer\" (\"order_date\", \"customer_id\")");
+        assertThatSql(sqlCaptureHelper).contains("INDEX \"idx_order_customer\" (\"order_date\", \"customer_id\")");
     }
 
     @Test
@@ -338,10 +333,10 @@ class CreateTableBuilderTest {
         new CreateTableBuilder(specFactory, "Test")
                 .column("default_column")
                 .notNull()
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
         // ColumnDefinition has a default of VARCHAR(255)
-        assertThat(sqlCaptor.getValue()).contains("\"default_column\" VARCHAR(255) NOT NULL");
+        assertThatSql(sqlCaptureHelper).contains("\"default_column\" VARCHAR(255) NOT NULL");
     }
 
     @Test
@@ -357,9 +352,9 @@ class CreateTableBuilderTest {
                 .column("quantity")
                 .integer()
                 .primaryKey("order_id", "item_id") // Ordine esplicito: order_id prima di item_id
-                .buildPreparedStatement(connection);
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThat(sqlCaptor.getValue())
+        assertThatSql(sqlCaptureHelper)
                 .contains("\"item_id\" INTEGER NOT NULL")
                 .contains("\"order_id\" INTEGER NOT NULL")
                 .contains("\"quantity\" INTEGER")
