@@ -17,13 +17,13 @@ import lan.tlab.r4j.jdsql.ast.core.expression.window.OverClause;
 import lan.tlab.r4j.jdsql.ast.core.expression.window.WindowFunction;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
-import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
+import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-@IntegrationTest
-class SelectDSLIntegrationTest {
+@ComponentTest
+class SelectDSLComponentTest {
 
     private DSL dsl;
     private Connection connection;

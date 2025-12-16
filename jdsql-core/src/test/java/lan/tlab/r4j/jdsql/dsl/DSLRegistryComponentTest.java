@@ -10,7 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.functional.Result;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
+import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,8 +21,8 @@ import org.mockito.ArgumentCaptor;
  * These tests show how users can leverage DSLRegistry to create dialect-specific
  * DSL instances and generate SQL for different database systems.
  */
-@IntegrationTest
-class DSLRegistryIntegrationTest {
+@ComponentTest
+class DSLRegistryComponentTest {
 
     private DSLRegistry registry;
     private Connection connection;
