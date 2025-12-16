@@ -15,13 +15,13 @@ import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
-import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
+import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-@IntegrationTest
-class MergeDSLIntegrationTest {
+@ComponentTest
+class MergeDSLComponentTest {
 
     private DSL dsl;
     private Connection connection;
