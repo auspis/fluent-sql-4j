@@ -149,20 +149,22 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 ## How to Run Tests
 
 - make sure you are in the root folder or `cd` to it
-- Use `./mvnw clean test -am -pl jdsql-core` to run unit tests only (fast feedback)
-- Use `./mvnw clean verify -am -pl jdsql-core` to run all tests (unit + integration + E2E)
+- Use `./mvnw clean test -am -pl jdsql-core` to run unit and component tests (fast feedback, no database)
+- Use `./mvnw clean verify -am -pl jdsql-core` to run all tests (unit + component + integration + E2E)
+- Use `./mvnw test -am -pl jdsql-core -Dgroups=component` to run only component tests
 - Use `./mvnw verify -am -pl jdsql-core -Dgroups=integration` to run only integration tests
 - Use `./mvnw verify -am -pl jdsql-core -Dgroups=e2e` to run only E2E tests
 - The project is a multi module maven project, so in some cases you may need to add -am to compile dependencies
 - When you need to run integration tests try to run only the needed ones
 - All tests are now consolidated in the `jdsql-core/` module with the following structure:
-  - `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/`: Unit tests (fast, isolated)
+  - `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/`: Unit tests (fast, isolated, single class)
+  - `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/*ComponentTest.java`: Component tests (fast, multiple classes, mocked JDBC)
   - `jdsql-core/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
   - `jdsql-core/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
 
-## Test Categories
+## Test Categories (Test Pyramid)
 
-The project uses a structured test pyramid with three main categories:
+The project uses a structured test pyramid with four main categories:
 
 ### Unit Tests (`jdsql-core/src/test/java/lan/tlab/r4j/jdsql/`)
 
@@ -171,6 +173,15 @@ The project uses a structured test pyramid with three main categories:
 - **Dependencies**: None
 - **Database**: No database access
 - **Examples**: `SemVerUtilTest`, `StandardSqlColumnReferencePsStrategyTest`
+
+### Component Tests (`jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/*ComponentTest.java`)
+
+- **Purpose**: Test interaction between multiple classes within a component (DSL → AST → Visitor → SQL Renderer)
+- **Speed**: Fast (🚀)
+- **Dependencies**: Real component classes, mocked JDBC (Connection, PreparedStatement)
+- **Database**: No database access (mocked JDBC)
+- **Annotation**: `@ComponentTest` (JUnit tag: `component`)
+- **Examples**: `SelectDSLComponentTest`, `DSLRegistryComponentTest`
 
 ### Integration Tests (`jdsql-core/src/test/java/integration/`)
 
@@ -190,12 +201,14 @@ The project uses a structured test pyramid with three main categories:
 
 ### Test Annotations
 
+- `@ComponentTest`: Marks component tests (JUnit tag: `component`)
 - `@IntegrationTest`: Marks integration tests (JUnit tag: `integration`)
 - `@E2ETest`: Marks end-to-end tests (JUnit tag: `e2e`)
 
 ### Writing New Tests
 
 - **Unit tests**: Place in `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/` following existing package structure
+- **Component tests**: Place in `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/` with `@ComponentTest` annotation and suffix `*ComponentTest.java`
 - **Integration tests**: Place in `jdsql-core/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
 - **E2E tests**: Place in `jdsql-core/src/test/java/e2e/system/` with `@E2ETest` annotation
 
