@@ -36,7 +36,7 @@ class DeleteDSLComponentTest {
         dsl.deleteFrom("users").where().column("id").eq(1).buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
-                DELETE FROM "users" WHERE "id" = ?""");
+                        DELETE FROM "users" WHERE "id" = ?""");
         verify(ps).setObject(1, 1);
     }
 

@@ -216,35 +216,35 @@ The project uses a structured test pyramid with four main categories:
 
 The project provides helper and utility classes to reduce boilerplate in mocked JDBC tests:
 
-### MockedConnectionHelper (Helper Class)
+### SqlCaptureHelper (Helper Class)
 
-**Location**: `test-support/src/main/java/lan/tlab/r4j/jdsql/test/helper/MockedConnectionHelper.java`
+**Location**: `test-support/src/main/java/lan/tlab/r4j/jdsql/test/helper/SqlCaptureHelper.java`
 
 **Purpose**: Encapsulates common JDBC mock setup (Connection, PreparedStatement, SQL ArgumentCaptor).
 
-**Usage** (in unit and integration tests with mocks):
+**Usage** (in unit and component tests with mocks):
 
 ```java
 class MyBuilderTest {
-    private MockedConnectionHelper mockHelper;
+    private SqlCaptureHelper sqlCaptureHelper;
 
     @BeforeEach
     void setUp() throws SQLException {
-        mockHelper = new MockedConnectionHelper();  // All mocks created automatically
+        sqlCaptureHelper = new SqlCaptureHelper();  // All mocks created automatically
     }
 
     @Test
     void myTest() throws SQLException {
-        builder.buildPreparedStatement(mockHelper.getConnection());
-        assertThatSql(mockHelper.getSql()).contains("SELECT");
-        verify(mockHelper.getPreparedStatement()).setObject(1, value);
+        builder.buildPreparedStatement(sqlCaptureHelper.getConnection());
+        assertThatSql(sqlCaptureHelper).isEqualTo("SELECT \"name\" FROM \"users\"");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, value);
     }
 }
 ```
 
 **When to use**:
 - Writing unit tests for SQL builders (SelectBuilder, InsertBuilder, etc.)
-- Writing integration tests with mock JDBC (no real database)
+- Writing component tests with mock JDBC (no real database)
 - **Do NOT use** for integration tests with real H2/database - use `TestDatabaseUtil` instead
 
 ### SqlAssert (Custom AssertJ Assertion)
