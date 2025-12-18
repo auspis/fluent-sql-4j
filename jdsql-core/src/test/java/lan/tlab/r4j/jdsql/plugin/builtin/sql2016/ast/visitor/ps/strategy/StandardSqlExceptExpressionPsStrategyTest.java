@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.jdsql.ast.core.expression.set.ExceptExpression;
 import lan.tlab.r4j.jdsql.ast.core.expression.set.NullSetExpression;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class StandardSqlExceptExpressionPsStrategyTest {
     void shouldHandleExceptDistinct() {
         // given
         var expression = ExceptExpression.except(new NullSetExpression(), new NullSetExpression());
-        var visitor = PreparedStatementRenderer.builder().build();
+        var visitor = AstToPreparedStatementSpecVisitor.builder().build();
 
         // when
         PreparedStatementSpec result = strategy.handle(expression, visitor, null);
@@ -31,7 +31,7 @@ class StandardSqlExceptExpressionPsStrategyTest {
     void shouldHandleExceptAll() {
         // given
         var expression = ExceptExpression.exceptAll(new NullSetExpression(), new NullSetExpression());
-        var visitor = PreparedStatementRenderer.builder().build();
+        var visitor = AstToPreparedStatementSpecVisitor.builder().build();
 
         // when
         PreparedStatementSpec result = strategy.handle(expression, visitor, null);

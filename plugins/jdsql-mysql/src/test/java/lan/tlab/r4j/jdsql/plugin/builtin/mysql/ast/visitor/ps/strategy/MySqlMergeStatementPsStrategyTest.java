@@ -15,7 +15,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.MergeUsing;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +43,7 @@ class MySqlMergeStatementPsStrategyTest {
                 .build();
 
         // TODO: use TestDialectRendererFactory
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
@@ -70,7 +70,7 @@ class MySqlMergeStatementPsStrategyTest {
                         InsertData.InsertValues.of(ColumnReference.of("src", "id"), Literal.of("John")))))
                 .build();
 
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
@@ -99,7 +99,7 @@ class MySqlMergeStatementPsStrategyTest {
                                 InsertData.InsertValues.of(Literal.of(2), Literal.of("pending")))))
                 .build();
 
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
@@ -125,7 +125,7 @@ class MySqlMergeStatementPsStrategyTest {
                         List.of(new UpdateItem(ColumnReference.of("", "status"), Literal.of("active"))))))
                 .build();
 
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();

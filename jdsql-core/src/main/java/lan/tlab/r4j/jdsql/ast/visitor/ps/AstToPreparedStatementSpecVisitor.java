@@ -288,7 +288,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class PreparedStatementRenderer implements Visitor<PreparedStatementSpec> {
+public class AstToPreparedStatementSpecVisitor implements Visitor<PreparedStatementSpec> {
     @Default
     private final EscapeStrategy escapeStrategy = new StandardSqlEscapeStrategy();
 

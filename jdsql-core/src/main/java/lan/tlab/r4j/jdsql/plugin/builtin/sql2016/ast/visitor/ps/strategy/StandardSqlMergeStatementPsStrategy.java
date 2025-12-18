@@ -8,13 +8,14 @@ import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 
 public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
     @Override
-    public PreparedStatementSpec handle(MergeStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            MergeStatement stmt, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         List<Object> params = new ArrayList<>();
 
         // MERGE INTO target

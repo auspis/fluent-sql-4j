@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonExists;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonExistsPsStrategy;
 
@@ -38,7 +38,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonExistsPsStrategy;
 public class MysqlJsonExistsPsStrategy implements JsonExistsPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(JsonExists jsonExists, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            JsonExists jsonExists, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         var documentResult = jsonExists.jsonDocument().accept(renderer, ctx);
         var pathResult = jsonExists.path().accept(renderer, ctx);
 

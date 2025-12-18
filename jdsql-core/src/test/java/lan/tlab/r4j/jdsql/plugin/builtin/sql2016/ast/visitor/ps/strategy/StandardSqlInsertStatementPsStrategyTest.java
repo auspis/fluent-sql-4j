@@ -11,7 +11,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.DefaultValues;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.dml.statement.InsertStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +19,13 @@ import org.junit.jupiter.api.Test;
 class StandardSqlInsertStatementPsStrategyTest {
 
     private StandardSqlInsertStatementPsStrategy strategy;
-    private PreparedStatementRenderer visitor;
+    private AstToPreparedStatementSpecVisitor visitor;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlInsertStatementPsStrategy();
-        visitor = new PreparedStatementRenderer();
+        visitor = new AstToPreparedStatementSpecVisitor();
         ctx = new AstContext();
     }
 

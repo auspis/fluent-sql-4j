@@ -5,7 +5,7 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.SimpleDataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
 import org.assertj.core.api.Assertions;
@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 class StandardSqlTableDefinitionPsStrategyTest {
 
     private final TableDefinitionPsStrategy strategy = new StandardSqlTableDefinitionPsStrategy();
-    private final PreparedStatementRenderer specFactory =
-            PreparedStatementRenderer.builder().build();
+    private final AstToPreparedStatementSpecVisitor specFactory =
+            AstToPreparedStatementSpecVisitor.builder().build();
     private final AstContext context = new AstContext();
 
     @Test
