@@ -6,7 +6,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.string.Substring;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 class StandardSqlSubstringPsStrategyTest {
 
     private StandardSqlSubstringPsStrategy strategy;
-    private PreparedStatementRenderer visitor;
+    private AstToPreparedStatementSpecVisitor visitor;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlSubstringPsStrategy();
-        visitor = PreparedStatementRenderer.builder().build();
+        visitor = AstToPreparedStatementSpecVisitor.builder().build();
         ctx = new AstContext();
     }
 

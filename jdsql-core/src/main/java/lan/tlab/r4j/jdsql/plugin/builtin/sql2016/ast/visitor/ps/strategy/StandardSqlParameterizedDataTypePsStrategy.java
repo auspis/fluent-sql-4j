@@ -3,7 +3,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 
@@ -11,7 +11,7 @@ public class StandardSqlParameterizedDataTypePsStrategy implements Parameterized
 
     @Override
     public PreparedStatementSpec handle(
-            ParameterizedDataType type, PreparedStatementRenderer renderer, AstContext ctx) {
+            ParameterizedDataType type, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         var parameterResults = type.parameters().stream()
                 .map(param -> param.accept(renderer, ctx))
                 .collect(Collectors.toList());

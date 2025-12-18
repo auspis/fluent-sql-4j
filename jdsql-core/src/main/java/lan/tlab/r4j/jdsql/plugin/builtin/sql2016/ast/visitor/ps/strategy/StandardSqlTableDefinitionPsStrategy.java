@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefi
 import lan.tlab.r4j.jdsql.ast.ddl.definition.IndexDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
 
@@ -16,7 +16,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
 
     @Override
     public PreparedStatementSpec handle(
-            TableDefinition tableDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
+            TableDefinition tableDefinition, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
 
         PreparedStatementSpec tableDto = tableDefinition.table().accept(renderer, ctx);
@@ -40,7 +40,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
 
     private String renderPrimaryKey(
             PrimaryKeyDefinition primaryKey,
-            PreparedStatementRenderer renderer,
+            AstToPreparedStatementSpecVisitor renderer,
             AstContext ctx,
             List<Object> allParameters) {
         if (primaryKey == null) {
@@ -53,7 +53,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
 
     private String renderConstraints(
             List<ConstraintDefinition> constraints,
-            PreparedStatementRenderer renderer,
+            AstToPreparedStatementSpecVisitor renderer,
             AstContext ctx,
             List<Object> allParameters) {
         if (constraints == null || constraints.isEmpty()) {
@@ -71,7 +71,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
 
     private String renderIndexes(
             List<IndexDefinition> indexes,
-            PreparedStatementRenderer renderer,
+            AstToPreparedStatementSpecVisitor renderer,
             AstContext ctx,
             List<Object> allParameters) {
         if (indexes == null || indexes.isEmpty()) {

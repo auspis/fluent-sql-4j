@@ -11,7 +11,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.UpdateStatement;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,8 @@ class StandardSqlUpdateStatementPsStrategyTest {
                 .set(List.of(UpdateItem.of("name", Literal.of("Mario")), UpdateItem.of("age", Literal.of(42))))
                 .where(Where.of(Comparison.eq(ColumnReference.of("", "id"), Literal.of(1))))
                 .build();
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         UpdateStatementPsStrategy strategy = new StandardSqlUpdateStatementPsStrategy();
         PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
         assertThat(result.sql()).isEqualTo("UPDATE \"person\" SET \"name\" = ?, \"age\" = ? WHERE \"id\" = ?");

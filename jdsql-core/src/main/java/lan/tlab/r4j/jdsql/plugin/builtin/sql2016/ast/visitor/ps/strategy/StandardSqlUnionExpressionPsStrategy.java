@@ -5,14 +5,14 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.set.UnionExpression;
 import lan.tlab.r4j.jdsql.ast.core.expression.set.UnionExpression.UnionType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 
 public class StandardSqlUnionExpressionPsStrategy implements UnionExpressionPsStrategy {
     @Override
     public PreparedStatementSpec handle(
-            UnionExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
+            UnionExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
 
         PreparedStatementSpec leftPart = expression.left().accept(renderer, ctx);
         PreparedStatementSpec rightPart = expression.right().accept(renderer, ctx);

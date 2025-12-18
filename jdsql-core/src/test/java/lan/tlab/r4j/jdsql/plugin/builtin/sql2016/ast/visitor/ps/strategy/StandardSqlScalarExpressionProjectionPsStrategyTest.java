@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.core.identifier.Alias;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 class StandardSqlScalarExpressionProjectionPsStrategyTest {
 
     private StandardSqlScalarExpressionProjectionPsStrategy strategy;
-    private PreparedStatementRenderer specFactory;
+    private AstToPreparedStatementSpecVisitor specFactory;
 
     static record StubScalarExpression(PreparedStatementSpec result) implements ScalarExpression {
 
@@ -30,7 +30,7 @@ class StandardSqlScalarExpressionProjectionPsStrategyTest {
     @BeforeEach
     public void beforeEach() {
         strategy = new StandardSqlScalarExpressionProjectionPsStrategy();
-        specFactory = new PreparedStatementRenderer();
+        specFactory = new AstToPreparedStatementSpecVisitor();
     }
 
     @Test

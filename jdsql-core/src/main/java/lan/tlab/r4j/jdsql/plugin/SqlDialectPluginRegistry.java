@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.functional.Result;
 import lan.tlab.r4j.jdsql.functional.Result.Failure;
@@ -252,7 +252,7 @@ public final class SqlDialectPluginRegistry {
     }
 
     /**
-     * Gets a {@link PreparedStatementRenderer} for the specified dialect and version.
+     * Gets a {@link AstToPreparedStatementSpecVisitor} for the specified dialect and version.
      * <p>
      * This is a convenience method that extracts the PS renderer from the dialect renderer.
      *
@@ -260,8 +260,8 @@ public final class SqlDialectPluginRegistry {
      * @param version the version to match
      * @return a {@link lan.tlab.r4j.jdsql.functional.Result} containing either the PS renderer or an error message
      */
-    public Result<PreparedStatementRenderer> getPsRenderer(String dialect, String version) {
-        return getSpecFactory(dialect, version).map(PreparedStatementSpecFactory::psRenderer);
+    public Result<AstToPreparedStatementSpecVisitor> getPsRenderer(String dialect, String version) {
+        return getSpecFactory(dialect, version).map(PreparedStatementSpecFactory::astVisitor);
     }
 
     /**
