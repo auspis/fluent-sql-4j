@@ -2,10 +2,10 @@ package lan.tlab.r4j.jdsql.ast.visitor.ps.strategy;
 
 import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface CreateTableStatementPsStrategy {
     PreparedStatementSpec handle(
-            CreateTableStatement createTableStatement, PreparedStatementRenderer renderer, AstContext ctx);
+            CreateTableStatement createTableStatement, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
 }

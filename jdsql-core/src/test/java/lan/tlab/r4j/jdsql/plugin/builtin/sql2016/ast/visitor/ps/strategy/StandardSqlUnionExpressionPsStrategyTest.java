@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 import org.assertj.core.api.Assertions;
@@ -30,7 +30,7 @@ class StandardSqlUnionExpressionPsStrategyTest {
                         ColumnReference.of("User", "id"), Literal.of(2))))
                 .build();
         UnionExpression union = UnionExpression.union(select1, select2);
-        PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
+        AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         UnionExpressionPsStrategy strategy = new StandardSqlUnionExpressionPsStrategy();
         PreparedStatementSpec result = strategy.handle(union, specFactory, new AstContext());
         Assertions.assertThat(result.sql())

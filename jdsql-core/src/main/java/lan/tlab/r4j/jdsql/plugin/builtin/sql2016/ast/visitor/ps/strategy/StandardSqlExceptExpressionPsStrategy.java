@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.set.ExceptExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
 
@@ -12,7 +12,7 @@ public class StandardSqlExceptExpressionPsStrategy implements ExceptExpressionPs
 
     @Override
     public PreparedStatementSpec handle(
-            ExceptExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
+            ExceptExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         PreparedStatementSpec leftDto = expression.left().accept(renderer, ctx);
         PreparedStatementSpec rightDto = expression.right().accept(renderer, ctx);
 

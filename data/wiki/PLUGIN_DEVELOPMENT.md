@@ -145,7 +145,7 @@ public final class PostgreSqlDialectPluginProvider implements SqlDialectPluginPr
     private PreparedStatementSpecFactory createRenderer() {
         return PreparedStatementSpecFactory.of(
             createSqlRenderer(),
-            createPreparedStatementRenderer()
+            createAstToPreparedStatementSpecVisitor()
         );
     }
 
@@ -156,8 +156,8 @@ public final class PostgreSqlDialectPluginProvider implements SqlDialectPluginPr
             .build();
     }
 
-    private PreparedStatementRenderer createPreparedStatementRenderer() {
-        return PreparedStatementRenderer.builder()
+    private AstToPreparedStatementSpecVisitor createAstToPreparedStatementSpecVisitor() {
+        return AstToPreparedStatementSpecVisitor.builder()
             // ... PS strategies
             .build();
     }

@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ForeignKeyConstraintPsStrategy;
 
@@ -10,7 +10,7 @@ public class StandardSqlForeignKeyConstraintPsStrategy implements ForeignKeyCons
 
     @Override
     public PreparedStatementSpec handle(
-            ForeignKeyConstraintDefinition constraint, PreparedStatementRenderer renderer, AstContext ctx) {
+            ForeignKeyConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         // Foreign key constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlForeignKeyConstraintRenderStrategy
         String columns = constraint.columns().stream()

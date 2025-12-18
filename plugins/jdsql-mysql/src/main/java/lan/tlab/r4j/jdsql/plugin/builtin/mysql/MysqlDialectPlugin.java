@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlFetchPsStrategy;
@@ -151,7 +151,7 @@ public final class MysqlDialectPlugin {
     /**
      * Creates the MySQL-specific renderers.
      * <p>
-     * This method creates both the {@link SqlRenderer} and {@link PreparedStatementRenderer}
+     * This method creates both the {@link SqlRenderer} and {@link AstToPreparedStatementSpecVisitor}
      * configured specifically for MySQL syntax, including:
      * <ul>
      *   <li>Backtick identifier escaping</li>
@@ -164,7 +164,7 @@ public final class MysqlDialectPlugin {
      * @return a new {@link PreparedStatementSpecFactory} instance configured for MySQL, never {@code null}
      */
     private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
-        PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .currentDateStrategy(new MysqlCurrentDatePsStrategy())
                 .currentDateTimeStrategy(new MysqlCurrentDateTimePsStrategy())

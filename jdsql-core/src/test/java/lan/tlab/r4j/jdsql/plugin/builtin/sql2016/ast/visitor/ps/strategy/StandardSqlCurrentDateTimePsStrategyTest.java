@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.datetime.CurrentDateTime;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ class StandardSqlCurrentDateTimePsStrategyTest {
     void returnsCurrentTimestampWithoutParameters() {
         var strategy = new StandardSqlCurrentDateTimePsStrategy();
         var currentDateTime = new CurrentDateTime();
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(currentDateTime, visitor, ctx);
@@ -28,7 +28,7 @@ class StandardSqlCurrentDateTimePsStrategyTest {
     void handlesCurrentDateTimeFunction() {
         var strategy = new StandardSqlCurrentDateTimePsStrategy();
         var currentDateTime = new CurrentDateTime();
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(currentDateTime, visitor, ctx);

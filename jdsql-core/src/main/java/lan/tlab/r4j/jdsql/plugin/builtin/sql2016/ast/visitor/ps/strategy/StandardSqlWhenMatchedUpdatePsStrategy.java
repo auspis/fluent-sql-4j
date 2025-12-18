@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhenMatchedUpdatePsStrategy;
 
 public class StandardSqlWhenMatchedUpdatePsStrategy implements WhenMatchedUpdatePsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(WhenMatchedUpdate item, PreparedStatementRenderer visitor, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            WhenMatchedUpdate item, AstToPreparedStatementSpecVisitor visitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("WHEN MATCHED");
 

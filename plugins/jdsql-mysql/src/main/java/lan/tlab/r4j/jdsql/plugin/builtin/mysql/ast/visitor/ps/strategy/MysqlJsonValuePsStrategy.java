@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonValue;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 
@@ -42,7 +42,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 public class MysqlJsonValuePsStrategy implements JsonValuePsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(JsonValue jsonValue, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            JsonValue jsonValue, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         var documentResult = jsonValue.jsonDocument().accept(renderer, ctx);
         var pathResult = jsonValue.path().accept(renderer, ctx);
 

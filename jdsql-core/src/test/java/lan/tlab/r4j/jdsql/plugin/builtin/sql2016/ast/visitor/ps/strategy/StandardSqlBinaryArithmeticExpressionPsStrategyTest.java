@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ArithmeticExpression.Binary
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 class StandardSqlBinaryArithmeticExpressionPsStrategyTest {
 
     private StandardSqlBinaryArithmeticExpressionPsStrategy strategy;
-    private PreparedStatementRenderer specFactory;
+    private AstToPreparedStatementSpecVisitor specFactory;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlBinaryArithmeticExpressionPsStrategy();
-        specFactory = new PreparedStatementRenderer();
+        specFactory = new AstToPreparedStatementSpecVisitor();
     }
 
     @Test
