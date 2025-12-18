@@ -11,14 +11,16 @@ import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
+import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * Integration test verifying that MySQLDSL is correctly integrated
+ * Component test verifying that MySQLDSL is correctly integrated
  * into the plugin system and can be retrieved via DSLRegistry.
  */
-class MysqlDSLIntegrationTest {
+@ComponentTest
+class MysqlDSLComponentTest {
 
     @Test
     void shouldRetrieveMySQLDSLFromRegistry() {
