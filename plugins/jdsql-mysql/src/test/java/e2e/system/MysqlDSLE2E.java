@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
@@ -313,6 +315,79 @@ class MysqlDSLE2E {
                 .containsExactly(
                         org.assertj.core.api.Assertions.tuple("Frank", "Milan"),
                         org.assertj.core.api.Assertions.tuple("Grace", "Rome"));
+    }
+
+    @Test
+    void windowFunctionRowNumberOrdersByAgeDescending() throws SQLException {
+        RowMapper<List<String>> mapper = r -> List.of(r.getString("name"), String.valueOf(r.getInt("age_rank")));
+
+        PreparedStatement ps = dsl.select()
+                .column("users", "name")
+                .column("users", "age")
+                .rowNumber()
+                .orderByDesc("users", "age")
+                .orderByAsc("users", "id")
+                .as("age_rank")
+                .from("users")
+                .orderByDesc("age")
+                .orderBy("id")
+                .buildPreparedStatement(connection);
+
+        List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
+
+        results.sort(Comparator.comparingInt(r -> Integer.parseInt(r.get(1))));
+
+        assertThat(results)
+                .containsExactly(
+                        List.of("Eve", "1"),
+                        List.of("Alice", "2"),
+                        List.of("Frank", "3"),
+                        List.of("John Doe", "4"),
+                        List.of("Charlie", "5"),
+                        List.of("Henry", "6"),
+                        List.of("Grace", "7"),
+                        List.of("Jane Smith", "8"),
+                        List.of("Diana", "9"),
+                        List.of("Bob", "10"));
+    }
+
+    @Test
+    void windowFunctionRowNumberPartitionsByActive() throws SQLException {
+        RowMapper<List<String>> mapper = r -> List.of(
+                r.getString("name"), Boolean.toString(r.getBoolean("active")), String.valueOf(r.getInt("active_rank")));
+
+        PreparedStatement ps = dsl.select()
+                .column("users", "name")
+                .column("users", "active")
+                .rowNumber()
+                .partitionBy("users", "active")
+                .orderByDesc("users", "age")
+                .orderByAsc("users", "id")
+                .as("active_rank")
+                .from("users")
+                .orderByDesc("active")
+                .orderByDesc("age")
+                .orderBy("id")
+                .buildPreparedStatement(connection);
+
+        List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
+
+        results.sort(Comparator.<List<String>, Boolean>comparing(r -> Boolean.parseBoolean(r.get(1)))
+                .reversed()
+                .thenComparingInt(r -> Integer.parseInt(r.get(2))));
+
+        assertThat(results)
+                .containsExactly(
+                        List.of("Eve", "true", "1"),
+                        List.of("Alice", "true", "2"),
+                        List.of("Frank", "true", "3"),
+                        List.of("John Doe", "true", "4"),
+                        List.of("Charlie", "true", "5"),
+                        List.of("Henry", "true", "6"),
+                        List.of("Jane Smith", "true", "7"),
+                        List.of("Grace", "false", "1"),
+                        List.of("Diana", "false", "2"),
+                        List.of("Bob", "false", "3"));
     }
 
     //  @Test
