@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
 
@@ -14,7 +14,7 @@ public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPs
 
     @Override
     public PreparedStatementSpec handle(
-            ColumnDefinition columnDefinition, PreparedStatementRenderer renderer, AstContext ctx) {
+            ColumnDefinition columnDefinition, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         if (columnDefinition.equals(ColumnDefinition.nullObject())) {
             return new PreparedStatementSpec("", List.of());
         }
@@ -26,7 +26,7 @@ public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPs
         String columnName = renderer.getEscapeStrategy().apply(columnDefinition.name());
         builder.append(columnName);
 
-        // Handle data type - use PreparedStatementRenderer directly
+        // Handle data type - use AstToPreparedStatementSpecVisitor directly
         PreparedStatementSpec typeDto = columnDefinition.type().accept(renderer, ctx);
         builder.append(" ").append(typeDto.sql());
         parameters.addAll(typeDto.parameters());

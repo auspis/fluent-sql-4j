@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.ast.visitor.ps.strategy;
 
 import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 /**
@@ -13,8 +13,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
  * such as SEPARATOR in GROUP_CONCAT.
  *
  * @see CustomFunctionCall
- * @see lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer
+ * @see lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor
  */
 public interface CustomFunctionCallPsStrategy {
-    PreparedStatementSpec handle(CustomFunctionCall functionCall, PreparedStatementRenderer renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            CustomFunctionCall functionCall, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
 }

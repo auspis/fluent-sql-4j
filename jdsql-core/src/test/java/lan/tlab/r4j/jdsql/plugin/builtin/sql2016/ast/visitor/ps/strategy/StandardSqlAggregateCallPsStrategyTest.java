@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateCall;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test;
 class StandardSqlAggregateCallPsStrategyTest {
 
     private StandardSqlAggregateCallPsStrategy strategy;
-    private PreparedStatementRenderer specFactory;
+    private AstToPreparedStatementSpecVisitor specFactory;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlAggregateCallPsStrategy();
-        specFactory = new PreparedStatementRenderer();
+        specFactory = new AstToPreparedStatementSpecVisitor();
         ctx = new AstContext();
     }
 

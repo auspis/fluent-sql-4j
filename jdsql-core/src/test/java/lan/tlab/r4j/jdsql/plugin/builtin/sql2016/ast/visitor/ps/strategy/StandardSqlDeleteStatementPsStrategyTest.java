@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.dml.statement.DeleteStatement;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class StandardSqlDeleteStatementPsStrategyTest {
         Where where = Where.of(whereExpr);
         DeleteStatement stmt =
                 DeleteStatement.builder().table(table).where(where).build();
-        PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
+        AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec ps = specFactory.visit(stmt, new AstContext());
         Assertions.assertThat(ps.sql())
                 .contains("DELETE FROM")
@@ -34,7 +34,7 @@ class StandardSqlDeleteStatementPsStrategyTest {
     void deleteWithoutWhere() {
         TableExpression table = new TableIdentifier("users");
         DeleteStatement stmt = DeleteStatement.builder().table(table).build();
-        PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
+        AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec ps = specFactory.visit(stmt, new AstContext());
         Assertions.assertThat(ps.sql()).isEqualTo("DELETE FROM \"users\"");
         Assertions.assertThat(ps.parameters()).isEmpty();

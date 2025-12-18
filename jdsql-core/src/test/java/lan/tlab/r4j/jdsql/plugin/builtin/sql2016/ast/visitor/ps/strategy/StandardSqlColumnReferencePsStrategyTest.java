@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlColumnReferencePsStrategyTest {
     private final ColumnReferencePsStrategy strategy = new StandardSqlColumnReferencePsStrategy();
-    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
+    private final AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
 
     @Test
     void noTable() {

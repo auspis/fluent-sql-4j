@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 
 public class StandardSqlUpdateItemPsStrategy implements UpdateItemPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(UpdateItem item, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(UpdateItem item, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         PreparedStatementSpec columnDto = item.column().accept(renderer, ctx);
         PreparedStatementSpec valueDto = item.value().accept(renderer, ctx);
 

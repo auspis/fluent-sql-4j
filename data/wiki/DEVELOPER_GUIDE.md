@@ -28,19 +28,16 @@ This guide covers the development workflow, testing strategies, code coverage, a
 
 This project uses a structured approach to test execution with three distinct test categories organized within the `jdsql-core` module.
 
-### Test Categories
+### Test Categories (Test Pyramid)
 
-📊 Refined Test Classification
+The project uses a structured test pyramid with four main categories:
 
-|     Level      |         Type          |      Isolation      |  Dependencies  |    Database    | Speed |                                    Examples                                     |
-|----------------|-----------------------|---------------------|----------------|----------------|-------|---------------------------------------------------------------------------------|
-| 🧱 UNIT        | Logic Unit Tests      | Complete            | None           | No             | 🚀    | SemVerUtilTest                                                                  |
-| 🧱 UNIT        | Strategy Unit Tests   | Complete            | None           | No             | 🚀    | StandardSqlColumnReferencePsStrategyTest, MysqlCustomFunctionCallPsStrategyTest |
-| 🔗 INTEGRATION | Plugin/ServiceLoader  | ServiceLoader       | Java SPI       | No             | 🏃    | MysqlDialectPluginServiceLoaderTest                                             |
-| 🔗 INTEGRATION | Component Integration | Internal Components | Registry/DSL   | No             | 🏃    | DSLRegistryTest                                                                 |
-| 🔗 INTEGRATION | DSL Integration       | Complete API        | H2 in-memory   | Yes (embedded) | 🏃    | SelectBuilderIntegrationTest                                                    |
-| 🔗 INTEGRATION | Database Integration  | Complete Plugin     | Testcontainers | Yes (real)     | 🏃    | MysqlDialectPluginIntegrationTest                                               |
-| 🌐 END-TO-END  | System E2E            | Entire System       | Complete JDBC  | Yes (real)     | 🐌    | PreparedStatementRendererTest                                                   |
+|     Level      |              Type               |    Isolation    |  Dependencies  |  Database   | Speed |                              Examples                               |
+|----------------|---------------------------------|-----------------|----------------|-------------|-------|---------------------------------------------------------------------|
+| 🧱 Unit        | Individual classes in isolation | Complete        | None           | No          | 🚀    | `SemVerUtilTest`, `StandardSqlColumnReferencePsStrategyTest`        |
+| 🔗 Component   | DSL + AST + Visitor + Renderer  | Real components | Mocked JDBC    | No (mocked) | 🚀    | `SelectDSLComponentTest`, `DSLRegistryComponentTest`                |
+| 🔗 Integration | DSL/Plugin + H2 database        | Complete API    | H2 (embedded)  | Yes (H2)    | 🏃    | `SelectBuilderIntegrationTest`, `MysqlDialectPluginIntegrationTest` |
+| 🌐 End-to-End  | Complete system workflow        | Entire System   | Testcontainers | Yes (real)  | 🐌    | `AstToPreparedStatementSpecVisitorTest`                             |
 
 ### Project Structure
 
@@ -48,18 +45,19 @@ All tests are consolidated within the `jdsql-core` module with the following org
 
 ```
 jdsql-core/src/test/java/
-├── lan/tlab/r4j/jdsql/       # Unit tests (205+)
-├── integration/              # Integration tests (21)
-└── e2e/system/               # E2E tests (3)
+├── lan/tlab/r4j/jdsql/                    # Unit tests (~200)
+├── lan/tlab/r4j/jdsql/dsl/*ComponentTest  # Component tests (~50)
+├── integration/                           # Integration tests (~20)
+└── e2e/system/                            # E2E tests (~3)
 ```
 
 ### Basic Commands
 
 ```bash
-# Run only unit tests (fast, no containers)
+# Run unit + component tests (fast feedback, no database)
 ./mvnw test -pl jdsql-core
 
-# Run all tests (unit + integration + e2e)
+# Run all tests (unit + component + integration + e2e)
 ./mvnw verify -pl jdsql-core
 
 # Run tests with dependencies
@@ -69,26 +67,35 @@ jdsql-core/src/test/java/
 ### Selective Test Execution
 
 ```bash
+# Run only unit tests
+./mvnw test -pl jdsql-core -Dgroups="\!component,\!integration,\!e2e"
+
+# Run unit + component tests (fast feedback, no database)
+./mvnw test -pl jdsql-core -Dgroups="\!integration,\!e2e"
+
+# Run only component tests
+./mvnw test -pl jdsql-core -Dgroups=component
+
 # Run only integration tests
 ./mvnw verify -pl jdsql-core -Dgroups=integration
 
 # Run only e2e tests
 ./mvnw verify -pl jdsql-core -Dgroups=e2e
 
-# Run both integration and e2e (skip unit tests)
+# Run integration + e2e (skip unit + component)
 ./mvnw verify -pl jdsql-core -Dgroups=integration,e2e
 ```
 
 ### Development Workflow
 
 ```bash
-# Fast feedback loop (unit tests only)
+# Fast feedback loop (unit + component tests only, no database)
 ./mvnw clean test
 
-# Pre-commit check (unit + integration + e2e)
+# Pre-commit check (all tests)
 ./mvnw clean verify
 
-# Quick integration check (no slow E2E tests)
+# Integration check (skip unit + component tests)
 ./mvnw verify -pl jdsql-core -Dgroups=integration
 
 # Full e2e validation with real databases
@@ -99,15 +106,15 @@ jdsql-core/src/test/java/
 
 The GitHub Actions pipeline executes tests in stages:
 
-1. **Fast Feedback** - Unit tests only (`mvn test`)
-2. **Integration** - Integration tests with H2 (`mvn verify -Dgroups=integration`)
-3. **E2E Validation** - E2E tests with Testcontainers (`mvn verify -Dgroups=e2e`)
+1. **Fast Feedback** - Unit + Component tests (`mvn test`) - No database, complete in seconds
+2. **Integration** - Integration tests with H2 (`mvn verify -Dgroups=integration`) - Embedded H2, complete in ~30s
+3. **E2E Validation** - E2E tests with Testcontainers (`mvn verify -Dgroups=e2e`) - Real databases, complete in a few minutes
 
 This staged approach provides:
 
-- **Quick feedback** for developers (unit tests complete in seconds)
-- **Medium feedback** for integration issues (H2 tests complete in under a minute)
-- **Complete validation** for production readiness (E2E tests complete in a few minutes)
+- **Quick feedback** for developers (unit + component tests run in ~15-20s)
+- **Medium feedback** for database integration issues (H2 integration tests run in ~30s)
+- **Complete validation** for production readiness (E2E tests with real databases run in a few minutes)
 
 ### Writing Tests
 
@@ -121,17 +128,39 @@ void shouldDoSomething() {
 }
 ```
 
+#### Component Test
+
+```java
+@ComponentTest  // includes @Tag("component")
+class SelectDSLComponentTest {
+    
+    @Test
+    void shouldGenerateCorrectSQL() throws SQLException {
+        // Test DSL API with mocked JDBC (real components, mocked database)
+        PreparedStatement result = new SelectBuilder(specFactory, "id", "name")
+                .from("users")
+                .where()
+                .column("age")
+                .gt(18)
+                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        
+        assertThatSql(sqlCaptureHelper)
+                .isEqualTo("SELECT \"id\", \"name\" FROM \"users\" WHERE \"age\" > ?");
+    }
+}
+```
+
 #### Integration Test
 
 ```java
 @IntegrationTest  // includes @Tag("integration")
-class MyIntegrationTest {
+class SelectBuilderIntegrationTest {
     
     @Test
     void shouldIntegrateWithDatabase() {
         // Test with H2 in-memory database
         Connection conn = TestDatabaseUtil.createH2Connection();
-        // ... test code
+        // ... test code with real H2 database
     }
 }
 ```
@@ -141,7 +170,7 @@ class MyIntegrationTest {
 ```java
 @E2ETest  // includes @Tag("e2e")
 @Testcontainers
-class MyE2E {
+class AstToPreparedStatementSpecVisitorE2E {
     
     @Container
     private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0");
@@ -157,8 +186,9 @@ class MyE2E {
 
 ### Test Annotations
 
-Custom test annotations are located in `lan.tlab.r4j.jdsql.util.annotation`:
+Custom test annotations are located in `lan.tlab.r4j.jdsql.test.util.annotation`:
 
+- `@ComponentTest` - Marks component tests (tagged with `component`)
 - `@IntegrationTest` - Marks integration tests (tagged with `integration`)
 - `@E2ETest` - Marks end-to-end tests (tagged with `e2e`)
 

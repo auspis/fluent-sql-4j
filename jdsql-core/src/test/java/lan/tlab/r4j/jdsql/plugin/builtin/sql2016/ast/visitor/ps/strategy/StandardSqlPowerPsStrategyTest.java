@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.number.Power;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class StandardSqlPowerPsStrategyTest {
     void handlesPowerWithTwoLiterals() {
         var strategy = new StandardSqlPowerPsStrategy();
         var power = new Power(Literal.of(2), Literal.of(8));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(power, visitor, ctx);
@@ -30,7 +30,7 @@ class StandardSqlPowerPsStrategyTest {
     void handlesPowerWithColumnAndLiteral() {
         var strategy = new StandardSqlPowerPsStrategy();
         var power = new Power(ColumnReference.of("calculations", "base"), Literal.of(3));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(power, visitor, ctx);
@@ -43,7 +43,7 @@ class StandardSqlPowerPsStrategyTest {
     void handlesPowerWithTwoColumns() {
         var strategy = new StandardSqlPowerPsStrategy();
         var power = new Power(ColumnReference.of("math", "base"), ColumnReference.of("math", "exponent"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(power, visitor, ctx);
@@ -56,7 +56,7 @@ class StandardSqlPowerPsStrategyTest {
     void handlesPowerWithLiteralAndColumn() {
         var strategy = new StandardSqlPowerPsStrategy();
         var power = new Power(Literal.of(10), ColumnReference.of("settings", "log_level"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(power, visitor, ctx);

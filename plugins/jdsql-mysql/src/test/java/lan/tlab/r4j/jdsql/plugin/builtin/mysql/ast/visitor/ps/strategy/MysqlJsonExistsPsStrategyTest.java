@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonExists;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ class MysqlJsonExistsPsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonExistsPsStrategy strategy = new MysqlJsonExistsPsStrategy();
@@ -29,7 +29,7 @@ class MysqlJsonExistsPsStrategyTest {
 
     @Test
     void withTableQualifiedColumn() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonExistsPsStrategy strategy = new MysqlJsonExistsPsStrategy();
@@ -37,7 +37,7 @@ class MysqlJsonExistsPsStrategyTest {
 
         PreparedStatementSpec result = strategy.handle(jsonExists, specFactory, new AstContext());
 
-        // PreparedStatementRenderer outputs only column name when no table context
+        // AstToPreparedStatementSpecVisitor outputs only column name when no table context
         assertThat(result.sql()).isEqualTo("JSON_CONTAINS_PATH(`data`, 'one', ?)");
         assertThat(result.parameters()).containsExactly("$.email");
     }
@@ -45,7 +45,7 @@ class MysqlJsonExistsPsStrategyTest {
     @Test
     void withOnErrorBehaviorIsIgnored() {
         // MySQL does not support ON ERROR - it should be ignored
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonExistsPsStrategy strategy = new MysqlJsonExistsPsStrategy();
@@ -61,7 +61,7 @@ class MysqlJsonExistsPsStrategyTest {
 
     @Test
     void withComplexJsonPath() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonExistsPsStrategy strategy = new MysqlJsonExistsPsStrategy();

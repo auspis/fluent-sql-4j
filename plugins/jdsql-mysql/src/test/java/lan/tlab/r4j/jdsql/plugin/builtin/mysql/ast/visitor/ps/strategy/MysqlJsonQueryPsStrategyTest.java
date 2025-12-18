@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.json.WrapperBehavior;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class MysqlJsonQueryPsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonQueryPsStrategy strategy = new MysqlJsonQueryPsStrategy();
@@ -31,7 +31,7 @@ class MysqlJsonQueryPsStrategyTest {
 
     @Test
     void withTableQualifiedColumn() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonQueryPsStrategy strategy = new MysqlJsonQueryPsStrategy();
@@ -39,7 +39,7 @@ class MysqlJsonQueryPsStrategyTest {
 
         PreparedStatementSpec result = strategy.handle(jsonQuery, specFactory, new AstContext());
 
-        // PreparedStatementRenderer outputs only column name when no table context
+        // AstToPreparedStatementSpecVisitor outputs only column name when no table context
         assertThat(result.sql()).isEqualTo("JSON_EXTRACT(`data`, ?)");
         assertThat(result.parameters()).containsExactly("$.items");
     }
@@ -47,7 +47,7 @@ class MysqlJsonQueryPsStrategyTest {
     @Test
     void withReturningTypeIsIgnored() {
         // MySQL does not support RETURNING - it should be ignored
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonQueryPsStrategy strategy = new MysqlJsonQueryPsStrategy();
@@ -69,7 +69,7 @@ class MysqlJsonQueryPsStrategyTest {
     @Test
     void withWrapperBehaviorIsIgnored() {
         // MySQL does not support wrapper behavior - it should be ignored
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonQueryPsStrategy strategy = new MysqlJsonQueryPsStrategy();
@@ -91,7 +91,7 @@ class MysqlJsonQueryPsStrategyTest {
     @Test
     void withAllOptionsIgnored() {
         // MySQL does not support RETURNING, wrapper, ON EMPTY, or ON ERROR
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonQueryPsStrategy strategy = new MysqlJsonQueryPsStrategy();
@@ -112,7 +112,7 @@ class MysqlJsonQueryPsStrategyTest {
 
     @Test
     void withArrayPath() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonQueryPsStrategy strategy = new MysqlJsonQueryPsStrategy();

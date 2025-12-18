@@ -2,14 +2,14 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Cast;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CastPsStrategy;
 
 public class StandardSqlCastPsStrategy implements CastPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Cast cast, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Cast cast, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         // Visit the inner expression to get its SQL and parameters
         PreparedStatementSpec expressionDto = cast.expression().accept(renderer, ctx);
 

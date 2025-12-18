@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.number.Mod;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ModPsStrategy;
 
 public class StandardSqlModPsStrategy implements ModPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Mod mod, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Mod mod, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         PreparedStatementSpec dividendResult = mod.dividend().accept(renderer, ctx);
         PreparedStatementSpec divisorResult = mod.divisor().accept(renderer, ctx);
 

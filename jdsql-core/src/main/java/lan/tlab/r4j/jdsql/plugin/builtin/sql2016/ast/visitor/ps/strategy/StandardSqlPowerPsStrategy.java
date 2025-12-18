@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.number.Power;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.PowerPsStrategy;
 
 public class StandardSqlPowerPsStrategy implements PowerPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Power power, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Power power, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         PreparedStatementSpec baseResult = power.base().accept(renderer, ctx);
         PreparedStatementSpec exponentResult = power.exponent().accept(renderer, ctx);
 

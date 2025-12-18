@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.json.OnEmptyBehavior;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonValuePsStrategy;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,8 @@ class StandardSqlJsonValuePsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         JsonValuePsStrategy strategy = new StandardSqlJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
@@ -30,8 +30,8 @@ class StandardSqlJsonValuePsStrategyTest {
 
     @Test
     void withAllOptions() {
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         JsonValuePsStrategy strategy = new StandardSqlJsonValuePsStrategy();
         JsonValue jsonValue = new JsonValue(
                 ColumnReference.of("products", "data"),

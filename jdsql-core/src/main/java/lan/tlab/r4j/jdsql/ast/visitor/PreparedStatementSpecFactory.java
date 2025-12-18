@@ -2,7 +2,7 @@ package lan.tlab.r4j.jdsql.ast.visitor;
 
 import java.util.Objects;
 import lan.tlab.r4j.jdsql.ast.core.statement.Statement;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 /**
@@ -11,14 +11,14 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
  * This class coordinates two-phase rendering:
  * <ol>
  *   <li><b>Context preparation</b>: Analyzes the AST to enrich context with metadata (e.g., JOIN detection)</li>
- *   <li><b>SQL generation</b>: Delegates to {@link PreparedStatementRenderer} for dialect-specific rendering</li>
+ *   <li><b>SQL generation</b>: Delegates to {@link AstToPreparedStatementSpecVisitor} for dialect-specific rendering</li>
  * </ol>
  * <p>
  * This separation ensures rendering strategies receive the necessary context without managing it themselves.
  * <p>
  * <b>Example usage:</b>
  * <pre>{@code
- * PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+ * AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
  *     .escapeStrategy(new MysqlEscapeStrategy())
  *     .build();
  * PreparedStatementSpecFactory specFactory = new PreparedStatementSpecFactory(psRenderer);
@@ -29,15 +29,15 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
  * List<Object> params = spec.parameters();
  * }</pre>
  *
- * @param psRenderer the PreparedStatement renderer for this dialect
+ * @param astVisitor the PreparedStatement renderer for this dialect
  * @since 1.0
  */
-public record PreparedStatementSpecFactory(PreparedStatementRenderer psRenderer) {
+public record PreparedStatementSpecFactory(AstToPreparedStatementSpecVisitor astVisitor) {
 
     private static final ContextPreparationVisitor CONTEXT_ANALYZER = new ContextPreparationVisitor();
 
     public PreparedStatementSpecFactory {
-        Objects.requireNonNull(psRenderer, "PreparedStatementRenderer must not be null");
+        Objects.requireNonNull(astVisitor, "AstToPreparedStatementSpecVisitor must not be null");
     }
 
     /**
@@ -48,6 +48,6 @@ public record PreparedStatementSpecFactory(PreparedStatementRenderer psRenderer)
      */
     public PreparedStatementSpec create(Statement statement) {
         AstContext enrichedCtx = statement.accept(CONTEXT_ANALYZER, new AstContext());
-        return statement.accept(psRenderer, enrichedCtx);
+        return statement.accept(astVisitor, enrichedCtx);
     }
 }
