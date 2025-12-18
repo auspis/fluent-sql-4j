@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBu
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.statement.CreateTableStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 class StandardSqlCreateTableStatementPsStrategyTest {
 
     private StandardSqlCreateTableStatementPsStrategy strategy;
-    private PreparedStatementRenderer visitor;
+    private AstToPreparedStatementSpecVisitor visitor;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlCreateTableStatementPsStrategy();
-        visitor = PreparedStatementRenderer.builder().build();
+        visitor = AstToPreparedStatementSpecVisitor.builder().build();
         ctx = new AstContext(AstContext.Feature.DDL);
     }
 

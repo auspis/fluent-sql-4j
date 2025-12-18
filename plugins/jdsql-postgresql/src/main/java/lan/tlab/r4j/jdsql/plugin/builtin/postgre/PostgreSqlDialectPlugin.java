@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.postgre;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl.PostgreSqlDSL;
@@ -99,7 +99,7 @@ public final class PostgreSqlDialectPlugin {
     /**
      * Creates the PostgreSQL-specific renderers.
      * <p>
-     * This method creates both the {@link SqlRenderer} and {@link PreparedStatementRenderer}
+     * This method creates both the {@link SqlRenderer} and {@link AstToPreparedStatementSpecVisitor}
      * configured specifically for PostgreSQL syntax, including:
      * <ul>
      *   <li>STRING_AGG for string aggregation</li>
@@ -113,7 +113,7 @@ public final class PostgreSqlDialectPlugin {
      * @return a new {@link PreparedStatementSpecFactory} instance configured for PostgreSQL, never {@code null}
      */
     private static PreparedStatementSpecFactory createPostgreSqlRenderer() {
-        PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 

@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.dml.component.InsertData.InsertValues;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenNotMatchedInsert;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,13 +17,13 @@ import org.junit.jupiter.api.Test;
 class StandardSqlWhenNotMatchedInsertPsStrategyTest {
 
     private StandardSqlWhenNotMatchedInsertPsStrategy strategy;
-    private PreparedStatementRenderer visitor;
+    private AstToPreparedStatementSpecVisitor visitor;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlWhenNotMatchedInsertPsStrategy();
-        visitor = new PreparedStatementRenderer();
+        visitor = new AstToPreparedStatementSpecVisitor();
         ctx = new AstContext();
     }
 

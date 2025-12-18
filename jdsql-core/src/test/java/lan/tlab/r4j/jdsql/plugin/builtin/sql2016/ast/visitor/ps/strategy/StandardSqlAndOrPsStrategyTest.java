@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.predicate.AndOr;
 import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +15,13 @@ import org.junit.jupiter.api.Test;
 class StandardSqlAndOrPsStrategyTest {
 
     private StandardSqlAndOrPsStrategy strategy;
-    private PreparedStatementRenderer specFactory;
+    private AstToPreparedStatementSpecVisitor specFactory;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlAndOrPsStrategy();
-        specFactory = new PreparedStatementRenderer();
+        specFactory = new AstToPreparedStatementSpecVisitor();
         ctx = new AstContext();
     }
 

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.jdsql.ast.core.expression.set.IntersectExpression;
 import lan.tlab.r4j.jdsql.ast.core.expression.set.NullSetExpression;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class StandardSqlIntersectExpressionPsStrategyTest {
     void shouldHandleIntersectDistinct() {
         // given
         var expression = IntersectExpression.intersect(new NullSetExpression(), new NullSetExpression());
-        var visitor = PreparedStatementRenderer.builder().build();
+        var visitor = AstToPreparedStatementSpecVisitor.builder().build();
 
         // when
         PreparedStatementSpec result = strategy.handle(expression, visitor, null);
@@ -31,7 +31,7 @@ class StandardSqlIntersectExpressionPsStrategyTest {
     void shouldHandleIntersectAll() {
         // given
         var expression = IntersectExpression.intersectAll(new NullSetExpression(), new NullSetExpression());
-        var visitor = PreparedStatementRenderer.builder().build();
+        var visitor = AstToPreparedStatementSpecVisitor.builder().build();
 
         // when
         PreparedStatementSpec result = strategy.handle(expression, visitor, null);

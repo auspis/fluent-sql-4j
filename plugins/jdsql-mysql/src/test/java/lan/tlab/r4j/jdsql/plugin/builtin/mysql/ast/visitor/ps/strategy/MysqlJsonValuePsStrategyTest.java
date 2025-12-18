@@ -8,7 +8,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.json.OnEmptyBehavior;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ class MysqlJsonValuePsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
@@ -30,7 +30,7 @@ class MysqlJsonValuePsStrategyTest {
 
     @Test
     void withTableQualifiedColumn() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
@@ -38,7 +38,7 @@ class MysqlJsonValuePsStrategyTest {
 
         PreparedStatementSpec result = strategy.handle(jsonValue, specFactory, new AstContext());
 
-        // PreparedStatementRenderer outputs only column name when no table context
+        // AstToPreparedStatementSpecVisitor outputs only column name when no table context
         assertThat(result.sql()).isEqualTo("JSON_UNQUOTE(JSON_EXTRACT(`data`, ?))");
         assertThat(result.parameters()).containsExactly("$.price");
     }
@@ -46,7 +46,7 @@ class MysqlJsonValuePsStrategyTest {
     @Test
     void withReturningTypeIsIgnored() {
         // MySQL does not support RETURNING - it should be ignored
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
@@ -63,7 +63,7 @@ class MysqlJsonValuePsStrategyTest {
     @Test
     void withOnEmptyAndOnErrorBehaviorsAreIgnored() {
         // MySQL does not support ON EMPTY or ON ERROR - they should be ignored
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();
@@ -83,7 +83,7 @@ class MysqlJsonValuePsStrategyTest {
 
     @Test
     void withNestedJsonPath() {
-        PreparedStatementRenderer specFactory = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MysqlJsonValuePsStrategy strategy = new MysqlJsonValuePsStrategy();

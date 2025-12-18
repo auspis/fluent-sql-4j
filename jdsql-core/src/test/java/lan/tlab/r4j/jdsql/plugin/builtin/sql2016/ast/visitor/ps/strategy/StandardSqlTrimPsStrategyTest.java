@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.TrimPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Test;
 class StandardSqlTrimPsStrategyTest {
 
     private final TrimPsStrategy strategy = new StandardSqlTrimPsStrategy();
-    private final PreparedStatementRenderer specFactory =
-            PreparedStatementRenderer.builder().build();
+    private final AstToPreparedStatementSpecVisitor specFactory =
+            AstToPreparedStatementSpecVisitor.builder().build();
     private final AstContext ctx = new AstContext();
 
     @Test

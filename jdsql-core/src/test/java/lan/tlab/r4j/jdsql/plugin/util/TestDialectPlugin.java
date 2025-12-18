@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin.util;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 
@@ -27,6 +27,6 @@ public final class TestDialectPlugin {
 
     private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
         return new PreparedStatementSpecFactory(
-                PreparedStatementRenderer.builder().build());
+                AstToPreparedStatementSpecVisitor.builder().build());
     }
 }

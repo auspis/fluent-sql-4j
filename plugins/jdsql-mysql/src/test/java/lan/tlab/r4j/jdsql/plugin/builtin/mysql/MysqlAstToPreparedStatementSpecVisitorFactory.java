@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
 /**
@@ -12,24 +12,24 @@ import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
  *
  * @since 1.0
  */
-public final class MysqlPreparedStatementRendererFactory {
+public final class MysqlAstToPreparedStatementSpecVisitorFactory {
 
     private static final SqlDialectPluginRegistry REGISTRY = SqlDialectPluginRegistry.createWithServiceLoader();
 
-    private MysqlPreparedStatementRendererFactory() {
+    private MysqlAstToPreparedStatementSpecVisitorFactory() {
         // Utility class - prevent instantiation
     }
 
     /**
-     * Creates a {@link PreparedStatementRenderer} for MySQL 8.x dialect.
+     * Creates a {@link AstToPreparedStatementSpecVisitor} for MySQL 8.x dialect.
      *
-     * @return PreparedStatementRenderer configured for MySQL 8.x
+     * @return AstToPreparedStatementSpecVisitor configured for MySQL 8.x
      * @throws IllegalStateException if the MySQL plugin is not available
      */
-    public static PreparedStatementRenderer create() {
+    public static AstToPreparedStatementSpecVisitor create() {
         return REGISTRY.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow()
-                .psRenderer();
+                .astVisitor();
     }
 
     /**

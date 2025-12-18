@@ -12,7 +12,7 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
@@ -21,18 +21,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests for PreparedStatementRenderer with H2 in-memory database.
+ * Integration tests for AstToPreparedStatementSpecVisitor with H2 in-memory database.
  */
 @IntegrationTest
-class PreparedStatementRendererTest {
+class AstToPreparedStatementSpecVisitorTest {
 
     private Connection connection;
-    private PreparedStatementRenderer specFactory;
+    private AstToPreparedStatementSpecVisitor specFactory;
 
     @BeforeEach
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.createH2Connection();
-        specFactory = new PreparedStatementRenderer();
+        specFactory = new AstToPreparedStatementSpecVisitor();
 
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
@@ -54,7 +54,7 @@ class PreparedStatementRendererTest {
                 .where(Where.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John Doe"))))
                 .build();
 
-        // Generate SQL and parameters using PreparedStatementRenderer
+        // Generate SQL and parameters using AstToPreparedStatementSpecVisitor
         AstContext context = new AstContext();
         PreparedStatementSpec result = selectStmt.accept(specFactory, context);
 

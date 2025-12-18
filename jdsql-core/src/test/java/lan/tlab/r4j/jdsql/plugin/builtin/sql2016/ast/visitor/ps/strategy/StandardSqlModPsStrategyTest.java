@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.number.Mod;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class StandardSqlModPsStrategyTest {
     void handlesModWithTwoLiterals() {
         var strategy = new StandardSqlModPsStrategy();
         var mod = new Mod(Literal.of(10), Literal.of(3));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);
@@ -30,7 +30,7 @@ class StandardSqlModPsStrategyTest {
     void handlesModWithColumnAndLiteral() {
         var strategy = new StandardSqlModPsStrategy();
         var mod = new Mod(ColumnReference.of("orders", "total"), Literal.of(100));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);
@@ -44,7 +44,7 @@ class StandardSqlModPsStrategyTest {
         var strategy = new StandardSqlModPsStrategy();
         var mod =
                 new Mod(ColumnReference.of("calculations", "dividend"), ColumnReference.of("calculations", "divisor"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);
@@ -57,7 +57,7 @@ class StandardSqlModPsStrategyTest {
     void handlesModWithLiteralAndColumn() {
         var strategy = new StandardSqlModPsStrategy();
         var mod = new Mod(Literal.of(25), ColumnReference.of("settings", "page_size"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(mod, visitor, ctx);

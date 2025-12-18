@@ -6,7 +6,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ConstraintDefinition.ForeignKeyConstraintDefinition;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ForeignKeyConstraintPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class StandardSqlForeignKeyConstraintPsStrategyTest {
 
     private final ForeignKeyConstraintPsStrategy strategy = new StandardSqlForeignKeyConstraintPsStrategy();
-    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
+    private final AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
     private final AstContext ctx = new AstContext();
 
     @Test
