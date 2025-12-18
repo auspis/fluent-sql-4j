@@ -77,7 +77,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void pluginDiscovery_ok() {
+    void pluginDiscoveryOk() {
         Result<DSL> dslResult = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION);
         assertThat(dslResult).isInstanceOf(Result.Success.class);
         assertThat(dslResult.orElseThrow()).isNotNull().isInstanceOf(MysqlDSL.class);
