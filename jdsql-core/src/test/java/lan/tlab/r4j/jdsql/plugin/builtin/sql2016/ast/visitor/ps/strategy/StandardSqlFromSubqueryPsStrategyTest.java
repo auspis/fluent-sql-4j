@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSubquery;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlFromSubqueryPsStrategyTest {
@@ -25,7 +25,7 @@ class StandardSqlFromSubqueryPsStrategyTest {
         var fromSubquery = FromSubquery.of(subquery, "sub");
 
         var strategy = new StandardSqlFromSubqueryPsStrategy();
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var result = strategy.handle(fromSubquery, visitor, new AstContext());
 
         assertThat(result.sql()).isEqualTo("(SELECT \"id\" FROM \"User\") AS \"sub\"");
@@ -42,7 +42,7 @@ class StandardSqlFromSubqueryPsStrategyTest {
         var fromSubquery = FromSubquery.of(subquery, Alias.nullObject());
 
         var strategy = new StandardSqlFromSubqueryPsStrategy();
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var result = strategy.handle(fromSubquery, visitor, new AstContext());
 
         assertThat(result.sql()).isEqualTo("(SELECT \"id\" FROM \"User\")");
@@ -62,7 +62,7 @@ class StandardSqlFromSubqueryPsStrategyTest {
         var fromSubquery = FromSubquery.of(subquery, new Alias("sub"));
 
         var strategy = new StandardSqlFromSubqueryPsStrategy();
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var result = strategy.handle(fromSubquery, visitor, new AstContext());
 
         assertThat(result.sql()).isEqualTo("(SELECT \"id\" FROM \"User\" WHERE \"name\" = ?) AS \"sub\"");

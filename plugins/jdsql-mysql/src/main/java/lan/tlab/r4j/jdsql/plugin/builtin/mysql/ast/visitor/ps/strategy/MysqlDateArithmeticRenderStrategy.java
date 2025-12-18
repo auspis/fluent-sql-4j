@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.datetime.DateArithmetic;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.DateArithmeticPsStrategy;
 
@@ -12,7 +12,7 @@ public class MysqlDateArithmeticRenderStrategy implements DateArithmeticPsStrate
 
     @Override
     public PreparedStatementSpec handle(
-            DateArithmetic dateArithmetic, PreparedStatementRenderer renderer, AstContext ctx) {
+            DateArithmetic dateArithmetic, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         PreparedStatementSpec dateExprDto = dateArithmetic.dateExpression().accept(renderer, ctx);
         PreparedStatementSpec valueDto = dateArithmetic.interval().value().accept(renderer, ctx);
 

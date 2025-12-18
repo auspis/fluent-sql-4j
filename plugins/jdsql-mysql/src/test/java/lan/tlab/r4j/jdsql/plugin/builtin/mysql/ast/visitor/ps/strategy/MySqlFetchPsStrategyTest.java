@@ -4,21 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.jdsql.ast.dql.clause.Fetch;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlPreparedStatementRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlAstToPreparedStatementSpecVisitorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class MySqlFetchPsStrategyTest {
 
     private MySqlFetchPsStrategy strategy;
-    private PreparedStatementRenderer psRenderer;
+    private AstToPreparedStatementSpecVisitor psRenderer;
 
     @BeforeEach
     public void setUp() {
         strategy = new MySqlFetchPsStrategy();
-        psRenderer = MysqlPreparedStatementRendererFactory.create();
+        psRenderer = MysqlAstToPreparedStatementSpecVisitorFactory.create();
     }
 
     @Test

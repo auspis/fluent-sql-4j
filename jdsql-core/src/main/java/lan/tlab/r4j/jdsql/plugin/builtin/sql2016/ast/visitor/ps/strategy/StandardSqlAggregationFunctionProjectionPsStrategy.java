@@ -3,7 +3,7 @@ package lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AggregationFunctionProjectionPsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.EscapeStrategy;
@@ -15,7 +15,7 @@ public class StandardSqlAggregationFunctionProjectionPsStrategy implements Aggre
             Visitor<PreparedStatementSpec> renderer,
             AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
-        if (renderer instanceof PreparedStatementRenderer psRenderer) {
+        if (renderer instanceof AstToPreparedStatementSpecVisitor psRenderer) {
             escapeStrategy = psRenderer.getEscapeStrategy();
         }
 

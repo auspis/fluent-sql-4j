@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.jdsql.ast.ddl.definition.ReferencesItem;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ReferencesItemPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class StandardSqlReferencesItemPsStrategyTest {
     void shouldHandleReferencesWithSingleColumn() {
         // given
         var referencesItem = new ReferencesItem("users", "id");
-        var visitor = PreparedStatementRenderer.builder().build();
+        var visitor = AstToPreparedStatementSpecVisitor.builder().build();
         var ctx = new AstContext();
 
         // when
@@ -32,7 +32,7 @@ class StandardSqlReferencesItemPsStrategyTest {
     void shouldHandleReferencesWithMultipleColumns() {
         // given
         var referencesItem = new ReferencesItem("users", "tenant_id", "user_id");
-        var visitor = PreparedStatementRenderer.builder().build();
+        var visitor = AstToPreparedStatementSpecVisitor.builder().build();
         var ctx = new AstContext();
 
         // when

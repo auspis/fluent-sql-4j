@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.NullScalarExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ class StandardSqlNullScalarExpressionPsStrategyTest {
     void handlesNullScalarExpression() {
         var strategy = new StandardSqlNullScalarExpressionPsStrategy();
         var nullExpression = new NullScalarExpression();
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(nullExpression, visitor, ctx);

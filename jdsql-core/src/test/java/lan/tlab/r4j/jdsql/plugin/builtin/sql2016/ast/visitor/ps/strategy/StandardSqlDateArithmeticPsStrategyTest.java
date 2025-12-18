@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.datetime.Interval;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class StandardSqlDateArithmeticPsStrategyTest {
         var strategy = new StandardSqlDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(30), Interval.IntervalUnit.DAY);
         var dateArithmetic = DateArithmetic.addition(ColumnReference.of("orders", "created_date"), interval);
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(dateArithmetic, visitor, ctx);
@@ -32,7 +32,7 @@ class StandardSqlDateArithmeticPsStrategyTest {
         var strategy = new StandardSqlDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(7), Interval.IntervalUnit.DAY);
         var dateArithmetic = DateArithmetic.subtraction(ColumnReference.of("events", "event_date"), interval);
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(dateArithmetic, visitor, ctx);
@@ -46,7 +46,7 @@ class StandardSqlDateArithmeticPsStrategyTest {
         var strategy = new StandardSqlDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(3), Interval.IntervalUnit.MONTH);
         var dateArithmetic = DateArithmetic.addition(ColumnReference.of("subscriptions", "start_date"), interval);
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(dateArithmetic, visitor, ctx);
@@ -60,7 +60,7 @@ class StandardSqlDateArithmeticPsStrategyTest {
         var strategy = new StandardSqlDateArithmeticPsStrategy();
         var interval = new Interval(Literal.of(1), Interval.IntervalUnit.YEAR);
         var dateArithmetic = DateArithmetic.subtraction(ColumnReference.of("employees", "hire_date"), interval);
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(dateArithmetic, visitor, ctx);

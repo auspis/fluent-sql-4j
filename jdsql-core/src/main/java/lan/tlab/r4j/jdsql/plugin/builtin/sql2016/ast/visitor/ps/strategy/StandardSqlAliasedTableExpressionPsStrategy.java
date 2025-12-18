@@ -5,7 +5,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.set.AliasedTableExpression;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.AliasedTableExpressionPsStrategy;
 
@@ -19,7 +19,7 @@ public class StandardSqlAliasedTableExpressionPsStrategy implements AliasedTable
 
     @Override
     public PreparedStatementSpec handle(
-            AliasedTableExpression item, PreparedStatementRenderer visitor, AstContext ctx) {
+            AliasedTableExpression item, AstToPreparedStatementSpecVisitor visitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
 

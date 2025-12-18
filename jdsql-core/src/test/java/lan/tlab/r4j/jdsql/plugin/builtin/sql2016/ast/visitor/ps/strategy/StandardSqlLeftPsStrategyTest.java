@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.string.Left;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class StandardSqlLeftPsStrategyTest {
     void handlesLeftWithLiteralStringAndNumber() {
         var strategy = new StandardSqlLeftPsStrategy();
         var left = new Left(Literal.of("Hello World"), Literal.of(5));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(left, visitor, ctx);
@@ -30,7 +30,7 @@ class StandardSqlLeftPsStrategyTest {
     void handlesLeftWithColumnAndNumber() {
         var strategy = new StandardSqlLeftPsStrategy();
         var left = Left.of(ColumnReference.of("users", "full_name"), 3);
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(left, visitor, ctx);
@@ -43,7 +43,7 @@ class StandardSqlLeftPsStrategyTest {
     void handlesLeftWithStringAndColumnLength() {
         var strategy = new StandardSqlLeftPsStrategy();
         var left = new Left(Literal.of("Test String"), ColumnReference.of("config", "name_length"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(left, visitor, ctx);
@@ -57,7 +57,7 @@ class StandardSqlLeftPsStrategyTest {
         var strategy = new StandardSqlLeftPsStrategy();
         var left = new Left(
                 ColumnReference.of("products", "description"), ColumnReference.of("settings", "preview_length"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(left, visitor, ctx);

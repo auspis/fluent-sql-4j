@@ -5,14 +5,14 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.number.Round;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.NullScalarExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.RoundPsStrategy;
 
 public class StandardSqlRoundPsStrategy implements RoundPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Round round, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Round round, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         PreparedStatementSpec numericResult = round.numericExpression().accept(renderer, ctx);
 
         List<Object> parameters = new ArrayList<>(numericResult.parameters());

@@ -20,17 +20,17 @@ import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
 class StandardSqlSelectStatementPsStrategyTest {
 
     private final StandardSqlSelectStatementPsStrategy strategy = new StandardSqlSelectStatementPsStrategy();
-    private final PreparedStatementRenderer renderer = new PreparedStatementRenderer();
+    private final AstToPreparedStatementSpecVisitor renderer = new AstToPreparedStatementSpecVisitor();
     private final AstContext ctx = new AstContext();
-    private final PreparedStatementSpecFactory specFactory =
-            new PreparedStatementSpecFactory(PreparedStatementRenderer.builder().build());
+    private final PreparedStatementSpecFactory specFactory = new PreparedStatementSpecFactory(
+            AstToPreparedStatementSpecVisitor.builder().build());
 
     @Test
     void star() {

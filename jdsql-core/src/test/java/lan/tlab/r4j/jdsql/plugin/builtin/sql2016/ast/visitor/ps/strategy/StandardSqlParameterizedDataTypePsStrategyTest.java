@@ -6,7 +6,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType.ParameterizedDataType;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ParameterizedDataTypePsStrategy;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class StandardSqlParameterizedDataTypePsStrategyTest {
 
     private final ParameterizedDataTypePsStrategy strategy = new StandardSqlParameterizedDataTypePsStrategy();
-    private final PreparedStatementRenderer specFactory = new PreparedStatementRenderer();
+    private final AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
     private final AstContext ctx = new AstContext();
 
     @Test

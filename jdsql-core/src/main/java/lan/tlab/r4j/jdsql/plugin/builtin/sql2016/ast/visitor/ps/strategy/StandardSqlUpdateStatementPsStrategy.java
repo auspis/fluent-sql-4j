@@ -5,13 +5,14 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.UpdateStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 
 public class StandardSqlUpdateStatementPsStrategy implements UpdateStatementPsStrategy {
     @Override
-    public PreparedStatementSpec handle(UpdateStatement stmt, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            UpdateStatement stmt, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         // TableIdentifier name
         PreparedStatementSpec tableDto =
                 stmt.table().accept(renderer, ctx); // Usa il visitor su qualunque TableExpression

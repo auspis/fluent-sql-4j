@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.json.WrapperBehavior;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonQueryPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,8 @@ class StandardSqlJsonQueryPsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         JsonQueryPsStrategy strategy = new StandardSqlJsonQueryPsStrategy();
         JsonQuery jsonQuery = new JsonQuery(ColumnReference.of("products", "data"), Literal.of("$.tags"));
 
@@ -31,8 +31,8 @@ class StandardSqlJsonQueryPsStrategyTest {
 
     @Test
     void withAllOptions() {
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         JsonQueryPsStrategy strategy = new StandardSqlJsonQueryPsStrategy();
         JsonQuery jsonQuery = new JsonQuery(
                 ColumnReference.of("products", "data"),

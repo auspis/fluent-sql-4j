@@ -1,7 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.sql2016;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlEscapeStrategy;
 
@@ -100,7 +100,7 @@ public final class StandardSQLDialectPlugin {
      * @return a new PreparedStatementSpecFactory instance
      */
     private static PreparedStatementSpecFactory createStandardSql2008Renderer() {
-        PreparedStatementRenderer psRenderer = PreparedStatementRenderer.builder()
+        AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 

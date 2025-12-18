@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.string.Concat;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ConcatPsStrategy;
 
 public class StandardSqlConcatPsStrategy implements ConcatPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Concat concat, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(Concat concat, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
 
         // Visit all expressions to get their SQL and parameters

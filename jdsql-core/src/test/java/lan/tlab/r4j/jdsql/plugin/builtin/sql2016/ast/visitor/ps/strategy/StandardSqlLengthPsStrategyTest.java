@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.string.Length;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class StandardSqlLengthPsStrategyTest {
     void handlesLengthWithLiteralString() {
         var strategy = new StandardSqlLengthPsStrategy();
         var length = new Length(Literal.of("Hello World"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(length, visitor, ctx);
@@ -30,7 +30,7 @@ class StandardSqlLengthPsStrategyTest {
     void handlesLengthWithColumnReference() {
         var strategy = new StandardSqlLengthPsStrategy();
         var length = new Length(ColumnReference.of("users", "email"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(length, visitor, ctx);
@@ -43,7 +43,7 @@ class StandardSqlLengthPsStrategyTest {
     void handlesLengthWithColumnOnly() {
         var strategy = new StandardSqlLengthPsStrategy();
         var length = new Length(ColumnReference.of("products", "description"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(length, visitor, ctx);
@@ -56,7 +56,7 @@ class StandardSqlLengthPsStrategyTest {
     void handlesLengthWithTableAlias() {
         var strategy = new StandardSqlLengthPsStrategy();
         var length = new Length(ColumnReference.of("p", "product_name"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(length, visitor, ctx);

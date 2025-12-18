@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.datetime.ExtractDatePart;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
     void handlesExtractYearFromColumn() {
         var strategy = new StandardSqlExtractDatePartPsStrategy();
         var extractYear = ExtractDatePart.year(ColumnReference.of("orders", "created_date"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(extractYear, visitor, ctx);
@@ -30,7 +30,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
     void handlesExtractMonthFromLiteral() {
         var strategy = new StandardSqlExtractDatePartPsStrategy();
         var extractMonth = ExtractDatePart.month(Literal.of("2023-12-25"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(extractMonth, visitor, ctx);
@@ -43,7 +43,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
     void handlesExtractDayFromColumn() {
         var strategy = new StandardSqlExtractDatePartPsStrategy();
         var extractDay = ExtractDatePart.day(ColumnReference.of("events", "event_date"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(extractDay, visitor, ctx);
@@ -56,7 +56,7 @@ class StandardSqlExtractDatePartPsStrategyTest {
     void handlesExtractWithComplexDateExpression() {
         var strategy = new StandardSqlExtractDatePartPsStrategy();
         var extractYear = ExtractDatePart.year(Literal.of("2023-06-15"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(extractYear, visitor, ctx);

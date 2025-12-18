@@ -197,7 +197,7 @@ The project uses a structured test pyramid with four main categories:
 - **Speed**: Slow (🐌)
 - **Dependencies**: Full system, real databases
 - **Database**: Real databases via Testcontainers
-- **Examples**: `PreparedStatementRendererTest`, `StandardSqlRendererMySqlE2E`
+- **Examples**: `AstToPreparedStatementSpecVisitorTest`, `StandardSqlRendererMySqlE2E`
 
 ### Test Annotations
 

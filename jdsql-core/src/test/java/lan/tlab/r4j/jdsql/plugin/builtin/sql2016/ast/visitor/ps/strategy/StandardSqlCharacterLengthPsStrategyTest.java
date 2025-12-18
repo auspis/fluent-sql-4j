@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.string.CharacterLength;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class StandardSqlCharacterLengthPsStrategyTest {
     void handlesCharacterLengthWithLiteralString() {
         var strategy = new StandardSqlCharacterLengthPsStrategy();
         var characterLength = new CharacterLength(Literal.of("Hello World"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(characterLength, visitor, ctx);
@@ -30,7 +30,7 @@ class StandardSqlCharacterLengthPsStrategyTest {
     void handlesCharacterLengthWithColumnReference() {
         var strategy = new StandardSqlCharacterLengthPsStrategy();
         var characterLength = new CharacterLength(ColumnReference.of("users", "email"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(characterLength, visitor, ctx);
@@ -43,7 +43,7 @@ class StandardSqlCharacterLengthPsStrategyTest {
     void handlesCharacterLengthWithTableColumn() {
         var strategy = new StandardSqlCharacterLengthPsStrategy();
         var characterLength = new CharacterLength(ColumnReference.of("products", "description"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(characterLength, visitor, ctx);
@@ -56,7 +56,7 @@ class StandardSqlCharacterLengthPsStrategyTest {
     void handlesCharacterLengthWithAliasedColumn() {
         var strategy = new StandardSqlCharacterLengthPsStrategy();
         var characterLength = new CharacterLength(ColumnReference.of("c", "content"));
-        var visitor = new PreparedStatementRenderer();
+        var visitor = new AstToPreparedStatementSpecVisitor();
         var ctx = new AstContext();
 
         PreparedStatementSpec result = strategy.handle(characterLength, visitor, ctx);
