@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonQuery;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonQueryPsStrategy;
 
@@ -41,7 +41,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.JsonQueryPsStrategy;
 public class MysqlJsonQueryPsStrategy implements JsonQueryPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(JsonQuery jsonQuery, PreparedStatementRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            JsonQuery jsonQuery, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         var documentResult = jsonQuery.jsonDocument().accept(renderer, ctx);
         var pathResult = jsonQuery.path().accept(renderer, ctx);
 

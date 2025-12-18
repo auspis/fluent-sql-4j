@@ -14,7 +14,7 @@ import lan.tlab.r4j.jdsql.ast.dml.component.MergeUsing;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 import org.junit.jupiter.api.Test;
@@ -42,8 +42,8 @@ class StandardSqlMergeStatementPsStrategyTest {
                                         Literal.of("new")))))
                 .build();
 
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
         PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
@@ -68,8 +68,8 @@ class StandardSqlMergeStatementPsStrategyTest {
                         InsertData.InsertValues.of(ColumnReference.of("src", "id"), Literal.of("John")))))
                 .build();
 
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
         PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
@@ -95,8 +95,8 @@ class StandardSqlMergeStatementPsStrategyTest {
                                 InsertData.InsertValues.of(Literal.of(2), Literal.of("pending")))))
                 .build();
 
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         MergeStatementPsStrategy strategy = new StandardSqlMergeStatementPsStrategy();
         PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 

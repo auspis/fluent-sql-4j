@@ -4,7 +4,7 @@ import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
 import lan.tlab.r4j.jdsql.ast.visitor.Visitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.EscapeStrategy;
@@ -13,7 +13,7 @@ public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsSt
     @Override
     public PreparedStatementSpec handle(ColumnReference col, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
-        if (renderer instanceof PreparedStatementRenderer psRenderer) {
+        if (renderer instanceof AstToPreparedStatementSpecVisitor psRenderer) {
             escapeStrategy = psRenderer.getEscapeStrategy();
         }
 

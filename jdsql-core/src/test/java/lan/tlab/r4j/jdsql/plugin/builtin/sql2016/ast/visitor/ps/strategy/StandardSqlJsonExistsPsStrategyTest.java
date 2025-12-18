@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.json.JsonExists;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +15,8 @@ class StandardSqlJsonExistsPsStrategyTest {
 
     @Test
     void withBasicArguments() {
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         StandardSqlJsonExistsPsStrategy strategy = new StandardSqlJsonExistsPsStrategy();
         JsonExists jsonExists = new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"));
 
@@ -28,8 +28,8 @@ class StandardSqlJsonExistsPsStrategyTest {
 
     @Test
     void withOnErrorBehavior() {
-        PreparedStatementRenderer specFactory =
-                PreparedStatementRenderer.builder().build();
+        AstToPreparedStatementSpecVisitor specFactory =
+                AstToPreparedStatementSpecVisitor.builder().build();
         StandardSqlJsonExistsPsStrategy strategy = new StandardSqlJsonExistsPsStrategy();
         JsonExists jsonExists =
                 new JsonExists(ColumnReference.of("products", "data"), Literal.of("$.price"), BehaviorKind.ERROR);

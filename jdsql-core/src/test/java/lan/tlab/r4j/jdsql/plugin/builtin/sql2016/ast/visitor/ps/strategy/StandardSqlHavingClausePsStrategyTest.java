@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.core.predicate.NullPredicate;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Having;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,13 +17,13 @@ import org.junit.jupiter.api.Test;
 class StandardSqlHavingClausePsStrategyTest {
 
     private StandardSqlHavingClausePsStrategy strategy;
-    private PreparedStatementRenderer visitor;
+    private AstToPreparedStatementSpecVisitor visitor;
     private AstContext ctx;
 
     @BeforeEach
     void setUp() {
         strategy = new StandardSqlHavingClausePsStrategy();
-        visitor = new PreparedStatementRenderer();
+        visitor = new AstToPreparedStatementSpecVisitor();
         ctx = new AstContext();
     }
 

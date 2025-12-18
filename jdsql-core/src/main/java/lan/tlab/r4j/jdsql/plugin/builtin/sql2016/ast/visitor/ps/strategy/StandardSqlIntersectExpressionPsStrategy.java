@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.set.IntersectExpression;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.IntersectExpressionPsStrategy;
 
@@ -12,7 +12,7 @@ public class StandardSqlIntersectExpressionPsStrategy implements IntersectExpres
 
     @Override
     public PreparedStatementSpec handle(
-            IntersectExpression expression, PreparedStatementRenderer renderer, AstContext ctx) {
+            IntersectExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
         PreparedStatementSpec leftDto = expression.leftSetExpression().accept(renderer, ctx);
         PreparedStatementSpec rightDto = expression.rightSetExpression().accept(renderer, ctx);
 

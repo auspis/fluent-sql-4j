@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.dml.component.MergeAction.WhenMatchedDelete;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementRenderer;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.WhenMatchedDeletePsStrategy;
 
 public class StandardSqlWhenMatchedDeletePsStrategy implements WhenMatchedDeletePsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(WhenMatchedDelete item, PreparedStatementRenderer visitor, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            WhenMatchedDelete item, AstToPreparedStatementSpecVisitor visitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder("WHEN MATCHED");
 
