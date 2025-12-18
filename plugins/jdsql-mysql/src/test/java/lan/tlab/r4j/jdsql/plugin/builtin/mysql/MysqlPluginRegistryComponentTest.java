@@ -1,4 +1,4 @@
-package integration.plugin;
+package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,19 +7,18 @@ import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.functional.Result;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
-import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
+import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Integration tests for MySQLDialectPlugin with SqlDialectRegistry.
+ * Component tests for MySQLDialectPlugin with SqlDialectRegistry.
  * <p>
  * These tests verify that the plugin integrates correctly with the registry,
  * is discoverable via ServiceLoader.
  */
-@IntegrationTest
-class MysqlPluginRegistryIntegrationTest {
+@ComponentTest
+class MysqlPluginRegistryComponentTest {
 
     private SqlDialectPluginRegistry pluginRegistry;
 
