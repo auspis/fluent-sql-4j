@@ -57,7 +57,7 @@ class MysqlPluginRegistryComponentTest {
     }
 
     @Test
-    void getRenderer() {
+    void getSpecFactory() {
         Result<PreparedStatementSpecFactory> result =
                 pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
 
