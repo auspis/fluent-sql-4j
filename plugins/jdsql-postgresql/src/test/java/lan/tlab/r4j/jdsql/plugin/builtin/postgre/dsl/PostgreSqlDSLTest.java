@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarExpression;
-import lan.tlab.r4j.jdsql.plugin.builtin.postgre.PostgreSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.builtin.postgre.PostgreSqlAstToPreparedStatementSpecVisitorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class PostgreSqlDSLTest {
 
     @BeforeEach
     void setUp() {
-        dsl = new PostgreSqlDSL(PostgreSqlRendererFactory.dialectRendererPostgreSql());
+        dsl = new PostgreSqlDSL(PostgreSqlAstToPreparedStatementSpecVisitorFactory.dialectRendererPostgreSql());
     }
 
     // STRING_AGG Tests
