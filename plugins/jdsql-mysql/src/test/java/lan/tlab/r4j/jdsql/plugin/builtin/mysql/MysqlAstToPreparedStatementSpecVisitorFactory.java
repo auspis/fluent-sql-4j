@@ -5,9 +5,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
 /**
- * Test utility factory for creating MySQL PreparedStatement renderers.
+ * Test utility factory for creating MySQL AstToPreparedStatementSpecVisitor instances.
  * <p>
- * Provides convenient access to MySQL PreparedStatement renderers for tests without boilerplate.
+ * Provides convenient access to MySQL AST visitors for tests without boilerplate.
  * This class is specific to the MySQL plugin module and uses the plugin's constants.
  *
  * @since 1.0
