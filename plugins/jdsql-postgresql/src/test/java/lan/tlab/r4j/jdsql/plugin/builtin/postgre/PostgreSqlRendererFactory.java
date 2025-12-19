@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.plugin.builtin.postgre;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
@@ -17,6 +18,18 @@ public final class PostgreSqlRendererFactory {
     private static final SqlDialectPluginRegistry REGISTRY = SqlDialectPluginRegistry.createWithServiceLoader();
 
     private PostgreSqlRendererFactory() {}
+
+    /**
+     * Creates a {@link AstToPreparedStatementSpecVisitor} for PostgreSQL 15.x dialect.
+     *
+     * @return AstToPreparedStatementSpecVisitor configured for PostgreSQL 15.x
+     * @throws IllegalStateException if the PostgreSQL plugin is not available
+     */
+    public static AstToPreparedStatementSpecVisitor create() {
+        return REGISTRY.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, PostgreSqlDialectPlugin.DIALECT_VERSION)
+                .orElseThrow()
+                .astVisitor();
+    }
 
     /**
      * Creates a complete {@link PreparedStatementSpecFactory} (SQL + PreparedStatement) for PostgreSQL.
