@@ -60,7 +60,7 @@ class PostgreSqlPluginRegistryComponentTest {
     }
 
     @Test
-    void getRenderer() {
+    void getSpecFactory() {
         Result<PreparedStatementSpecFactory> result =
                 pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "15.2.0");
 
