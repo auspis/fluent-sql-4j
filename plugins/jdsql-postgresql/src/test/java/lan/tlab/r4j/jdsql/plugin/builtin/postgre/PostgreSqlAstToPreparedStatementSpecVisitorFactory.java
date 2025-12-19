@@ -6,18 +6,20 @@ import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
 
 /**
- * Test utility factory for creating PostgreSQL renderers.
+ * Test utility factory for creating PostgreSQL AstToPreparedStatementSpecVisitor instances.
  * <p>
- * Provides convenient access to PostgreSQL renderers for tests without boilerplate.
+ * Provides convenient access to PostgreSQL AST visitors for tests without boilerplate.
  * This class is specific to the PostgreSQL plugin module and uses the plugin's constants.
  *
  * @since 1.0
  */
-public final class PostgreSqlRendererFactory {
+public final class PostgreSqlAstToPreparedStatementSpecVisitorFactory {
 
     private static final SqlDialectPluginRegistry REGISTRY = SqlDialectPluginRegistry.createWithServiceLoader();
 
-    private PostgreSqlRendererFactory() {}
+    private PostgreSqlAstToPreparedStatementSpecVisitorFactory() {
+        // Utility class - prevent instantiation
+    }
 
     /**
      * Creates a {@link AstToPreparedStatementSpecVisitor} for PostgreSQL 15.x dialect.
