@@ -298,7 +298,7 @@ class WhereConditionBuilderTest {
                 .between(startDate, endDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
-                        SELECT "birth_date" FROM "users" WHERE ("birth_date" >= ?) AND ("birth_date" <= ?)""");
+                        SELECT "birth_date" FROM "users" WHERE "birth_date" BETWEEN ? AND ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDate);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, endDate);
 
@@ -312,7 +312,7 @@ class WhereConditionBuilderTest {
                 .between(startDateTime, endDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
-                SELECT "created_at" FROM "posts" WHERE ("created_at" >= ?) AND ("created_at" <= ?)""");
+                SELECT "created_at" FROM "posts" WHERE "created_at" BETWEEN ? AND ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDateTime);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, endDateTime);
 
@@ -324,7 +324,7 @@ class WhereConditionBuilderTest {
                 .between(18, 65)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
-                SELECT "age" FROM "users" WHERE ("age" >= ?) AND ("age" <= ?)""");
+                SELECT "age" FROM "users" WHERE "age" BETWEEN ? AND ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 18);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 65);
     }

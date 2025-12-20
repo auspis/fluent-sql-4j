@@ -790,7 +790,7 @@ class SelectBuilderTest {
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
-        assertThatSql(sqlCaptureHelper).contains("HAVING (\"price\" >= ?) AND (\"price\" <= ?)");
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"price\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 10.0);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 100.0);
     }
@@ -806,7 +806,7 @@ class SelectBuilderTest {
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
-        assertThatSql(sqlCaptureHelper).contains("HAVING (\"order_date\" >= ?) AND (\"order_date\" <= ?)");
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"order_date\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, java.time.LocalDate.of(2023, 1, 1));
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, java.time.LocalDate.of(2023, 12, 31));
     }
