@@ -63,9 +63,7 @@ class UpdateDSLComponentTest {
                 .eq(0)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "products" SET "stock" = ?, "discontinued" = ? WHERE ("last_order_date" < ?) AND ("quantity" = ?)""");
         verify(ps).setObject(1, 0);
         verify(ps).setObject(2, true);
@@ -84,8 +82,7 @@ class UpdateDSLComponentTest {
                 .eq(42)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo("""
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "user_preferences" SET "settings" = ? WHERE "user_id" = ?""");
         verify(ps).setObject(1, settings);
         verify(ps).setObject(2, 42);
@@ -110,9 +107,7 @@ class UpdateDSLComponentTest {
                 .eq("active")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "developers" SET "full_name" = ?, "profile_json" = ?, "contact_info" = ?, "is_available" = ?, "updated_at" = ? WHERE ("developer_id" = ?) AND ("status" = ?)""");
         verify(ps).setObject(1, "Marco Bianchi");
         verify(ps).setObject(2, profile);

@@ -69,9 +69,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .build();
 
         PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
-        assertThat(spec.sql())
-                .isEqualTo(
-                        """
+        assertThat(spec.sql()).isEqualTo("""
             SELECT * FROM \"products\" \
             WHERE (\"price\" > ?) \
             AND (\"category\" = ?)\
@@ -91,9 +89,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .build();
 
         PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
-        assertThat(spec.sql())
-                .isEqualTo(
-                        """
+        assertThat(spec.sql()).isEqualTo("""
             SELECT \"department\", COUNT(*) \
             FROM \"employees\" \
             GROUP BY \"department\" \
@@ -110,9 +106,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .build();
 
         PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
-        assertThat(spec.sql())
-                .isEqualTo(
-                        """
+        assertThat(spec.sql()).isEqualTo("""
             SELECT * \
             FROM \"orders\" \
             ORDER BY \"orderDate\" DESC\
@@ -138,9 +132,7 @@ class StandardSqlSelectStatementPsStrategyTest {
 
         // Use PreparedStatementSpecFactory to trigger context-aware rendering with ContextPreparationVisitor
         PreparedStatementSpec spec = specFactory.create(statement);
-        assertThat(spec.sql())
-                .isEqualTo(
-                        """
+        assertThat(spec.sql()).isEqualTo("""
             SELECT \"t1\".\"id\", \"t2\".\"name\" \
             FROM \"t1\" INNER JOIN \"t2\" \
             ON \"t1\".\"id\" = \"t2\".\"t1_id\"\
