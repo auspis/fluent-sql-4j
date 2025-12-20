@@ -40,8 +40,7 @@ class InsertBuilderTest {
                 .set("name", "John")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("name") VALUES (?)\
             """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -55,9 +54,7 @@ class InsertBuilderTest {
                 .set("email", "john@example.com")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("id", "name", "email") VALUES (?, ?, ?)\
             """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1);
@@ -72,8 +69,7 @@ class InsertBuilderTest {
                 .set("email", (String) null)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("name", "email") VALUES (?, ?)\
             """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -87,8 +83,7 @@ class InsertBuilderTest {
                 .set("active", true)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("name", "active") VALUES (?, ?)\
             """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -103,8 +98,7 @@ class InsertBuilderTest {
                 .set("quantity", 100)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "products" ("id", "price", "quantity") VALUES (?, ?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 19.99);
@@ -148,9 +142,7 @@ class InsertBuilderTest {
                 .set("null_col", (String) null)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "mixed_table" ("text_col", "int_col", "bool_col", "null_col") VALUES (?, ?, ?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "test");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 42);

@@ -42,9 +42,7 @@ class CreateTableBuilderTest {
                 .primaryKey("id")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                     CREATE TABLE "User" (\
                     "id" INTEGER NOT NULL, \
                     "name" VARCHAR(100) NOT NULL, \
