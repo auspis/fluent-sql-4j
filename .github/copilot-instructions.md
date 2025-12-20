@@ -308,7 +308,8 @@ Example:
 // Correct usage
 PreparedStatement ps = dsl.select("name", "email")
     .from("users")
-    .where("age").gt(18)
+    .where()
+    .column("age").gt(18)
     .buildPreparedStatement(connection);
 
 // execute query

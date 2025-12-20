@@ -160,7 +160,8 @@ class LikeTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("users")
                 .groupBy("category")
-                .having("category")
+                .having()
+                .column("category")
                 .like("premium%")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
