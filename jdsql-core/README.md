@@ -323,7 +323,8 @@ WHEN NOT MATCHED THEN INSERT ("product_id", "name", "price", "created_at") VALUE
 ```java
 SelectStatement subquery = dsl.select("id", "name", "status")
     .from("staging_products")
-    .where("status").eq("active")
+    .where()
+    .column("status").eq("active")
     .getCurrentStatement();
 
 PreparedStatement ps = dsl.mergeInto("products")

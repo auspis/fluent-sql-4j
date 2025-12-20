@@ -556,7 +556,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("age")
-                .having("age")
+                .having()
+                .column("age")
                 .gt(18)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -571,9 +572,11 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("age")
-                .having("age")
+                .having()
+                .column("age")
                 .gt(18)
-                .andHaving("age")
+                .andHaving()
+                .column("age")
                 .lt(65)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -591,9 +594,11 @@ class SelectBuilderTest {
         PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("status")
-                .having("status")
+                .having()
+                .column("status")
                 .eq("active")
-                .orHaving("status")
+                .orHaving()
+                .column("status")
                 .eq("pending")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -613,11 +618,14 @@ class SelectBuilderTest {
         PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
-                .having("customer_id")
+                .having()
+                .column("customer_id")
                 .gt(100)
-                .andHaving("customer_id")
+                .andHaving()
+                .column("customer_id")
                 .lt(500)
-                .orHaving("customer_id")
+                .orHaving()
+                .column("customer_id")
                 .eq(999)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -643,7 +651,8 @@ class SelectBuilderTest {
                 .column("category")
                 .eq("electronics")
                 .groupBy("brand")
-                .having("brand")
+                .having()
+                .column("brand")
                 .like("%Apple%")
                 .orderBy("brand")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
@@ -665,7 +674,8 @@ class SelectBuilderTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
-                        .having(""))
+                        .having()
+                        .column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
@@ -677,7 +687,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category")
-                .having("category")
+                .having()
+                .column("category")
                 .eq("electronics")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -687,7 +698,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category")
-                .having("category")
+                .having()
+                .column("category")
                 .ne("books")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -701,7 +713,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("total")
-                .having("total")
+                .having()
+                .column("total")
                 .gte(100.0)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -710,7 +723,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("total")
-                .having("total")
+                .having()
+                .column("total")
                 .lte(500)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -722,7 +736,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("active")
-                .having("active")
+                .having()
+                .column("active")
                 .eq(true)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -732,7 +747,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("active")
-                .having("active")
+                .having()
+                .column("active")
                 .ne(false)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -745,7 +761,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("email")
-                .having("email")
+                .having()
+                .column("email")
                 .isNull()
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -754,7 +771,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("email")
-                .having("email")
+                .having()
+                .column("email")
                 .isNotNull()
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -766,7 +784,8 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("price")
-                .having("price")
+                .having()
+                .column("price")
                 .between(10.0, 100.0)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -781,7 +800,8 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("order_date")
-                .having("order_date")
+                .having()
+                .column("order_date")
                 .between(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -803,7 +823,8 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("departments")
                 .groupBy("budget")
-                .having("budget")
+                .having()
+                .column("budget")
                 .gt(subquery)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -819,7 +840,8 @@ class SelectBuilderTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
-                        .having("age")
+                        .having()
+                        .column("age")
                         .eq((SelectBuilder) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Subquery cannot be null");
@@ -830,7 +852,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category")
-                .having("category")
+                .having()
+                .column("category")
                 .in("electronics", "books", "toys")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -845,7 +868,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
-                .having("customer_id")
+                .having()
+                .column("customer_id")
                 .in(100, 200, 300)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -860,7 +884,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .groupBy("active")
-                .having("active")
+                .having()
+                .column("active")
                 .in(true)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -873,7 +898,8 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .in(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -887,9 +913,11 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("products")
                 .groupBy("category", "brand")
-                .having("category")
+                .having()
+                .column("category")
                 .in("electronics", "computers")
-                .andHaving("brand")
+                .andHaving()
+                .column("brand")
                 .ne("unknown")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -905,9 +933,11 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("status")
-                .having("status")
+                .having()
+                .column("status")
                 .in("completed", "shipped")
-                .orHaving("status")
+                .orHaving()
+                .column("status")
                 .eq("delivered")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -923,7 +953,8 @@ class SelectBuilderTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
-                        .having("age")
+                        .having()
+                        .column("age")
                         .in(new String[0]))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be provided for IN clause");
@@ -934,7 +965,8 @@ class SelectBuilderTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .groupBy("age")
-                        .having("age")
+                        .having()
+                        .column("age")
                         .in((String[]) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be provided for IN clause");
@@ -1150,7 +1182,8 @@ class SelectBuilderTest {
                 .avg("salary")
                 .from("employees")
                 .groupBy("department")
-                .having("department")
+                .having()
+                .column("department")
                 .ne("HR")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 

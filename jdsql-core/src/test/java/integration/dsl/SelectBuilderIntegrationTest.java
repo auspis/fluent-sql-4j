@@ -478,7 +478,8 @@ class SelectBuilderIntegrationTest {
         try (PreparedStatement ps = dsl.select("age")
                 .from("users")
                 .groupBy("age")
-                .having("age")
+                .having()
+                .column("age")
                 .gt(25)
                 .buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
@@ -497,9 +498,11 @@ class SelectBuilderIntegrationTest {
         try (PreparedStatement ps = dsl.select("age")
                 .from("users")
                 .groupBy("age")
-                .having("age")
+                .having()
+                .column("age")
                 .ne(25)
-                .andHaving("age")
+                .andHaving()
+                .column("age")
                 .gt(20)
                 .buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
@@ -518,9 +521,11 @@ class SelectBuilderIntegrationTest {
         try (PreparedStatement ps = dsl.select("age")
                 .from("users")
                 .groupBy("age")
-                .having("age")
+                .having()
+                .column("age")
                 .eq(25)
-                .orHaving("age")
+                .orHaving()
+                .column("age")
                 .eq(30)
                 .buildPreparedStatement(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
@@ -538,7 +543,8 @@ class SelectBuilderIntegrationTest {
                 .column("active")
                 .eq(true)
                 .groupBy("age")
-                .having("age")
+                .having()
+                .column("age")
                 .gte(30)
                 .orderBy("age")
                 .buildPreparedStatement(connection)) {
@@ -599,7 +605,8 @@ class SelectBuilderIntegrationTest {
                 .as("avg_id")
                 .from("users")
                 .groupBy("age")
-                .having("age")
+                .having()
+                .column("age")
                 .gte(30)
                 .orderBy("age")
                 .buildPreparedStatement(connection)) {
