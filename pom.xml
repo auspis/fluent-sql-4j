@@ -1,10 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>lan.tlab</groupId>
   <artifactId>jdsql</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
+
+  <!-- Project metadata required for publishing on Maven Central -->
+  <name>jdsql</name>
+  <description>Repository for java</description>
+  <url>https://github.com/massimiliano/jdsql</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git://github.com/massimiliano/jdsql.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:massimiliano/jdsql.git</developerConnection>
+    <url>https://github.com/massimiliano/jdsql</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>massimiliano</id>
+      <name>Massimiliano</name>
+    </developer>
+  </developers>
 
   <modules>
     <module>test-support</module>
@@ -42,105 +71,36 @@
     <dep.mockito-core.version>5.21.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.18.3</dep.byte-buddy.version>
 
-    <!-- Run both integration and e2e by default during verify phase -->
+    <!-- Run integration and e2e by default during verify phase -->
     <test.groups.slow>integration,e2e</test.groups.slow>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <!-- Internal modules -->
       <dependency>
         <groupId>lan.tlab</groupId>
         <artifactId>jdsql-core</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
         <artifactId>test-support</artifactId>
-        <version>1.0</version>
-        <scope>test</scope>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
-        <artifactId>jdsql-mysql</artifactId>
-        <version>1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>lan.tlab</groupId>
-        <artifactId>jdsql-postgresql</artifactId>
-        <version>1.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>${dep.lombok.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${dep.jackson-core.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${dep.jackson-core.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.vdurmont</groupId>
-        <artifactId>semver4j</artifactId>
-        <version>${dep.semver4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${dep.slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>${dep.h2.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>testcontainers</artifactId>
-        <version>${dep.testcontainer-core.version}</version>
+        <artifactId>test-support</artifactId>
+        <version>${project.version}</version>
+        <classifier>tests</classifier>
         <scope>test</scope>
       </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <version>${dep.testcontainer.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>mysql</artifactId>
-        <version>${dep.testcontainer.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>com.mysql</groupId>
-        <artifactId>mysql-connector-j</artifactId>
-        <version>${dep.mysql-connector-java.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>${dep.testcontainer.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>${dep.postgresql.version}</version>
-      </dependency>
+
+      <!-- Testing frameworks -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>${dep.junit-jupiter.version}</version>
+        <version>5.11.4</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -155,6 +115,64 @@
         <version>${dep.mockito-core.version}</version>
         <scope>test</scope>
       </dependency>
+
+      <!-- Testcontainers -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers</artifactId>
+        <version>${dep.testcontainer.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${dep.testcontainer.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>mysql</artifactId>
+        <version>${dep.testcontainer.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${dep.testcontainer.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- Database drivers -->
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${dep.h2.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+        <version>${dep.mysql-connector-java.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${dep.postgresql.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- Other runtime dependencies -->
+      <dependency>
+        <groupId>com.vdurmont</groupId>
+        <artifactId>semver4j</artifactId>
+        <version>${dep.semver4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${dep.jackson-core.version}</version>
+      </dependency>
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy-agent</artifactId>
@@ -164,252 +182,130 @@
     </dependencies>
   </dependencyManagement>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <!-- Distribution settings for Sonatype OSSRH (Maven Central) -->
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
   <build>
     <pluginManagement>
       <plugins>
+        <!-- Attach sources jar -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven.compiler.plugin.version}</version>
-          <configuration>
-            <source>${java.version}</source>
-            <target>${java.version}</target>
-            <release>${java.version}</release>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>${maven.spotless.plugin.version}</version>
-          <configuration>
-            <java>
-              <palantirJavaFormat/>
-              <encoding>${project.build.sourceEncoding}</encoding>
-              <importOrder>
-                <order>java</order>
-                <order>javax</order>
-                <order>org</order>
-                <order>com</order>
-              </importOrder>
-              <removeUnusedImports/>
-              <formatAnnotations/>
-              <trimTrailingWhitespace/>
-              <endWithNewline/>
-            </java>
-            <pom>
-              <sortPom>
-                <encoding>${project.build.sourceEncoding}</encoding>
-                <expandEmptyElements>false</expandEmptyElements>
-              </sortPom>
-              <trimTrailingWhitespace/>
-              <endWithNewline/>
-            </pom>
-            <markdown>
-              <includes>
-                <include>**/*.md</include>
-              </includes>
-              <flexmark/>
-            </markdown>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>versions-maven-plugin</artifactId>
-          <version>${maven.versions.plugin.version}</version>
-          <configuration>
-            <allowSnapshots>false</allowSnapshots>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>${maven.enforcer.plugin.version}</version>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.2.1</version>
           <executions>
             <execution>
-              <id>enforce-maven</id>
+              <id>attach-sources</id>
               <goals>
-                <goal>enforce</goal>
+                <goal>jar-no-fork</goal>
               </goals>
-              <configuration>
-                <rules>
-                  <requireMavenVersion>
-                    <version>[3.6.3,)</version>
-                  </requireMavenVersion>
-                </rules>
-                <fail>true</fail>
-              </configuration>
             </execution>
           </executions>
         </plugin>
+
+        <!-- Attach javadoc jar -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>${maven.dependency.plugin.version}</version>
-          <configuration>
-            <artifactItems>
-              <artifactItem>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy-agent</artifactId>
-                <version>${dep.byte-buddy.version}</version>
-                <outputDirectory>${project.build.directory}/agents</outputDirectory>
-                <destFileName>byte-buddy-agent-${dep.byte-buddy.version}.jar</destFileName>
-              </artifactItem>
-            </artifactItems>
-          </configuration>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.5.0</version>
           <executions>
             <execution>
-              <id>copy-byte-buddy-agent</id>
+              <id>attach-javadocs</id>
               <goals>
-                <goal>copy</goal>
+                <goal>jar</goal>
               </goals>
-              <phase>process-test-resources</phase>
             </execution>
           </executions>
+        </plugin>
+
+        <!-- GPG signing plugin (artifacts will be signed during verify/deploy) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>3.1.0</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Nexus Staging plugin to automate staging close and release -->
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.13</version>
+          <extensions>true</extensions>
+          <configuration>
+            <serverId>ossrh</serverId>
+            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
+
     <plugins>
+      <!-- Spotless plugin for code formatting -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>${maven.resource.plugin.version}</version>
-        <inherited>false</inherited>
-        <executions>
-          <execution>
-            <id>install-pre-commit-hook</id>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <outputDirectory>${basedir}/.git/hooks</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${basedir}/data/scripts</directory>
-                  <includes>
-                    <include>pre-commit</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>${maven.exec.plugin.version}</version>
-        <inherited>false</inherited>
-        <executions>
-          <execution>
-            <id>chmod-pre-commit-hook</id>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <phase>process-resources</phase>
-            <configuration>
-              <executable>chmod</executable>
-              <workingDirectory>${basedir}</workingDirectory>
-              <arguments>
-                <argument>+x</argument>
-                <argument>.git/hooks/pre-commit</argument>
-              </arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Surefire: run only unit tests (exclude integration and e2e) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven.surefire.plugin.version}</version>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${maven.spotless.plugin.version}</version>
         <configuration>
-          <excludedGroups>${test.groups.slow}</excludedGroups>
-        </configuration>
-      </plugin>
-      <!-- Failsafe: run only integration and e2e tests -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>${maven.failsafe.plugin.version}</version>
-        <configuration>
-          <!-- Include all test files, filter by JUnit tags only -->
-          <includes>
-            <include>**/*Test.java</include>
-            <include>**/*E2E.java</include>
-          </includes>
-          <groups>${test.groups.slow}</groups>
+          <java>
+            <googleJavaFormat>
+              <version>1.26.0</version>
+              <style>AOSP</style>
+            </googleJavaFormat>
+            <removeUnusedImports/>
+            <formatAnnotations/>
+          </java>
+          <pom>
+            <sortPom>
+              <expandEmptyElements>false</expandEmptyElements>
+            </sortPom>
+          </pom>
+          <markdown>
+            <includes>
+              <include>**/*.md</include>
+            </includes>
+            <flexmark/>
+          </markdown>
         </configuration>
         <executions>
           <execution>
             <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
+              <goal>check</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${maven.jacoco.plugin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-maven</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireMavenVersion>
-                  <version>[3.6.3,)</version>
-                </requireMavenVersion>
-              </rules>
-              <fail>true</fail>
-            </configuration>
+            <phase>compile</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+    </profile>
+  </profiles>
 </project>

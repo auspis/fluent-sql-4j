@@ -10,7 +10,7 @@
   </parent>
   <artifactId>test-support</artifactId>
 
-  <!-- Test utilities artifact: dependencies are test-scope so they are not transitive -->
+  <!-- Test utilities artifact: declare testing frameworks as scope=test so they are not transitive -->
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -36,7 +36,7 @@
 
   <build>
     <plugins>
-      <!-- Generate a test-jar with classifier 'tests' so consumers can depend on test utilities explicitly -->
+      <!-- Generate a test-jar (classifier 'tests') so consumers can depend on test utilities explicitly -->
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.3.0</version>
