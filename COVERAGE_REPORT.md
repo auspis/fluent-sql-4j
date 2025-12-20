@@ -10,17 +10,18 @@
 
 |          Metric          | Initial |   Current   | Change |  Status  |
 |--------------------------|---------|-------------|--------|----------|
-| **Instruction Coverage** | 88.1%   | **88.6%** ✅ | +0.5%  | Improved |
+| **Instruction Coverage** | 88.1%   | **88.8%** ✅ | +0.7%  | Improved |
 | **Branch Coverage**      | 71.4%   | 71.4%       | —      | Stable   |
 | **Classes Analyzed**     | 37      | 37          | —      | —        |
 | **Total Instructions**   | 16,995  | 16,995      | —      | —        |
-| **Missed Instructions**  | 2,014   | **1,945** ✅ | -69    | Improved |
-| **Test Count**           | 998     | **1,054** ✅ | +56    | Added    |
+| **Missed Instructions**  | 2,014   | **1,903** ✅ | -111   | Improved |
+| **Test Count**           | 998     | **1,072** ✅ | +74    | Added    |
 
 ### Overall Assessment
 
-- ✅ **Instruction coverage improved** to 88.6% (+69 instructions covered)
+- ✅ **Instruction coverage improved** to 88.8% (+111 instructions covered)
 - ✅ **Number Functions Package** now at **100% coverage** 🎉
+- ✅ **WhereJsonFunctionBuilder** improved from 68.17% → **81.34%** ✅
 - ⚠️ **Branch coverage stable** at 71.4% (target should be 75%+)
 - 8 packages below 85% instruction coverage (was 9) ✅
 - 7 packages below 70% branch coverage
@@ -29,7 +30,9 @@
 
 ## 🎯 Key Findings
 
-### ✅ COMPLETED: Number Functions Coverage
+### ✅ COMPLETED IMPROVEMENTS
+
+#### 1. Number Functions Coverage (Week 1)
 
 **Status:** DONE ✓  
 **Test Files Added:** 4 new unit test files  
@@ -50,12 +53,35 @@
 - `UnaryNumericTest.java` - Tests for ABS, CEIL, FLOOR, SQRT functions
 - `ModTest.java` - Tests for MOD function with edge cases (negative divisors, zero dividends)
 
+#### 2. JSON Functions in WHERE Clauses (Week 1)
+
+**Status:** DONE ✓  
+**Test Files Added:** 1 new test file (`WhereJsonFunctionBuilderTest.java`)  
+**Test Cases Added:** 18 tests  
+**Coverage Improvement:** From 68.17% → **81.34%** (+13.17%)
+
+|        Feature         | Tests  |            Coverage             |
+|------------------------|--------|---------------------------------|
+| JSON_VALUE comparisons | 8      | Number eq, ne, gt, lt, gte, lte |
+| JSON_VALUE null checks | 2      | isNull, isNotNull               |
+| JSON_EXISTS predicates | 3      | exists, notExists, onError      |
+| JSON_QUERY comparisons | 3      | String eq, ne, null checks      |
+| Logical combinations   | 2      | AND/OR with JSON functions      |
+| **TOTAL**              | **18** | **81.34%** ✅                    |
+
+**Test Details:**
+- Tests verify correct SQL generation with JSON functions
+- Parameter binding: JSON path (1st param) + comparison value (2nd param)
+- Covered all comparison operators for Number types
+- Tested logical combinations (AND/OR) with multiple JSON functions
+- Package `dsl.clause` improved: 69.22% → **72.06%** (+2.84%)
+
 ### 1. **Remaining Critical Areas for Improvement** (Instruction Coverage < 85%)
 
 |       Package        | Coverage | Missed | Priority  |                      Recommendation                      |
 |----------------------|----------|--------|-----------|----------------------------------------------------------|
-| `dsl.clause`         | 69.2%    | 455    | 🔴 HIGH   | Test WHERE, HAVING, GROUP BY clause edge cases           |
 | `ast.core.predicate` | 71.1%    | 113    | 🔴 HIGH   | Add predicate composition and operator combination tests |
+| `dsl.clause`         | 72.1%    | 413    | 🔴 HIGH   | Test HAVING clause, complete WHERE edge cases            |
 | `dsl.merge`          | 74.7%    | 247    | 🟠 MEDIUM | Test MERGE statement conditions and edge cases           |
 | `dsl.util`           | 79.6%    | 92     | 🟠 MEDIUM | Test utility functions error handling                    |
 | `ast.visitor`        | 80.7%    | 159    | 🟠 MEDIUM | Test visitor pattern edge cases                          |
@@ -94,19 +120,25 @@ Critical areas where conditional logic is not fully tested:
 
 ### ✅ COMPLETED (Week 1)
 
-**Number Function Coverage** - 100% ✓
+**1. Number Function Coverage** - 100% ✓
 - ✅ Added 56 test cases for Round, Power, Mod, UnaryNumeric
 - ✅ Coverage improved from 65.5% → 100%
 - ✅ Instruction coverage improved +0.5% overall
 
+**2. JSON Functions in WHERE** - 81.34% ✓
+- ✅ Added 18 test cases for WhereJsonFunctionBuilder
+- ✅ Coverage improved from 68.17% → 81.34% (+13.17%)
+- ✅ Package dsl.clause improved from 69.22% → 72.06%
+- ✅ Total instruction coverage: 88.1% → 88.8% (+0.7%)
+
 ### 🔴 HIGH PRIORITY (Next)
 
-1. **Clause Coverage** - Add 50+ test cases
-   - Complex WHERE combinations (AND/OR/NOT nesting)
-   - GROUP BY with multiple aggregates
-   - HAVING with complex conditions
-   - Edge cases: empty groups, null handling
-   - **Expected impact:** +15% coverage = 84.2%
+1. **HAVING Clause Coverage** - Add 20-30 test cases
+   - HavingConditionBuilder coverage: 53.41% (246 instructions missing)
+   - Test LocalDateTime, Boolean, subquery comparisons
+   - Test IN operator with all types
+   - Test BETWEEN with dates and numbers
+   - **Expected impact:** +20% coverage = 73%+ for HavingConditionBuilder
 2. **Predicate Testing** - Add 30+ branch tests
    - Test predicate composition (nested conditions)
    - Test all comparison operators with type coercion
