@@ -32,8 +32,7 @@ class UpdateBuilderJsonTest {
                 .eq(1)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, jsonValue);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 1);
@@ -52,9 +51,7 @@ class UpdateBuilderJsonTest {
                 .eq(42)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "user_settings" SET "username" = ?, "preferences" = ?, "updated_at" = ? \
                 WHERE "user_id" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "alice");
@@ -75,8 +72,7 @@ class UpdateBuilderJsonTest {
                 .eq(100)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "profiles" SET "profile_data" = ? WHERE "profile_id" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, profile);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 100);
@@ -91,8 +87,7 @@ class UpdateBuilderJsonTest {
                 .eq(5)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, null);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 5);
@@ -109,8 +104,7 @@ class UpdateBuilderJsonTest {
                 .eq(7)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "documents" SET "properties" = ? WHERE "doc_id" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, emptyJson);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 7);
@@ -127,8 +121,7 @@ class UpdateBuilderJsonTest {
                 .eq(15)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "tags" SET "tag_list" = ? WHERE "item_id" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, emptyArray);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 15);
@@ -149,9 +142,7 @@ class UpdateBuilderJsonTest {
                 .gte("2.0")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "api_configs" SET "configuration" = ?, "last_modified" = ? WHERE ("api_name" = ?) AND ("version" >= ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, config);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "2025-11-08");

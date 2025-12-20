@@ -41,9 +41,7 @@ class CreateTableDSLComponentTest {
                 .primaryKey("id")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 CREATE TABLE "users" (\
                 "id" INTEGER NOT NULL, \
                 "name" VARCHAR(100), \
@@ -55,8 +53,7 @@ class CreateTableDSLComponentTest {
     void appliesRendererQuoting() throws SQLException {
         dsl.createTable("temp_table").column("value").varchar(50).buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo("""
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 CREATE TABLE "temp_table" ("value" VARCHAR(50))""");
     }
 
@@ -74,9 +71,7 @@ class CreateTableDSLComponentTest {
                 .primaryKey("id")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 CREATE TABLE "products" (\
                 "id" INTEGER NOT NULL, \
                 "sku" VARCHAR(50), \

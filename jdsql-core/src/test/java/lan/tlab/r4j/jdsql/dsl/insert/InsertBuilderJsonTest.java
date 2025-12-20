@@ -33,8 +33,7 @@ class InsertBuilderJsonTest {
                 .set("data", jsonValue)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "users" ("id", "data") VALUES (?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, jsonValue);
@@ -48,8 +47,7 @@ class InsertBuilderJsonTest {
                 .set("tags", jsonArray)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "products" ("id", "tags") VALUES (?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, jsonArray);
@@ -63,8 +61,7 @@ class InsertBuilderJsonTest {
                 .set("content", nestedJson)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "documents" ("doc_id", "content") VALUES (?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 42);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, nestedJson);
@@ -80,9 +77,7 @@ class InsertBuilderJsonTest {
                 .set("view_count", 0)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "articles" ("title", "published", "metadata", "view_count") VALUES (?, ?, ?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Test Article");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, true);
@@ -97,8 +92,7 @@ class InsertBuilderJsonTest {
                 .set("value", (String) null)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "settings" ("key", "value") VALUES (?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "app_config");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, null);
@@ -112,8 +106,7 @@ class InsertBuilderJsonTest {
                 .set("details", emptyJson)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "logs" ("log_id", "details") VALUES (?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 999);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, emptyJson);
@@ -127,8 +120,7 @@ class InsertBuilderJsonTest {
                 .set("items", emptyArray)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo("""
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "collections" ("collection_id", "items") VALUES (?, ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 5);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, emptyArray);

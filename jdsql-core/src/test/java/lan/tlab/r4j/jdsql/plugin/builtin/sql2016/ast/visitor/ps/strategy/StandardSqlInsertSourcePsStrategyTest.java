@@ -46,9 +46,7 @@ class StandardSqlInsertSourcePsStrategyTest {
         InsertSource item = new InsertSource(UnionExpression.union(select1, select2));
 
         PreparedStatementSpec result = strategy.handle(item, visitor, new AstContext());
-        assertThat(result.sql())
-                .isEqualTo(
-                        """
+        assertThat(result.sql()).isEqualTo("""
             (\
             (SELECT \"Customer_current\".\"id\", \"Customer_current\".\"name\" FROM \"Customer_current\") \
             UNION \

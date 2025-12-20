@@ -252,9 +252,7 @@ class InsertBuilderIntegrationTest {
             assertThat(rs.getInt("id")).isEqualTo(100);
             assertThat(rs.getString("name")).isEqualTo("Marco");
             String retrievedAddress = rs.getString("address");
-            assertThatJson(retrievedAddress)
-                    .isEqualToJson(
-                            """
+            assertThatJson(retrievedAddress).isEqualToJson("""
                     {
                         "street": "Via Roma 123",
                         "city": "Milan",
@@ -288,8 +286,7 @@ class InsertBuilderIntegrationTest {
             assertThat(rs.getInt("id")).isEqualTo(101);
             assertThat(rs.getString("name")).isEqualTo("Laura");
             String retrievedPreferences = rs.getString("preferences");
-            assertThatJson(retrievedPreferences)
-                    .isEqualToJson("""
+            assertThatJson(retrievedPreferences).isEqualToJson("""
                     ["email", "sms", "push"]
                     """);
             assertThat(rs.next()).isFalse();
