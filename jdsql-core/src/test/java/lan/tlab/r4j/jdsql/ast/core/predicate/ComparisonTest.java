@@ -212,4 +212,86 @@ class ComparisonTest {
         assertThat(Comparison.ComparisonOperator.LESS_THAN_OR_EQUALS.getSqlSymbol())
                 .isEqualTo("<=");
     }
+
+    // Aggregate function tests
+    @Test
+    void countAggregateComparison() {
+        Comparison comp = Comparison.eq(Literal.of("COUNT(*)"), Literal.of(10));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.EQUALS);
+    }
+
+    @Test
+    void sumAggregateComparison() {
+        Comparison comp = Comparison.gt(Literal.of("SUM(amount)"), Literal.of(1000));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.GREATER_THAN);
+    }
+
+    @Test
+    void avgAggregateComparison() {
+        Comparison comp = Comparison.gte(Literal.of("AVG(salary)"), Literal.of(50000));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.GREATER_THAN_OR_EQUALS);
+    }
+
+    @Test
+    void maxAggregateComparison() {
+        Comparison comp = Comparison.lt(Literal.of("MAX(price)"), Literal.of(1000));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.LESS_THAN);
+    }
+
+    @Test
+    void minAggregateComparison() {
+        Comparison comp = Comparison.lte(Literal.of("MIN(value)"), Literal.of(100));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.LESS_THAN_OR_EQUALS);
+    }
+
+    @Test
+    void countDistinctAggregateComparison() {
+        Comparison comp = Comparison.ne(Literal.of("COUNT(DISTINCT category)"), Literal.of(0));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.NOT_EQUALS);
+    }
+
+    @Test
+    void multipleAggregateCombination() {
+        Comparison comp = Comparison.gte(Literal.of("SUM(orders)"), Literal.of(100));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.lhs()).isNotNull();
+        assertThat(comp.rhs()).isNotNull();
+    }
+
+    @Test
+    void aggregateWithColumnReference() {
+        Comparison comp = Comparison.gt(ColumnReference.of("summary", "total_count"), Literal.of(5));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.lhs()).isNotNull();
+    }
+
+    @Test
+    void aggregateComparisonWithDecimal() {
+        Comparison comp = Comparison.gte(Literal.of("AVG(rating)"), Literal.of(3.5));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.GREATER_THAN_OR_EQUALS);
+    }
+
+    @Test
+    void complexAggregateExpression() {
+        Comparison comp = Comparison.eq(Literal.of("SUM(CASE WHEN status='active' THEN 1 ELSE 0 END)"), Literal.of(42));
+
+        assertThat(comp).isNotNull();
+        assertThat(comp.operator()).isEqualTo(Comparison.ComparisonOperator.EQUALS);
+    }
 }
