@@ -782,9 +782,7 @@ class SelectBuilderIntegrationTest {
                     .orElseThrow();
             assertThat(frankRow.get(1)).isEqualTo("Frank");
             String frankAddress = (String) frankRow.get(2);
-            assertThatJson(frankAddress)
-                    .isEqualToJson(
-                            """
+            assertThatJson(frankAddress).isEqualToJson("""
                     {
                         "street": "Via Roma 123",
                         "city": "Milan",
@@ -793,8 +791,7 @@ class SelectBuilderIntegrationTest {
                     }
                     """);
             String frankPreferences = (String) frankRow.get(3);
-            assertThatJson(frankPreferences)
-                    .isEqualToJson("""
+            assertThatJson(frankPreferences).isEqualToJson("""
                     ["email", "sms"]
                     """);
 
@@ -805,9 +802,7 @@ class SelectBuilderIntegrationTest {
                     .orElseThrow();
             assertThat(graceRow.get(1)).isEqualTo("Grace");
             String graceAddress = (String) graceRow.get(2);
-            assertThatJson(graceAddress)
-                    .isEqualToJson(
-                            """
+            assertThatJson(graceAddress).isEqualToJson("""
                     {
                         "street": "Via Torino 45",
                         "city": "Rome",
@@ -816,8 +811,7 @@ class SelectBuilderIntegrationTest {
                     }
                     """);
             String gracePreferences = (String) graceRow.get(3);
-            assertThatJson(gracePreferences)
-                    .isEqualToJson("""
+            assertThatJson(gracePreferences).isEqualToJson("""
                     ["email", "push"]
                     """);
 
@@ -828,9 +822,7 @@ class SelectBuilderIntegrationTest {
                     .orElseThrow();
             assertThat(henryRow.get(1)).isEqualTo("Henry");
             String henryAddress = (String) henryRow.get(2);
-            assertThatJson(henryAddress)
-                    .isEqualToJson(
-                            """
+            assertThatJson(henryAddress).isEqualToJson("""
                     {
                         "street": "Corso Vittorio 78",
                         "city": "Turin",
@@ -839,8 +831,7 @@ class SelectBuilderIntegrationTest {
                     }
                     """);
             String henryPreferences = (String) henryRow.get(3);
-            assertThatJson(henryPreferences)
-                    .isEqualToJson("""
+            assertThatJson(henryPreferences).isEqualToJson("""
                     ["sms", "push", "phone"]
                     """);
         }

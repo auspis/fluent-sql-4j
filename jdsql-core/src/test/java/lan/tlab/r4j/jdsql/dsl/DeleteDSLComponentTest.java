@@ -58,9 +58,7 @@ class DeleteDSLComponentTest {
                 .gt(100)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 DELETE FROM "orders" \
                 WHERE ("status" = ?) \
                 AND ("amount" > ?)""");

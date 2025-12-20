@@ -57,12 +57,10 @@ public class SqlAssert extends AbstractAssert<SqlAssert, String> {
         isNotNull();
 
         if (!actual.equals(expected)) {
-            failWithMessage(
-                    """
+            failWithMessage("""
                         Expected SQL to be equal but was not.%n\
                         Expected: %s%n\
-                        Actual:   %s""",
-                    expected, actual);
+                        Actual:   %s""", expected, actual);
         }
 
         return this;
@@ -89,12 +87,10 @@ public class SqlAssert extends AbstractAssert<SqlAssert, String> {
         String normalizedExpected = normalizeWhitespace(expected);
 
         if (!normalizedActual.equals(normalizedExpected)) {
-            failWithMessage(
-                    """
+            failWithMessage("""
                         Expected SQL to be equal (after normalizing whitespace) but was not.%n\
                         Expected: %s%n\
-                        Actual:   %s""",
-                    normalizedExpected, normalizedActual);
+                        Actual:   %s""", normalizedExpected, normalizedActual);
         }
 
         return this;

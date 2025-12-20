@@ -56,8 +56,7 @@ class InsertDSLComponentTest {
                 .set("price", 19.99)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo("""
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "products" ("id", "name", "price") VALUES (?, ?, ?)""");
         verify(ps).setObject(1, 1);
         verify(ps).setObject(2, "Widget");
@@ -70,8 +69,7 @@ class InsertDSLComponentTest {
 
         dsl.insertInto("users").set("id", 42).set("metadata", jsonData).buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo("""
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "users" ("id", "metadata") VALUES (?, ?)""");
         verify(ps).setObject(1, 42);
         verify(ps).setObject(2, jsonData);
@@ -90,9 +88,7 @@ class InsertDSLComponentTest {
                 .set("is_active", true)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "user_profiles" ("user_id", "username", "preferences", "profile_data", "is_active") VALUES (?, ?, ?, ?, ?)""");
         verify(ps).setObject(1, 100);
         verify(ps).setObject(2, "dev_user");
