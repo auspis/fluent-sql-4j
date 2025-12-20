@@ -1,8 +1,9 @@
 # Test Coverage Analysis Report
 
-**Generated:** 2025-12-20  
+**Generated:** 2025-12-20 (Updated after Phase 3)  
 **Report Type:** Unit + Component Tests Only (Fast Feedback)  
-**Tool:** JaCoCo 0.8.14
+**Tool:** JaCoCo 0.8.14  
+**Total Tests:** 1,109 ✅
 
 ---
 
@@ -10,25 +11,47 @@
 
 |          Metric          | Initial |   Current   | Change |  Status  |
 |--------------------------|---------|-------------|--------|----------|
-| **Instruction Coverage** | 88.1%   | **88.8%** ✅ | +0.7%  | Improved |
+| **Instruction Coverage** | 88.1%   | **88.9%** ✅ | +0.8%  | Improved |
 | **Branch Coverage**      | 71.4%   | 71.4%       | —      | Stable   |
 | **Classes Analyzed**     | 37      | 37          | —      | —        |
 | **Total Instructions**   | 16,995  | 16,995      | —      | —        |
-| **Missed Instructions**  | 2,014   | **1,903** ✅ | -111   | Improved |
-| **Test Count**           | 998     | **1,072** ✅ | +74    | Added    |
+| **Missed Instructions**  | 2,014   | **1,893** ✅ | -121   | Improved |
+| **Test Count**           | 998     | **1,109** ✅ | +111   | Added    |
 
 ### Overall Assessment
 
-- ✅ **Instruction coverage improved** to 88.8% (+111 instructions covered)
+- ✅ **Instruction coverage improved** to 88.9% (+121 instructions covered)
 - ✅ **Number Functions Package** now at **100% coverage** 🎉
 - ✅ **WhereJsonFunctionBuilder** improved from 68.17% → **81.34%** ✅
+- ✅ **ast.core.predicate** improved from 71.1% → **73.7%** ✅ (+2.6%)
+- ✅ **Total test count** increased to 1,109 tests (+111 tests) 🎉
 - ⚠️ **Branch coverage stable** at 71.4% (target should be 75%+)
-- 8 packages below 85% instruction coverage (was 9) ✅
+- 8 packages below 85% instruction coverage
 - 7 packages below 70% branch coverage
 
 ---
 
 ## 🎯 Key Findings
+
+### ✅ PHASE 3: Predicate Package Testing (Just Completed)
+
+**Status:** DONE ✓  
+**Test Files Added:** 3 new unit test files  
+**Test Cases Added:** 37 tests (ComparisonTest: 27, NullPredicateTest: 4, InPredicateTest: 6)  
+**Coverage Improvement:** From 71.1% → **73.7%** (+2.6%)
+
+|      Test File      | Coverage  | Tests  |     Status     |
+|---------------------|-----------|--------|----------------|
+| `ComparisonTest`    | N/A       | 27     | ✅ Complete     |
+| `NullPredicateTest` | N/A       | 4      | ✅ Complete     |
+| `InPredicateTest`   | N/A       | 6      | ✅ Complete     |
+| **TOTAL**           | **73.7%** | **37** | **✅ Complete** |
+
+**Test Details:**
+- `ComparisonTest.java` - Tests for all 6 comparison operators (eq, ne, gt, lt, gte, lte) with Literal, ColumnReference, dates, booleans, nulls
+- `NullPredicateTest.java` - Tests for NullPredicate construction and logical combinations  
+- `InPredicateTest.java` - Tests for IN predicate with varargs, lists, mixed types, large lists
+- Instruction missed reduced: 113 → 103 (-10 instructions) ✅
 
 ### ✅ COMPLETED IMPROVEMENTS
 
