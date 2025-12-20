@@ -32,7 +32,7 @@ import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
-import lan.tlab.r4j.jdsql.dsl.clause.HavingConditionBuilder;
+import lan.tlab.r4j.jdsql.dsl.clause.HavingBuilder;
 import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
 import lan.tlab.r4j.jdsql.dsl.clause.SupportsWhere;
 import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
@@ -359,19 +359,16 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     }
 
     // HAVING clause support
-    public HavingConditionBuilder having(String column) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        return new HavingConditionBuilder(this, column, LogicalCombinator.AND);
+    public HavingBuilder having() {
+        return new HavingBuilder(this, LogicalCombinator.AND);
     }
 
-    public HavingConditionBuilder andHaving(String column) {
-        return new HavingConditionBuilder(this, column, LogicalCombinator.AND);
+    public HavingBuilder andHaving() {
+        return new HavingBuilder(this, LogicalCombinator.AND);
     }
 
-    public HavingConditionBuilder orHaving(String column) {
-        return new HavingConditionBuilder(this, column, LogicalCombinator.OR);
+    public HavingBuilder orHaving() {
+        return new HavingBuilder(this, LogicalCombinator.OR);
     }
 
     // Functional HAVING updater
