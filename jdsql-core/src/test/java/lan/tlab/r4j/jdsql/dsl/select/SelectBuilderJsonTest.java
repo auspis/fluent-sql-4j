@@ -41,9 +41,7 @@ class SelectBuilderJsonTest {
 
         new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_EXISTS("profile", ?) AS "has_email" FROM "users"\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.email");
@@ -60,9 +58,7 @@ class SelectBuilderJsonTest {
 
         new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_EXISTS("profile", ? ERROR ON ERROR) AS "has_email" \
                 FROM "users"\
                 """);
@@ -81,9 +77,7 @@ class SelectBuilderJsonTest {
                 .from("products")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ?) AS "price" FROM "products"\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.price");
@@ -102,9 +96,7 @@ class SelectBuilderJsonTest {
                 .from("products")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2)) AS "price" FROM "products"\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.price");
@@ -127,9 +119,7 @@ class SelectBuilderJsonTest {
                 .from("products")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2) DEFAULT 0.00 ON EMPTY) AS "discount" FROM "products"\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.discount");
@@ -145,9 +135,7 @@ class SelectBuilderJsonTest {
 
         new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_QUERY("profile", ?) AS "addresses" FROM "users"\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.addresses");
@@ -166,9 +154,7 @@ class SelectBuilderJsonTest {
                 .from("products")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_QUERY("data", ? WITH WRAPPER) AS "tags" FROM "products"\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.tags");
@@ -192,9 +178,7 @@ class SelectBuilderJsonTest {
                 .from("products")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "id", JSON_QUERY("data", ? RETURNING JSON WITH CONDITIONAL WRAPPER DEFAULT [] ON EMPTY) AS "reviews" FROM "products"\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.reviews");
@@ -216,9 +200,7 @@ class SelectBuilderJsonTest {
 
         new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_EXISTS("profile", ?) AS "has_email", \
                 JSON_VALUE("profile", ? RETURNING INT) AS "age", \
                 JSON_QUERY("profile", ?) AS "addresses" \
@@ -245,9 +227,7 @@ class SelectBuilderJsonTest {
                 .eq("Electronics")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2)) AS "price" \
                 FROM "products" WHERE "category" = ?\
                 """);
@@ -269,9 +249,7 @@ class SelectBuilderJsonTest {
                 .orderBy("name")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(3,1)) AS "rating" FROM "products" ORDER BY "name" ASC\
                 """);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.rating");
