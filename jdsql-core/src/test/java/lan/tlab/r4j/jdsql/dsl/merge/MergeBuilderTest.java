@@ -42,9 +42,7 @@ class MergeBuilderTest {
                 .set("value", ColumnReference.of("src", "value"))
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 MERGE INTO "target_table" AS tgt \
                 USING "source_table" AS src \
                 ON "tgt"."id" = "src"."id" \
@@ -65,9 +63,7 @@ class MergeBuilderTest {
                 .set("name", "updated")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                 MERGE INTO "target" \
                 USING (SELECT * FROM ) "src" \
                 ON "target"."id" = "src"."id" \
@@ -87,9 +83,7 @@ class MergeBuilderTest {
                 .set("value", 200)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -108,9 +102,7 @@ class MergeBuilderTest {
                 .delete()
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -129,9 +121,7 @@ class MergeBuilderTest {
                 .set("id", ColumnReference.of("src", "id"))
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -208,9 +198,7 @@ class MergeBuilderTest {
                 .set("count", 100)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -233,9 +221,7 @@ class MergeBuilderTest {
                 .set("salary", 50000.50)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -291,9 +277,7 @@ class MergeBuilderTest {
                 .set("target.value", ColumnReference.of("src", "new_value"))
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -312,9 +296,7 @@ class MergeBuilderTest {
                 .delete()
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -335,9 +317,7 @@ class MergeBuilderTest {
                 .set("value", ColumnReference.of("src", "value"))
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \
@@ -361,9 +341,7 @@ class MergeBuilderTest {
                 .set("email", "src.email")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .isEqualTo(
-                        """
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
                         USING "source" AS src \
                         ON "target"."id" = "src"."id" \

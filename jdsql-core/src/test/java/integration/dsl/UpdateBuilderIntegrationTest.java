@@ -228,8 +228,7 @@ class UpdateBuilderIntegrationTest {
     void updateJsonObjectValue() throws SQLException {
         // Frank (id=8) has initial Milan address prepopulated
         // Update his address to a Turin address
-        String updatedAddress =
-                """
+        String updatedAddress = """
                 {"street":"Via Milano 25","city":"Turin","zip":"10100","country":"Italy"}""";
 
         PreparedStatement updatePs = dsl.update("users")
@@ -249,9 +248,7 @@ class UpdateBuilderIntegrationTest {
             assertThat(rs.getInt("id")).isEqualTo(8);
             assertThat(rs.getString("name")).isEqualTo("Frank");
             String retrievedAddress = rs.getString("address");
-            assertThatJson(retrievedAddress)
-                    .isEqualToJson(
-                            """
+            assertThatJson(retrievedAddress).isEqualToJson("""
                     {
                         "street": "Via Milano 25",
                         "city": "Turin",
@@ -287,8 +284,7 @@ class UpdateBuilderIntegrationTest {
             assertThat(rs.getInt("id")).isEqualTo(8);
             assertThat(rs.getString("name")).isEqualTo("Frank");
             String retrievedPreferences = rs.getString("preferences");
-            assertThatJson(retrievedPreferences)
-                    .isEqualToJson("""
+            assertThatJson(retrievedPreferences).isEqualToJson("""
                     ["email", "push", "phone"]
                     """);
             assertThat(rs.next()).isFalse();
@@ -315,9 +311,7 @@ class UpdateBuilderIntegrationTest {
             assertThat(rs.getInt("id")).isEqualTo(3);
             assertThat(rs.getString("name")).isEqualTo("Laptop");
             String retrievedMetadata = rs.getString("metadata");
-            assertThatJson(retrievedMetadata)
-                    .isEqualToJson(
-                            """
+            assertThatJson(retrievedMetadata).isEqualToJson("""
                     {
                         "tags": ["electronics", "sale"],
                         "featured": false,
