@@ -557,7 +557,7 @@ class HavingConditionBuilderTest {
                 .between(100, 500)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper).contains("HAVING (\"total\" >= ?) AND (\"total\" <= ?");
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 500);
     }
@@ -572,7 +572,7 @@ class HavingConditionBuilderTest {
                 .between(99.99, 499.99)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper).contains("HAVING (\"total\" >= ?) AND (\"total\" <= ?");
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 99.99);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 499.99);
     }
@@ -589,7 +589,7 @@ class HavingConditionBuilderTest {
                 .between(startDate, endDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper).contains("HAVING (\"event_date\" >= ?) AND (\"event_date\" <= ?");
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDate);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, endDate);
     }
@@ -606,8 +606,7 @@ class HavingConditionBuilderTest {
                 .between(startDateTime, endDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper).contains("HAVING (\"event_time\" >= ?) AND (\"event_time\" <= ?");
-        ;
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDateTime);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, endDateTime);
     }
@@ -798,8 +797,7 @@ class HavingConditionBuilderTest {
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
-                .contains(">=")
-                .contains("<=")
+                .contains("BETWEEN")
                 .contains("IN")
                 .contains("AND");
     }
