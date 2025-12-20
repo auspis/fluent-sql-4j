@@ -29,7 +29,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("category")
-                .having("category")
+                .having()
+                .column("category")
                 .eq("electronics")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -42,7 +43,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("category")
-                .having("category")
+                .having()
+                .column("category")
                 .ne("discontinued")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -55,7 +57,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("name")
-                .having("name")
+                .having()
+                .column("name")
                 .gt("Widget")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -68,7 +71,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("name")
-                .having("name")
+                .having()
+                .column("name")
                 .lt("Zebra")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -81,7 +85,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("code")
-                .having("code")
+                .having()
+                .column("code")
                 .gte("A001")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -94,7 +99,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("code")
-                .having("code")
+                .having()
+                .column("code")
                 .lte("Z999")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -108,7 +114,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "SUM(amount)")
                 .from("orders")
                 .groupBy("customer_id")
-                .having("customer_id")
+                .having()
+                .column("customer_id")
                 .eq(42)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -121,7 +128,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("total")
-                .having("total")
+                .having()
+                .column("total")
                 .ne(0)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -134,7 +142,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "SUM(amount)")
                 .from("orders")
                 .groupBy("customer_id")
-                .having("customer_id")
+                .having()
+                .column("customer_id")
                 .gt(100)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -147,7 +156,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "AVG(price)")
                 .from("products")
                 .groupBy("category_id")
-                .having("category_id")
+                .having()
+                .column("category_id")
                 .lt(50)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -160,7 +170,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("total")
-                .having("total")
+                .having()
+                .column("total")
                 .gte(100.5)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -173,7 +184,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("total")
-                .having("total")
+                .having()
+                .column("total")
                 .lte(500.99)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -187,7 +199,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("users")
                 .groupBy("active")
-                .having("active")
+                .having()
+                .column("active")
                 .eq(true)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -200,7 +213,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("users")
                 .groupBy("verified")
-                .having("verified")
+                .having()
+                .column("verified")
                 .ne(false)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -215,7 +229,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .eq(testDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -229,7 +244,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .ne(testDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -243,7 +259,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .gt(testDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -257,7 +274,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .lt(testDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -271,7 +289,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .gte(testDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -285,7 +304,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .lte(testDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -300,7 +320,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .eq(testDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -314,7 +335,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .ne(testDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -328,7 +350,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .gt(testDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -342,7 +365,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .lt(testDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -356,7 +380,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .gte(testDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -370,7 +395,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .lte(testDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -384,7 +410,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("users")
                 .groupBy("email")
-                .having("email")
+                .having()
+                .column("email")
                 .isNull()
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -396,7 +423,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("users")
                 .groupBy("email")
-                .having("email")
+                .having()
+                .column("email")
                 .isNotNull()
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -409,7 +437,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("name")
-                .having("name")
+                .having()
+                .column("name")
                 .like("%electronics%")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -422,7 +451,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("name")
-                .having("name")
+                .having()
+                .column("name")
                 .like("Widget%")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -436,7 +466,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("products")
                 .groupBy("category")
-                .having("category")
+                .having()
+                .column("category")
                 .in("electronics", "books", "toys")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -451,7 +482,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("status_id")
-                .having("status_id")
+                .having()
+                .column("status_id")
                 .in(1, 2, 3, 4, 5)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -468,7 +500,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("users")
                 .groupBy("status")
-                .having("status")
+                .having()
+                .column("status")
                 .in(true, false)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -485,7 +518,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .in(date1, date2, date3)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -502,7 +536,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .in(dt1, dt2)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -517,7 +552,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("total")
-                .having("total")
+                .having()
+                .column("total")
                 .between(100, 500)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -531,7 +567,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("total")
-                .having("total")
+                .having()
+                .column("total")
                 .between(99.99, 499.99)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -547,7 +584,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .between(startDate, endDate)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -563,7 +601,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_time")
-                .having("event_time")
+                .having()
+                .column("event_time")
                 .between(startDateTime, endDateTime)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -580,7 +619,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("departments")
                 .groupBy("dept_id")
-                .having("dept_id")
+                .having()
+                .column("dept_id")
                 .eq(subquery)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -597,7 +637,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("departments")
                 .groupBy("dept_id")
-                .having("dept_id")
+                .having()
+                .column("dept_id")
                 .ne(subquery)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -614,7 +655,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("departments")
                 .groupBy("avg_salary")
-                .having("avg_salary")
+                .having()
+                .column("avg_salary")
                 .gt(subquery)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -631,7 +673,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("departments")
                 .groupBy("avg_salary")
-                .having("avg_salary")
+                .having()
+                .column("avg_salary")
                 .lt(subquery)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -648,7 +691,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("accounts")
                 .groupBy("account_id")
-                .having("account_id")
+                .having()
+                .column("account_id")
                 .gte(subquery)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -665,7 +709,8 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("accounts")
                 .groupBy("account_id")
-                .having("account_id")
+                .having()
+                .column("account_id")
                 .lte(subquery)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -682,9 +727,11 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("customer_id")
-                .having("customer_id")
+                .having()
+                .column("customer_id")
                 .gt(100)
-                .andHaving("customer_id")
+                .andHaving()
+                .column("customer_id")
                 .lt(500)
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -701,9 +748,11 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
                 .groupBy("status")
-                .having("status")
+                .having()
+                .column("status")
                 .eq("pending")
-                .orHaving("status")
+                .orHaving()
+                .column("status")
                 .eq("cancelled")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -716,9 +765,11 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*), SUM(amount)")
                 .from("orders")
                 .groupBy("customer_id", "status")
-                .having("customer_id")
+                .having()
+                .column("customer_id")
                 .gte(1)
-                .andHaving("status")
+                .andHaving()
+                .column("status")
                 .in("active", "pending")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
@@ -737,9 +788,11 @@ class HavingConditionBuilderTest {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("events")
                 .groupBy("event_date", "category")
-                .having("event_date")
+                .having()
+                .column("event_date")
                 .between(startDate, endDate)
-                .andHaving("category")
+                .andHaving()
+                .column("category")
                 .in("A", "B", "C")
                 .buildPreparedStatement(sqlCaptureHelper.getConnection());
 
