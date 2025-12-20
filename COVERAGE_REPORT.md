@@ -1,9 +1,9 @@
 # Test Coverage Analysis Report
 
-**Generated:** 2025-12-20 (Updated after Phase 3)  
+**Generated:** 2025-12-20 (Updated after Phase 5)  
 **Report Type:** Unit + Component Tests Only (Fast Feedback)  
 **Tool:** JaCoCo 0.8.14  
-**Total Tests:** 1,109 ✅
+**Total Tests:** 1,186 ✅
 
 ---
 
@@ -11,29 +11,56 @@
 
 |          Metric          | Initial |   Current   | Change |  Status  |
 |--------------------------|---------|-------------|--------|----------|
-| **Instruction Coverage** | 88.1%   | **88.9%** ✅ | +0.8%  | Improved |
-| **Branch Coverage**      | 71.4%   | 71.4%       | —      | Stable   |
+| **Instruction Coverage** | 88.1%   | **90.2%** ✅ | +2.1%  | Improved |
+| **Branch Coverage**      | 71.4%   | 71.6%       | +0.2%  | Improved |
 | **Classes Analyzed**     | 37      | 37          | —      | —        |
 | **Total Instructions**   | 16,995  | 16,995      | —      | —        |
-| **Missed Instructions**  | 2,014   | **1,893** ✅ | -121   | Improved |
-| **Test Count**           | 998     | **1,109** ✅ | +111   | Added    |
+| **Missed Instructions**  | 2,014   | **1,667** ✅ | -347   | Improved |
+| **Test Count**           | 998     | **1,186** ✅ | +188   | Added    |
 
 ### Overall Assessment
 
-- ✅ **Instruction coverage improved** to 88.9% (+121 instructions covered)
+- ✅ **Instruction coverage improved** to 90.2% (+347 instructions covered, +2.1%)
 - ✅ **Number Functions Package** now at **100% coverage** 🎉
 - ✅ **WhereJsonFunctionBuilder** improved from 68.17% → **81.34%** ✅
 - ✅ **ast.core.predicate** improved from 71.1% → **73.7%** ✅ (+2.6%)
-- ✅ **Total test count** increased to 1,109 tests (+111 tests) 🎉
-- ⚠️ **Branch coverage stable** at 71.4% (target should be 75%+)
-- 8 packages below 85% instruction coverage
+- ✅ **dsl.clause** improved from 72.1% → **87.3%** ✅ (+15.2%) **FIRST PACKAGE ABOVE 85%!** 🎉
+- ✅ **Total test count** increased to 1,186 tests (+188 tests) 🎉
+- ✅ **Branch coverage improved** to 71.6% (+0.2%)
+- 7 packages below 85% instruction coverage (down from 8)
 - 7 packages below 70% branch coverage
 
 ---
 
 ## 🎯 Key Findings
 
-### ✅ PHASE 3: Predicate Package Testing (Just Completed)
+### ✅ PHASE 5: HAVING Clause Testing (Just Completed)
+
+**Status:** DONE ✓  
+**Test File Added:** 1 new test file (`HavingConditionBuilderTest.java`)  
+**Test Cases Added:** 77 tests  
+**Coverage Improvement:** dsl.clause from 72.1% → **87.3%** (+15.2%)
+
+|    Test Category     | Tests  |               Coverage               |
+|----------------------|--------|--------------------------------------|
+| Comparisons (6 ops)  | 30     | eq, ne, gt, lt, gte, lte for 5 types |
+| Predicates           | 20     | NULL, LIKE, IN (5 types)             |
+| Complex Operators    | 15     | BETWEEN, Subqueries                  |
+| Logical Combinations | 12     | AND/OR, complex mixtures             |
+| **TOTAL**            | **77** | **87.3%** ✅                          |
+
+**Test Details:**
+- Comparison operators: String, Number, Boolean, LocalDate, LocalDateTime (eq, ne, gt, lt, gte, lte)
+- NULL predicates: isNull, isNotNull
+- LIKE operator: pattern matching variants
+- IN operator: strings, numbers, booleans, dates, datetimes
+- BETWEEN operator: numbers, decimals, dates, datetimes  
+- Subquery comparisons: all operators with scalar subqueries
+- Multiple conditions: AND/OR logical combinations
+- All tests use SqlCaptureHelper and assertThatSql() for verification
+- **dsl.clause package now ABOVE 85% threshold!** ✅
+
+### ✅ PHASE 3: Predicate Package Testing (Completed in Phase 3)
 
 **Status:** DONE ✓  
 **Test Files Added:** 3 new unit test files  
@@ -103,8 +130,7 @@
 
 |       Package        | Coverage | Missed | Priority  |                      Recommendation                      |
 |----------------------|----------|--------|-----------|----------------------------------------------------------|
-| `ast.core.predicate` | 71.1%    | 113    | 🔴 HIGH   | Add predicate composition and operator combination tests |
-| `dsl.clause`         | 72.1%    | 413    | 🔴 HIGH   | Test HAVING clause, complete WHERE edge cases            |
+| `ast.core.predicate` | 73.7%    | 103    | 🔴 HIGH   | Add predicate composition and operator combination tests |
 | `dsl.merge`          | 74.7%    | 247    | 🟠 MEDIUM | Test MERGE statement conditions and edge cases           |
 | `dsl.util`           | 79.6%    | 92     | 🟠 MEDIUM | Test utility functions error handling                    |
 | `ast.visitor`        | 80.7%    | 159    | 🟠 MEDIUM | Test visitor pattern edge cases                          |
@@ -156,17 +182,18 @@ Critical areas where conditional logic is not fully tested:
 
 ### 🔴 HIGH PRIORITY (Next)
 
-1. **HAVING Clause Coverage** - Add 20-30 test cases
-   - HavingConditionBuilder coverage: 53.41% (246 instructions missing)
-   - Test LocalDateTime, Boolean, subquery comparisons
-   - Test IN operator with all types
-   - Test BETWEEN with dates and numbers
-   - **Expected impact:** +20% coverage = 73%+ for HavingConditionBuilder
-2. **Predicate Testing** - Add 30+ branch tests
-   - Test predicate composition (nested conditions)
+1. **Predicate Composition Testing** - Add 30+ branch tests
+   - Test nested predicate conditions
    - Test all comparison operators with type coercion
    - Test IS NULL/IS NOT NULL branches
-   - **Expected impact:** +15% branch coverage
+   - **Current:** ast.core.predicate at 73.7% (103 missed)
+   - **Expected impact:** +15-20% branch coverage improvement
+2. **MERGE Statement Coverage** - Add 25+ test cases
+   - WHEN MATCHED UPDATE/DELETE conditions
+   - WHEN NOT MATCHED INSERT conditions
+   - Multiple WHEN clauses combinations
+   - **Current:** dsl.merge at 74.7% (247 missed)
+   - **Expected impact:** +15% coverage = 89%+
 
 ### 🟠 MEDIUM PRIORITY
 
