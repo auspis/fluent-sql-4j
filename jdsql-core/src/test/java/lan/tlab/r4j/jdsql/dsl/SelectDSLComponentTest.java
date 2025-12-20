@@ -43,8 +43,7 @@ class SelectDSLComponentTest {
     void createsSelectBuilderWithRenderer() throws SQLException {
         dsl.select("name", "email").from("users").buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo("""
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "email" FROM "users"\
                 """);
     }
@@ -53,8 +52,7 @@ class SelectDSLComponentTest {
     void appliesRendererQuoting() throws SQLException {
         dsl.select("id", "value").from("temp_table").buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo("""
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "id", "value" FROM "temp_table"\
                 """);
     }
@@ -73,9 +71,7 @@ class SelectDSLComponentTest {
                 .fetch(10)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "age" \
                 FROM "users" \
                 WHERE ("age" > ?) AND ("active" = ?) \
@@ -102,9 +98,7 @@ class SelectDSLComponentTest {
                 .eq("Electronics")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", \
                 JSON_EXISTS("metadata", ?) AS "has_tags", \
                 JSON_VALUE("metadata", ? RETURNING DECIMAL(10,2)) AS "price", \
@@ -131,9 +125,7 @@ class SelectDSLComponentTest {
                 .orderBy("name")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "id", "name", \
                 JSON_VALUE("data", ? RETURNING DECIMAL(5,2) DEFAULT 0.00 ON EMPTY) AS "discount" \
                 FROM "products" \
@@ -158,9 +150,7 @@ class SelectDSLComponentTest {
                 .from("products")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", \
                 JSON_VALUE("data", ? RETURNING DECIMAL(5,2) DEFAULT 0.00 ON EMPTY) AS "discount" \
                 FROM "products"\
@@ -179,9 +169,7 @@ class SelectDSLComponentTest {
                 .from("employees")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "salary", \
                 ROW_NUMBER() OVER (ORDER BY "salary" DESC) AS "rank" \
                 FROM "employees"\
@@ -201,9 +189,7 @@ class SelectDSLComponentTest {
                 .from("employees")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "department", "salary", \
                 ROW_NUMBER() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_rank" \
                 FROM "employees"\
@@ -224,9 +210,7 @@ class SelectDSLComponentTest {
                 .from("products")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "price", \
                 RANK() OVER (ORDER BY "price" DESC) AS "price_rank", \
                 DENSE_RANK() OVER (ORDER BY "price" DESC) AS "price_dense_rank" \
@@ -248,9 +232,7 @@ class SelectDSLComponentTest {
                 .eq(2024)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "sale_date", "amount", \
                 LAG("amount", 1) OVER (ORDER BY "sale_date" ASC) AS "previous_amount" \
                 FROM "sales" \
@@ -272,9 +254,7 @@ class SelectDSLComponentTest {
                 .from("employees")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", \
                 ROW_NUMBER() OVER (ORDER BY "salary" DESC) AS "rank" \
                 FROM "employees"\
@@ -292,9 +272,7 @@ class SelectDSLComponentTest {
                 .from("employees")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "salary", \
                 NTILE(4) OVER (ORDER BY "salary" DESC) AS "quartile" \
                 FROM "employees"\
@@ -315,9 +293,7 @@ class SelectDSLComponentTest {
                 .eq(2024)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "sale_date", \
                 LEAD("amount", 1) OVER (ORDER BY "sale_date" ASC) AS "next_amount", "amount" \
                 FROM "sales" \
@@ -343,9 +319,7 @@ class SelectDSLComponentTest {
                 .from("employees")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "department", "salary", \
                 ROW_NUMBER() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_rank", \
                 RANK() OVER (PARTITION BY "department" ORDER BY "salary" DESC) AS "dept_rank_with_gaps" \
@@ -369,9 +343,7 @@ class SelectDSLComponentTest {
                 .like("%@example.com")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "u"."name", "u"."email", "u"."created_at" \
                 FROM "users" AS u \
                 INNER JOIN "orders" AS o ON "u"."id" = "o"."user_id" \
@@ -396,9 +368,7 @@ class SelectDSLComponentTest {
                 .fetch(10)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "u"."name", "u"."email" \
                 FROM "users" AS u \
                 LEFT JOIN "profiles" AS p ON "u"."id" = "p"."user_id" \
@@ -428,9 +398,7 @@ class SelectDSLComponentTest {
                 .like("New%")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "u"."name", "u"."city" \
                 FROM "users" AS u \
                 INNER JOIN "orders" AS o ON "u"."id" = "o"."user_id" \
@@ -463,9 +431,7 @@ class SelectDSLComponentTest {
                 .orderByDesc("budget")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "d"."dept_name", "d"."budget", "d"."location" \
                 FROM "departments" AS d \
                 RIGHT JOIN "employees" AS e ON "d"."id" = "e"."dept_id" \
@@ -491,9 +457,7 @@ class SelectDSLComponentTest {
                 .orderBy("department")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "department", "COUNT(*)", "SUM(salary)", "AVG(age)" \
                 FROM "employees" AS e \
                 WHERE "status" = ? \
@@ -519,9 +483,7 @@ class SelectDSLComponentTest {
                 .orderBy("category")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "region", "category", "COUNT(*)", "MAX(price)" \
                 FROM "products" AS p \
                 GROUP BY "region", "category" \
@@ -551,9 +513,7 @@ class SelectDSLComponentTest {
                 .fetch(10)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "customer_id", "COUNT(*)", "SUM(amount)", "AVG(quantity)" \
                 FROM "orders" AS o \
                 WHERE ("order_date" >= ?) AND ("order_date" <= ?) \
@@ -580,9 +540,7 @@ class SelectDSLComponentTest {
                 .gt(25)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "id", "name" \
                 FROM "users" \
                 WHERE (JSON_VALUE("profile", ?) = ?) \
@@ -607,9 +565,7 @@ class SelectDSLComponentTest {
                 .orderBy("name")
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "product_id", "name", "price" \
                 FROM "products" \
                 WHERE (JSON_EXISTS("metadata", ?) = ?) \
@@ -639,9 +595,7 @@ class SelectDSLComponentTest {
                 .fetch(20)
                 .buildPreparedStatement(connection);
 
-        assertThat(sqlCaptor.getValue())
-                .isEqualTo(
-                        """
+        assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT * \
                 FROM "orders" AS o \
                 WHERE (("status" = ?) \

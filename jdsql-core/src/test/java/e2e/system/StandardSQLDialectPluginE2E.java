@@ -223,8 +223,7 @@ class StandardSQLDialectPluginE2E {
 
         // Create source table with user updates
         try (var stmt = connection.createStatement()) {
-            stmt.execute(
-                    """
+            stmt.execute("""
                     CREATE TABLE users_updates (
                         "id" INTEGER PRIMARY KEY,
                         "name" VARCHAR(50),

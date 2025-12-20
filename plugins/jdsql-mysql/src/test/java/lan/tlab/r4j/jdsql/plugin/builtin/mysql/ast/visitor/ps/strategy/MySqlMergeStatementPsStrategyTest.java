@@ -49,9 +49,7 @@ class MySqlMergeStatementPsStrategyTest {
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
-        assertThat(result.sql())
-                .isEqualTo(
-                        """
+        assertThat(result.sql()).isEqualTo("""
                     INSERT INTO `users` (`id`, `name`, `status`) \
                     SELECT `src`.`id`, `src`.`name`, ? \
                     FROM `users_updates` AS src \
@@ -76,9 +74,7 @@ class MySqlMergeStatementPsStrategyTest {
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
-        assertThat(result.sql())
-                .isEqualTo(
-                        """
+        assertThat(result.sql()).isEqualTo("""
                     INSERT INTO `users` (`id`, `name`) \
                     SELECT `src`.`id`, ? \
                     FROM `users_updates` AS src""");
@@ -105,9 +101,7 @@ class MySqlMergeStatementPsStrategyTest {
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
         PreparedStatementSpec result = strategy.handle(stmt, specFactory, new AstContext());
 
-        assertThat(result.sql())
-                .isEqualTo(
-                        """
+        assertThat(result.sql()).isEqualTo("""
                     INSERT INTO `users` (`id`, `status`) \
                     SELECT ?, ? \
                     FROM `users_updates` AS src \
