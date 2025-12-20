@@ -28,7 +28,8 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 // Build and execute a query
 PreparedStatement ps = dsl.select("name", "email")
     .from("users")
-    .where("age").gt(18)
+    .where()
+    .column("age").gt(18)
     .buildPreparedStatement(connection);
 ```
 
