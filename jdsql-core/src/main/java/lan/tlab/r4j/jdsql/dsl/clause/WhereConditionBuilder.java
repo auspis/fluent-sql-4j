@@ -7,7 +7,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.ValueExpression;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ScalarSubquery;
-import lan.tlab.r4j.jdsql.ast.core.predicate.AndOr;
+import lan.tlab.r4j.jdsql.ast.core.predicate.Between;
 import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.core.predicate.In;
 import lan.tlab.r4j.jdsql.ast.core.predicate.IsNotNull;
@@ -157,23 +157,15 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
 
     // Convenience methods for date ranges
     public T between(LocalDate startDate, LocalDate endDate) {
-        Predicate condition = AndOr.and(
-                Comparison.gte(getColumnRef(), Literal.of(startDate)),
-                Comparison.lte(getColumnRef(), Literal.of(endDate)));
-        return addCondition(condition);
+        return addCondition(new Between(getColumnRef(), Literal.of(startDate), Literal.of(endDate)));
     }
 
     public T between(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        Predicate condition = AndOr.and(
-                Comparison.gte(getColumnRef(), Literal.of(startDateTime)),
-                Comparison.lte(getColumnRef(), Literal.of(endDateTime)));
-        return addCondition(condition);
+        return addCondition(new Between(getColumnRef(), Literal.of(startDateTime), Literal.of(endDateTime)));
     }
 
     public T between(Number min, Number max) {
-        Predicate condition = AndOr.and(
-                Comparison.gte(getColumnRef(), Literal.of(min)), Comparison.lte(getColumnRef(), Literal.of(max)));
-        return addCondition(condition);
+        return addCondition(new Between(getColumnRef(), Literal.of(min), Literal.of(max)));
     }
 
     // Subquery comparisons

@@ -436,7 +436,7 @@ class SelectDSLComponentTest {
                 SELECT "d"."dept_name", "d"."budget", "d"."location" \
                 FROM "departments" AS d \
                 RIGHT JOIN "employees" AS e ON "d"."id" = "e"."dept_id" \
-                WHERE ((("d"."budget" >= ?) AND ("d"."budget" <= ?)) AND ("d"."active" = ?)) OR ("d"."manager_id" IS NULL) \
+                WHERE (("d"."budget" BETWEEN ? AND ?) AND ("d"."active" = ?)) OR ("d"."manager_id" IS NULL) \
                 ORDER BY "d"."budget" DESC\
                 """);
         verify(ps).setObject(1, 50000);
@@ -522,7 +522,7 @@ class SelectDSLComponentTest {
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "customer_id", "COUNT(*)", "SUM(amount)", "AVG(quantity)" \
                 FROM "orders" AS o \
-                WHERE ("order_date" >= ?) AND ("order_date" <= ?) \
+                WHERE "order_date" BETWEEN ? AND ? \
                 GROUP BY "customer_id" \
                 HAVING ("customer_id" > ?) AND ("customer_id" < ?) \
                 ORDER BY "customer_id" DESC \
