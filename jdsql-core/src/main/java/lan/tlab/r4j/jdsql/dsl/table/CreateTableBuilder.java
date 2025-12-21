@@ -35,10 +35,18 @@ public class CreateTableBuilder {
         return new ColumnBuilder(this, columnName);
     }
 
+    /**
+     * Adds a PRIMARY KEY constraint with the specified column names.
+     *
+     * @param columnNames the names of columns to include in the primary key
+     * @return this builder instance
+     * @throws IllegalArgumentException if columnNames is empty
+     */
     public CreateTableBuilder primaryKey(String... columnNames) {
-        if (columnNames.length > 0) {
-            definitionBuilder = definitionBuilder.primaryKey(new PrimaryKeyDefinition(List.of(columnNames)));
+        if (columnNames == null || columnNames.length == 0) {
+            throw new IllegalArgumentException("Column names cannot be empty in primaryKey()");
         }
+        definitionBuilder = definitionBuilder.primaryKey(new PrimaryKeyDefinition(List.of(columnNames)));
         return this;
     }
 
@@ -103,48 +111,105 @@ public class CreateTableBuilder {
         columns.add(column);
     }
 
+    /**
+     * Adds an INDEX constraint with the specified name and columns.
+     *
+     * @param indexName the name of the index (cannot be null)
+     * @param columns the names of columns to include in the index (cannot be empty)
+     * @return this builder instance
+     * @throws IllegalArgumentException if indexName is null or columns is empty
+     */
     public CreateTableBuilder index(String indexName, String... columns) {
-        if (indexName != null && columns != null && columns.length > 0) {
-            definitionBuilder = definitionBuilder.index(new IndexDefinition(indexName, columns));
+        if (indexName == null) {
+            throw new IllegalArgumentException("Index name cannot be null");
         }
-        return this;
-    }
-
-    public CreateTableBuilder unique(String... columns) {
-        if (columns != null && columns.length > 0) {
-            definitionBuilder =
-                    definitionBuilder.constraint(new ConstraintDefinition.UniqueConstraintDefinition(columns));
+        if (columns == null || columns.length == 0) {
+            throw new IllegalArgumentException("Column names cannot be empty in index()");
         }
+        definitionBuilder = definitionBuilder.index(new IndexDefinition(indexName, columns));
         return this;
     }
 
     /**
-     * Convenience method to add a single-column foreign key constraint.
+     * Adds a UNIQUE constraint with the specified columns.
+     *
+     * @param columns the names of columns to include in the unique constraint (cannot be empty)
+     * @return this builder instance
+     * @throws IllegalArgumentException if columns is empty
+     */
+    public CreateTableBuilder unique(String... columns) {
+        if (columns == null || columns.length == 0) {
+            throw new IllegalArgumentException("Column names cannot be empty in unique()");
+        }
+        definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.UniqueConstraintDefinition(columns));
+        return this;
+    }
+
+    /**
+     * Adds a foreign key constraint on the specified column referencing another table.
+     *
+     * @param column the column name to which the foreign key applies (cannot be null)
+     * @param refTable the referenced table name (cannot be null)
+     * @param refColumns the referenced column names (at least one required)
+     * @return this builder instance
+     * @throws IllegalArgumentException if column or refTable is null, or refColumns is empty
      */
     public CreateTableBuilder foreignKey(String column, String refTable, String... refColumns) {
-        if (column != null && refTable != null) {
-            definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.ForeignKeyConstraintDefinition(
-                    List.of(column), new ReferencesItem(refTable, refColumns)));
+        if (column == null) {
+            throw new IllegalArgumentException("Column name cannot be null in foreignKey()");
         }
+        if (refTable == null) {
+            throw new IllegalArgumentException("Referenced table name cannot be null in foreignKey()");
+        }
+        if (refColumns == null || refColumns.length == 0) {
+            throw new IllegalArgumentException("Referenced column names cannot be empty in foreignKey()");
+        }
+        definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.ForeignKeyConstraintDefinition(
+                List.of(column), new ReferencesItem(refTable, refColumns)));
         return this;
     }
 
+    /**
+     * Adds a CHECK constraint with the specified predicate expression.
+     *
+     * @param expr the predicate to check (cannot be null)
+     * @return this builder instance
+     * @throws IllegalArgumentException if expr is null
+     */
     public CreateTableBuilder check(Predicate expr) {
-        if (expr != null) {
-            definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.CheckConstraintDefinition(expr));
+        if (expr == null) {
+            throw new IllegalArgumentException("Predicate cannot be null in check()");
         }
+        definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.CheckConstraintDefinition(expr));
         return this;
     }
 
+    /**
+     * Adds a DEFAULT constraint with the specified scalar expression value.
+     *
+     * @param value the default value expression (cannot be null)
+     * @return this builder instance
+     * @throws IllegalArgumentException if value is null
+     */
     public CreateTableBuilder defaultConstraint(ScalarExpression value) {
-        if (value != null) {
-            definitionBuilder =
-                    definitionBuilder.constraint(new ConstraintDefinition.DefaultConstraintDefinition(value));
+        if (value == null) {
+            throw new IllegalArgumentException("Default value expression cannot be null in defaultConstraint()");
         }
+        definitionBuilder = definitionBuilder.constraint(new ConstraintDefinition.DefaultConstraintDefinition(value));
         return this;
     }
 
+    /**
+     * Marks the specified column with a NOT NULL constraint.
+     *
+     * @param columnName the name of the column to mark as NOT NULL (cannot be null)
+     * @return this builder instance
+     * @throws IllegalArgumentException if columnName is null, empty, or column does not exist
+     */
     public CreateTableBuilder notNullColumn(String columnName) {
+        if (columnName == null || columnName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty in notNullColumn()");
+        }
         for (int i = 0; i < columns.size(); i++) {
             ColumnDefinition c = columns.get(i);
             if (c.name().equals(columnName)) {
