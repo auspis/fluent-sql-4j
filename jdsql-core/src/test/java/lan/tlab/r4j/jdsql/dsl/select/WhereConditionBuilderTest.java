@@ -936,4 +936,231 @@ class WhereConditionBuilderTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Dot notation not supported");
     }
+
+    // Column-to-column comparisons (new feature)
+    @Test
+    void columnToColumnComparisonWithEq() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("users")
+                .as("u")
+                .innerJoin("employees")
+                .as("e")
+                .on("u.id", "e.user_id")
+                .where()
+                .column("u", "age")
+                .eq()
+                .column("e", "age")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"u\".\"age\" = \"e\".\"age\"");
+    }
+
+    @Test
+    void columnToColumnComparisonWithGt() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("users")
+                .as("u")
+                .innerJoin("employees")
+                .as("e")
+                .on("u.id", "e.user_id")
+                .where()
+                .column("u", "age")
+                .gt()
+                .column("e", "age")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"u\".\"age\" > \"e\".\"age\"");
+    }
+
+    @Test
+    void columnToColumnComparisonWithLt() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("orders")
+                .as("o")
+                .innerJoin("expected_orders")
+                .as("eo")
+                .on("o.id", "eo.order_id")
+                .where()
+                .column("o", "total")
+                .lt()
+                .column("eo", "total")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"o\".\"total\" < \"eo\".\"total\"");
+    }
+
+    @Test
+    void columnToColumnComparisonWithGte() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("products")
+                .as("p")
+                .innerJoin("thresholds")
+                .as("t")
+                .on("p.id", "t.product_id")
+                .where()
+                .column("p", "price")
+                .gte()
+                .column("t", "min_price")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"p\".\"price\" >= \"t\".\"min_price\"");
+    }
+
+    @Test
+    void columnToColumnComparisonWithLte() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("budget")
+                .as("b")
+                .innerJoin("spending")
+                .as("s")
+                .on("b.id", "s.budget_id")
+                .where()
+                .column("s", "amount")
+                .lte()
+                .column("b", "limit")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"s\".\"amount\" <= \"b\".\"limit\"");
+    }
+
+    @Test
+    void columnToColumnComparisonWithNe() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("current")
+                .as("c")
+                .innerJoin("previous")
+                .as("p")
+                .on("c.id", "p.id")
+                .where()
+                .column("c", "status")
+                .ne()
+                .column("p", "status")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"c\".\"status\" <> \"p\".\"status\"");
+    }
+
+    @Test
+    void columnToColumnComparisonWithAndCondition() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("users")
+                .as("u")
+                .innerJoin("profiles")
+                .as("p")
+                .on("u.id", "p.user_id")
+                .where()
+                .column("u", "age")
+                .gt()
+                .column("p", "age")
+                .and()
+                .column("u", "status")
+                .eq("active")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"u\".\"age\" > \"p\".\"age\"")
+                .contains("\"u\".\"status\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "active");
+    }
+
+    @Test
+    void columnToColumnComparisonWithOrCondition() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("left_table")
+                .as("l")
+                .innerJoin("right_table")
+                .as("r")
+                .on("l.id", "r.id")
+                .where()
+                .column("l", "value")
+                .eq()
+                .column("r", "value")
+                .or()
+                .column("l", "status")
+                .eq("pending")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"l\".\"value\" = \"r\".\"value\"")
+                .contains("\"l\".\"status\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "pending");
+    }
+
+    @Test
+    void columnToColumnComparisonRejectsNullAliasInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "age")
+                        .gt()
+                        .column(null, "age"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonRejectsEmptyAliasInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "age")
+                        .eq()
+                        .column("", "age"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonRejectsAliasWithDotInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "age")
+                        .ne()
+                        .column("u.x", "age"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias must not contain dot");
+    }
+
+    @Test
+    void columnToColumnComparisonRejectsNullColumnInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "age")
+                        .lte()
+                        .column("e", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonRejectsEmptyColumnInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "age")
+                        .gte()
+                        .column("e", ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonRejectsColumnWithDotInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "age")
+                        .lt()
+                        .column("e", "table.age"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column must not contain dot");
+    }
 }

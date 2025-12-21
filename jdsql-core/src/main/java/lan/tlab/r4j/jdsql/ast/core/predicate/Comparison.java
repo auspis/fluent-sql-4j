@@ -29,8 +29,6 @@ public record Comparison(ValueExpression lhs, ComparisonOperator operator, Value
     public enum ComparisonOperator {
         EQUALS("="),
         NOT_EQUALS("!="),
-        // TODO: handle dialect
-        // O "<>" a seconda del dialetto SQL
         GREATER_THAN(">"),
         GREATER_THAN_OR_EQUALS(">="),
         LESS_THAN("<"),
