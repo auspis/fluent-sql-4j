@@ -43,7 +43,7 @@ class DeleteBuilderIntegrationTest {
     @Test
     void whereCondition() throws SQLException {
         PreparedStatement ps =
-                dsl.deleteFrom("users").where().column("id").eq(2).buildPreparedStatement(connection);
+                dsl.deleteFrom("users").where().column("id").eq(2).build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -63,7 +63,7 @@ class DeleteBuilderIntegrationTest {
     @Test
     void multipleConditions() throws SQLException {
         PreparedStatement ps =
-                dsl.deleteFrom("users").where().column("age").lt(18).buildPreparedStatement(connection);
+                dsl.deleteFrom("users").where().column("age").lt(18).build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -84,7 +84,7 @@ class DeleteBuilderIntegrationTest {
                 .and()
                 .column("name")
                 .eq("Alice")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -109,7 +109,7 @@ class DeleteBuilderIntegrationTest {
                 .or()
                 .column("name")
                 .eq("Jane Smith")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(2);
@@ -138,7 +138,7 @@ class DeleteBuilderIntegrationTest {
                 .where()
                 .column("email")
                 .like("%example.com")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);
@@ -152,7 +152,7 @@ class DeleteBuilderIntegrationTest {
 
     @Test
     void allRows() throws SQLException {
-        PreparedStatement ps = dsl.deleteFrom("users").buildPreparedStatement(connection);
+        PreparedStatement ps = dsl.deleteFrom("users").build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);

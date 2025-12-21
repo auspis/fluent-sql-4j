@@ -32,7 +32,7 @@ class IsNotNullTest {
                 .where()
                 .column("email")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("IS NOT NULL");
     }
@@ -44,7 +44,7 @@ class IsNotNullTest {
                 .where()
                 .column("description")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("IS NOT NULL");
     }
@@ -56,7 +56,7 @@ class IsNotNullTest {
                 .where()
                 .column("parent_order_id")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("IS NOT NULL");
     }
@@ -68,7 +68,7 @@ class IsNotNullTest {
                 .where()
                 .column("deleted_at")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("IS NOT NULL");
     }
@@ -80,7 +80,7 @@ class IsNotNullTest {
                 .where()
                 .column("value")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("IS NOT NULL");
     }
@@ -92,7 +92,7 @@ class IsNotNullTest {
                 .where()
                 .column("enabled")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("IS NOT NULL");
     }
@@ -108,7 +108,7 @@ class IsNotNullTest {
                 .and()
                 .column("phone")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")
@@ -126,7 +126,7 @@ class IsNotNullTest {
                 .or()
                 .column("phone")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")
@@ -144,7 +144,7 @@ class IsNotNullTest {
                 .and()
                 .column("age")
                 .gt(18)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")
@@ -163,7 +163,7 @@ class IsNotNullTest {
                 .or()
                 .column("price")
                 .lt(50)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")
@@ -183,7 +183,7 @@ class IsNotNullTest {
                 .and()
                 .column("category")
                 .in("A", "B", "C")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")
@@ -202,7 +202,7 @@ class IsNotNullTest {
                 .and()
                 .column("name")
                 .like("%John%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")
@@ -221,7 +221,7 @@ class IsNotNullTest {
                 .or()
                 .column("phone")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")

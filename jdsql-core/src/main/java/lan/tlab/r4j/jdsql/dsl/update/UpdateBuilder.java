@@ -144,7 +144,7 @@ public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
         return statementBuilder.set(setItems).build();
     }
 
-    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+    public PreparedStatement build(Connection connection) throws SQLException {
         validateState();
         UpdateStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);

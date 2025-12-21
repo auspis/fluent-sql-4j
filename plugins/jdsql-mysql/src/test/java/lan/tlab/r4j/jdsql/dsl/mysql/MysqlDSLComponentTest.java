@@ -95,7 +95,7 @@ class MysqlDSLComponentTest {
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
         when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
 
-        dsl.select("name", "email").from("users").buildPreparedStatement(connection);
+        dsl.select("name", "email").from("users").build(connection);
 
         // MySQL uses backticks for identifiers
         assertThat(sqlCaptor.getValue()).contains("`name`");

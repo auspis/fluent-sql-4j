@@ -28,7 +28,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("info", "$.city")
                 .eq("Rome")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_VALUE("info", ?) = ?""");
@@ -43,7 +43,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("info", "$.age")
                 .gt(30)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_VALUE("info", ?) > ?""");
@@ -58,7 +58,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonExists("info", "$.email")
                 .exists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_EXISTS("info", ?) = ?""");
@@ -73,7 +73,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonExists("info", "$.phone")
                 .notExists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_EXISTS("info", ?) = ?""");
@@ -88,7 +88,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonQuery("data", "$.tags")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "products" WHERE JSON_QUERY("data", ?) IS NOT NULL""");
@@ -105,7 +105,7 @@ class WhereJsonFunctionBuilderTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE (JSON_VALUE("info", ?) = ?) AND ("active" = ?)""");
@@ -124,7 +124,7 @@ class WhereJsonFunctionBuilderTest {
                 .or()
                 .jsonValue("info", "$.status")
                 .eq("premium")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE (JSON_VALUE("info", ?) = ?) OR (JSON_VALUE("info", ?) = ?)""");
@@ -147,7 +147,7 @@ class WhereJsonFunctionBuilderTest {
                 .and()
                 .jsonExists("data", "$.customer.email")
                 .exists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "orders" \
@@ -168,7 +168,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("data", "$.discount")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "products" WHERE JSON_VALUE("data", ?) IS NULL""");
@@ -183,7 +183,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("u", "info", "$.city")
                 .eq("Milan")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" AS u WHERE JSON_VALUE("info", ?) = ?""");

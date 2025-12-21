@@ -28,7 +28,7 @@ class SelectBuilderJoinTest {
                 .from("users")
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -41,7 +41,7 @@ class SelectBuilderJoinTest {
                 .from("users")
                 .leftJoin("profiles")
                 .on("users.id", "profiles.user_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -54,7 +54,7 @@ class SelectBuilderJoinTest {
                 .from("users")
                 .rightJoin("departments")
                 .on("users.dept_id", "departments.id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -67,7 +67,7 @@ class SelectBuilderJoinTest {
                 .from("users")
                 .fullJoin("roles")
                 .on("users.role_id", "roles.id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"users\" FULL JOIN \"roles\" ON \"users\".\"role_id\" = \"roles\".\"id\"");
@@ -75,10 +75,7 @@ class SelectBuilderJoinTest {
 
     @Test
     void crossJoin() throws SQLException {
-        new SelectBuilder(specFactory, "*")
-                .from("users")
-                .crossJoin("settings")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, "*").from("users").crossJoin("settings").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" CROSS JOIN \"settings\"");
     }
@@ -91,7 +88,7 @@ class SelectBuilderJoinTest {
                 .innerJoin("orders")
                 .as("o")
                 .on("u.id", "o.user_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -109,7 +106,7 @@ class SelectBuilderJoinTest {
                 .leftJoin("products")
                 .as("p")
                 .on("o.product_id", "p.id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -124,7 +121,7 @@ class SelectBuilderJoinTest {
                 .innerJoin("orders")
                 .as("o")
                 .on("u.id", "o.user_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -142,7 +139,7 @@ class SelectBuilderJoinTest {
                 .where()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -157,7 +154,7 @@ class SelectBuilderJoinTest {
                 .innerJoin("orders")
                 .on("users.id", "orders.user_id")
                 .orderBy("created_at")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -172,7 +169,7 @@ class SelectBuilderJoinTest {
                 .on("users.id", "orders.user_id")
                 .fetch(10)
                 .offset(5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -198,7 +195,7 @@ class SelectBuilderJoinTest {
                 .gt(100)
                 .orderByDesc("created_at")
                 .fetch(20)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(

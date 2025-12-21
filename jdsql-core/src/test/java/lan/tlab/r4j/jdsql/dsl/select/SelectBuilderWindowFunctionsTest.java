@@ -42,9 +42,7 @@ class SelectBuilderWindowFunctionsTest {
                         "row_num"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", \
@@ -68,9 +66,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_row_num"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "department", "salary", \
@@ -92,9 +88,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_rank"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", RANK() OVER (ORDER BY "salary" DESC) AS "salary_rank" FROM "employees"\
@@ -114,9 +108,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_dense_rank"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", DENSE_RANK() OVER (ORDER BY "salary" DESC) AS "salary_dense_rank" FROM "employees"\
@@ -138,9 +130,7 @@ class SelectBuilderWindowFunctionsTest {
                         "quartile"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", NTILE(4) OVER (ORDER BY "salary" DESC) AS "quartile" FROM "employees"\
@@ -163,9 +153,7 @@ class SelectBuilderWindowFunctionsTest {
                         "prev_salary"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", LAG("salary", 1) OVER (ORDER BY "hire_date" ASC) AS "prev_salary" FROM "employees"\
@@ -189,9 +177,7 @@ class SelectBuilderWindowFunctionsTest {
                         "prev_salary"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", LAG("salary", 1, ?) OVER (ORDER BY "hire_date" DESC) AS "prev_salary" FROM "employees"\
@@ -215,9 +201,7 @@ class SelectBuilderWindowFunctionsTest {
                         "next_salary"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", LEAD("salary", 1) OVER (ORDER BY "hire_date" DESC) AS "next_salary" FROM "employees"\
@@ -241,9 +225,7 @@ class SelectBuilderWindowFunctionsTest {
                         "next_salary"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", LEAD("salary", 1, ?) OVER (ORDER BY "hire_date" DESC) AS "next_salary" FROM "employees"\
@@ -278,9 +260,7 @@ class SelectBuilderWindowFunctionsTest {
                         "quartile"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", \
@@ -306,9 +286,7 @@ class SelectBuilderWindowFunctionsTest {
                         "hire_order"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "department", "salary", \
@@ -331,9 +309,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_salary_rank"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", \
@@ -355,9 +331,7 @@ class SelectBuilderWindowFunctionsTest {
                         "hire_dense_rank"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", DENSE_RANK() OVER (ORDER BY "hire_date" ASC) AS "hire_dense_rank" \
@@ -380,9 +354,7 @@ class SelectBuilderWindowFunctionsTest {
                         "decile"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", NTILE(10) OVER (ORDER BY "salary" DESC) AS "decile" \
@@ -407,9 +379,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_two_back"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", \
@@ -436,9 +406,7 @@ class SelectBuilderWindowFunctionsTest {
                         "salary_three_ahead"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "salary", \
@@ -460,9 +428,7 @@ class SelectBuilderWindowFunctionsTest {
                         "id_order"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", ROW_NUMBER() OVER (ORDER BY "employee_id" ASC) AS "id_order" FROM "employees"\
@@ -482,9 +448,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_rank_no_order"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "department", "salary", RANK() OVER (PARTITION BY "department") AS "dept_rank_no_order" \
@@ -509,9 +473,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_job_rank"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "department", "job_title", "salary", \
@@ -539,9 +501,7 @@ class SelectBuilderWindowFunctionsTest {
                         "dept_hire_quintile"))
                 .build();
 
-        new SelectBuilder(specFactory, select)
-                .from("employees")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("employees").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             SELECT "employee_id", "name", "department", "salary", \

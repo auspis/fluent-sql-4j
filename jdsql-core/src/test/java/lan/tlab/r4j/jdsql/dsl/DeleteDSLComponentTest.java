@@ -33,7 +33,7 @@ class DeleteDSLComponentTest {
 
     @Test
     void createsDeleteBuilderWithPreparedStatementSpecFactory() throws SQLException {
-        dsl.deleteFrom("users").where().column("id").eq(1).buildPreparedStatement(connection);
+        dsl.deleteFrom("users").where().column("id").eq(1).build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                         DELETE FROM "users" WHERE "id" = ?""");
@@ -42,7 +42,7 @@ class DeleteDSLComponentTest {
 
     @Test
     void appliesPreparedStatementSpecFactoryQuoting() throws SQLException {
-        dsl.deleteFrom("temp_table").buildPreparedStatement(connection);
+        dsl.deleteFrom("temp_table").build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"temp_table\"");
     }
@@ -56,7 +56,7 @@ class DeleteDSLComponentTest {
                 .and()
                 .column("amount")
                 .gt(100)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 DELETE FROM "orders" \

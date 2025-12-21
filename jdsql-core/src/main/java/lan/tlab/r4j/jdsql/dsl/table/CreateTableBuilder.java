@@ -228,7 +228,7 @@ public class CreateTableBuilder {
         throw new IllegalArgumentException("Column not found: " + columnName);
     }
 
-    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+    public PreparedStatement build(Connection connection) throws SQLException {
         TableDefinition.TableDefinitionBuilder finalBuilder = definitionBuilder;
         if (!columns.isEmpty()) {
             finalBuilder = finalBuilder.columns(columns);

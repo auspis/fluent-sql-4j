@@ -38,7 +38,7 @@ import org.mockito.ArgumentCaptor;
  *     void myTest() throws SQLException {
  *         new SelectBuilder(specFactory, "name")
  *             .from("users")
- *             .buildPreparedStatement(mockHelper.getConnection());
+ *             .build(mockHelper.getConnection());
  *
  *         assertThatSql(mockHelper.getSql()).isEqualTo("SELECT \"name\" FROM \"users\"");
  *     }
@@ -72,7 +72,7 @@ public class SqlCaptureHelper {
         String value = sqlCaptor.getValue();
         if (value == null) {
             throw new IllegalStateException(
-                    "No SQL was captured. Ensure buildPreparedStatement() was called with this helper's connection.");
+                    "No SQL was captured. Ensure build() was called with this helper's connection.");
         }
         return value;
     }

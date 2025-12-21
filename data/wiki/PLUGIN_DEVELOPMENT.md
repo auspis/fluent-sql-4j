@@ -378,7 +378,7 @@ class PostgreSqlE2E {
                 ).as("employees")
                 .from("employees")
                 .groupBy("department")
-                .buildPreparedStatement(conn);
+                .build(conn);
             
             ResultSet rs = ps.executeQuery();
             // Verify results
@@ -625,7 +625,7 @@ class PostgreSqlE2E {
                 .as("names")
             .from("employees")
             .groupBy("dept")
-            .buildPreparedStatement(getConnection());
+            .build(getConnection());
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();

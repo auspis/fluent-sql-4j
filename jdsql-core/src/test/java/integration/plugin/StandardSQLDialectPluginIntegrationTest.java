@@ -99,7 +99,7 @@ class StandardSQLDialectPluginIntegrationTest {
 
         // Execute the query to verify it works with H2
         List<List<Object>> rows = ResultSetUtil.list(
-                dsl.select("name", "email").from("users").buildPreparedStatement(connection),
+                dsl.select("name", "email").from("users").build(connection),
                 r -> List.of(r.getString("name"), r.getString("email")));
 
         assertThat(rows)
@@ -120,7 +120,7 @@ class StandardSQLDialectPluginIntegrationTest {
         DSL dsl = new DSL(specFactory);
 
         // Verify it generates standard SQL:2008 syntax for pagination using the DSL
-        dsl.select("name").from("users").orderBy("name").offset(5).fetch(3).buildPreparedStatement(mockConnection);
+        dsl.select("name").from("users").orderBy("name").offset(5).fetch(3).build(mockConnection);
 
         assertThat(sqlCaptor.getValue()).contains("OFFSET 5 ROWS");
         assertThat(sqlCaptor.getValue()).contains("FETCH NEXT 3 ROWS ONLY");
@@ -138,26 +138,26 @@ class StandardSQLDialectPluginIntegrationTest {
         DSL dsl = new DSL(specFactory);
 
         // Test SELECT with WHERE using the custom renderer
-        dsl.select("name", "age").from("users").where().column("age").gt(25).buildPreparedStatement(mockConnection);
+        dsl.select("name", "age").from("users").where().column("age").gt(25).build(mockConnection);
         assertThat(sqlCaptor.getValue()).contains("WHERE");
         assertThat(sqlCaptor.getValue()).isNotEmpty();
         verify(mockPs).setObject(1, 25);
 
         // Test UPDATE using the custom renderer
-        dsl.update("users").set("age", 31).where().column("name").eq("John Doe").buildPreparedStatement(mockConnection);
+        dsl.update("users").set("age", 31).where().column("name").eq("John Doe").build(mockConnection);
         assertThat(sqlCaptor.getValue()).contains("UPDATE");
         assertThat(sqlCaptor.getValue()).contains("SET");
         verify(mockPs).setObject(1, 31);
         verify(mockPs).setObject(2, "John Doe");
 
         // Test DELETE using the custom renderer
-        dsl.deleteFrom("users").where().column("age").lt(18).buildPreparedStatement(mockConnection);
+        dsl.deleteFrom("users").where().column("age").lt(18).build(mockConnection);
         assertThat(sqlCaptor.getValue()).contains("DELETE");
         assertThat(sqlCaptor.getValue()).contains("FROM");
         verify(mockPs).setObject(1, 18);
 
         // Test INSERT using the custom renderer
-        dsl.insertInto("users").set("name", "Test").set("age", 25).buildPreparedStatement(mockConnection);
+        dsl.insertInto("users").set("name", "Test").set("age", 25).build(mockConnection);
         assertThat(sqlCaptor.getValue()).contains("INSERT");
         assertThat(sqlCaptor.getValue()).contains("INTO");
         verify(mockPs).setObject(1, "Test");
