@@ -22,11 +22,26 @@ import lan.tlab.r4j.jdsql.dsl.select.SelectBuilder;
 public class HavingConditionBuilder {
     private final SelectBuilder parent;
     private final String column;
+    private final ColumnReference columnRef;
     private final LogicalCombinator combinator;
 
+    /**
+     * Constructor for single-table context (column name only).
+     */
     public HavingConditionBuilder(SelectBuilder parent, String column, LogicalCombinator combinator) {
         this.parent = parent;
         this.column = column;
+        this.columnRef = null;
+        this.combinator = combinator;
+    }
+
+    /**
+     * Constructor for multi-table context (explicit ColumnReference).
+     */
+    public HavingConditionBuilder(SelectBuilder parent, ColumnReference columnRef, LogicalCombinator combinator) {
+        this.parent = parent;
+        this.column = null;
+        this.columnRef = columnRef;
         this.combinator = combinator;
     }
 
@@ -239,6 +254,9 @@ public class HavingConditionBuilder {
 
     // Helper methods
     private ColumnReference getColumnRef() {
+        if (columnRef != null) {
+            return columnRef; // Use explicit column reference (multi-table context)
+        }
         return ColumnReference.of(parent.getTableReference(), column);
     }
 
