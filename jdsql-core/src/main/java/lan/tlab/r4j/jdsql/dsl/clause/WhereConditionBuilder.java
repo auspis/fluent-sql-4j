@@ -47,7 +47,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         this.combinator = combinator;
     }
 
-    // String comparisons
+    // String comparisons - with value
     public T eq(String value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -72,7 +72,32 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
-    // Number comparisons
+    // String comparisons - column-to-column
+    public ColumnComparator<T> eq() {
+        return new ColumnComparator<>(this, Comparison.ComparisonOperator.EQUALS);
+    }
+
+    public ColumnComparator<T> ne() {
+        return new ColumnComparator<>(this, Comparison.ComparisonOperator.NOT_EQUALS);
+    }
+
+    public ColumnComparator<T> gt() {
+        return new ColumnComparator<>(this, Comparison.ComparisonOperator.GREATER_THAN);
+    }
+
+    public ColumnComparator<T> lt() {
+        return new ColumnComparator<>(this, Comparison.ComparisonOperator.LESS_THAN);
+    }
+
+    public ColumnComparator<T> gte() {
+        return new ColumnComparator<>(this, Comparison.ComparisonOperator.GREATER_THAN_OR_EQUALS);
+    }
+
+    public ColumnComparator<T> lte() {
+        return new ColumnComparator<>(this, Comparison.ComparisonOperator.LESS_THAN_OR_EQUALS);
+    }
+
+    // Number comparisons - with value
     public T eq(Number value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -97,7 +122,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
-    // Boolean comparisons
+    // Boolean comparisons - with value
     public T eq(Boolean value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -106,7 +131,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    // LocalDate comparisons
+    // LocalDate comparisons - with value
     public T eq(LocalDate value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -131,7 +156,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
-    // LocalDateTime comparisons
+    // LocalDateTime comparisons - with value
     public T eq(LocalDateTime value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -273,5 +298,50 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
 
     private T addCondition(Predicate condition) {
         return parent.addWhereCondition(condition, combinator);
+    }
+
+    /**
+     * Intermediate builder for column-to-column comparisons.
+     * Allows fluent syntax: .where().column("u", "age").gt().column("z", "age")
+     */
+    public class ColumnComparator<R extends SupportsWhere<R>> {
+        private final WhereConditionBuilder<R> parent;
+        private final Comparison.ComparisonOperator operator;
+
+        public ColumnComparator(WhereConditionBuilder<R> parent, Comparison.ComparisonOperator operator) {
+            this.parent = parent;
+            this.operator = operator;
+        }
+
+        /**
+         * Compare with a column from another table.
+         */
+        public R column(String alias, String column) {
+            if (alias == null || alias.isEmpty()) {
+                throw new IllegalArgumentException("Alias cannot be null or empty");
+            }
+            if (alias.contains(".")) {
+                throw new IllegalArgumentException("Alias must not contain dot");
+            }
+            if (column == null || column.isEmpty()) {
+                throw new IllegalArgumentException("Column cannot be null or empty");
+            }
+            if (column.contains(".")) {
+                throw new IllegalArgumentException("Column must not contain dot");
+            }
+
+            ColumnReference rightColumn = ColumnReference.of(alias, column);
+            Predicate condition =
+                    switch (operator) {
+                        case EQUALS -> Comparison.eq(parent.getColumnRef(), rightColumn);
+                        case NOT_EQUALS -> Comparison.ne(parent.getColumnRef(), rightColumn);
+                        case GREATER_THAN -> Comparison.gt(parent.getColumnRef(), rightColumn);
+                        case LESS_THAN -> Comparison.lt(parent.getColumnRef(), rightColumn);
+                        case GREATER_THAN_OR_EQUALS -> Comparison.gte(parent.getColumnRef(), rightColumn);
+                        case LESS_THAN_OR_EQUALS -> Comparison.lte(parent.getColumnRef(), rightColumn);
+                    };
+
+            return parent.addCondition(condition);
+        }
     }
 }

@@ -390,11 +390,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteMySQLGroupConcatFunctionWithPreparedStatement() throws SQLException {
-        // Get DSL from registry
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void groupConcatFunctionWithPreparedStatement() throws SQLException {
         // Use GROUP_CONCAT to concatenate names by age group
         var selectBuilder = dsl.select()
                 .column("age")
@@ -430,7 +426,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteMySQLDateFormatFunction() throws SQLException {
+    void dateFormatFunction() throws SQLException {
         // Get DSL from registry
         var dsl =
                 registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
@@ -444,8 +440,8 @@ class MysqlDSLE2E {
                 .orderBy("name")
                 .fetch(5);
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             int count = 0;
             while (rs.next()) {
                 count++;
@@ -462,11 +458,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteComplexQueryWithMultipleMySQLFunctions() throws SQLException {
-        // Get DSL from registry
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void complexQueryWithMultipleMySQLFunctions() throws SQLException {
         // Combine multiple MySQL custom functions: GROUP_CONCAT and COUNT
         var selectBuilder = dsl.select()
                 .column("age")
@@ -482,8 +474,8 @@ class MysqlDSLE2E {
                 .groupBy("age")
                 .orderBy("age");
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             boolean foundResults = false;
             while (rs.next()) {
                 foundResults = true;
@@ -505,10 +497,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteConcatFunctionWithBuilder() throws SQLException {
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void concatFunctionWithBuilder() throws SQLException {
         var selectBuilder = dsl.select()
                 .concat()
                 .column("name")
@@ -519,8 +508,8 @@ class MysqlDSLE2E {
                 .column("id")
                 .eq(1);
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
             String result = rs.getString("name_email");
             assertThat(result).isEqualTo("John Doejohn@example.com");
@@ -528,10 +517,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteCoalesceFunctionWithBuilder() throws SQLException {
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void coalesceFunctionWithBuilder() throws SQLException {
         // COALESCE returns first non-NULL value
         var selectBuilder = dsl.select()
                 .coalesce()
@@ -543,8 +529,8 @@ class MysqlDSLE2E {
                 .column("id")
                 .eq(1);
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
             String result = rs.getString("contact");
             assertThat(result).isEqualTo("john@example.com");
@@ -552,10 +538,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteIfnullFunction() throws SQLException {
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void ifnullFunction() throws SQLException {
         // Add a row with NULL email for testing
         try (var stmt = connection.createStatement()) {
             stmt.execute(
@@ -571,8 +554,8 @@ class MysqlDSLE2E {
                 .column("id")
                 .eq(99);
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
             String name = rs.getString("name");
             String email = rs.getString("contact_email");
@@ -582,14 +565,11 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteInheritedSumAggregateFunction() throws SQLException {
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void inheritedSumAggregateFunction() throws SQLException {
         var selectBuilder = dsl.select().sum("age").as("total_age").from("users");
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
             int totalAge = rs.getInt("total_age");
             assertThat(totalAge).isEqualTo(293); // Sum of all ages: 30+25+15+35+30+25+40+35+28+30
@@ -597,15 +577,12 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteInheritedCountDistinctAggregateFunction() throws SQLException {
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void inheritedCountDistinctAggregateFunction() throws SQLException {
         var selectBuilder =
                 dsl.select().countDistinct("age").as("distinct_ages").from("users");
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
             int distinctAges = rs.getInt("distinct_ages");
             assertThat(distinctAges).isEqualTo(6); // Distinct ages: 15, 25, 28, 30, 35, 40
@@ -613,10 +590,7 @@ class MysqlDSLE2E {
     }
 
     @Test
-    void shouldExecuteIfFunctionWithComplexCondition() throws SQLException {
-        var dsl =
-                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-
+    void ifFunctionWithComplexCondition() throws SQLException {
         var selectBuilder = dsl.select()
                 .column("name")
                 .ifExpr()
@@ -628,8 +602,8 @@ class MysqlDSLE2E {
                 .from("users")
                 .orderBy("id");
 
-        PreparedStatement ps = selectBuilder.build(connection);
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             int count = 0;
             while (rs.next()) {
                 count++;
