@@ -878,8 +878,8 @@ class HavingConditionBuilderTest {
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("\"o\".\"created_date\" >= ?").contains("\"c\".\"active\" = ?");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, cutoffDate);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, cutoffDate);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, true);
     }
 
     @Test
