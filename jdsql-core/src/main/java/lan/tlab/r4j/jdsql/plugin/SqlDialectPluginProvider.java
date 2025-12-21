@@ -18,8 +18,12 @@ package lan.tlab.r4j.jdsql.plugin;
  *         return new SqlDialectPlugin(
  *             "mysql",
  *             "^8.0.0",
- *             MySqlRenderer::new
+ *             () -> new MysqlDSL(createPreparedStatementSpecFactory())
  *         );
+ *     }
+ *
+ *     private PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
+ *         // Build and return the dialect-specific factory
  *     }
  * }
  * }</pre>
