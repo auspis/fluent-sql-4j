@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.dsl.clause;
 
 import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
 import java.sql.SQLException;
@@ -800,5 +801,270 @@ class HavingConditionBuilderTest {
                 .contains("BETWEEN")
                 .contains("IN")
                 .contains("AND");
+    }
+
+    // Cross-table HAVING conditions (multi-table context)
+    @Test
+    void crossTableHavingWithExplicitAliasAndColumn() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("orders")
+                .as("o")
+                .innerJoin("customers")
+                .as("c")
+                .on("o.customer_id", "c.id")
+                .groupBy("customer_id")
+                .having()
+                .column("o", "total")
+                .gt(1000)
+                .and()
+                .column("c", "country")
+                .eq("IT")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("HAVING")
+                .contains("\"o\".\"total\" > ?")
+                .contains("\"c\".\"country\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "IT");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 1000);
+    }
+
+    @Test
+    void crossTableHavingWithMultipleConditions() throws SQLException {
+        new SelectBuilder(specFactory, "SUM(amount)")
+                .from("transactions")
+                .as("t")
+                .innerJoin("accounts")
+                .as("a")
+                .on("t.account_id", "a.id")
+                .groupBy("account_id")
+                .having()
+                .column("t", "amount")
+                .gte(100)
+                .and()
+                .column("a", "type")
+                .eq("PREMIUM")
+                .and()
+                .column("t", "status")
+                .ne("CANCELLED")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"t\".\"amount\" >= ?")
+                .contains("\"a\".\"type\" = ?")
+                .contains("\"t\".\"status\" <> ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "PREMIUM");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "CANCELLED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 100);
+    }
+
+    @Test
+    void crossTableHavingWithDateComparisons() throws SQLException {
+        LocalDate cutoffDate = LocalDate.of(2024, 6, 1);
+
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("orders")
+                .as("o")
+                .innerJoin("customers")
+                .as("c")
+                .on("o.customer_id", "c.id")
+                .groupBy("customer_id")
+                .having()
+                .column("o", "created_date")
+                .gte(cutoffDate)
+                .and()
+                .column("c", "active")
+                .eq(true)
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"o\".\"created_date\" >= ?").contains("\"c\".\"active\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, cutoffDate);
+    }
+
+    @Test
+    void crossTableHavingWithNullChecks() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("products")
+                .as("p")
+                .leftJoin("categories")
+                .as("c")
+                .on("p.category_id", "c.id")
+                .groupBy("category_id")
+                .having()
+                .column("p", "discount")
+                .isNotNull()
+                .and()
+                .column("c", "parent_id")
+                .isNull()
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"p\".\"discount\" IS NOT NULL")
+                .contains("\"c\".\"parent_id\" IS NULL");
+    }
+
+    @Test
+    void crossTableHavingWithInOperator() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("sales")
+                .as("s")
+                .innerJoin("regions")
+                .as("r")
+                .on("s.region_id", "r.id")
+                .groupBy("region_id")
+                .having()
+                .column("s", "status")
+                .in("COMPLETED", "SHIPPED", "DELIVERED")
+                .and()
+                .column("r", "country")
+                .in("IT", "FR", "ES")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"s\".\"status\" IN (?, ?, ?)")
+                .contains("\"r\".\"country\" IN (?, ?, ?)");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "IT");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "FR");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "ES");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, "COMPLETED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(5, "SHIPPED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(6, "DELIVERED");
+    }
+
+    @Test
+    void crossTableHavingWithBetween() throws SQLException {
+        new SelectBuilder(specFactory, "AVG(price)")
+                .from("orders")
+                .as("o")
+                .innerJoin("products")
+                .as("p")
+                .on("o.product_id", "p.id")
+                .groupBy("product_id")
+                .having()
+                .column("o", "quantity")
+                .between(10, 100)
+                .and()
+                .column("p", "rating")
+                .between(4.0, 5.0)
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"o\".\"quantity\" BETWEEN ? AND ?")
+                .contains("\"p\".\"rating\" BETWEEN ? AND ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 4.0);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 5.0);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 10);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, 100);
+    }
+
+    @Test
+    void crossTableHavingWithLike() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("users")
+                .as("u")
+                .innerJoin("subscriptions")
+                .as("s")
+                .on("u.id", "s.user_id")
+                .groupBy("user_id")
+                .having()
+                .column("u", "email")
+                .like("%@company.com")
+                .and()
+                .column("s", "plan_name")
+                .like("Premium%")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"u\".\"email\" LIKE ?").contains("\"s\".\"plan_name\" LIKE ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Premium%");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "%@company.com");
+    }
+
+    // Validation tests for cross-table HAVING
+    @Test
+    void crossTableHavingRejectsNullAlias() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .groupBy("customer_id")
+                        .having()
+                        .column(null, "total")
+                        .gt(1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void crossTableHavingRejectsEmptyAlias() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .groupBy("customer_id")
+                        .having()
+                        .column("", "total")
+                        .gt(1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void crossTableHavingRejectsAliasWithDot() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .groupBy("customer_id")
+                        .having()
+                        .column("o.x", "total")
+                        .gt(1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias must not contain dot");
+    }
+
+    @Test
+    void crossTableHavingRejectsNullColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .as("o")
+                        .groupBy("customer_id")
+                        .having()
+                        .column("o", null)
+                        .gt(1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name cannot be null or empty");
+    }
+
+    @Test
+    void crossTableHavingRejectsEmptyColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .as("o")
+                        .groupBy("customer_id")
+                        .having()
+                        .column("o", "")
+                        .gt(1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name cannot be null or empty");
+    }
+
+    @Test
+    void crossTableHavingRejectsColumnWithDot() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .as("o")
+                        .groupBy("customer_id")
+                        .having()
+                        .column("o", "orders.total")
+                        .gt(1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name must not contain dot");
+    }
+
+    @Test
+    void singleTableHavingRejectsDotNotation() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .groupBy("customer_id")
+                        .having()
+                        .column("orders.total")
+                        .gt(1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Dot notation not supported");
     }
 }
