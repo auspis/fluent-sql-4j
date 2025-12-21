@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.ast.core.predicate;
 
 import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import java.sql.SQLException;
@@ -213,17 +214,17 @@ class LikeTest {
     void likePredicateConstruction() {
         Like predicate = new Like(ColumnReference.of("users", "name"), "%test%");
 
-        assert predicate.expression() != null;
-        assert predicate.pattern() != null;
-        assert predicate.pattern().equals("%test%");
-        assert predicate instanceof Predicate;
+        assertThat(predicate.expression()).isNotNull();
+        assertThat(predicate.pattern()).isNotNull();
+        assertThat(predicate.pattern()).isEqualTo("%test%");
+        assertThat(predicate).isInstanceOf(Predicate.class);
     }
 
     @Test
     void likePredicateWithLiteral() {
         Like predicate = new Like(Literal.of("SearchValue"), "S%");
 
-        assert predicate.expression() != null;
-        assert predicate.pattern().equals("S%");
+        assertThat(predicate.expression()).isNotNull();
+        assertThat(predicate.pattern()).isEqualTo("S%");
     }
 }
