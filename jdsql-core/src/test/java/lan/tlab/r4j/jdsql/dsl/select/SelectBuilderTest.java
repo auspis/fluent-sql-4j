@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class SelectBuilderTest {
     @BeforeEach
     void setUp() throws SQLException {
         sqlCaptureHelper = new SqlCaptureHelper();
-        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlUtil.preparedStatementSpecFactory();
     }
 
     @Test

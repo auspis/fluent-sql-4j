@@ -11,9 +11,10 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LeftPsStrategy;
 public class StandardSqlLeftPsStrategy implements LeftPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Left left, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var expressionResult = left.expression().accept(renderer, ctx);
-        var lengthResult = left.length().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            Left left, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var expressionResult = left.expression().accept(astToPsSpecVisitor, ctx);
+        var lengthResult = left.length().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(expressionResult.parameters());

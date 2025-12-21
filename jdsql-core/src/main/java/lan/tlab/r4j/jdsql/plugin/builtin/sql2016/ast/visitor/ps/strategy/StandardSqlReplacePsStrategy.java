@@ -11,10 +11,11 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ReplacePsStrategy;
 public class StandardSqlReplacePsStrategy implements ReplacePsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Replace replace, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec expressionResult = replace.expression().accept(renderer, ctx);
-        PreparedStatementSpec oldSubstringResult = replace.oldSubstring().accept(renderer, ctx);
-        PreparedStatementSpec newSubstringResult = replace.newSubstring().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            Replace replace, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec expressionResult = replace.expression().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec oldSubstringResult = replace.oldSubstring().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec newSubstringResult = replace.newSubstring().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(expressionResult.parameters());

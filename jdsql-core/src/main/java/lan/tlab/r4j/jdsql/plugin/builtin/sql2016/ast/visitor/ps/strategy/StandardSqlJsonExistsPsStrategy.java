@@ -13,9 +13,9 @@ public class StandardSqlJsonExistsPsStrategy implements JsonExistsPsStrategy {
 
     @Override
     public PreparedStatementSpec handle(
-            JsonExists jsonExists, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var documentResult = jsonExists.jsonDocument().accept(renderer, ctx);
-        var pathResult = jsonExists.path().accept(renderer, ctx);
+            JsonExists jsonExists, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var documentResult = jsonExists.jsonDocument().accept(astToPsSpecVisitor, ctx);
+        var pathResult = jsonExists.path().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(documentResult.parameters());

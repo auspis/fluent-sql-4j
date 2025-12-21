@@ -12,8 +12,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.RoundPsStrategy;
 public class StandardSqlRoundPsStrategy implements RoundPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Round round, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec numericResult = round.numericExpression().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            Round round, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec numericResult = round.numericExpression().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>(numericResult.parameters());
         String sql;
@@ -24,7 +25,7 @@ public class StandardSqlRoundPsStrategy implements RoundPsStrategy {
             sql = String.format("ROUND(%s)", numericResult.sql());
         } else {
             // ROUND with two parameters
-            PreparedStatementSpec decimalPlacesResult = round.decimalPlaces().accept(renderer, ctx);
+            PreparedStatementSpec decimalPlacesResult = round.decimalPlaces().accept(astToPsSpecVisitor, ctx);
             parameters.addAll(decimalPlacesResult.parameters());
             sql = String.format("ROUND(%s, %s)", numericResult.sql(), decimalPlacesResult.sql());
         }

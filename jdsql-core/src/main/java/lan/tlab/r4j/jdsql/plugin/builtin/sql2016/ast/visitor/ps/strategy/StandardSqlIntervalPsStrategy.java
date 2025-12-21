@@ -9,8 +9,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.IntervalPsStrategy;
 public class StandardSqlIntervalPsStrategy implements IntervalPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Interval interval, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var valueResult = interval.value().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            Interval interval, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var valueResult = interval.value().accept(astToPsSpecVisitor, ctx);
         String unitName = interval.unit().name();
 
         String sql = String.format("INTERVAL %s %s", valueResult.sql(), unitName);

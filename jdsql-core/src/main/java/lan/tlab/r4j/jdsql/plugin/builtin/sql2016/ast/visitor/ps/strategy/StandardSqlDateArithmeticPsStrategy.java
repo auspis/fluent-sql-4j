@@ -12,9 +12,9 @@ public class StandardSqlDateArithmeticPsStrategy implements DateArithmeticPsStra
 
     @Override
     public PreparedStatementSpec handle(
-            DateArithmetic dateArithmetic, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var dateExpressionResult = dateArithmetic.dateExpression().accept(renderer, ctx);
-        var intervalResult = dateArithmetic.interval().accept(renderer, ctx);
+            DateArithmetic dateArithmetic, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var dateExpressionResult = dateArithmetic.dateExpression().accept(astToPsSpecVisitor, ctx);
+        var intervalResult = dateArithmetic.interval().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(intervalResult.parameters());

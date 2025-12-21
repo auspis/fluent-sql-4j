@@ -10,7 +10,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.FetchPsStrategy;
 public class MySqlFetchPsStrategy implements FetchPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Fetch clause, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            Fetch clause, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         // Inlined from MySqlFetchRenderStrategy
         if (!clause.isActive()) {
             return new PreparedStatementSpec("", List.of());

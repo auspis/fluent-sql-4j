@@ -18,10 +18,10 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
  * <p>
  * <b>Example usage:</b>
  * <pre>{@code
- * AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
+ * AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
  *     .escapeStrategy(new MysqlEscapeStrategy())
  *     .build();
- * PreparedStatementSpecFactory specFactory = new PreparedStatementSpecFactory(psRenderer);
+ * PreparedStatementSpecFactory specFactory = new PreparedStatementSpecFactory(astToPsSpecVisitor);
  *
  * // Create PreparedStatementSpec
  * PreparedStatementSpec spec = specFactory.create(selectStatement);

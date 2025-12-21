@@ -10,10 +10,12 @@ public class StandardSqlCheckConstraintPsStrategy implements CheckConstraintPsSt
 
     @Override
     public PreparedStatementSpec handle(
-            CheckConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            CheckConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx) {
         // Check constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlCheckConstraintRenderStrategy
-        PreparedStatementSpec exprDto = constraint.expression().accept(renderer, ctx);
+        PreparedStatementSpec exprDto = constraint.expression().accept(astToPsSpecVisitor, ctx);
         String sql = "CHECK (" + exprDto.sql() + ")";
         return new PreparedStatementSpec(sql, exprDto.parameters());
     }

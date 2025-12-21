@@ -42,9 +42,9 @@ public class MysqlJsonQueryPsStrategy implements JsonQueryPsStrategy {
 
     @Override
     public PreparedStatementSpec handle(
-            JsonQuery jsonQuery, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var documentResult = jsonQuery.jsonDocument().accept(renderer, ctx);
-        var pathResult = jsonQuery.path().accept(renderer, ctx);
+            JsonQuery jsonQuery, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var documentResult = jsonQuery.jsonDocument().accept(astToPsSpecVisitor, ctx);
+        var pathResult = jsonQuery.path().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(documentResult.parameters());

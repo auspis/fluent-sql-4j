@@ -9,8 +9,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LengthPsStrategy;
 public class StandardSqlLengthPsStrategy implements LengthPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Length length, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var expressionResult = length.expression().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            Length length, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var expressionResult = length.expression().accept(astToPsSpecVisitor, ctx);
 
         String sql = String.format("LENGTH(%s)", expressionResult.sql());
         return new PreparedStatementSpec(sql, expressionResult.parameters());

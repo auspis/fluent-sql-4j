@@ -7,5 +7,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ForeignKeyConstraintPsStrategy {
     PreparedStatementSpec handle(
-            ForeignKeyConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            ForeignKeyConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx);
 }

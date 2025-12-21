@@ -11,9 +11,10 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.PowerPsStrategy;
 public class StandardSqlPowerPsStrategy implements PowerPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Power power, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec baseResult = power.base().accept(renderer, ctx);
-        PreparedStatementSpec exponentResult = power.exponent().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            Power power, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec baseResult = power.base().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec exponentResult = power.exponent().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(baseResult.parameters());
