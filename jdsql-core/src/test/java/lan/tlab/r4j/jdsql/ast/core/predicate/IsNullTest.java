@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.ast.core.predicate;
 
 import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import java.sql.SQLException;
@@ -203,21 +204,21 @@ class IsNullTest {
     void isNullPredicateConstruction() {
         IsNull predicate = new IsNull(ColumnReference.of("users", "email"));
 
-        assert predicate.expression() != null;
-        assert predicate instanceof Predicate;
+        assertThat(predicate.expression()).isNotNull();
+        assertThat(predicate).isInstanceOf(Predicate.class);
     }
 
     @Test
     void isNullPredicateWithLiteral() {
         IsNull predicate = new IsNull(Literal.of("test"));
 
-        assert predicate.expression() != null;
+        assertThat(predicate.expression()).isNotNull();
     }
 
     @Test
     void isNullPredicateWithQualifiedColumn() {
         IsNull predicate = new IsNull(ColumnReference.of("orders", "deleted_at"));
 
-        assert predicate.expression() != null;
+        assertThat(predicate.expression()).isNotNull();
     }
 }
