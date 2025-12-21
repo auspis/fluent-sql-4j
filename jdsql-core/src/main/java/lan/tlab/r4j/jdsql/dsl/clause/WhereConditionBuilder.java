@@ -304,7 +304,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
      * Intermediate builder for column-to-column comparisons.
      * Allows fluent syntax: .where().column("u", "age").gt().column("z", "age")
      */
-    public class ColumnComparator<R extends SupportsWhere<R>> {
+    public static class ColumnComparator<R extends SupportsWhere<R>> {
         private final WhereConditionBuilder<R> parent;
         private final Comparison.ComparisonOperator operator;
 
