@@ -77,7 +77,7 @@ public class InsertBuilder {
         return this;
     }
 
-    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+    public PreparedStatement build(Connection connection) throws SQLException {
         validateState();
         InsertStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);

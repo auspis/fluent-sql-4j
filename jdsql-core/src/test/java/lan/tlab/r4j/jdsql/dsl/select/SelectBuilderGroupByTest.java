@@ -29,7 +29,7 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\"");
     }
@@ -39,7 +39,7 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id", "product_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
     }
@@ -50,7 +50,7 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .as("o")
                 .groupBy("customer_id", "product_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" AS o GROUP BY \"customer_id\", \"product_id\"");
@@ -61,7 +61,7 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("orders.customer_id", "orders.product_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
     }
@@ -72,7 +72,7 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .as("o")
                 .groupBy("o.customer_id", "o.product_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" AS o GROUP BY \"customer_id\", \"product_id\"");
@@ -86,7 +86,7 @@ class SelectBuilderGroupByTest {
                 .column("status")
                 .eq("completed")
                 .groupBy("customer_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -100,7 +100,7 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .groupBy("customer_id")
                 .orderBy("customer_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\" ORDER BY \"customer_id\" ASC");
@@ -115,7 +115,7 @@ class SelectBuilderGroupByTest {
                 .as("c")
                 .on("o.customer_id", "c.id")
                 .groupBy("c.id", "c.name")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -135,7 +135,7 @@ class SelectBuilderGroupByTest {
                 .eq("completed")
                 .groupBy("c.id")
                 .orderBy("c.id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -151,7 +151,7 @@ class SelectBuilderGroupByTest {
                 .groupBy("customer_id")
                 .fetch(10)
                 .offset(5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\" OFFSET 5 ROWS FETCH NEXT 10 ROWS ONLY");
@@ -162,7 +162,7 @@ class SelectBuilderGroupByTest {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
                 .groupBy("customer_id", "product_id", "region", "status", "payment_method")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -187,7 +187,7 @@ class SelectBuilderGroupByTest {
                 .orderByDesc("total")
                 .fetch(20)
                 .offset(10)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
