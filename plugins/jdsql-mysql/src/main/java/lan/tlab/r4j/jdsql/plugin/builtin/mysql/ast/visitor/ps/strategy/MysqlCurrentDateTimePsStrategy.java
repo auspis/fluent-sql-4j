@@ -11,7 +11,7 @@ public class MysqlCurrentDateTimePsStrategy implements CurrentDateTimePsStrategy
 
     @Override
     public PreparedStatementSpec handle(
-            CurrentDateTime currentDateTime, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            CurrentDateTime currentDateTime, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         return new PreparedStatementSpec("NOW()", List.of());
     }
 }

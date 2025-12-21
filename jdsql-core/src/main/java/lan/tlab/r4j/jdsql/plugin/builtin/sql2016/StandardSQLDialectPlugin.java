@@ -36,7 +36,7 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * Result<PreparedStatementSpecFactory> result = registry.getRenderer("standardsql", "2008");
+ * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("standardsql", "2008");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
@@ -92,19 +92,19 @@ public final class StandardSQLDialectPlugin {
     }
 
     /**
-     * Creates a {@link PreparedStatementSpecFactory} for Standard SQL:2008.
+     * Creates a {@link PreparedStatementSpecFactory} for Standard SQL.
      * <p>
      * This method creates both SQL and PreparedStatement renderers configured
-     * for the SQL:2008 standard, ensuring consistency between the two.
+     * for the SQL standard, ensuring consistency between the two.
      *
      * @return a new PreparedStatementSpecFactory instance
      */
-    private static PreparedStatementSpecFactory createStandardSql2008Renderer() {
-        AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
+    private static PreparedStatementSpecFactory standardSqlPsSpecFacory() {
+        AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(psRenderer);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
     }
 
     /**
@@ -116,7 +116,7 @@ public final class StandardSQLDialectPlugin {
      * @return a new {@link lan.tlab.r4j.jdsql.dsl.DSL} instance, never {@code null}
      */
     private static lan.tlab.r4j.jdsql.dsl.DSL createStandardSql2008DSL() {
-        return new lan.tlab.r4j.jdsql.dsl.DSL(createStandardSql2008Renderer());
+        return new lan.tlab.r4j.jdsql.dsl.DSL(standardSqlPsSpecFacory());
     }
 
     /**

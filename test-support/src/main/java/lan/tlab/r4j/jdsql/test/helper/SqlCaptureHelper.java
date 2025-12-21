@@ -31,7 +31,7 @@ import org.mockito.ArgumentCaptor;
  *     &#64;BeforeEach
  *     void setUp() throws SQLException {
  *         mockHelper = new SqlCaptureHelper();
- *         specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
+ *         specFactory = StandardSqlRendererFactory.preparedStatementSpecFactory();
  *     }
  *
  *     &#64;Test

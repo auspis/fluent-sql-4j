@@ -12,13 +12,14 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ConcatPsStrategy;
 public class StandardSqlConcatPsStrategy implements ConcatPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Concat concat, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            Concat concat, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
 
         // Visit all expressions to get their SQL and parameters
         List<String> sqlExpressions = concat.stringExpressions().stream()
                 .map(expr -> {
-                    PreparedStatementSpec exprDto = expr.accept(renderer, ctx);
+                    PreparedStatementSpec exprDto = expr.accept(astToPsSpecVisitor, ctx);
                     allParameters.addAll(exprDto.parameters());
                     return exprDto.sql();
                 })

@@ -8,5 +8,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 public interface NullSetExpressionPsStrategy {
 
     PreparedStatementSpec handle(
-            NullSetExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            NullSetExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

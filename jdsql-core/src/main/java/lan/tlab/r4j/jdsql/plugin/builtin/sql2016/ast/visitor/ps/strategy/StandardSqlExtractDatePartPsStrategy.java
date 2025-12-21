@@ -10,8 +10,8 @@ public class StandardSqlExtractDatePartPsStrategy implements ExtractDatePartPsSt
 
     @Override
     public PreparedStatementSpec handle(
-            ExtractDatePart extractDatePart, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var dateExpressionResult = extractDatePart.dateExpression().accept(renderer, ctx);
+            ExtractDatePart extractDatePart, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var dateExpressionResult = extractDatePart.dateExpression().accept(astToPsSpecVisitor, ctx);
         String functionName = extractDatePart.functionName().name();
 
         String sql = String.format("EXTRACT(%s FROM %s)", functionName, dateExpressionResult.sql());

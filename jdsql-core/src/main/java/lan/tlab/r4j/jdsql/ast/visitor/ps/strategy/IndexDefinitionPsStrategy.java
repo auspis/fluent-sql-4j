@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface IndexDefinitionPsStrategy {
     PreparedStatementSpec handle(
-            IndexDefinition indexDefinition, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            IndexDefinition indexDefinition, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

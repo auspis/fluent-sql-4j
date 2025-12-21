@@ -13,7 +13,7 @@ import lan.tlab.r4j.jdsql.ast.core.predicate.Predicate;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class MergeBuilderTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlUtil.preparedStatementSpecFactory();
         sqlCaptureHelper = new SqlCaptureHelper();
     }
 

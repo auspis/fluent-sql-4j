@@ -14,7 +14,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.predicate.Comparison;
 import lan.tlab.r4j.jdsql.ast.dml.component.UpdateItem;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class MergeDSLComponentTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = StandardSqlRendererFactory.dslStandardSql();
+        dsl = StandardSqlUtil.dsl();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);

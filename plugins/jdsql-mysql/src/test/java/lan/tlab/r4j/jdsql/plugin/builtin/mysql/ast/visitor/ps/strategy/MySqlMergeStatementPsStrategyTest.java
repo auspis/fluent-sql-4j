@@ -42,7 +42,7 @@ class MySqlMergeStatementPsStrategyTest {
                                         Literal.of("new")))))
                 .build();
 
-        // TODO: use TestDialectRendererFactory
+        // TODO: use TestDialectPreparedStatementSpecFactoryFactory
         AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();

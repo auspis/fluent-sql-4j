@@ -6,5 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface FetchPsStrategy {
-    PreparedStatementSpec handle(Fetch pagination, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            Fetch pagination, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

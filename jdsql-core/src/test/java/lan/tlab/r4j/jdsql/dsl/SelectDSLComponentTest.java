@@ -16,7 +16,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.core.expression.window.OverClause;
 import lan.tlab.r4j.jdsql.ast.core.expression.window.WindowFunction;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class SelectDSLComponentTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = StandardSqlRendererFactory.dslStandardSql();
+        dsl = StandardSqlUtil.dsl();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -40,7 +40,7 @@ class SelectDSLComponentTest {
     }
 
     @Test
-    void createsSelectBuilderWithRenderer() throws SQLException {
+    void createsSelectBuilderWithPreparedStatementSpecFactory() throws SQLException {
         dsl.select("name", "email").from("users").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -49,7 +49,7 @@ class SelectDSLComponentTest {
     }
 
     @Test
-    void appliesRendererQuoting() throws SQLException {
+    void appliesPreparedStatementSpecFactoryQuoting() throws SQLException {
         dsl.select("id", "value").from("temp_table").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""

@@ -62,7 +62,7 @@ import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * Result<PreparedStatementSpecFactory> result = registry.getRenderer("mysql", "8.0.35");
+ * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("mysql", "8.0.35");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
@@ -164,7 +164,7 @@ public final class MysqlDialectPlugin {
      * @return a new {@link PreparedStatementSpecFactory} instance configured for MySQL, never {@code null}
      */
     private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
-        AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
+        AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .currentDateStrategy(new MysqlCurrentDatePsStrategy())
                 .currentDateTimeStrategy(new MysqlCurrentDateTimePsStrategy())
@@ -177,7 +177,7 @@ public final class MysqlDialectPlugin {
                 .mergeStatementStrategy(new MySqlMergeStatementPsStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(psRenderer);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
     }
 
     /**

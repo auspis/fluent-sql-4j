@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ExtractDatePartPsStrategy {
     PreparedStatementSpec handle(
-            ExtractDatePart extractDatePart, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            ExtractDatePart extractDatePart, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

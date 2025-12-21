@@ -13,7 +13,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.TrimPsStrategy;
 public class StandardSqlTrimPsStrategy implements TrimPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Trim functionCall, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            Trim functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         TrimMode mode = functionCall.mode();
         ScalarExpression charactersToRemove = functionCall.charactersToRemove();
         ScalarExpression stringExpression = functionCall.stringExpression();
@@ -26,16 +27,16 @@ public class StandardSqlTrimPsStrategy implements TrimPsStrategy {
         }
 
         if (charactersToRemove != null) {
-            PreparedStatementSpec charactersDto = charactersToRemove.accept(renderer, ctx);
+            PreparedStatementSpec charactersDto = charactersToRemove.accept(astToPsSpecVisitor, ctx);
             sb.append(charactersDto.sql()).append(" FROM ");
-            PreparedStatementSpec stringDto = stringExpression.accept(renderer, ctx);
+            PreparedStatementSpec stringDto = stringExpression.accept(astToPsSpecVisitor, ctx);
             sb.append(stringDto.sql()).append(")");
 
             List<Object> allParameters = new ArrayList<>(charactersDto.parameters());
             allParameters.addAll(stringDto.parameters());
             return new PreparedStatementSpec(sb.toString(), allParameters);
         } else {
-            PreparedStatementSpec stringDto = stringExpression.accept(renderer, ctx);
+            PreparedStatementSpec stringDto = stringExpression.accept(astToPsSpecVisitor, ctx);
             sb.append(stringDto.sql()).append(")");
             return new PreparedStatementSpec(sb.toString(), stringDto.parameters());
         }

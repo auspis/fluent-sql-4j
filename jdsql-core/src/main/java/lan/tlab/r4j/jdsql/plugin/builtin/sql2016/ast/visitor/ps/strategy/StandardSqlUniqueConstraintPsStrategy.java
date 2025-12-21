@@ -11,11 +11,13 @@ public class StandardSqlUniqueConstraintPsStrategy implements UniqueConstraintPs
 
     @Override
     public PreparedStatementSpec handle(
-            UniqueConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            UniqueConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx) {
         // Unique constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlUniqueConstraintRenderStrategy
         String columns = constraint.columns().stream()
-                .map(c -> renderer.getEscapeStrategy().apply(c))
+                .map(c -> astToPsSpecVisitor.getEscapeStrategy().apply(c))
                 .collect(java.util.stream.Collectors.joining(", "));
         String sql = String.format("UNIQUE (%s)", columns);
         return new PreparedStatementSpec(sql, List.of());

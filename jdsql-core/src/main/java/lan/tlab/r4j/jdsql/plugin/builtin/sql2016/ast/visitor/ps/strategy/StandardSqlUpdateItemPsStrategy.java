@@ -11,9 +11,10 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateItemPsStrategy;
 public class StandardSqlUpdateItemPsStrategy implements UpdateItemPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(UpdateItem item, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec columnDto = item.column().accept(renderer, ctx);
-        PreparedStatementSpec valueDto = item.value().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            UpdateItem item, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec columnDto = item.column().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec valueDto = item.value().accept(astToPsSpecVisitor, ctx);
 
         String sql = String.format("%s = %s", columnDto.sql(), valueDto.sql());
 

@@ -26,12 +26,12 @@ public class MysqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsSt
 
     @Override
     public PreparedStatementSpec handle(
-            CustomFunctionCall functionCall, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            CustomFunctionCall functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         List<Object> allParams = new ArrayList<>();
 
         String args = functionCall.arguments().stream()
                 .map(arg -> {
-                    PreparedStatementSpec argDto = arg.accept(renderer, ctx);
+                    PreparedStatementSpec argDto = arg.accept(astToPsSpecVisitor, ctx);
                     allParams.addAll(argDto.parameters());
                     return argDto.sql();
                 })

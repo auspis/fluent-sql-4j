@@ -11,9 +11,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.ModPsStrategy;
 public class StandardSqlModPsStrategy implements ModPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Mod mod, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec dividendResult = mod.dividend().accept(renderer, ctx);
-        PreparedStatementSpec divisorResult = mod.divisor().accept(renderer, ctx);
+    public PreparedStatementSpec handle(Mod mod, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec dividendResult = mod.dividend().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec divisorResult = mod.divisor().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(dividendResult.parameters());
