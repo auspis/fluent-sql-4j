@@ -168,7 +168,37 @@ PreparedStatement ps = dsl.select("name", "age", "active")
     .or()
     .column("name").eq("Bob")
     .build(connection);
+
+// WHERE with multiple JOINs (cross-table references with explicit aliases)
+PreparedStatement ps = dsl.select("*")
+    .from("users").as("u")
+    .innerJoin("orders").as("o")
+    .on("u.id", "o.user_id")
+    .where()
+    .column("u", "age").gt(18)           // Column from users table
+    .and()
+    .column("o", "status").eq("COMPLETED")  // Column from orders table
+    .and()
+    .column("u", "active").eq(true)     // Column from users table
+    .build(connection);
+
+// Complex multi-table WHERE with multiple JOINs
+PreparedStatement ps = dsl.select("*")
+    .from("customers").as("c")
+    .leftJoin("orders").as("o")
+    .on("c.id", "o.customer_id")
+    .innerJoin("products").as("p")
+    .on("o.product_id", "p.id")
+    .where()
+    .column("c", "country").eq("IT")     // Customer from Italy
+    .and()
+    .column("o", "total").gte(1000)      // Order total >= 1000
+    .and()
+    .column("p", "category").eq("Electronics")  // Electronics products
+    .build(connection);
 ```
+
+**Note on cross-table references**: Use `column(alias, columnName)` syntax for explicit table references in multi-table queries. Dot notation (e.g., `"users.age"`) is not supported and will throw `IllegalArgumentException`.
 
 ### JOIN Operations
 
@@ -301,6 +331,18 @@ PreparedStatement ps = dsl.select("user_id")
     .having()
     .column("user_id").gt(0)
     .orderBy("user_id")
+    .build(connection);
+
+// HAVING with cross-table references (multiple JOINs)
+PreparedStatement ps = dsl.select("*")
+    .from("orders").as("o")
+    .innerJoin("customers").as("c")
+    .on("o.customer_id", "c.id")
+    .groupBy("customer_id")
+    .having()
+    .column("o", "total").gt(1000)       // Condition on orders table
+    .and()
+    .column("c", "country").eq("IT")     // Condition on customers table
     .build(connection);
 ```
 

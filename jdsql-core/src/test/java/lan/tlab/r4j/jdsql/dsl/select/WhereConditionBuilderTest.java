@@ -683,4 +683,257 @@ class WhereConditionBuilderTest {
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "$.price");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, 100);
     }
+
+    // Cross-table WHERE conditions (multi-table context)
+    @Test
+    void crossTableWhereWithExplicitAliasAndColumn() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("users")
+                .as("u")
+                .innerJoin("orders")
+                .as("o")
+                .on("u.id", "o.user_id")
+                .where()
+                .column("u", "age")
+                .gt(18)
+                .and()
+                .column("o", "status")
+                .eq("COMPLETED")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("WHERE")
+                .contains("\"u\".\"age\" > ?")
+                .contains("\"o\".\"status\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 18);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "COMPLETED");
+    }
+
+    @Test
+    void crossTableWhereWithMultipleConditions() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("customers")
+                .as("c")
+                .leftJoin("orders")
+                .as("o")
+                .on("c.id", "o.customer_id")
+                .where()
+                .column("c", "country")
+                .eq("IT")
+                .and()
+                .column("o", "total")
+                .gte(1000)
+                .and()
+                .column("c", "active")
+                .eq(true)
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("WHERE")
+                .contains("\"c\".\"country\" = ?")
+                .contains("\"o\".\"total\" >= ?")
+                .contains("\"c\".\"active\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "IT");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 1000);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, true);
+    }
+
+    @Test
+    void crossTableWhereWithDateComparisons() throws SQLException {
+        LocalDate cutoffDate = LocalDate.of(2024, 1, 1);
+
+        new SelectBuilder(specFactory, "*")
+                .from("employees")
+                .as("e")
+                .innerJoin("departments")
+                .as("d")
+                .on("e.dept_id", "d.id")
+                .where()
+                .column("e", "hire_date")
+                .gte(cutoffDate)
+                .and()
+                .column("d", "active")
+                .eq(true)
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"e\".\"hire_date\" >= ?").contains("\"d\".\"active\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, cutoffDate);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, true);
+    }
+
+    @Test
+    void crossTableWhereWithNullChecks() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("users")
+                .as("u")
+                .leftJoin("profiles")
+                .as("p")
+                .on("u.id", "p.user_id")
+                .where()
+                .column("u", "email")
+                .isNotNull()
+                .and()
+                .column("p", "phone")
+                .isNull()
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"u\".\"email\" IS NOT NULL").contains("\"p\".\"phone\" IS NULL");
+    }
+
+    @Test
+    void crossTableWhereWithInOperator() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("orders")
+                .as("o")
+                .innerJoin("customers")
+                .as("c")
+                .on("o.customer_id", "c.id")
+                .where()
+                .column("o", "status")
+                .in("PENDING", "PROCESSING", "COMPLETED")
+                .and()
+                .column("c", "country")
+                .in("IT", "FR", "DE")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"o\".\"status\" IN (?, ?, ?)")
+                .contains("\"c\".\"country\" IN (?, ?, ?)");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "PENDING");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "PROCESSING");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "COMPLETED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, "IT");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(5, "FR");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(6, "DE");
+    }
+
+    @Test
+    void crossTableWhereWithBetween() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("products")
+                .as("p")
+                .innerJoin("categories")
+                .as("c")
+                .on("p.category_id", "c.id")
+                .where()
+                .column("p", "price")
+                .between(10.0, 100.0)
+                .and()
+                .column("c", "priority")
+                .between(1, 5)
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"p\".\"price\" BETWEEN ? AND ?")
+                .contains("\"c\".\"priority\" BETWEEN ? AND ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 10.0);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 100.0);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 1);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, 5);
+    }
+
+    @Test
+    void crossTableWhereWithLike() throws SQLException {
+        new SelectBuilder(specFactory, "*")
+                .from("users")
+                .as("u")
+                .leftJoin("profiles")
+                .as("p")
+                .on("u.id", "p.user_id")
+                .where()
+                .column("u", "username")
+                .like("admin%")
+                .and()
+                .column("p", "bio")
+                .like("%developer%")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"u\".\"username\" LIKE ?").contains("\"p\".\"bio\" LIKE ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "admin%");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "%developer%");
+    }
+
+    // Validation tests for cross-table WHERE
+    @Test
+    void crossTableWhereRejectsNullAlias() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column(null, "age")
+                        .gt(18))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void crossTableWhereRejectsEmptyAlias() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("", "age")
+                        .gt(18))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void crossTableWhereRejectsAliasWithDot() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u.x", "age")
+                        .gt(18))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias must not contain dot");
+    }
+
+    @Test
+    void crossTableWhereRejectsNullColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", null)
+                        .gt(18))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name cannot be null or empty");
+    }
+
+    @Test
+    void crossTableWhereRejectsEmptyColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "")
+                        .gt(18))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name cannot be null or empty");
+    }
+
+    @Test
+    void crossTableWhereRejectsColumnWithDot() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .as("u")
+                        .where()
+                        .column("u", "users.age")
+                        .gt(18))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name must not contain dot");
+    }
+
+    @Test
+    void singleTableWhereRejectsDotNotation() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory)
+                        .from("users")
+                        .where()
+                        .column("users.age")
+                        .gt(18))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Dot notation not supported");
+    }
 }

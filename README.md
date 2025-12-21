@@ -43,6 +43,21 @@ PreparedStatement ps = dsl.insertInto("users")
     .build(connection);
 ```
 
+### Multi-Table Query with JOIN
+
+```java
+// Query with explicit cross-table column references
+PreparedStatement ps = dsl.select("*")
+    .from("users").as("u")
+    .innerJoin("orders").as("o")
+    .on("u.id", "o.user_id")
+    .where()
+    .column("u", "age").gt(18)           // Column from users table
+    .and()
+    .column("o", "status").eq("COMPLETED")  // Column from orders table
+    .build(connection);
+```
+
 **Note**: All builders use `.build(connection)` which automatically handles parameter binding, preventing SQL injection attacks. The `Connection` object must be managed by the caller (not closed automatically by the builder).
 
 For more examples, see the [DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md).
