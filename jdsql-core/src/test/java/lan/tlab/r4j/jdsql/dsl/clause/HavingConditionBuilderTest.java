@@ -816,7 +816,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("o", "total")
                 .gt(1000)
-                .and()
+                .andHaving()
                 .column("c", "country")
                 .eq("IT")
                 .build(sqlCaptureHelper.getConnection());
@@ -825,8 +825,8 @@ class HavingConditionBuilderTest {
                 .contains("HAVING")
                 .contains("\"o\".\"total\" > ?")
                 .contains("\"c\".\"country\" = ?");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "IT");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 1000);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1000);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "IT");
     }
 
     @Test
@@ -841,10 +841,10 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("t", "amount")
                 .gte(100)
-                .and()
+                .andHaving()
                 .column("a", "type")
                 .eq("PREMIUM")
-                .and()
+                .andHaving()
                 .column("t", "status")
                 .ne("CANCELLED")
                 .build(sqlCaptureHelper.getConnection());
@@ -853,9 +853,9 @@ class HavingConditionBuilderTest {
                 .contains("\"t\".\"amount\" >= ?")
                 .contains("\"a\".\"type\" = ?")
                 .contains("\"t\".\"status\" <> ?");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "PREMIUM");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "CANCELLED");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "PREMIUM");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "CANCELLED");
     }
 
     @Test
@@ -872,7 +872,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("o", "created_date")
                 .gte(cutoffDate)
-                .and()
+                .andHaving()
                 .column("c", "active")
                 .eq(true)
                 .build(sqlCaptureHelper.getConnection());
@@ -894,7 +894,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("p", "discount")
                 .isNotNull()
-                .and()
+                .andHaving()
                 .column("c", "parent_id")
                 .isNull()
                 .build(sqlCaptureHelper.getConnection());
@@ -916,7 +916,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("s", "status")
                 .in("COMPLETED", "SHIPPED", "DELIVERED")
-                .and()
+                .andHaving()
                 .column("r", "country")
                 .in("IT", "FR", "ES")
                 .build(sqlCaptureHelper.getConnection());
@@ -924,12 +924,12 @@ class HavingConditionBuilderTest {
         assertThatSql(sqlCaptureHelper)
                 .contains("\"s\".\"status\" IN (?, ?, ?)")
                 .contains("\"r\".\"country\" IN (?, ?, ?)");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "IT");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "FR");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "ES");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, "COMPLETED");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(5, "SHIPPED");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(6, "DELIVERED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "COMPLETED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "SHIPPED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, "DELIVERED");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, "IT");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(5, "FR");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(6, "ES");
     }
 
     @Test
@@ -944,7 +944,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("o", "quantity")
                 .between(10, 100)
-                .and()
+                .andHaving()
                 .column("p", "rating")
                 .between(4.0, 5.0)
                 .build(sqlCaptureHelper.getConnection());
@@ -952,10 +952,10 @@ class HavingConditionBuilderTest {
         assertThatSql(sqlCaptureHelper)
                 .contains("\"o\".\"quantity\" BETWEEN ? AND ?")
                 .contains("\"p\".\"rating\" BETWEEN ? AND ?");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 4.0);
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 5.0);
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 10);
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 10);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 100);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(3, 4.0);
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(4, 5.0);
     }
 
     @Test
@@ -970,14 +970,14 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("u", "email")
                 .like("%@company.com")
-                .and()
+                .andHaving()
                 .column("s", "plan_name")
                 .like("Premium%")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("\"u\".\"email\" LIKE ?").contains("\"s\".\"plan_name\" LIKE ?");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Premium%");
-        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "%@company.com");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%@company.com");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "Premium%");
     }
 
     // Validation tests for cross-table HAVING
@@ -1190,7 +1190,7 @@ class HavingConditionBuilderTest {
                 .column("s", "revenue")
                 .gt()
                 .column("p", "projected_revenue")
-                .and()
+                .andHaving()
                 .column("s", "region")
                 .eq("EMEA")
                 .build(sqlCaptureHelper.getConnection());
