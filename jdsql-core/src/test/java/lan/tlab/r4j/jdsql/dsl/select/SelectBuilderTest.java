@@ -34,9 +34,8 @@ class SelectBuilderTest {
 
     @Test
     void ok() throws SQLException {
-        PreparedStatement result = new SelectBuilder(specFactory, "name", "email")
-                .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        PreparedStatement result =
+                new SelectBuilder(specFactory, "name", "email").from("users").build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT \"name\", \"email\" FROM \"users\"");
@@ -44,9 +43,8 @@ class SelectBuilderTest {
 
     @Test
     void star() throws SQLException {
-        PreparedStatement result = new SelectBuilder(specFactory, "*")
-                .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        PreparedStatement result =
+                new SelectBuilder(specFactory, "*").from("products").build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"products\"");
@@ -60,7 +58,7 @@ class SelectBuilderTest {
                 .where()
                 .column("name")
                 .eq("John")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -76,7 +74,7 @@ class SelectBuilderTest {
                 .where()
                 .column("age")
                 .gt(18)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" WHERE \"age\" > ?");
@@ -96,7 +94,7 @@ class SelectBuilderTest {
                 .and()
                 .column("country")
                 .eq("Italy")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -117,7 +115,7 @@ class SelectBuilderTest {
                 .or()
                 .column("role")
                 .eq("moderator")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" WHERE (\"role\" = ?) OR (\"role\" = ?)");
@@ -138,7 +136,7 @@ class SelectBuilderTest {
                 .or()
                 .column("role")
                 .eq("admin")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -153,7 +151,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectBuilder(specFactory, "name", "age")
                 .from("users")
                 .orderBy("name")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT \"name\", \"age\" FROM \"users\" ORDER BY \"name\" ASC");
@@ -164,28 +162,21 @@ class SelectBuilderTest {
         new SelectBuilder(specFactory, "*")
                 .from("products")
                 .orderByDesc("created_at")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"products\" ORDER BY \"created_at\" DESC");
     }
 
     @Test
     void fetch() throws SQLException {
-        new SelectBuilder(specFactory, "*")
-                .from("users")
-                .fetch(10)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, "*").from("users").fetch(10).build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" FETCH NEXT 10 ROWS ONLY");
     }
 
     @Test
     void fetchWithOffset() throws SQLException {
-        new SelectBuilder(specFactory, "*")
-                .from("users")
-                .fetch(10)
-                .offset(20)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, "*").from("users").fetch(10).offset(20).build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY");
     }
@@ -196,7 +187,7 @@ class SelectBuilderTest {
                 .from("users")
                 .offset(15)
                 .fetch(5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(sql).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -210,7 +201,7 @@ class SelectBuilderTest {
                 .from("users")
                 .fetch(5)
                 .offset(0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" FETCH NEXT 5 ROWS ONLY");
@@ -223,7 +214,7 @@ class SelectBuilderTest {
                 .offset(10)
                 .offset(20)
                 .fetch(5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" OFFSET 20 ROWS FETCH NEXT 5 ROWS ONLY");
@@ -236,7 +227,7 @@ class SelectBuilderTest {
                 .fetch(10)
                 .offset(25)
                 .fetch(8)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" OFFSET 25 ROWS FETCH NEXT 8 ROWS ONLY");
@@ -248,7 +239,7 @@ class SelectBuilderTest {
                 .from("users")
                 .offset(23)
                 .fetch(10)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\" OFFSET 23 ROWS FETCH NEXT 10 ROWS ONLY");
@@ -273,7 +264,7 @@ class SelectBuilderTest {
                 .orderByDesc("created_at")
                 .fetch(50)
                 .offset(100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -305,7 +296,7 @@ class SelectBuilderTest {
                 .and()
                 .column("category")
                 .ne("deprecated")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -324,8 +315,7 @@ class SelectBuilderTest {
 
     @Test
     void fromNotSpecified() {
-        assertThatThrownBy(() ->
-                        new SelectBuilder(specFactory, "*").buildPreparedStatement(sqlCaptureHelper.getConnection()))
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified");
     }
@@ -450,9 +440,7 @@ class SelectBuilderTest {
                 .column("age")
                 .gt(18);
 
-        new SelectBuilder(specFactory, "*")
-                .from(subquery, "u")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, "*").from(subquery, "u").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT * FROM \
@@ -475,7 +463,7 @@ class SelectBuilderTest {
                 .where()
                 .column("total")
                 .gt(100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(sql).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -500,7 +488,7 @@ class SelectBuilderTest {
                 .where()
                 .column("age")
                 .gt(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -519,7 +507,7 @@ class SelectBuilderTest {
                 .where()
                 .column("age")
                 .eq(maxAgeSubquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -559,7 +547,7 @@ class SelectBuilderTest {
                 .having()
                 .column("age")
                 .gt(18)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT * FROM "users" GROUP BY "age" HAVING "age" > ?\
@@ -578,7 +566,7 @@ class SelectBuilderTest {
                 .andHaving()
                 .column("age")
                 .lt(65)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT * FROM "users" \
@@ -600,7 +588,7 @@ class SelectBuilderTest {
                 .orHaving()
                 .column("status")
                 .eq("pending")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(sql).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -627,7 +615,7 @@ class SelectBuilderTest {
                 .orHaving()
                 .column("customer_id")
                 .eq(999)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(sql).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -655,7 +643,7 @@ class SelectBuilderTest {
                 .column("brand")
                 .like("%Apple%")
                 .orderBy("brand")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(sql).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -690,7 +678,7 @@ class SelectBuilderTest {
                 .having()
                 .column("category")
                 .eq("electronics")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"category\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "electronics");
@@ -701,7 +689,7 @@ class SelectBuilderTest {
                 .having()
                 .column("category")
                 .ne("books")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"category\" <> ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "books");
@@ -716,7 +704,7 @@ class SelectBuilderTest {
                 .having()
                 .column("total")
                 .gte(100.0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" >= ?");
 
@@ -726,7 +714,7 @@ class SelectBuilderTest {
                 .having()
                 .column("total")
                 .lte(500)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" <= ?");
     }
@@ -739,7 +727,7 @@ class SelectBuilderTest {
                 .having()
                 .column("active")
                 .eq(true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"active\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
@@ -750,7 +738,7 @@ class SelectBuilderTest {
                 .having()
                 .column("active")
                 .ne(false)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"active\" <> ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, false);
@@ -764,7 +752,7 @@ class SelectBuilderTest {
                 .having()
                 .column("email")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"email\" IS NULL");
 
@@ -774,7 +762,7 @@ class SelectBuilderTest {
                 .having()
                 .column("email")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"email\" IS NOT NULL");
     }
@@ -787,7 +775,7 @@ class SelectBuilderTest {
                 .having()
                 .column("price")
                 .between(10.0, 100.0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).contains("HAVING \"price\" BETWEEN ? AND ?");
@@ -803,7 +791,7 @@ class SelectBuilderTest {
                 .having()
                 .column("order_date")
                 .between(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).contains("HAVING \"order_date\" BETWEEN ? AND ?");
@@ -826,7 +814,7 @@ class SelectBuilderTest {
                 .having()
                 .column("budget")
                 .gt(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -855,7 +843,7 @@ class SelectBuilderTest {
                 .having()
                 .column("category")
                 .in("electronics", "books", "toys")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"category\" IN (?, ?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "electronics");
@@ -871,7 +859,7 @@ class SelectBuilderTest {
                 .having()
                 .column("customer_id")
                 .in(100, 200, 300)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"customer_id\" IN (?, ?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100);
@@ -887,7 +875,7 @@ class SelectBuilderTest {
                 .having()
                 .column("active")
                 .in(true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"active\" IN (?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
@@ -901,7 +889,7 @@ class SelectBuilderTest {
                 .having()
                 .column("event_date")
                 .in(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" IN (?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, java.time.LocalDate.of(2023, 1, 1));
@@ -919,7 +907,7 @@ class SelectBuilderTest {
                 .andHaving()
                 .column("brand")
                 .ne("unknown")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).contains("HAVING (\"category\" IN (?, ?)) AND (\"brand\" <> ?)");
@@ -939,7 +927,7 @@ class SelectBuilderTest {
                 .orHaving()
                 .column("status")
                 .eq("delivered")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).contains("HAVING (\"status\" IN (?, ?)) OR (\"status\" = ?)");
@@ -977,7 +965,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .countStar()
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT COUNT(*) FROM "users"\
@@ -990,7 +978,7 @@ class SelectBuilderTest {
                 .countStar()
                 .as("total")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT COUNT(*) AS "total" FROM "users"\
@@ -1002,7 +990,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("amount")
                 .from("orders")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT SUM("amount") FROM "orders"\
@@ -1015,7 +1003,7 @@ class SelectBuilderTest {
                 .sum("amount")
                 .as("total_amount")
                 .from("orders")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT SUM("amount") AS "total_amount" FROM "orders"\
@@ -1027,7 +1015,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .avg("score")
                 .from("students")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT AVG("score") FROM "students"\
@@ -1040,7 +1028,7 @@ class SelectBuilderTest {
                 .avg("score")
                 .as("avg_score")
                 .from("students")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT AVG("score") AS "avg_score" FROM "students"\
@@ -1052,7 +1040,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .count("id")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT COUNT("id") FROM "users"\
@@ -1065,7 +1053,7 @@ class SelectBuilderTest {
                 .count("id")
                 .as("user_count")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT COUNT("id") AS "user_count" FROM "users"\
@@ -1077,7 +1065,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .countDistinct("email")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT COUNT(DISTINCT "email") FROM "users"\
@@ -1090,7 +1078,7 @@ class SelectBuilderTest {
                 .countDistinct("email")
                 .as("unique_emails")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT COUNT(DISTINCT "email") AS "unique_emails" FROM "users"\
@@ -1102,7 +1090,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .max("price")
                 .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT MAX("price") FROM "products"\
@@ -1115,7 +1103,7 @@ class SelectBuilderTest {
                 .max("price")
                 .as("max_price")
                 .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT MAX("price") AS "max_price" FROM "products"\
@@ -1127,7 +1115,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .min("price")
                 .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT MIN("price") FROM "products"\
@@ -1140,7 +1128,7 @@ class SelectBuilderTest {
                 .min("price")
                 .as("min_price")
                 .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT MIN("price") AS "min_price" FROM "products"\
@@ -1153,7 +1141,7 @@ class SelectBuilderTest {
                 .sum("amount")
                 .from("orders")
                 .groupBy("customer_id")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT SUM("amount") FROM "orders" GROUP BY "customer_id"\
@@ -1168,7 +1156,7 @@ class SelectBuilderTest {
                 .where()
                 .column("active")
                 .eq(true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT COUNT(*) FROM "users" WHERE "active" = ?\
@@ -1185,7 +1173,7 @@ class SelectBuilderTest {
                 .having()
                 .column("department")
                 .ne("HR")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT AVG("salary") \
@@ -1202,7 +1190,7 @@ class SelectBuilderTest {
                 .sum("score")
                 .max("createdAt")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT SUM("score"), MAX("createdAt") FROM "users"\
@@ -1217,7 +1205,7 @@ class SelectBuilderTest {
                 .max("createdAt")
                 .as("latest")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT SUM("score") AS "total_score", MAX("createdAt") AS "latest" \
@@ -1232,7 +1220,7 @@ class SelectBuilderTest {
                 .max("createdAt")
                 .as("latest")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT SUM("score"), MAX("createdAt") AS "latest" \
@@ -1245,7 +1233,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("name")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users"\
@@ -1258,7 +1246,7 @@ class SelectBuilderTest {
                 .column("name")
                 .as("user_name")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" AS "user_name" FROM "users"\
@@ -1271,7 +1259,7 @@ class SelectBuilderTest {
                 .column("name")
                 .column("email")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", "email" FROM "users"\
@@ -1286,7 +1274,7 @@ class SelectBuilderTest {
                 .column("email")
                 .as("user_email")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" AS "user_name", "email" AS "user_email" FROM "users"\
@@ -1300,7 +1288,7 @@ class SelectBuilderTest {
                 .column("email")
                 .as("user_email")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", "email" AS "user_email" FROM "users"\
@@ -1312,7 +1300,7 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .column("users", "name")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users"\
@@ -1326,7 +1314,7 @@ class SelectBuilderTest {
                 .sum("score")
                 .as("total_score")
                 .from("users")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", SUM("score") AS "total_score" FROM "users"\

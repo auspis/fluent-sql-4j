@@ -38,7 +38,7 @@ class UpdateBuilderTest {
                 .where()
                 .column("id")
                 .eq(1)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("UPDATE \"users\" SET \"name\" = ? WHERE \"id\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 1);
@@ -52,7 +52,7 @@ class UpdateBuilderTest {
                 .where()
                 .column("id")
                 .eq(1)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("UPDATE \"users\" SET \"name\" = ?, \"age\" = ? WHERE \"id\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 30);
@@ -61,9 +61,7 @@ class UpdateBuilderTest {
 
     @Test
     void noWhere() throws SQLException {
-        new UpdateBuilder(specFactory, "users")
-                .set("status", "active")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new UpdateBuilder(specFactory, "users").set("status", "active").build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("UPDATE \"users\" SET \"status\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "active");
     }
@@ -75,7 +73,7 @@ class UpdateBuilderTest {
                 .where()
                 .column("id")
                 .eq(42)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("UPDATE \"users\" SET \"age\" = ? WHERE \"id\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 25);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 42);
@@ -91,7 +89,7 @@ class UpdateBuilderTest {
                 .and()
                 .column("verified")
                 .eq(false)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("UPDATE \"users\" SET \"status\" = ? WHERE (\"age\" < ?) AND (\"verified\" = ?)");
@@ -110,7 +108,7 @@ class UpdateBuilderTest {
                 .or()
                 .column("status")
                 .eq("inactive")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("UPDATE \"users\" SET \"status\" = ? WHERE (\"status\" = ?) OR (\"status\" = ?)");
@@ -132,7 +130,7 @@ class UpdateBuilderTest {
                 .or()
                 .column("deleted_at")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -149,7 +147,7 @@ class UpdateBuilderTest {
                 .where()
                 .column("status")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("UPDATE \"users\" SET \"deleted_at\" = ? WHERE \"status\" IS NULL");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, null);
@@ -162,7 +160,7 @@ class UpdateBuilderTest {
                 .where()
                 .column("email")
                 .like("%@example.com")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("UPDATE \"users\" SET \"status\" = ? WHERE \"email\" LIKE ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "verified");
@@ -188,7 +186,7 @@ class UpdateBuilderTest {
                 .and()
                 .column("category")
                 .ne("deprecated")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
@@ -221,7 +219,7 @@ class UpdateBuilderTest {
                         .where()
                         .column("id")
                         .eq(1)
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("At least one SET clause must be specified");
     }

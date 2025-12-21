@@ -33,7 +33,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .eq("John")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" WHERE "name" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -44,7 +44,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .ne("Jane")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" WHERE "name" <> ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Jane");
@@ -55,7 +55,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .gt("A")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" WHERE "name" > ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "A");
@@ -65,7 +65,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .lt("Z")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" WHERE "name" < ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Z");
@@ -75,7 +75,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .gte("B")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" WHERE "name" >= ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "B");
@@ -85,7 +85,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .lte("Y")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" WHERE "name" <= ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Y");
@@ -99,7 +99,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("age")
                 .eq(25)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "age" FROM "users" WHERE "age" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 25);
@@ -109,7 +109,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("age")
                 .ne(30)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "age" FROM "users" WHERE "age" <> ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 30);
@@ -119,7 +119,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("age")
                 .gt(18)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "age" FROM "users" WHERE "age" > ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 18);
@@ -129,7 +129,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("age")
                 .lt(65)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "age" FROM "users" WHERE "age" < ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 65);
@@ -140,7 +140,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("salary")
                 .gte(50000.5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "salary" FROM "employees" WHERE "salary" >= ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 50000.5);
@@ -150,7 +150,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("salary")
                 .lte(100000.75)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "salary" FROM "employees" WHERE "salary" <= ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100000.75);
@@ -164,7 +164,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("active")
                 .eq(true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "active" FROM "users" WHERE "active" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
@@ -175,7 +175,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("active")
                 .ne(false)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "active" FROM "users" WHERE "active" <> ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, false);
@@ -191,7 +191,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("birth_date")
                 .eq(date)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "birth_date" FROM "users" WHERE "birth_date" = ?""");
 
@@ -200,7 +200,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("birth_date")
                 .gt(date)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "birth_date" FROM "users" WHERE "birth_date" > ?""");
 
@@ -209,7 +209,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("birth_date")
                 .lt(date)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "birth_date" FROM "users" WHERE "birth_date" < ?""");
         verify(sqlCaptureHelper.getPreparedStatement(), times(3)).setObject(1, date);
@@ -225,7 +225,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("created_at")
                 .eq(dateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "created_at" FROM "posts" WHERE "created_at" = ?""");
 
@@ -234,7 +234,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("created_at")
                 .gte(dateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "created_at" FROM "posts" WHERE "created_at" >= ?""");
         verify(sqlCaptureHelper.getPreparedStatement(), times(2)).setObject(1, dateTime);
@@ -247,7 +247,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .like("John%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" WHERE "name" LIKE ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John%");
@@ -257,7 +257,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("email")
                 .like("%@example.com")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "email" FROM "users" WHERE "email" LIKE ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%@example.com");
@@ -271,7 +271,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("email")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "email" FROM "users" WHERE "email" IS NULL""");
 
@@ -281,7 +281,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("email")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "email" FROM "users" WHERE "email" IS NOT NULL""");
     }
@@ -296,7 +296,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("birth_date")
                 .between(startDate, endDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         SELECT "birth_date" FROM "users" WHERE "birth_date" BETWEEN ? AND ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDate);
@@ -310,7 +310,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("created_at")
                 .between(startDateTime, endDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "created_at" FROM "posts" WHERE "created_at" BETWEEN ? AND ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDateTime);
@@ -322,7 +322,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("age")
                 .between(18, 65)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "age" FROM "users" WHERE "age" BETWEEN ? AND ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 18);
@@ -340,7 +340,7 @@ class WhereConditionBuilderTest {
                 .and()
                 .column("age")
                 .gt(25)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", "age" FROM "users" WHERE ("name" = ?) AND ("age" > ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -355,7 +355,7 @@ class WhereConditionBuilderTest {
                 .or()
                 .column("active")
                 .eq(false)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", "age" FROM "users" WHERE ("age" < ?) OR ("active" = ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 18);
@@ -370,7 +370,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("name")
                 .eq("John")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name" FROM "users" AS u WHERE "name" = ?""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -383,7 +383,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("status")
                 .in("active", "pending", "approved")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE "status" IN (?, ?, ?)""");
@@ -399,7 +399,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("customer_id")
                 .in(100, 200, 300, 400)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "orders" WHERE "customer_id" IN (?, ?, ?, ?)""");
@@ -416,7 +416,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("active")
                 .in(true, false)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE "active" IN (?, ?)""");
@@ -435,7 +435,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("event_date")
                 .in(date1, date2, date3)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "events" WHERE "event_date" IN (?, ?, ?)""");
@@ -454,7 +454,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .column("created_at")
                 .in(dt1, dt2)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "logs" WHERE "created_at" IN (?, ?)""");
@@ -472,7 +472,7 @@ class WhereConditionBuilderTest {
                 .and()
                 .column("price")
                 .gt(50)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "products" WHERE ("category" IN (?, ?)) AND ("price" > ?)""");
@@ -491,7 +491,7 @@ class WhereConditionBuilderTest {
                 .or()
                 .column("status")
                 .eq("verified")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE ("role" IN (?, ?)) OR ("status" = ?)""");
@@ -529,7 +529,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .jsonValue("profile", "$.name")
                 .eq("John")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_VALUE("profile", ?) = ?""");
@@ -544,7 +544,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .jsonValue("profile", "$.age")
                 .gt(18)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE JSON_VALUE("profile", ?) > ?""");
@@ -559,7 +559,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .jsonValue("details", "$.address.city")
                 .eq("New York")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "customers" WHERE JSON_VALUE("details", ?) = ?""");
@@ -574,7 +574,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .jsonValue("metadata", "$.discount")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "products" WHERE JSON_VALUE("metadata", ?) IS NULL""");
@@ -588,7 +588,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .jsonExists("config", "$.theme")
                 .exists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "settings" WHERE JSON_EXISTS("config", ?) = ?""");
@@ -603,7 +603,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .jsonExists("tags", "$.featured")
                 .notExists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "items" WHERE JSON_EXISTS("tags", ?) = ?""");
@@ -621,7 +621,7 @@ class WhereConditionBuilderTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE (JSON_VALUE("profile", ?) = ?) AND ("active" = ?)""");
@@ -640,7 +640,7 @@ class WhereConditionBuilderTest {
                 .or()
                 .jsonValue("role", "$.type")
                 .eq("moderator")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "users" WHERE (JSON_VALUE("role", ?) = ?) OR (JSON_VALUE("role", ?) = ?)""");
@@ -657,7 +657,7 @@ class WhereConditionBuilderTest {
                 .where()
                 .jsonQuery("content", "$.data.items")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "records" WHERE JSON_QUERY("content", ?) IS NOT NULL""");
@@ -674,7 +674,7 @@ class WhereConditionBuilderTest {
                 .and()
                 .jsonValue("metadata", "$.price")
                 .lte(100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT * FROM "products" WHERE (JSON_VALUE("metadata", ?) >= ?) AND (JSON_VALUE("metadata", ?) <= ?)""");

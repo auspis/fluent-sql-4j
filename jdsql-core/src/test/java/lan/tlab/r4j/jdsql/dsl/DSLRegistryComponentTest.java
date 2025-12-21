@@ -51,7 +51,7 @@ class DSLRegistryComponentTest {
                 .where()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         // MySQL uses backticks for identifiers
         assertThat(sqlCaptor.getValue()).contains("\"users\"");
@@ -75,7 +75,7 @@ class DSLRegistryComponentTest {
                 .where()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         // Standard SQL uses double quotes for identifiers
         assertThat(sqlCaptor.getValue()).contains("\"users\"");
@@ -95,7 +95,7 @@ class DSLRegistryComponentTest {
                 .set("name", "John Doe")
                 .set("email", "john@example.com")
                 .set("age", 30)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).contains("INSERT INTO \"users\"");
         assertThat(sqlCaptor.getValue()).contains("\"name\"");
@@ -116,7 +116,7 @@ class DSLRegistryComponentTest {
                 .where()
                 .column("last_login")
                 .isNull()
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).contains("UPDATE \"users\"");
         assertThat(sqlCaptor.getValue()).contains("SET \"status\" = ?");
@@ -129,7 +129,7 @@ class DSLRegistryComponentTest {
         DSL dsl = registry.dslFor(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
 
-        dsl.deleteFrom("users").where().column("created_at").lt("2020-01-01").buildPreparedStatement(connection);
+        dsl.deleteFrom("users").where().column("created_at").lt("2020-01-01").build(connection);
 
         assertThat(sqlCaptor.getValue()).contains("DELETE FROM \"users\"");
         assertThat(sqlCaptor.getValue()).contains("WHERE \"created_at\" < ?");
@@ -150,7 +150,7 @@ class DSLRegistryComponentTest {
                 .where()
                 .column("o.status")
                 .eq("completed")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).contains("SELECT");
         assertThat(sqlCaptor.getValue()).contains("INNER JOIN");
@@ -165,7 +165,7 @@ class DSLRegistryComponentTest {
         assertThat(result.isSuccess()).isTrue();
         DSL dsl = result.orElseThrow();
 
-        dsl.select("*").from("test").buildPreparedStatement(connection);
+        dsl.select("*").from("test").build(connection);
         // Should still use MySQL dialect (backticks)
         assertThat(sqlCaptor.getValue()).contains("\"test\"");
     }

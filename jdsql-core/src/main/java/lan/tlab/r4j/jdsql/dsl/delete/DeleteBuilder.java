@@ -95,7 +95,7 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
         return statementBuilder.build();
     }
 
-    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+    public PreparedStatement build(Connection connection) throws SQLException {
         DeleteStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);
 

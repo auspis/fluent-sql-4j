@@ -37,24 +37,20 @@ class DeleteBuilderTest {
                 .where()
                 .column("status")
                 .eq("inactive")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("DELETE FROM \"users\" WHERE \"status\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "inactive");
     }
 
     @Test
     void noWhere() throws SQLException {
-        new DeleteBuilder(specFactory, "users").buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new DeleteBuilder(specFactory, "users").build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("DELETE FROM \"users\"");
     }
 
     @Test
     void whereWithNumber() throws SQLException {
-        new DeleteBuilder(specFactory, "users")
-                .where()
-                .column("id")
-                .eq(42)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new DeleteBuilder(specFactory, "users").where().column("id").eq(42).build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("DELETE FROM \"users\" WHERE \"id\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 42);
     }
@@ -68,7 +64,7 @@ class DeleteBuilderTest {
                 .and()
                 .column("age")
                 .lt(18)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("DELETE FROM \"users\" WHERE (\"status\" = ?) AND (\"age\" < ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "inactive");
@@ -84,7 +80,7 @@ class DeleteBuilderTest {
                 .or()
                 .column("status")
                 .eq("banned")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("DELETE FROM \"users\" WHERE (\"status\" = ?) OR (\"status\" = ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "deleted");
@@ -103,7 +99,7 @@ class DeleteBuilderTest {
                 .or()
                 .column("role")
                 .eq("guest")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("DELETE FROM \"users\" WHERE ((\"status\" = ?) AND (\"age\" < ?)) OR (\"role\" = ?)");
@@ -118,7 +114,7 @@ class DeleteBuilderTest {
                 .where()
                 .column("deleted_at")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("DELETE FROM \"users\" WHERE \"deleted_at\" IS NOT NULL");
     }
@@ -129,7 +125,7 @@ class DeleteBuilderTest {
                 .where()
                 .column("email")
                 .like("%@temp.com")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("DELETE FROM \"users\" WHERE \"email\" LIKE ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%@temp.com");
@@ -153,7 +149,7 @@ class DeleteBuilderTest {
                 .and()
                 .column("category")
                 .ne("deprecated")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(

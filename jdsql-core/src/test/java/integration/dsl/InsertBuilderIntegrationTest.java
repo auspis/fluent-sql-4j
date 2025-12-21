@@ -45,7 +45,7 @@ class InsertBuilderIntegrationTest {
     @Test
     void singleStringValue() throws SQLException {
         PreparedStatement ps =
-                dsl.insertInto("users").set("id", 1).set("name", "John").buildPreparedStatement(connection);
+                dsl.insertInto("users").set("id", 1).set("name", "John").build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -69,7 +69,7 @@ class InsertBuilderIntegrationTest {
                 .set("active", true)
                 .set("birthdate", LocalDate.of(1999, 5, 15))
                 .set("createdAt", LocalDateTime.of(2023, 10, 10, 12, 0, 0))
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -96,7 +96,7 @@ class InsertBuilderIntegrationTest {
                 .set("name", "Bob")
                 .set("email", (String) null)
                 .set("age", (Integer) null)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -119,7 +119,7 @@ class InsertBuilderIntegrationTest {
                 .set("name", "Widget")
                 .set("price", 19.99)
                 .set("quantity", 100)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -141,7 +141,7 @@ class InsertBuilderIntegrationTest {
                 .set("id", 10)
                 .set("name", "Alice")
                 .set("active", true)
-                .buildPreparedStatement(connection);
+                .build(connection);
         assertThat(ps1.executeUpdate()).isEqualTo(1);
 
         // Insert second row
@@ -149,7 +149,7 @@ class InsertBuilderIntegrationTest {
                 .set("id", 11)
                 .set("name", "Charlie")
                 .set("active", false)
-                .buildPreparedStatement(connection);
+                .build(connection);
         assertThat(ps2.executeUpdate()).isEqualTo(1);
 
         try (Statement stmt = connection.createStatement();
@@ -174,14 +174,14 @@ class InsertBuilderIntegrationTest {
                 .set("id", 20)
                 .set("name", "David")
                 .set("email", "david@example.com")
-                .buildPreparedStatement(connection);
+                .build(connection);
         assertThat(ps1.executeUpdate()).isEqualTo(1);
 
         PreparedStatement ps2 = dsl.insertInto("products")
                 .set("id", 20)
                 .set("price", 29.99)
                 .set("quantity", 50)
-                .buildPreparedStatement(connection);
+                .build(connection);
         assertThat(ps2.executeUpdate()).isEqualTo(1);
 
         try (Statement stmt = connection.createStatement();
@@ -209,7 +209,7 @@ class InsertBuilderIntegrationTest {
                 .set("active", true)
                 .set("birthdate", LocalDate.of(1996, 3, 20))
                 .set("createdAt", LocalDateTime.of(2023, 10, 10, 14, 30, 0))
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -240,7 +240,7 @@ class InsertBuilderIntegrationTest {
                 .set("email", "marco@example.com")
                 .set("age", 35)
                 .set("address", addressJson)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -274,7 +274,7 @@ class InsertBuilderIntegrationTest {
                 .set("name", "Laura")
                 .set("email", "laura@example.com")
                 .set("preferences", preferencesJson)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -298,7 +298,7 @@ class InsertBuilderIntegrationTest {
                 .set("name", "Laptop")
                 .set("price", 999.99)
                 .set("metadata", metadataJson)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected2 = ps2.executeUpdate();
         assertThat(rowsAffected2).isEqualTo(1);

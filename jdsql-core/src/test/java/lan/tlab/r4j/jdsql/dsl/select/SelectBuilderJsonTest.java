@@ -39,7 +39,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonExists, "has_email"));
 
-        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("users").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_EXISTS("profile", ?) AS "has_email" FROM "users"\
@@ -56,7 +56,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonExists, "has_email"));
 
-        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("users").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_EXISTS("profile", ? ERROR ON ERROR) AS "has_email" \
@@ -73,9 +73,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        new SelectBuilder(specFactory, select)
-                .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("products").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ?) AS "price" FROM "products"\
@@ -92,9 +90,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "price"));
 
-        new SelectBuilder(specFactory, select)
-                .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("products").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2)) AS "price" FROM "products"\
@@ -115,9 +111,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "discount"));
 
-        new SelectBuilder(specFactory, select)
-                .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("products").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2) DEFAULT 0.00 ON EMPTY) AS "discount" FROM "products"\
@@ -133,7 +127,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("users", "name")),
                 new ScalarExpressionProjection(jsonQuery, "addresses"));
 
-        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("users").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_QUERY("profile", ?) AS "addresses" FROM "users"\
@@ -150,9 +144,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonQuery, "tags"));
 
-        new SelectBuilder(specFactory, select)
-                .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("products").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_QUERY("data", ? WITH WRAPPER) AS "tags" FROM "products"\
@@ -174,9 +166,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "id")),
                 new ScalarExpressionProjection(jsonQuery, "reviews"));
 
-        new SelectBuilder(specFactory, select)
-                .from("products")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("products").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "id", JSON_QUERY("data", ? RETURNING JSON WITH CONDITIONAL WRAPPER DEFAULT [] ON EMPTY) AS "reviews" FROM "products"\
@@ -198,7 +188,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(jsonValue, "age"),
                 new ScalarExpressionProjection(jsonQuery, "addresses"));
 
-        new SelectBuilder(specFactory, select).from("users").buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("users").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_EXISTS("profile", ?) AS "has_email", \
@@ -225,7 +215,7 @@ class SelectBuilderJsonTest {
                 .where()
                 .column("category")
                 .eq("Electronics")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(10,2)) AS "price" \
@@ -244,10 +234,7 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "rating"));
 
-        new SelectBuilder(specFactory, select)
-                .from("products")
-                .orderBy("name")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select).from("products").orderBy("name").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(3,1)) AS "rating" FROM "products" ORDER BY "name" ASC\

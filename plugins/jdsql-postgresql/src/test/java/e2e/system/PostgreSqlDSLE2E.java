@@ -93,7 +93,7 @@ class PostgreSqlDSLE2E {
                 .where()
                 .column("email")
                 .eq("john@example.com")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(ResultSetUtil.list(ps, nameMapper)).hasSize(1).containsAll(List.of("John Doe"));
     }
@@ -107,7 +107,7 @@ class PostgreSqlDSLE2E {
                 .orderBy("name")
                 .fetch(3)
                 .offset(1)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(ResultSetUtil.list(ps, nameMapper)).hasSize(3).containsAll(List.of("Bob", "Charlie", "Diana"));
     }
@@ -126,7 +126,7 @@ class PostgreSqlDSLE2E {
                 .from("users")
                 .orderByDesc("age")
                 .orderBy("id")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
 
@@ -164,7 +164,7 @@ class PostgreSqlDSLE2E {
                 .orderByDesc("active")
                 .orderByDesc("age")
                 .orderBy("id")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
 
@@ -322,7 +322,7 @@ class PostgreSqlDSLE2E {
     @Test
     void aggregateFunctionsShouldWork() throws SQLException {
         PreparedStatement ps =
-                dsl.select().sum("age").as("total_age").from("users").buildPreparedStatement(connection);
+                dsl.select().sum("age").as("total_age").from("users").build(connection);
 
         RowMapper<Integer> sumMapper = r -> r.getInt("total_age");
         List<Integer> totals = ResultSetUtil.list(ps, sumMapper);
@@ -337,7 +337,7 @@ class PostgreSqlDSLE2E {
                 .countDistinct("age")
                 .as("distinct_ages")
                 .from("users")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         RowMapper<Integer> countMapper = r -> r.getInt("distinct_ages");
         List<Integer> counts = ResultSetUtil.list(ps, countMapper);

@@ -88,9 +88,9 @@ public class ColumnBuilder {
         return tableBuilder.defaultConstraint(value);
     }
 
-    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+    public PreparedStatement build(Connection connection) throws SQLException {
         buildAndAdd();
-        return tableBuilder.buildPreparedStatement(connection);
+        return tableBuilder.build(connection);
     }
 
     void buildColumn() {

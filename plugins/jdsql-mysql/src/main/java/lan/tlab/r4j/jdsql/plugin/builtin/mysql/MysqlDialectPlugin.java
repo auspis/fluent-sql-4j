@@ -192,7 +192,7 @@ public final class MysqlDialectPlugin {
      * MysqlDSL dsl = (MysqlDSL) MysqlDialectPlugin.instance().createDSL();
      * PreparedStatement ps = dsl.select(
      *     dsl.groupConcat("name", ", ").as("names")
-     * ).from("users").buildPreparedStatement(connection);
+     * ).from("users").build(connection);
      * }</pre>
      *
      * @return a new {@link lan.tlab.r4j.sql.dsl.mysql.MysqlDSL} instance configured for MySQL, never {@code null}

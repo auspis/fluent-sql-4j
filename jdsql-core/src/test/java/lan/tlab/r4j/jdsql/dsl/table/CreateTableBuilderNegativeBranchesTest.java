@@ -33,7 +33,7 @@ class CreateTableBuilderNegativeBranchesTest {
                         .column("id")
                         .integer()
                         .primaryKey() // empty varargs → throw
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Column names cannot be empty in primaryKey()");
     }
@@ -44,7 +44,7 @@ class CreateTableBuilderNegativeBranchesTest {
                         .column("email")
                         .varchar(255)
                         .index(null, "email") // null name → throw
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Index name cannot be null");
     }
@@ -55,7 +55,7 @@ class CreateTableBuilderNegativeBranchesTest {
                         .column("email")
                         .varchar(255)
                         .index("idx_email") // empty varargs → throw
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Column names cannot be empty in index()");
     }
@@ -114,7 +114,7 @@ class CreateTableBuilderNegativeBranchesTest {
                         .column("age")
                         .integer()
                         .check(null) // null predicate → throw
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Predicate cannot be null in check()");
     }

@@ -32,7 +32,7 @@ class LikeTest {
                 .where()
                 .column("name")
                 .like("John")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -45,7 +45,7 @@ class LikeTest {
                 .where()
                 .column("name")
                 .like("%John")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%John");
@@ -58,7 +58,7 @@ class LikeTest {
                 .where()
                 .column("name")
                 .like("John%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John%");
@@ -71,7 +71,7 @@ class LikeTest {
                 .where()
                 .column("name")
                 .like("%John%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%John%");
@@ -84,7 +84,7 @@ class LikeTest {
                 .where()
                 .column("code")
                 .like("ABC_DE")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "ABC_DE");
@@ -97,7 +97,7 @@ class LikeTest {
                 .where()
                 .column("reference")
                 .like("ORD-___-____")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "ORD-___-____");
@@ -110,7 +110,7 @@ class LikeTest {
                 .where()
                 .column("title")
                 .like("%premium%product%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%premium%product%");
@@ -123,7 +123,7 @@ class LikeTest {
                 .where()
                 .column("name")
                 .like("")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "");
@@ -136,7 +136,7 @@ class LikeTest {
                 .where()
                 .column("email")
                 .like("%@domain.com%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%@domain.com%");
@@ -149,7 +149,7 @@ class LikeTest {
                 .where()
                 .column("order_id")
                 .like("2025%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("WHERE").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "2025%");
@@ -164,7 +164,7 @@ class LikeTest {
                 .having()
                 .column("category")
                 .like("premium%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING").contains("LIKE").contains("?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "premium%");
@@ -181,7 +181,7 @@ class LikeTest {
                 .and()
                 .column("email")
                 .like("%@example.com")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")
@@ -200,7 +200,7 @@ class LikeTest {
                 .or()
                 .column("name")
                 .like("%Jane%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHERE")

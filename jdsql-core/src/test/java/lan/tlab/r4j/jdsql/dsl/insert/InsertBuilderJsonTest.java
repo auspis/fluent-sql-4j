@@ -31,7 +31,7 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "users")
                 .set("id", 1)
                 .set("data", jsonValue)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "users" ("id", "data") VALUES (?, ?)""");
@@ -45,7 +45,7 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "products")
                 .set("id", 100)
                 .set("tags", jsonArray)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "products" ("id", "tags") VALUES (?, ?)""");
@@ -59,7 +59,7 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "documents")
                 .set("doc_id", 42)
                 .set("content", nestedJson)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "documents" ("doc_id", "content") VALUES (?, ?)""");
@@ -75,7 +75,7 @@ class InsertBuilderJsonTest {
                 .set("published", true)
                 .set("metadata", metadata)
                 .set("view_count", 0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "articles" ("title", "published", "metadata", "view_count") VALUES (?, ?, ?, ?)""");
@@ -90,7 +90,7 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "settings")
                 .set("key", "app_config")
                 .set("value", (String) null)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "settings" ("key", "value") VALUES (?, ?)""");
@@ -104,7 +104,7 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "logs")
                 .set("log_id", 999)
                 .set("details", emptyJson)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "logs" ("log_id", "details") VALUES (?, ?)""");
@@ -118,7 +118,7 @@ class InsertBuilderJsonTest {
         new InsertBuilder(specFactory, "collections")
                 .set("collection_id", 5)
                 .set("items", emptyArray)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "collections" ("collection_id", "items") VALUES (?, ?)""");

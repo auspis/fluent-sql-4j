@@ -49,7 +49,7 @@ class CreateTableBuilderIntegrationTest {
                 .column("name")
                 .varchar(100)
                 .primaryKey("id")
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             ps.execute();
         }
 
@@ -72,7 +72,7 @@ class CreateTableBuilderIntegrationTest {
                 .column("quantity")
                 .integer()
                 .primaryKey("id")
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             ps.execute();
         }
 
@@ -96,7 +96,7 @@ class CreateTableBuilderIntegrationTest {
                 .column("birth_date")
                 .date()
                 .primaryKey("id")
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             ps.execute();
         }
 
@@ -119,7 +119,7 @@ class CreateTableBuilderIntegrationTest {
                 .column("quantity")
                 .integer()
                 .primaryKey("order_id", "item_id")
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             ps.execute();
         }
 
@@ -132,7 +132,7 @@ class CreateTableBuilderIntegrationTest {
     @Test
     void convenienceMethodColumnIntegerPrimaryKey() throws SQLException {
         try (PreparedStatement ps =
-                dsl.createTable("simple").columnIntegerPrimaryKey("id").buildPreparedStatement(connection)) {
+                dsl.createTable("simple").columnIntegerPrimaryKey("id").build(connection)) {
             ps.execute();
         }
 
@@ -145,7 +145,7 @@ class CreateTableBuilderIntegrationTest {
         try (PreparedStatement ps = dsl.createTable("text_table")
                 .columnIntegerPrimaryKey("id")
                 .columnVarcharNotNull("name", 100)
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             ps.execute();
         }
 
@@ -159,7 +159,7 @@ class CreateTableBuilderIntegrationTest {
         try (PreparedStatement ps = dsl.createTable("timestamps")
                 .columnIntegerPrimaryKey("id")
                 .columnTimestampNotNull("created_at")
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             ps.execute();
         }
 
@@ -177,7 +177,7 @@ class CreateTableBuilderIntegrationTest {
                 .column("name")
                 .varchar(50)
                 .primaryKey("id")
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             ps.execute();
         }
 

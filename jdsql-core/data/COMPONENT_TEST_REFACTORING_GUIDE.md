@@ -27,7 +27,7 @@ class DeleteDSLComponentTest {
     @Test
     void createsDeleteBuilderWithRenderer() throws SQLException {
         dsl.deleteFrom("users").where().column("id").eq(1)
-            .buildPreparedStatement(connection);
+            .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 DELETE FROM "users" WHERE "id" = ?""");
@@ -58,7 +58,7 @@ class DeleteDSLComponentTest {
     @Test
     void createsDeleteBuilderWithRenderer() throws SQLException {
         dsl.deleteFrom("users").where().column("id").eq(1)
-            .buildPreparedStatement(sqlCaptureHelper.getConnection());
+            .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 DELETE FROM "users" WHERE "id" = ?""");
@@ -124,10 +124,10 @@ class DeleteDSLComponentTest {
 
    ```java
    // DA:
-   .buildPreparedStatement(connection);
+   .build(connection);
 
    // A:
-   .buildPreparedStatement(sqlCaptureHelper.getConnection());
+   .build(sqlCaptureHelper.getConnection());
    ```
 5. **Aggiorna SQL assertions**:
 
