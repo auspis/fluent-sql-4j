@@ -17,7 +17,7 @@ class DeleteDSLComponentTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = StandardSqlRendererFactory.dslStandardSql();
+        dsl = StandardSQLDialectPlugin.instance().createDSL();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -51,7 +51,7 @@ class DeleteDSLComponentTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = StandardSqlRendererFactory.dslStandardSql();
+        dsl = StandardSQLDialectPlugin.instance().createDSL();
         sqlCaptureHelper = new SqlCaptureHelper();
     }
 
