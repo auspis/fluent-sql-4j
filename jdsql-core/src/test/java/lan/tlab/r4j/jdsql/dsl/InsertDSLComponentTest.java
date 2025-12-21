@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class InsertDSLComponentTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = StandardSqlRendererFactory.dslStandardSql();
+        dsl = StandardSqlUtil.dsl();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -32,7 +32,7 @@ class InsertDSLComponentTest {
     }
 
     @Test
-    void createsInsertBuilderWithRenderer() throws SQLException {
+    void createsInsertBuilderWithPreparedStatementSpecFactory() throws SQLException {
         dsl.insertInto("users").set("name", "John").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -41,7 +41,7 @@ class InsertDSLComponentTest {
     }
 
     @Test
-    void appliesRendererQuoting() throws SQLException {
+    void appliesPreparedStatementSpecFactoryQuoting() throws SQLException {
         dsl.insertInto("temp_table").defaultValues().buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""

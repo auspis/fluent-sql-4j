@@ -6,5 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface UpdateStatementPsStrategy {
-    PreparedStatementSpec handle(UpdateStatement stmt, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            UpdateStatement stmt, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

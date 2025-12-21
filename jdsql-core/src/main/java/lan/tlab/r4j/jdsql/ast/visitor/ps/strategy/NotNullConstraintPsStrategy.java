@@ -7,5 +7,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface NotNullConstraintPsStrategy {
     PreparedStatementSpec handle(
-            NotNullConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            NotNullConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx);
 }

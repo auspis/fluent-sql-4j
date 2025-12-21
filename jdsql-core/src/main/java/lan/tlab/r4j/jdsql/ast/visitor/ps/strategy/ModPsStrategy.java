@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ModPsStrategy {
 
-    PreparedStatementSpec handle(Mod mod, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(Mod mod, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

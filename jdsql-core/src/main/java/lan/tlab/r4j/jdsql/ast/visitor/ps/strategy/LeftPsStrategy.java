@@ -6,5 +6,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface LeftPsStrategy {
-    PreparedStatementSpec handle(Left left, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(Left left, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

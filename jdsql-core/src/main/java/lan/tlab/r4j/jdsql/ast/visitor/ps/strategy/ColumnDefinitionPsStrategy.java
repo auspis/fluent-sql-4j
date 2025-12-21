@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ColumnDefinitionPsStrategy {
     PreparedStatementSpec handle(
-            ColumnDefinition columnDefinition, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            ColumnDefinition columnDefinition, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

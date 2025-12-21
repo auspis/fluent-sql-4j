@@ -13,17 +13,17 @@ import org.junit.jupiter.api.Test;
 class MysqlCurrentDatePsStrategyTest {
 
     private MysqlCurrentDatePsStrategy strategy;
-    private AstToPreparedStatementSpecVisitor psRenderer;
+    private AstToPreparedStatementSpecVisitor astToPsSpecVisitor;
 
     @BeforeEach
     public void setUp() {
         strategy = new MysqlCurrentDatePsStrategy();
-        psRenderer = MysqlAstToPreparedStatementSpecVisitorFactory.create();
+        astToPsSpecVisitor = MysqlAstToPreparedStatementSpecVisitorFactory.create();
     }
 
     @Test
     void ok() {
-        PreparedStatementSpec result = strategy.handle(new CurrentDate(), psRenderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(new CurrentDate(), astToPsSpecVisitor, new AstContext());
         assertThat(result.sql()).isEqualTo("CURDATE()");
         assertThat(result.parameters()).isEmpty();
     }

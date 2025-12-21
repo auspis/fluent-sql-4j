@@ -10,7 +10,7 @@ import lan.tlab.r4j.jdsql.ast.ddl.definition.DataType;
 import lan.tlab.r4j.jdsql.ast.ddl.definition.TableDefinition;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ class CreateTableStatementTest {
 
     @BeforeEach
     void setUp() {
-        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlUtil.preparedStatementSpecFactory();
     }
 
     @Test

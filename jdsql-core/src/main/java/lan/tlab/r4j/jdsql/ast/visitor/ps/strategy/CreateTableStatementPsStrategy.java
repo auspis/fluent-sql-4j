@@ -7,5 +7,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface CreateTableStatementPsStrategy {
     PreparedStatementSpec handle(
-            CreateTableStatement createTableStatement, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            CreateTableStatement createTableStatement,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx);
 }

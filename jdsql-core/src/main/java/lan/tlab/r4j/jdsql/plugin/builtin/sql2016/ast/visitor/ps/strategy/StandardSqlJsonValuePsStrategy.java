@@ -13,9 +13,9 @@ public class StandardSqlJsonValuePsStrategy implements JsonValuePsStrategy {
 
     @Override
     public PreparedStatementSpec handle(
-            JsonValue jsonValue, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var documentResult = jsonValue.jsonDocument().accept(renderer, ctx);
-        var pathResult = jsonValue.path().accept(renderer, ctx);
+            JsonValue jsonValue, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var documentResult = jsonValue.jsonDocument().accept(astToPsSpecVisitor, ctx);
+        var pathResult = jsonValue.path().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>();
         parameters.addAll(documentResult.parameters());

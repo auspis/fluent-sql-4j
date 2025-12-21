@@ -6,5 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface PrimaryKeyPsStrategy {
-    PreparedStatementSpec handle(PrimaryKeyDefinition item, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            PrimaryKeyDefinition item, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

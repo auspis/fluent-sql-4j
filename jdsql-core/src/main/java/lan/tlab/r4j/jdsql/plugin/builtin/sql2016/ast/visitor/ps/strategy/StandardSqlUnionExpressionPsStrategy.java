@@ -12,10 +12,10 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
 public class StandardSqlUnionExpressionPsStrategy implements UnionExpressionPsStrategy {
     @Override
     public PreparedStatementSpec handle(
-            UnionExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            UnionExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
 
-        PreparedStatementSpec leftPart = expression.left().accept(renderer, ctx);
-        PreparedStatementSpec rightPart = expression.right().accept(renderer, ctx);
+        PreparedStatementSpec leftPart = expression.left().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec rightPart = expression.right().accept(astToPsSpecVisitor, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",

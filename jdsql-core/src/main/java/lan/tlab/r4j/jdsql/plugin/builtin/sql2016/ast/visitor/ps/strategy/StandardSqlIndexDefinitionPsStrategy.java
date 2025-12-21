@@ -11,14 +11,14 @@ public class StandardSqlIndexDefinitionPsStrategy implements IndexDefinitionPsSt
 
     @Override
     public PreparedStatementSpec handle(
-            IndexDefinition index, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            IndexDefinition index, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         // Index definitions are static DDL elements without parameters
         // Inline rendering logic from StandardSqlIndexDefinitionRenderStrategy
         String sql = String.format(
                 "INDEX %s (%s)",
-                renderer.getEscapeStrategy().apply(index.name()),
+                astToPsSpecVisitor.getEscapeStrategy().apply(index.name()),
                 index.columnNames().stream()
-                        .map(renderer.getEscapeStrategy()::apply)
+                        .map(astToPsSpecVisitor.getEscapeStrategy()::apply)
                         .collect(java.util.stream.Collectors.joining(", ")));
         return new PreparedStatementSpec(sql, List.of());
     }

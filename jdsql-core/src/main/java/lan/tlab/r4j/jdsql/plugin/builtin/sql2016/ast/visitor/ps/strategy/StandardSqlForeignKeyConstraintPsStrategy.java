@@ -10,13 +10,15 @@ public class StandardSqlForeignKeyConstraintPsStrategy implements ForeignKeyCons
 
     @Override
     public PreparedStatementSpec handle(
-            ForeignKeyConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            ForeignKeyConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx) {
         // Foreign key constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlForeignKeyConstraintRenderStrategy
         String columns = constraint.columns().stream()
-                .map(c -> renderer.getEscapeStrategy().apply(c))
+                .map(c -> astToPsSpecVisitor.getEscapeStrategy().apply(c))
                 .collect(java.util.stream.Collectors.joining(", "));
-        PreparedStatementSpec referencesDto = constraint.references().accept(renderer, ctx);
+        PreparedStatementSpec referencesDto = constraint.references().accept(astToPsSpecVisitor, ctx);
         String sql = String.format("FOREIGN KEY (%s) %s", columns, referencesDto.sql());
         return new PreparedStatementSpec(sql, referencesDto.parameters());
     }

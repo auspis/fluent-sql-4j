@@ -46,7 +46,7 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
- * Result<PreparedStatementSpecFactory> result = registry.getRenderer("postgresql", "15.0.0");
+ * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("postgresql", "15.0.0");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
@@ -84,7 +84,7 @@ public final class PostgreSqlDialectPlugin {
     public static final String DIALECT_VERSION = "^15.0.0";
 
     private static final SqlDialectPlugin INSTANCE =
-            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, PostgreSqlDialectPlugin::createPostgreSqlDSL);
+            new SqlDialectPlugin(DIALECT_NAME, DIALECT_VERSION, PostgreSqlDialectPlugin::dsl);
 
     /**
      * Private constructor to prevent instantiation.
@@ -112,12 +112,12 @@ public final class PostgreSqlDialectPlugin {
      *
      * @return a new {@link PreparedStatementSpecFactory} instance configured for PostgreSQL, never {@code null}
      */
-    private static PreparedStatementSpecFactory createPostgreSqlRenderer() {
-        AstToPreparedStatementSpecVisitor psRenderer = AstToPreparedStatementSpecVisitor.builder()
+    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
+        AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(psRenderer);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
     }
 
     /**
@@ -141,8 +141,8 @@ public final class PostgreSqlDialectPlugin {
      *
      * @return a new {@link PostgreSqlDSL} instance configured for PostgreSQL, never {@code null}
      */
-    private static DSL createPostgreSqlDSL() {
-        return new PostgreSqlDSL(createPostgreSqlRenderer());
+    private static DSL dsl() {
+        return new PostgreSqlDSL(createPreparedStatementSpecFactory());
     }
 
     /**

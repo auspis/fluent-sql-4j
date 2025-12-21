@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface SimpleDataTypePsStrategy {
     PreparedStatementSpec handle(
-            SimpleDataType simpleDataType, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            SimpleDataType simpleDataType, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

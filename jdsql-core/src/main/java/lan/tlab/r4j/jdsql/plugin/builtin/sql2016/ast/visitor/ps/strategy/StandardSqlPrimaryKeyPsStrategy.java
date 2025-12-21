@@ -11,11 +11,11 @@ public class StandardSqlPrimaryKeyPsStrategy implements PrimaryKeyPsStrategy {
 
     @Override
     public PreparedStatementSpec handle(
-            PrimaryKeyDefinition item, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            PrimaryKeyDefinition item, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         // Primary key constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlPrimaryKeyRenderStrategy
         String columns = item.columns().stream()
-                .map(c -> renderer.getEscapeStrategy().apply(c))
+                .map(c -> astToPsSpecVisitor.getEscapeStrategy().apply(c))
                 .collect(java.util.stream.Collectors.joining(", "));
         String sql = String.format("PRIMARY KEY (%s)", columns);
         return new PreparedStatementSpec(sql, List.of());

@@ -17,5 +17,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
  */
 public interface CustomFunctionCallPsStrategy {
     PreparedStatementSpec handle(
-            CustomFunctionCall functionCall, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            CustomFunctionCall functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

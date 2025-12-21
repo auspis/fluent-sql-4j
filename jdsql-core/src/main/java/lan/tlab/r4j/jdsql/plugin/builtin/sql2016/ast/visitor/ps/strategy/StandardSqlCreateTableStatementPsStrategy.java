@@ -10,9 +10,11 @@ public class StandardSqlCreateTableStatementPsStrategy implements CreateTableSta
 
     @Override
     public PreparedStatementSpec handle(
-            CreateTableStatement createTableStatement, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            CreateTableStatement createTableStatement,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx) {
         PreparedStatementSpec tableDefinitionDto =
-                createTableStatement.tableDefinition().accept(renderer, ctx);
+                createTableStatement.tableDefinition().accept(astToPsSpecVisitor, ctx);
         String sql = "CREATE TABLE " + tableDefinitionDto.sql();
         return new PreparedStatementSpec(sql, tableDefinitionDto.parameters());
     }

@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ReplacePsStrategy {
 
-    PreparedStatementSpec handle(Replace replace, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(Replace replace, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

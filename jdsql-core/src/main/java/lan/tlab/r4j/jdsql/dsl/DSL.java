@@ -43,8 +43,8 @@ public class DSL {
      * String sql = dsl.select("name").from("users").build();
      * }</pre>
      *
-     * @param renderer the dialect renderer to use for this DSL instance
-     * @throws NullPointerException if {@code renderer} is {@code null}
+     * @param specFactory the dialect PreparedStatementSpecFactory to use for this DSL instance
+     * @throws NullPointerException if {@code specFactory} is {@code null}
      * @see DSLRegistry
      */
     public DSL(PreparedStatementSpecFactory specFactory) {
