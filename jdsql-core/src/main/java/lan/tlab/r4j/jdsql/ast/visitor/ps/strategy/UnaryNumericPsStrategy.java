@@ -7,5 +7,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface UnaryNumericPsStrategy {
 
-    PreparedStatementSpec handle(UnaryNumeric functionCall, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            UnaryNumeric functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

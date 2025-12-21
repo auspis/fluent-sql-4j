@@ -58,7 +58,7 @@ class StandardSQLDialectPluginE2E {
     }
 
     @Test
-    void getRenderer() {
+    void getSpecFactory() {
         Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(Result.Success.class);
@@ -79,16 +79,16 @@ class StandardSQLDialectPluginE2E {
     }
 
     @Test
-    void getRendererWithoutVersion() {
+    void getSpecFactoryWithoutVersion() {
         // When version is not specified, should return available plugin
-        Result<PreparedStatementSpecFactory> result = registry.getRenderer(DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
     }
 
     @Test
-    void shouldProduceWorkingRenderer() throws SQLException {
+    void shouldProduceWorkingPreparedStatementSpecFactory() throws SQLException {
         // Get renderer from registry
         Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
@@ -129,7 +129,7 @@ class StandardSQLDialectPluginE2E {
     }
 
     @Test
-    void shouldUseRendererForDifferentDSLOperations() throws SQLException {
+    void shouldUsePreparedStatementSpecFactoryForDifferentDSLOperations() throws SQLException {
         // Get renderer from registry
         PreparedStatementSpecFactory specFactory =
                 registry.getSpecFactory("StandardSQL", "2008").orElseThrow();

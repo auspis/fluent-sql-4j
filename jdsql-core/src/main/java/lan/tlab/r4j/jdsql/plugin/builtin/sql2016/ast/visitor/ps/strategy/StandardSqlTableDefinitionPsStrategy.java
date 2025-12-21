@@ -16,23 +16,24 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
 
     @Override
     public PreparedStatementSpec handle(
-            TableDefinition tableDefinition, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            TableDefinition tableDefinition, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         List<Object> allParameters = new ArrayList<>();
 
-        PreparedStatementSpec tableDto = tableDefinition.table().accept(renderer, ctx);
+        PreparedStatementSpec tableDto = tableDefinition.table().accept(astToPsSpecVisitor, ctx);
         allParameters.addAll(tableDto.parameters());
 
         String columnsSql = tableDefinition.columns().stream()
                 .map(c -> {
-                    PreparedStatementSpec columnDto = renderer.visit(c, ctx);
+                    PreparedStatementSpec columnDto = astToPsSpecVisitor.visit(c, ctx);
                     allParameters.addAll(columnDto.parameters());
                     return columnDto.sql();
                 })
                 .collect(Collectors.joining(", "));
 
-        String primaryKeySql = renderPrimaryKey(tableDefinition.primaryKey(), renderer, ctx, allParameters);
-        String constraintsSql = renderConstraints(tableDefinition.constraints(), renderer, ctx, allParameters);
-        String indexesSql = renderIndexes(tableDefinition.indexes(), renderer, ctx, allParameters);
+        String primaryKeySql = renderPrimaryKey(tableDefinition.primaryKey(), astToPsSpecVisitor, ctx, allParameters);
+        String constraintsSql =
+                renderConstraints(tableDefinition.constraints(), astToPsSpecVisitor, ctx, allParameters);
+        String indexesSql = renderIndexes(tableDefinition.indexes(), astToPsSpecVisitor, ctx, allParameters);
 
         String sql = tableDto.sql() + " (" + columnsSql + primaryKeySql + constraintsSql + indexesSql + ")";
         return new PreparedStatementSpec(sql, allParameters);
@@ -40,20 +41,20 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
 
     private String renderPrimaryKey(
             PrimaryKeyDefinition primaryKey,
-            AstToPreparedStatementSpecVisitor renderer,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
             AstContext ctx,
             List<Object> allParameters) {
         if (primaryKey == null) {
             return "";
         }
-        PreparedStatementSpec pkDto = renderer.visit(primaryKey, ctx);
+        PreparedStatementSpec pkDto = astToPsSpecVisitor.visit(primaryKey, ctx);
         allParameters.addAll(pkDto.parameters());
         return ", " + pkDto.sql();
     }
 
     private String renderConstraints(
             List<ConstraintDefinition> constraints,
-            AstToPreparedStatementSpecVisitor renderer,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
             AstContext ctx,
             List<Object> allParameters) {
         if (constraints == null || constraints.isEmpty()) {
@@ -61,7 +62,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
         }
         String constraintsSql = constraints.stream()
                 .map(c -> {
-                    PreparedStatementSpec constraintDto = c.accept(renderer, ctx);
+                    PreparedStatementSpec constraintDto = c.accept(astToPsSpecVisitor, ctx);
                     allParameters.addAll(constraintDto.parameters());
                     return constraintDto.sql();
                 })
@@ -71,7 +72,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
 
     private String renderIndexes(
             List<IndexDefinition> indexes,
-            AstToPreparedStatementSpecVisitor renderer,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
             AstContext ctx,
             List<Object> allParameters) {
         if (indexes == null || indexes.isEmpty()) {
@@ -79,7 +80,7 @@ public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsSt
         }
         String indexesSql = indexes.stream()
                 .map(i -> {
-                    PreparedStatementSpec indexDto = renderer.visit(i, ctx);
+                    PreparedStatementSpec indexDto = astToPsSpecVisitor.visit(i, ctx);
                     allParameters.addAll(indexDto.parameters());
                     return indexDto.sql();
                 })

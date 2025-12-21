@@ -43,7 +43,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
     }
 
     @Test
-    void shouldProvideRendererViaRegistry() {
+    void shouldProvidePreparedStatementSpecFactoryViaRegistry() {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("StandardSQL", "2008");
@@ -53,7 +53,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
     }
 
     @Test
-    void shouldProvideRendererViaRegistryCaseInsensitive() {
+    void shouldProvidePreparedStatementSpecFactoryViaRegistryCaseInsensitive() {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Test various case combinations
@@ -80,11 +80,11 @@ class StandardSQLDialectPluginServiceLoaderTest {
     }
 
     @Test
-    void shouldProvideRendererWithoutVersion() {
+    void shouldProvidePreparedStatementSpecFactoryWithoutVersion() {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // When version is not specified, should return the first available plugin
-        Result<PreparedStatementSpecFactory> result = registry.getRenderer("StandardSQL");
+        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("StandardSQL");
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();

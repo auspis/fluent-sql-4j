@@ -114,7 +114,7 @@ class DSLRegistryTest {
     }
 
     @Test
-    void dslFor_shouldReturnDSLWithConfiguredRenderer() {
+    void dslFor_shouldReturnDSLWithConfiguredPreparedStatementSpecFactory() {
         Result<DSL> result = registry.dslFor(TestDialectPlugin.DIALECT_NAME);
 
         DSL dsl = result.orElseThrow();

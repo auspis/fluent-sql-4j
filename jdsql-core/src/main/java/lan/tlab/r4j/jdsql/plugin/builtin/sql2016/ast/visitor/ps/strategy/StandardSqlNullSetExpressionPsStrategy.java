@@ -11,7 +11,7 @@ public class StandardSqlNullSetExpressionPsStrategy implements NullSetExpression
 
     @Override
     public PreparedStatementSpec handle(
-            NullSetExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            NullSetExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         return new PreparedStatementSpec("", Collections.emptyList());
     }
 }

@@ -15,8 +15,8 @@ public class StandardSqlAggregationFunctionProjectionPsStrategy implements Aggre
             Visitor<PreparedStatementSpec> renderer,
             AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
-        if (renderer instanceof AstToPreparedStatementSpecVisitor psRenderer) {
-            escapeStrategy = psRenderer.getEscapeStrategy();
+        if (renderer instanceof AstToPreparedStatementSpecVisitor astToPsSpecVisitor) {
+            escapeStrategy = astToPsSpecVisitor.getEscapeStrategy();
         }
 
         // The AggregateExpressionProjection wraps an AggregateExpression (e.g., COUNT, SUM, etc.)

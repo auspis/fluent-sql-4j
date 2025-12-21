@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface CheckConstraintPsStrategy {
     PreparedStatementSpec handle(
-            CheckConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            CheckConstraintDefinition constraint, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

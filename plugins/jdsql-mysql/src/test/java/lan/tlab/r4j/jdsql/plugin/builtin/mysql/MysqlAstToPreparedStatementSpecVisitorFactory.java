@@ -38,7 +38,7 @@ public final class MysqlAstToPreparedStatementSpecVisitorFactory {
      * @return PreparedStatementSpecFactory configured for MySQL 8.x
      * @throws IllegalArgumentException if the MySQL plugin is not available
      */
-    public static PreparedStatementSpecFactory dialectRendererMysql() {
+    public static PreparedStatementSpecFactory preparedStatementSpecFactory() {
         return REGISTRY.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }

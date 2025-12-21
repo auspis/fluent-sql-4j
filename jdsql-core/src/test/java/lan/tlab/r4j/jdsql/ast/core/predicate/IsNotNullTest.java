@@ -9,7 +9,7 @@ import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.select.SelectBuilder;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class IsNotNullTest {
     @BeforeEach
     void setUp() throws SQLException {
         sqlCaptureHelper = new SqlCaptureHelper();
-        specFactory = StandardSqlRendererFactory.dialectRendererStandardSql();
+        specFactory = StandardSqlUtil.preparedStatementSpecFactory();
     }
 
     // Basic IS NOT NULL tests

@@ -9,9 +9,10 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CastPsStrategy;
 public class StandardSqlCastPsStrategy implements CastPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Cast cast, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            Cast cast, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         // Visit the inner expression to get its SQL and parameters
-        PreparedStatementSpec expressionDto = cast.expression().accept(renderer, ctx);
+        PreparedStatementSpec expressionDto = cast.expression().accept(astToPsSpecVisitor, ctx);
 
         // Build the CAST SQL syntax
         String sql = "CAST(" + expressionDto.sql() + " AS " + cast.dataType() + ")";

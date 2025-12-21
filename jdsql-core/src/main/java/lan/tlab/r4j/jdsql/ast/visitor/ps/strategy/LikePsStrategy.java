@@ -6,5 +6,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface LikePsStrategy {
-    PreparedStatementSpec handle(Like like, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(Like like, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

@@ -20,7 +20,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
     @Override
     public PreparedStatementSpec handle(
-            MergeStatement stmt, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            MergeStatement stmt, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         List<Object> params = new ArrayList<>();
 
         // Find WHEN NOT MATCHED INSERT action (required for MySQL)
@@ -40,13 +40,15 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
 
         // INSERT INTO target_table
         String sql = "INSERT INTO "
-                + renderer.getEscapeStrategy().apply(stmt.getTargetTable().name());
+                + astToPsSpecVisitor
+                        .getEscapeStrategy()
+                        .apply(stmt.getTargetTable().name());
 
         // Column list
         if (!insertAction.columns().isEmpty()) {
             List<String> columns = new ArrayList<>();
             for (var col : insertAction.columns()) {
-                columns.add(renderer.getEscapeStrategy().apply(col.column()));
+                columns.add(astToPsSpecVisitor.getEscapeStrategy().apply(col.column()));
             }
             sql += " (" + String.join(", ", columns) + ")";
         }
@@ -64,7 +66,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         if (insertAction.insertData() instanceof InsertData.InsertValues insertValues) {
             List<String> selectExprs = new ArrayList<>();
             for (var expr : insertValues.valueExpressions()) {
-                PreparedStatementSpec exprDto = expr.accept(renderer, selectCtx);
+                PreparedStatementSpec exprDto = expr.accept(astToPsSpecVisitor, selectCtx);
                 selectExprs.add(exprDto.sql());
                 params.addAll(exprDto.parameters());
             }
@@ -74,14 +76,14 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
             List<String> selectExprs = new ArrayList<>();
             for (var col : insertAction.columns()) {
                 ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.column());
-                PreparedStatementSpec colDto = sourceCol.accept(renderer, selectCtx);
+                PreparedStatementSpec colDto = sourceCol.accept(astToPsSpecVisitor, selectCtx);
                 selectExprs.add(colDto.sql());
             }
             sql += String.join(", ", selectExprs);
         }
 
         // FROM source
-        PreparedStatementSpec usingDto = stmt.getUsing().accept(renderer, ctx);
+        PreparedStatementSpec usingDto = stmt.getUsing().accept(astToPsSpecVisitor, ctx);
         sql += " FROM " + usingDto.sql();
         params.addAll(usingDto.parameters());
 
@@ -91,16 +93,17 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
 
             List<String> updateClauses = new ArrayList<>();
             for (UpdateItem item : updateAction.updateItems()) {
-                PreparedStatementSpec colDto = item.column().accept(renderer, ctx);
+                PreparedStatementSpec colDto = item.column().accept(astToPsSpecVisitor, ctx);
                 String columnName = colDto.sql();
 
                 // Check if value is a ColumnReference to use VALUES()
                 if (item.value() instanceof ColumnReference colRef) {
-                    String escapedColName = renderer.getEscapeStrategy().apply(colRef.column());
+                    String escapedColName =
+                            astToPsSpecVisitor.getEscapeStrategy().apply(colRef.column());
                     updateClauses.add(columnName + " = VALUES(" + escapedColName + ")");
                 } else {
                     // For literals and other expressions, use parameterized value
-                    PreparedStatementSpec valDto = item.value().accept(renderer, ctx);
+                    PreparedStatementSpec valDto = item.value().accept(astToPsSpecVisitor, ctx);
                     updateClauses.add(columnName + " = " + valDto.sql());
                     params.addAll(valDto.parameters());
                 }

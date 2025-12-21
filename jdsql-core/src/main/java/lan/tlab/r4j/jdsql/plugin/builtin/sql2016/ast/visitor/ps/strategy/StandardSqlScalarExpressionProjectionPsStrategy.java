@@ -16,8 +16,8 @@ public class StandardSqlScalarExpressionProjectionPsStrategy implements ScalarEx
             Visitor<PreparedStatementSpec> renderer,
             AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
-        if (renderer instanceof AstToPreparedStatementSpecVisitor psRenderer) {
-            escapeStrategy = psRenderer.getEscapeStrategy();
+        if (renderer instanceof AstToPreparedStatementSpecVisitor astToPsSpecVisitor) {
+            escapeStrategy = astToPsSpecVisitor.getEscapeStrategy();
         }
 
         Expression expr = scalarExpressionProjection.expression();

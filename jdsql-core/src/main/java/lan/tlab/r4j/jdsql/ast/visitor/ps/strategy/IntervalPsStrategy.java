@@ -6,5 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface IntervalPsStrategy {
-    PreparedStatementSpec handle(Interval interval, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            Interval interval, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

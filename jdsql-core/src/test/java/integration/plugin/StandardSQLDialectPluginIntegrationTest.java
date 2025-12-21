@@ -61,7 +61,7 @@ class StandardSQLDialectPluginIntegrationTest {
     }
 
     @Test
-    void getRenderer() {
+    void getSpecFactory() {
         Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(Result.Success.class);
@@ -82,16 +82,16 @@ class StandardSQLDialectPluginIntegrationTest {
     }
 
     @Test
-    void getRendererWithoutVersion() {
+    void getSpecFactoryWithoutVersion() {
         // When version is not specified, should return available plugin
-        Result<PreparedStatementSpecFactory> result = registry.getRenderer(DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
     }
 
     @Test
-    void shouldProduceWorkingRenderer() throws SQLException {
+    void shouldProduceWorkingPreparedStatementSpecFactory() throws SQLException {
         // Get specFactory from registry
         Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
@@ -127,7 +127,7 @@ class StandardSQLDialectPluginIntegrationTest {
     }
 
     @Test
-    void shouldUseRendererForDifferentDSLOperations() throws SQLException {
+    void shouldUsePreparedStatementSpecFactoryForDifferentDSLOperations() throws SQLException {
         Connection mockConnection = mock(Connection.class);
         PreparedStatement mockPs = mock(PreparedStatement.class);
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);

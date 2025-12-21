@@ -11,7 +11,7 @@ public class StandardSqlSimpleDataTypePsStrategy implements SimpleDataTypePsStra
 
     @Override
     public PreparedStatementSpec handle(
-            SimpleDataType type, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            SimpleDataType type, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         // Simple data types are static DDL elements without parameters
         // Inline rendering logic from StandardSqlSimpleDataTypeRenderStrategy
         return new PreparedStatementSpec(type.name(), List.of());

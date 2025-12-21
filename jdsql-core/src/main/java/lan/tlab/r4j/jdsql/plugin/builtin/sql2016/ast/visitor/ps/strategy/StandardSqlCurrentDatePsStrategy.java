@@ -11,7 +11,7 @@ public class StandardSqlCurrentDatePsStrategy implements CurrentDatePsStrategy {
 
     @Override
     public PreparedStatementSpec handle(
-            CurrentDate currentDate, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            CurrentDate currentDate, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         return new PreparedStatementSpec("CURRENT_DATE", List.of());
     }
 }

@@ -7,5 +7,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ReferencesItemPsStrategy {
 
-    PreparedStatementSpec handle(ReferencesItem item, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            ReferencesItem item, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

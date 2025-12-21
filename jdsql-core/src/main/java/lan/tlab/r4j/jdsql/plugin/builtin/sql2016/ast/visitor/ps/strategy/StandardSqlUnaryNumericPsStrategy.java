@@ -10,8 +10,8 @@ public class StandardSqlUnaryNumericPsStrategy implements UnaryNumericPsStrategy
 
     @Override
     public PreparedStatementSpec handle(
-            UnaryNumeric functionCall, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec expressionDto = functionCall.numericExpression().accept(renderer, ctx);
+            UnaryNumeric functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec expressionDto = functionCall.numericExpression().accept(astToPsSpecVisitor, ctx);
         String sql = String.format("%s(%s)", functionCall.functionName(), expressionDto.sql());
         return new PreparedStatementSpec(sql, expressionDto.parameters());
     }
