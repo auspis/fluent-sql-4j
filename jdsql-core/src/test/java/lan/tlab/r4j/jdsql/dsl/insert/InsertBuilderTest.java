@@ -25,9 +25,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithDefaultValues() throws SQLException {
-        new InsertBuilder(specFactory, "users")
-                .defaultValues()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new InsertBuilder(specFactory, "users").defaultValues().build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" DEFAULT VALUES\
@@ -36,9 +34,7 @@ class InsertBuilderTest {
 
     @Test
     void insertWithSingleColumnAndValue() throws SQLException {
-        new InsertBuilder(specFactory, "users")
-                .set("name", "John")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+        new InsertBuilder(specFactory, "users").set("name", "John").build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("name") VALUES (?)\
@@ -52,7 +48,7 @@ class InsertBuilderTest {
                 .set("id", 1)
                 .set("name", "John")
                 .set("email", "john@example.com")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("id", "name", "email") VALUES (?, ?, ?)\
@@ -67,7 +63,7 @@ class InsertBuilderTest {
         new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("email", (String) null)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("name", "email") VALUES (?, ?)\
@@ -81,7 +77,7 @@ class InsertBuilderTest {
         new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("active", true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
             INSERT INTO "users" ("name", "active") VALUES (?, ?)\
@@ -96,7 +92,7 @@ class InsertBuilderTest {
                 .set("id", 1)
                 .set("price", 19.99)
                 .set("quantity", 100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "products" ("id", "price", "quantity") VALUES (?, ?, ?)""");
@@ -140,7 +136,7 @@ class InsertBuilderTest {
                 .set("int_col", 42)
                 .set("bool_col", false)
                 .set("null_col", (String) null)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 INSERT INTO "mixed_table" ("text_col", "int_col", "bool_col", "null_col") VALUES (?, ?, ?, ?)""");
@@ -156,7 +152,7 @@ class InsertBuilderTest {
         new InsertBuilder(specFactory, "users")
                 .set("name", "John")
                 .set("birthdate", birthdate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("INSERT INTO \"users\" (\"name\", \"birthdate\") VALUES (?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "John");
@@ -164,9 +160,9 @@ class InsertBuilderTest {
     }
 
     @Test
-    void buildPreparedStatementRequiresConnection() {
+    void buildRequiresConnection() {
         InsertBuilder builder = new InsertBuilder(specFactory, "users").set("name", "John");
 
-        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> builder.build(null)).isInstanceOf(NullPointerException.class);
     }
 }

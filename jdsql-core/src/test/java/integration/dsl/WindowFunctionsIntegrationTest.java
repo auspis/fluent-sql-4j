@@ -53,7 +53,7 @@ class WindowFunctionsIntegrationTest {
                 .build();
 
         PreparedStatement ps =
-                new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
+                new SelectBuilder(specFactory, select).from("employees").build(connection);
 
         List<List<Object>> rows = lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil.list(
                 ps, rs -> List.of(rs.getString("name"), rs.getInt("row_num")));
@@ -77,7 +77,7 @@ class WindowFunctionsIntegrationTest {
                 .build();
 
         PreparedStatement ps =
-                new SelectBuilder(specFactory, select).from("employees").buildPreparedStatement(connection);
+                new SelectBuilder(specFactory, select).from("employees").build(connection);
 
         List<List<Object>> rows = lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil.list(
                 ps, rs -> List.of(rs.getString("department"), rs.getString("name"), rs.getInt("dept_row_num")));

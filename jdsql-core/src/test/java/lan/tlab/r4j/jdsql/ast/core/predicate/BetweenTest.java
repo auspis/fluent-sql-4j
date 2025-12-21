@@ -34,7 +34,7 @@ class BetweenTest {
                 .where()
                 .column("price")
                 .between(10, 100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 10);
@@ -48,7 +48,7 @@ class BetweenTest {
                 .where()
                 .column("amount")
                 .between(99.99, 999.99)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 99.99);
@@ -62,7 +62,7 @@ class BetweenTest {
                 .where()
                 .column("celsius")
                 .between(-10, 5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, -10);
@@ -76,7 +76,7 @@ class BetweenTest {
                 .where()
                 .column("id")
                 .between(1000000L, 9999999L)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1000000L);
@@ -93,7 +93,7 @@ class BetweenTest {
                 .where()
                 .column("event_date")
                 .between(start, end)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, start);
@@ -110,7 +110,7 @@ class BetweenTest {
                 .where()
                 .column("timestamp")
                 .between(start, end)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, start);
@@ -127,7 +127,7 @@ class BetweenTest {
                 .and()
                 .column("stock")
                 .gt(0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("AND").contains(">");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 10);
@@ -145,7 +145,7 @@ class BetweenTest {
                 .or()
                 .column("price")
                 .between(100, 200)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN").contains("OR");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 10);
@@ -162,7 +162,7 @@ class BetweenTest {
                 .having()
                 .column("COUNT(*)")
                 .between(5, 20)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING").contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 5);
@@ -180,7 +180,7 @@ class BetweenTest {
                 .having()
                 .column("MIN(created_at)")
                 .between(start, end)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING").contains("BETWEEN").contains("AND");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, start);
@@ -197,7 +197,7 @@ class BetweenTest {
                 .and()
                 .column("weight")
                 .between(0.5, 5.0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("BETWEEN");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 10);

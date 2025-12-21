@@ -58,7 +58,7 @@ class JsonFunctionsH2MySQLModeIntegrationTest {
                         .where()
                         .jsonValue("address", "$.city")
                         .eq("Milan")
-                        .buildPreparedStatement(connection);
+                        .build(connection);
                 ResultSet rs = ps.executeQuery()) {
 
             assertThat(rs.next()).isTrue();
@@ -79,7 +79,7 @@ class JsonFunctionsH2MySQLModeIntegrationTest {
                         .where()
                         .jsonExists("preferences", "$[?(@ == \"email\")]")
                         .exists()
-                        .buildPreparedStatement(connection);
+                        .build(connection);
                 ResultSet rs = ps.executeQuery()) {
 
             assertThat(rs.next()).isTrue();
@@ -107,7 +107,7 @@ class JsonFunctionsH2MySQLModeIntegrationTest {
                         .and()
                         .jsonExists("preferences", "$[?(@ == \"push\")]")
                         .exists()
-                        .buildPreparedStatement(connection);
+                        .build(connection);
                 ResultSet rs = ps.executeQuery()) {
 
             assertThat(rs.next()).isTrue();

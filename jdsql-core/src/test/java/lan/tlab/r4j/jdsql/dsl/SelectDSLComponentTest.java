@@ -41,7 +41,7 @@ class SelectDSLComponentTest {
 
     @Test
     void createsSelectBuilderWithPreparedStatementSpecFactory() throws SQLException {
-        dsl.select("name", "email").from("users").buildPreparedStatement(connection);
+        dsl.select("name", "email").from("users").build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "email" FROM "users"\
@@ -50,7 +50,7 @@ class SelectDSLComponentTest {
 
     @Test
     void appliesPreparedStatementSpecFactoryQuoting() throws SQLException {
-        dsl.select("id", "value").from("temp_table").buildPreparedStatement(connection);
+        dsl.select("id", "value").from("temp_table").build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "id", "value" FROM "temp_table"\
@@ -69,7 +69,7 @@ class SelectDSLComponentTest {
                 .eq(true)
                 .orderBy("name")
                 .fetch(10)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "age" \
@@ -96,7 +96,7 @@ class SelectDSLComponentTest {
                 .where()
                 .column("category")
                 .eq("Electronics")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", \
@@ -123,7 +123,7 @@ class SelectDSLComponentTest {
                 .as("discount")
                 .from("products")
                 .orderBy("name")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "id", "name", \
@@ -148,7 +148,7 @@ class SelectDSLComponentTest {
                 .column("products", "name")
                 .expression(jsonDiscount, "discount")
                 .from("products")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", \
@@ -167,7 +167,7 @@ class SelectDSLComponentTest {
                 .orderByDesc("employees", "salary")
                 .as("rank")
                 .from("employees")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "salary", \
@@ -187,7 +187,7 @@ class SelectDSLComponentTest {
                 .orderByDesc("employees", "salary")
                 .as("dept_rank")
                 .from("employees")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "department", "salary", \
@@ -208,7 +208,7 @@ class SelectDSLComponentTest {
                 .orderByDesc("products", "price")
                 .as("price_dense_rank")
                 .from("products")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "price", \
@@ -230,7 +230,7 @@ class SelectDSLComponentTest {
                 .where()
                 .column("year")
                 .eq(2024)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "sale_date", "amount", \
@@ -252,7 +252,7 @@ class SelectDSLComponentTest {
                                 .build()),
                         "rank")
                 .from("employees")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", \
@@ -270,7 +270,7 @@ class SelectDSLComponentTest {
                 .orderByDesc("employees", "salary")
                 .as("quartile")
                 .from("employees")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "salary", \
@@ -291,7 +291,7 @@ class SelectDSLComponentTest {
                 .where()
                 .column("year")
                 .eq(2024)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "sale_date", \
@@ -317,7 +317,7 @@ class SelectDSLComponentTest {
                 .orderByDesc("employees", "salary")
                 .as("dept_rank_with_gaps")
                 .from("employees")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "name", "department", "salary", \
@@ -341,7 +341,7 @@ class SelectDSLComponentTest {
                 .and()
                 .column("email")
                 .like("%@example.com")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "u"."name", "u"."email", "u"."created_at" \
@@ -366,7 +366,7 @@ class SelectDSLComponentTest {
                 .eq(true)
                 .orderByDesc("created_at")
                 .fetch(10)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "u"."name", "u"."email" \
@@ -397,7 +397,7 @@ class SelectDSLComponentTest {
                 .having()
                 .column("city")
                 .like("New%")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "u"."name", "u"."city" \
@@ -430,7 +430,7 @@ class SelectDSLComponentTest {
                 .column("manager_id")
                 .isNull()
                 .orderByDesc("budget")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "d"."dept_name", "d"."budget", "d"."location" \
@@ -457,7 +457,7 @@ class SelectDSLComponentTest {
                 .column("department")
                 .like("Engineering%")
                 .orderBy("department")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "department", "COUNT(*)", "SUM(salary)", "AVG(age)" \
@@ -485,7 +485,7 @@ class SelectDSLComponentTest {
                 .ne("discontinued")
                 .orderBy("region")
                 .orderBy("category")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "region", "category", "COUNT(*)", "MAX(price)" \
@@ -517,7 +517,7 @@ class SelectDSLComponentTest {
                 .lt(9999)
                 .orderByDesc("customer_id")
                 .fetch(10)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "customer_id", "COUNT(*)", "SUM(amount)", "AVG(quantity)" \
@@ -544,7 +544,7 @@ class SelectDSLComponentTest {
                 .and()
                 .jsonValue("profile", "$.age")
                 .gt(25)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "id", "name" \
@@ -569,7 +569,7 @@ class SelectDSLComponentTest {
                 .column("active")
                 .eq(true)
                 .orderBy("name")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT "product_id", "name", "price" \
@@ -599,7 +599,7 @@ class SelectDSLComponentTest {
                 .notExists()
                 .orderByDesc("order_date")
                 .fetch(20)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 SELECT * \
