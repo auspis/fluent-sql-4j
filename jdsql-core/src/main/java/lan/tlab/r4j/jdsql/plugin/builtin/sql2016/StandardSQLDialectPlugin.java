@@ -29,18 +29,18 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
  * <ul>
  *   <li><b>Immutable</b>: This class is a singleton with no mutable state</li>
  *   <li><b>Thread-safe</b>: Can be safely used from multiple threads</li>
- *   <li><b>Stateless</b>: All rendering logic is delegated to the SqlRenderer</li>
+ *   <li><b>Stateless</b>: Rendering logic lives in the {@link PreparedStatementSpecFactory} strategies</li>
  * </ul>
  * <p>
  * <b>Usage Example:</b>
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
- * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+ * SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
  * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("standardsql", "2008");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
- * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
+ * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
  * }</pre>
  * <p>
  * <b>Version Matching:</b>
@@ -94,8 +94,7 @@ public final class StandardSQLDialectPlugin {
     /**
      * Creates a {@link PreparedStatementSpecFactory} for Standard SQL.
      * <p>
-     * This method creates both SQL and PreparedStatement renderers configured
-     * for the SQL standard, ensuring consistency between the two.
+     * The factory wires Standard SQL rendering strategies into the {@link AstToPreparedStatementSpecVisitor}.
      *
      * @return a new PreparedStatementSpecFactory instance
      */
@@ -111,7 +110,7 @@ public final class StandardSQLDialectPlugin {
      * Creates a DSL instance for Standard SQL:2008.
      * <p>
      * Returns the base {@link lan.tlab.r4j.jdsql.dsl.DSL} class configured with
-     * the Standard SQL:2008 renderer.
+     * the Standard SQL:2008 PreparedStatement spec factory.
      *
      * @return a new {@link lan.tlab.r4j.jdsql.dsl.DSL} instance, never {@code null}
      */
@@ -128,7 +127,7 @@ public final class StandardSQLDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-     * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
+     * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
      * }</pre>
      *
      * @return the singleton Standard SQL:2008 dialect plugin instance, never {@code null}

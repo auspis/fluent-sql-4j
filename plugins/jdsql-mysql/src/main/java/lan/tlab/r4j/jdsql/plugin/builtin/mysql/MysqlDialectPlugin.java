@@ -55,18 +55,18 @@ import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
  * <ul>
  *   <li><b>Immutable</b>: This class is a singleton with no mutable state</li>
  *   <li><b>Thread-safe</b>: Can be safely used from multiple threads</li>
- *   <li><b>Stateless</b>: All rendering logic is delegated to the SqlRenderer</li>
+ *   <li><b>Stateless</b>: Rendering logic lives in the {@link PreparedStatementSpecFactory} strategies</li>
  * </ul>
  * <p>
  * <b>Usage Example:</b>
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
- * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+ * SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
  * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("mysql", "8.0.35");
  *
  * // Or created directly
- * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
- * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
+ * SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
+ * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
  * }</pre>
  * <p>
  * <b>Version Matching:</b>
@@ -149,10 +149,10 @@ public final class MysqlDialectPlugin {
     }
 
     /**
-     * Creates the MySQL-specific renderers.
+     * Creates the MySQL-specific {@link PreparedStatementSpecFactory}.
      * <p>
-     * This method creates both the {@link SqlRenderer} and {@link AstToPreparedStatementSpecVisitor}
-     * configured specifically for MySQL syntax, including:
+     * The factory wires MySQL rendering strategies into the {@link AstToPreparedStatementSpecVisitor},
+     * including:
      * <ul>
      *   <li>Backtick identifier escaping</li>
      *   <li>LIMIT/OFFSET pagination syntax</li>
@@ -184,15 +184,15 @@ public final class MysqlDialectPlugin {
      * Creates a MySQL-specific DSL instance.
      * <p>
      * Returns a {@link MysqlDSL} instance configured with
-     * the MySQL renderer. This DSL provides MySQL-specific custom functions like
+     * the MySQL PreparedStatement spec factory. This DSL provides MySQL-specific custom functions like
      * {@code GROUP_CONCAT}, {@code IF}, {@code DATE_FORMAT}, {@code NOW()}, etc.
      * <p>
      * <b>Example usage:</b>
      * <pre>{@code
-     * MySQLDSL dsl = (MySQLDSL) MySQLDialectPlugin.instance().createDSL();
-     * String sql = dsl.select(
+     * MysqlDSL dsl = (MysqlDSL) MysqlDialectPlugin.instance().createDSL();
+     * PreparedStatement ps = dsl.select(
      *     dsl.groupConcat("name", ", ").as("names")
-     * ).from("users").build();
+     * ).from("users").buildPreparedStatement(connection);
      * }</pre>
      *
      * @return a new {@link lan.tlab.r4j.sql.dsl.mysql.MysqlDSL} instance configured for MySQL, never {@code null}
@@ -209,8 +209,8 @@ public final class MysqlDialectPlugin {
      * <p>
      * <b>Example usage:</b>
      * <pre>{@code
-     * SqlDialectPlugin plugin = MySQLDialectPlugin.instance();
-     * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
+     * SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
+     * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
      * }</pre>
      *
      * @return the singleton MySQL dialect plugin instance, never {@code null}

@@ -41,7 +41,7 @@ The JDSQL plugin system uses Java's ServiceLoader (SPI) mechanism for automatic 
 │                                                           │
 │  - ConcurrentHashMap<String, List<SqlDialectPlugin>>     │
 │  - Auto-discovers plugins via ServiceLoader             │
-│  - Provides dialect renderers                            │
+│  - Provides dialect PreparedStatement spec factories     │
 │  - Manages plugin versioning (semantic versioning)       │
 └─────────────────────────┬───────────────────────────────┘
                           │
@@ -60,8 +60,7 @@ The JDSQL plugin system uses Java's ServiceLoader (SPI) mechanism for automatic 
 │                                                           │
 │  - dialectName: String                                   │
 │  - dialectVersion: String (semver regex)                 │
-│  - rendererFactory: Supplier<PreparedStatementSpecFactory>            │
-│  - dslFactory: Supplier<DSL>                             │
+│  - dslSupplier: Supplier<DSL> (builds a PreparedStatementSpecFactory) │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -81,7 +80,7 @@ The JDSQL plugin system uses Java's ServiceLoader (SPI) mechanism for automatic 
 4. Plugins are registered in `SqlDialectPluginRegistry`
 5. User requests DSL for specific dialect and version
 6. Registry matches dialect and version using semantic versioning
-7. Plugin creates renderer and DSL instance
+7. Plugin creates a DSL instance (internally building the PreparedStatementSpecFactory)
 8. DSL instance is cached for reuse
 
 ## How to Create a New Plugin
@@ -123,8 +122,11 @@ Create the provider that ServiceLoader will discover:
 ```java
 package lan.tlab.r4j.jdsql.plugin.builtin.postgresql;
 
+import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider;
+import lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl.PostgreSqlDSL;
 
 /**
  * Service provider for PostgreSQL dialect plugin.
@@ -134,36 +136,19 @@ public final class PostgreSqlDialectPluginProvider implements SqlDialectPluginPr
 
     @Override
     public SqlDialectPlugin get() {
-        return SqlDialectPlugin.builder()
-            .dialectName("postgresql")
-            .dialectVersion("^15\\.0\\.0")  // Semantic versioning regex
-            .rendererFactory(this::createRenderer)
-            .dslFactory(this::createDSL)
-            .build();
-    }
-
-    private PreparedStatementSpecFactory createRenderer() {
-        return PreparedStatementSpecFactory.of(
-            createSqlRenderer(),
-            createAstToPreparedStatementSpecVisitor()
+        return new SqlDialectPlugin(
+            "postgresql",
+            "^15.0.0",
+            () -> new PostgreSqlDSL(createPreparedStatementSpecFactory())
         );
     }
 
-    private SqlRenderer createSqlRenderer() {
-        return SqlRenderer.builder()
-            .customFunctionCallStrategy(new PostgreSqlCustomFunctionRenderStrategy())
-            // ... other strategies
+    private PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
+        AstToPreparedStatementSpecVisitor astToPreparedStatementSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
+            // ... dialect PS strategies
             .build();
-    }
 
-    private AstToPreparedStatementSpecVisitor createAstToPreparedStatementSpecVisitor() {
-        return AstToPreparedStatementSpecVisitor.builder()
-            // ... PS strategies
-            .build();
-    }
-
-    private DSL createDSL() {
-        return new PostgreSqlDSL(createRenderer());
+        return new PreparedStatementSpecFactory(astToPreparedStatementSpecVisitor);
     }
 }
 ```
@@ -185,53 +170,65 @@ lan.tlab.r4j.jdsql.plugin.builtin.postgresql.PostgreSqlDialectPluginProvider
 
 ### Step 4: Create Custom Rendering Strategy
 
-Implement dialect-specific SQL rendering:
+Implement dialect-specific SQL rendering for prepared statements:
 
 ```java
-package lan.tlab.r4j.jdsql.plugin.builtin.postgresql.renderer;
+package lan.tlab.r4j.jdsql.plugin.builtin.postgresql.visitor.ps.strategy;
 
-import lan.tlab.r4j.jdsql.ast.expression.scalar.CustomFunctionCall;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
 import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.SqlRenderer;
-import lan.tlab.r4j.jdsql.ast.visitor.sql.strategy.CustomFunctionCallRenderStrategy;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
+import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 
-public class PostgreSqlCustomFunctionRenderStrategy 
-        implements CustomFunctionCallRenderStrategy {
-    
+public class PostgreSqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsStrategy {
+
     @Override
-    public String render(CustomFunctionCall functionCall, 
-                        SqlRenderer renderer, 
-                        AstContext ctx) {
+    public PreparedStatementSpec handle(
+            CustomFunctionCall functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         return switch (functionCall.functionName()) {
-            case "STRING_AGG" -> renderStringAgg(functionCall, renderer, ctx);
-            default -> renderGeneric(functionCall, renderer, ctx);
+            case "STRING_AGG" -> renderStringAgg(functionCall, astToPsSpecVisitor, ctx);
+            default -> renderGeneric(functionCall, astToPsSpecVisitor, ctx);
         };
     }
-    
-    private String renderStringAgg(CustomFunctionCall call, 
-                                   SqlRenderer renderer, 
-                                   AstContext ctx) {
-        StringBuilder sql = new StringBuilder("STRING_AGG(");
-        sql.append(call.arguments().get(0).accept(renderer, ctx));
-        
+
+    private PreparedStatementSpec renderStringAgg(
+            CustomFunctionCall call, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        List<Object> params = new ArrayList<>();
+
+        PreparedStatementSpec expr = call.arguments().get(0).accept(astToPsSpecVisitor, ctx);
+        params.addAll(expr.parameters());
+
+        StringBuilder sql = new StringBuilder("STRING_AGG(").append(expr.sql());
+
         String separator = (String) call.options().get("SEPARATOR");
         sql.append(", '").append(separator).append("'");
-        
+
         if (call.options().containsKey("ORDER_BY")) {
             sql.append(" ORDER BY ").append(call.options().get("ORDER_BY"));
         }
-        
+
         sql.append(")");
-        return sql.toString();
+        return new PreparedStatementSpec(sql.toString(), params);
     }
-    
-    private String renderGeneric(CustomFunctionCall call, 
-                                 SqlRenderer renderer, 
-                                 AstContext ctx) {
+
+    private PreparedStatementSpec renderGeneric(
+            CustomFunctionCall call, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        List<Object> params = new ArrayList<>();
+
         String args = call.arguments().stream()
-            .map(arg -> arg.accept(renderer, ctx))
-            .collect(Collectors.joining(", "));
-        return call.functionName() + "(" + args + ")";
+                .map(arg -> {
+                    PreparedStatementSpec spec = arg.accept(astToPsSpecVisitor, ctx);
+                    params.addAll(spec.parameters());
+                    return spec.sql();
+                })
+                .collect(Collectors.joining(", "));
+
+        String sql = call.functionName() + "(" + args + ")";
+        return new PreparedStatementSpec(sql, params);
     }
 }
 ```
@@ -394,28 +391,30 @@ class PostgreSqlE2E {
 
 ### Thread Safety
 
-- **Renderers**: Must be stateless or use immutable state
+- **PreparedStatementSpec strategies**: Must be stateless or use immutable state
 - **DSL instances**: Should be immutable after construction
 - **Plugin registration**: Handled automatically by registry (thread-safe)
 
 ```java
-// ✅ GOOD: Stateless renderer strategy
-public class MyRenderStrategy implements CustomFunctionCallRenderStrategy {
+// ✅ GOOD: Stateless PS strategy
+public class MyRenderStrategy implements CustomFunctionCallPsStrategy {
     @Override
-    public String render(CustomFunctionCall call, SqlRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            CustomFunctionCall call, AstToPreparedStatementSpecVisitor visitor, AstContext ctx) {
         // No instance state, thread-safe
-        return "...";
+        return new PreparedStatementSpec("...", List.of());
     }
 }
 
 // ❌ BAD: Mutable state in renderer
-public class BadRenderStrategy implements CustomFunctionCallRenderStrategy {
+public class BadRenderStrategy implements CustomFunctionCallPsStrategy {
     private int counter; // Mutable state - not thread-safe!
     
     @Override
-    public String render(CustomFunctionCall call, SqlRenderer renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            CustomFunctionCall call, AstToPreparedStatementSpecVisitor visitor, AstContext ctx) {
         counter++; // Race condition
-        return "...";
+        return new PreparedStatementSpec("...", List.of());
     }
 }
 ```
@@ -476,21 +475,29 @@ try {
 - src/main/resources/META-INF/services/lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider
 ```
 
-### 2. Non-Thread-Safe Plugin
+### 2. Non-Thread-Safe Strategy
 
-**Problem**: Race conditions when multiple threads use the same renderer.
+**Problem**: Race conditions when multiple threads reuse a mutable PreparedStatement strategy.
 
 ```java
 ❌ BAD: Mutable state
-public class MyRenderer implements SqlRenderer {
+public class MyStrategy implements CustomFunctionCallPsStrategy {
     private StringBuilder buffer = new StringBuilder(); // Shared state!
+
+    @Override
+    public PreparedStatementSpec handle(CustomFunctionCall call, AstToPreparedStatementSpecVisitor visitor, AstContext ctx) {
+        buffer.append(call.functionName());
+        return new PreparedStatementSpec(buffer.toString(), List.of());
+    }
 }
 
 ✅ GOOD: Method-local state
-public class MyRenderer implements SqlRenderer {
-    public String render(AstNode node) {
+public class MyStrategy implements CustomFunctionCallPsStrategy {
+    @Override
+    public PreparedStatementSpec handle(CustomFunctionCall call, AstToPreparedStatementSpecVisitor visitor, AstContext ctx) {
         StringBuilder buffer = new StringBuilder(); // Thread-local
-        // ...
+        buffer.append(call.functionName());
+        return new PreparedStatementSpec(buffer.toString(), List.of());
     }
 }
 ```
@@ -539,15 +546,13 @@ void shouldRenderStringAggWithSeparator() {
         Map.of("SEPARATOR", ", ")
     );
 
-    SqlRenderer renderer = mock(SqlRenderer.class);
-    when(renderer.render(any(), any())).thenReturn("\"employees\".\"name\"");
+    AstToPreparedStatementSpecVisitor visitor = AstToPreparedStatementSpecVisitor.builder()
+        .customFunctionCallStrategy(new PostgreSqlCustomFunctionCallPsStrategy())
+        .build();
 
-    PostgreSqlCustomFunctionRenderStrategy strategy = 
-        new PostgreSqlCustomFunctionRenderStrategy();
-    
-    String result = strategy.render(call, renderer, AstContext.empty());
+    PreparedStatementSpec spec = call.accept(visitor, AstContext.empty());
 
-    assertThat(result).isEqualTo("STRING_AGG(\"employees\".\"name\", ', ')");
+    assertThat(spec.sql()).isEqualTo("STRING_AGG(\"employees\".\"name\", ', ')");
 }
 ```
 
