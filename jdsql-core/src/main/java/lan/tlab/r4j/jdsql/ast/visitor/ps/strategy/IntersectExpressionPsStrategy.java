@@ -8,5 +8,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 public interface IntersectExpressionPsStrategy {
 
     PreparedStatementSpec handle(
-            IntersectExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            IntersectExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

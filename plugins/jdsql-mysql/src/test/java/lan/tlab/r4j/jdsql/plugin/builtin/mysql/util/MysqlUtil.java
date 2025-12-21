@@ -1,8 +1,9 @@
-package lan.tlab.r4j.jdsql.plugin.builtin.mysql;
+package lan.tlab.r4j.jdsql.plugin.builtin.mysql.util;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
+import lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin;
 
 /**
  * Test utility factory for creating MySQL renderers.
@@ -12,11 +13,11 @@ import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
  *
  * @since 1.0
  */
-public final class MysqlSqlRendererFactory {
+public final class MysqlUtil {
 
     private static final SqlDialectPluginRegistry REGISTRY = SqlDialectPluginRegistry.createWithServiceLoader();
 
-    private MysqlSqlRendererFactory() {
+    private MysqlUtil() {
         // Utility class - prevent instantiation
     }
 
@@ -26,7 +27,7 @@ public final class MysqlSqlRendererFactory {
      * @return PreparedStatementSpecFactory configured for MySQL 8.x
      * @throws IllegalArgumentException if the MySQL plugin is not available
      */
-    public static PreparedStatementSpecFactory dialectRendererMysql() {
+    public static PreparedStatementSpecFactory preparedStatementSpecFactory() {
         return REGISTRY.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }
@@ -37,7 +38,7 @@ public final class MysqlSqlRendererFactory {
      * @return DSL instance configured for MySQL 8.x
      * @throws IllegalStateException if the MySQL plugin is not available
      */
-    public static DSL dslMysql() {
-        return new DSL(dialectRendererMysql());
+    public static DSL dsl() {
+        return new DSL(preparedStatementSpecFactory());
     }
 }

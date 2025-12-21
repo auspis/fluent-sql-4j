@@ -13,19 +13,19 @@ import org.junit.jupiter.api.Test;
 class MySqlFetchPsStrategyTest {
 
     private MySqlFetchPsStrategy strategy;
-    private AstToPreparedStatementSpecVisitor psRenderer;
+    private AstToPreparedStatementSpecVisitor astToPsSpecVisitor;
 
     @BeforeEach
     public void setUp() {
         strategy = new MySqlFetchPsStrategy();
-        psRenderer = MysqlAstToPreparedStatementSpecVisitorFactory.create();
+        astToPsSpecVisitor = MysqlAstToPreparedStatementSpecVisitorFactory.create();
     }
 
     @Test
     void empty() {
         Fetch pagination = Fetch.nullObject();
 
-        PreparedStatementSpec result = strategy.handle(pagination, psRenderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(pagination, astToPsSpecVisitor, new AstContext());
         assertThat(result.sql()).isEqualTo("");
         assertThat(result.parameters()).isEmpty();
     }
@@ -34,12 +34,12 @@ class MySqlFetchPsStrategyTest {
     void ok() {
         Fetch pagination = new Fetch(0, 10);
 
-        PreparedStatementSpec result = strategy.handle(pagination, psRenderer, new AstContext());
+        PreparedStatementSpec result = strategy.handle(pagination, astToPsSpecVisitor, new AstContext());
         assertThat(result.sql()).isEqualTo("LIMIT 10 OFFSET 0");
         assertThat(result.parameters()).isEmpty();
 
         pagination = new Fetch(16, 8);
-        result = strategy.handle(pagination, psRenderer, new AstContext());
+        result = strategy.handle(pagination, astToPsSpecVisitor, new AstContext());
         assertThat(result.sql()).isEqualTo("LIMIT 8 OFFSET 16");
         assertThat(result.parameters()).isEmpty();
     }

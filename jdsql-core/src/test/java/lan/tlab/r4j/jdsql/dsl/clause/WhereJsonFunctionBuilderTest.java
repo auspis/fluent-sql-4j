@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import java.sql.SQLException;
 import lan.tlab.r4j.jdsql.ast.core.expression.function.json.BehaviorKind;
 import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class WhereJsonFunctionBuilderTest {
     @BeforeEach
     void setUp() throws SQLException {
         sqlCaptureHelper = new SqlCaptureHelper();
-        dsl = StandardSqlRendererFactory.dslStandardSql();
+        dsl = StandardSqlUtil.dsl();
     }
 
     @Test

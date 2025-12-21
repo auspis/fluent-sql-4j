@@ -46,7 +46,7 @@ import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
  * <b>Benefits:</b>
  * <ul>
  *   <li><b>Separation of Concerns</b>: Plugin management is separated from DSL usage</li>
- *   <li><b>Simpler API</b>: Users work with DSL directly, not with renderers</li>
+ *   <li><b>Simpler API</b>: Users work with DSL directly, not with astToPsSpecVisitor</li>
  *   <li><b>Caching</b>: DSL instances are cached per dialect/version for efficiency</li>
  *   <li><b>Type Safety</b>: Returns {@link Result} for explicit error handling</li>
  *   <li><b>Testability</b>: Easy to mock and test</li>

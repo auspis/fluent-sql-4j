@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface UnionExpressionPsStrategy {
     PreparedStatementSpec handle(
-            UnionExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            UnionExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

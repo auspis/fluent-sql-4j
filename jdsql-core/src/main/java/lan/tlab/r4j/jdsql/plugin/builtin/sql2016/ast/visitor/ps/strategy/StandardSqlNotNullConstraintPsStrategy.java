@@ -11,7 +11,9 @@ public class StandardSqlNotNullConstraintPsStrategy implements NotNullConstraint
 
     @Override
     public PreparedStatementSpec handle(
-            NotNullConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            NotNullConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx) {
         // NOT NULL constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlNotNullConstraintRenderStrategy
         return new PreparedStatementSpec("NOT NULL", List.of());

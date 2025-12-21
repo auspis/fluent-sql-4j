@@ -13,9 +13,9 @@ public class StandardSqlSubstringPsStrategy implements SubstringPsStrategy {
 
     @Override
     public PreparedStatementSpec handle(
-            Substring substring, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec expressionResult = substring.expression().accept(renderer, ctx);
-        PreparedStatementSpec startPositionResult = substring.startPosition().accept(renderer, ctx);
+            Substring substring, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec expressionResult = substring.expression().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec startPositionResult = substring.startPosition().accept(astToPsSpecVisitor, ctx);
 
         List<Object> parameters = new ArrayList<>(expressionResult.parameters());
         parameters.addAll(startPositionResult.parameters());
@@ -27,7 +27,7 @@ public class StandardSqlSubstringPsStrategy implements SubstringPsStrategy {
             sql = String.format("SUBSTRING(%s, %s)", expressionResult.sql(), startPositionResult.sql());
         } else {
             // SUBSTRING with expression, start position and length
-            PreparedStatementSpec lengthResult = substring.length().accept(renderer, ctx);
+            PreparedStatementSpec lengthResult = substring.length().accept(astToPsSpecVisitor, ctx);
             parameters.addAll(lengthResult.parameters());
             sql = String.format(
                     "SUBSTRING(%s, %s, %s)", expressionResult.sql(), startPositionResult.sql(), lengthResult.sql());

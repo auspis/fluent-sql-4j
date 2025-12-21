@@ -12,10 +12,10 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.UpdateStatementPsStrategy;
 public class StandardSqlUpdateStatementPsStrategy implements UpdateStatementPsStrategy {
     @Override
     public PreparedStatementSpec handle(
-            UpdateStatement stmt, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            UpdateStatement stmt, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         // TableIdentifier name
         PreparedStatementSpec tableDto =
-                stmt.table().accept(renderer, ctx); // Usa il visitor su qualunque TableExpression
+                stmt.table().accept(astToPsSpecVisitor, ctx); // Usa il visitor su qualunque TableExpression
         String tableName = tableDto.sql();
 
         List<UpdateItem> setItems = stmt.set();
@@ -23,9 +23,9 @@ public class StandardSqlUpdateStatementPsStrategy implements UpdateStatementPsSt
         List<Object> params = new ArrayList<>();
         for (UpdateItem item : setItems) {
             // Colonna
-            PreparedStatementSpec colDto = item.column().accept(renderer, ctx);
+            PreparedStatementSpec colDto = item.column().accept(astToPsSpecVisitor, ctx);
             // Valore
-            PreparedStatementSpec valDto = item.value().accept(renderer, ctx);
+            PreparedStatementSpec valDto = item.value().accept(astToPsSpecVisitor, ctx);
             setClauses.add(colDto.sql() + " = " + valDto.sql());
             params.addAll(valDto.parameters());
         }
@@ -35,7 +35,7 @@ public class StandardSqlUpdateStatementPsStrategy implements UpdateStatementPsSt
         String whereSql = "";
         List<Object> whereParams = new ArrayList<>();
         if (stmt.where() != null) {
-            PreparedStatementSpec whereDto = stmt.where().accept(renderer, ctx);
+            PreparedStatementSpec whereDto = stmt.where().accept(astToPsSpecVisitor, ctx);
             if (whereDto.sql() != null && !whereDto.sql().isBlank()) {
                 whereSql = " WHERE " + whereDto.sql();
                 whereParams.addAll(whereDto.parameters());

@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSqlRendererFactory;
+import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.util.annotation.ComponentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class DeleteDSLComponentTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = StandardSqlRendererFactory.dslStandardSql();
+        dsl = StandardSqlUtil.dsl();
         connection = mock(Connection.class);
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
@@ -32,7 +32,7 @@ class DeleteDSLComponentTest {
     }
 
     @Test
-    void createsDeleteBuilderWithRenderer() throws SQLException {
+    void createsDeleteBuilderWithPreparedStatementSpecFactory() throws SQLException {
         dsl.deleteFrom("users").where().column("id").eq(1).buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -41,7 +41,7 @@ class DeleteDSLComponentTest {
     }
 
     @Test
-    void appliesRendererQuoting() throws SQLException {
+    void appliesPreparedStatementSpecFactoryQuoting() throws SQLException {
         dsl.deleteFrom("temp_table").buildPreparedStatement(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("DELETE FROM \"temp_table\"");

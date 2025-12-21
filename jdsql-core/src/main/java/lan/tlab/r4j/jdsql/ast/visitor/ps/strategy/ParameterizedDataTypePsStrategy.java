@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ParameterizedDataTypePsStrategy {
     PreparedStatementSpec handle(
-            ParameterizedDataType type, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            ParameterizedDataType type, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

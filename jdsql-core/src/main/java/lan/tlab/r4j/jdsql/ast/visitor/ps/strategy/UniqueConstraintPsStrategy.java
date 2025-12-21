@@ -7,5 +7,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface UniqueConstraintPsStrategy {
     PreparedStatementSpec handle(
-            UniqueConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            UniqueConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx);
 }

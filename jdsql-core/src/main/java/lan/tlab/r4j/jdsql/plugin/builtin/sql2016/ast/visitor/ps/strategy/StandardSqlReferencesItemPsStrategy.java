@@ -13,8 +13,8 @@ public class StandardSqlReferencesItemPsStrategy implements ReferencesItemPsStra
 
     @Override
     public PreparedStatementSpec handle(
-            ReferencesItem item, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
+            ReferencesItem item, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        EscapeStrategy escapeStrategy = astToPsSpecVisitor.getEscapeStrategy();
 
         String sql = String.format(
                 "REFERENCES %s (%s)",

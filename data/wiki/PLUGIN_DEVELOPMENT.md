@@ -101,7 +101,7 @@ plugins/
         │   │       ├── PostgreSqlDialectPluginProvider.java
         │   │       ├── PostgreSqlDialectPlugin.java
         │   │       ├── renderer/
-        │   │       │   ├── PostgreSqlRenderer.java
+        │   │       │   ├── PostgreSqlPostgreSqlAstToPreparedStatementSpecVisitorFactory.java
         │   │       │   └── PostgreSqlCustomFunctionRenderStrategy.java
         │   │       └── dsl/
         │   │           └── PostgreSqlDSL.java
