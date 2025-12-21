@@ -148,7 +148,7 @@ class DSLRegistryComponentTest {
                 .as("c")
                 .on("o.customer_id", "c.id")
                 .where()
-                .column("o.status")
+                .column("o", "status") // Updated to use explicit alias parameter
                 .eq("completed")
                 .build(connection);
 

@@ -24,11 +24,26 @@ import lan.tlab.r4j.jdsql.dsl.select.SelectBuilder;
 public class WhereConditionBuilder<T extends SupportsWhere<T>> {
     private final T parent;
     private final String column;
+    private final ColumnReference columnRef;
     private final LogicalCombinator combinator;
 
+    /**
+     * Constructor for single-table context (column name only).
+     */
     public WhereConditionBuilder(T parent, String column, LogicalCombinator combinator) {
         this.parent = parent;
         this.column = column;
+        this.columnRef = null;
+        this.combinator = combinator;
+    }
+
+    /**
+     * Constructor for multi-table context (explicit ColumnReference).
+     */
+    public WhereConditionBuilder(T parent, ColumnReference columnRef, LogicalCombinator combinator) {
+        this.parent = parent;
+        this.column = null;
+        this.columnRef = columnRef;
         this.combinator = combinator;
     }
 
@@ -241,6 +256,9 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
 
     // Helper methods
     private ColumnReference getColumnRef() {
+        if (columnRef != null) {
+            return columnRef; // Use explicit column reference (multi-table context)
+        }
         return ColumnReference.of(parent.getTableReference(), column);
     }
 
