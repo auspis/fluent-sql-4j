@@ -80,7 +80,7 @@ class MysqlDSLComponentTest {
     }
 
     @Test
-    void shouldHaveMySQLRendererConfigured() throws SQLException {
+    void shouldHaveMySQLPreparedStatementSpecFactoryConfigured() throws SQLException {
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 
         MysqlDSL dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, "8.0.35", MysqlDSL.class)

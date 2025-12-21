@@ -95,9 +95,10 @@ class PostgreSqlPluginRegistryComponentTest {
     }
 
     @Test
-    void getRendererWithoutVersion() {
+    void getSpecFactoryWithoutVersion() {
         // When version is not specified, should return available plugin
-        Result<PreparedStatementSpecFactory> result = pluginRegistry.getRenderer(PostgreSqlDialectPlugin.DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result =
+                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();

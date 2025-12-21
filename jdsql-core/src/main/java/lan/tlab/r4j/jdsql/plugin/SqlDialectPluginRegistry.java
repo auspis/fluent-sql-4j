@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>Using the registry:</b>
  * <pre>{@code
- * Result<SqlRenderer> result = registry.getRenderer("mysql", "8.0.35");
+ * Result<SqlRenderer> result = registry.getSpecFactory("mysql", "8.0.35");
  *
  * switch (result) {
  *     case Success<SqlRenderer>(SqlRenderer renderer) -> // use renderer
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * import lan.tlab.r4j.sql.functional.Result.Success;
  *
  * // Or use helper methods
- * SqlRenderer renderer = registry.getRenderer("mysql", "8.0.35").orElseThrow();
+ * SqlRenderer renderer = registry.getSpecFactory("mysql", "8.0.35").orElseThrow();
  * }</pre>
  * <p>
  * <b>Registering plugins:</b>
@@ -192,7 +192,7 @@ public final class SqlDialectPluginRegistry {
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @return a result containing the renderer, or a failure if the dialect is not supported
      */
-    public Result<PreparedStatementSpecFactory> getRenderer(String dialect) {
+    public Result<PreparedStatementSpecFactory> getSpecFactory(String dialect) {
         return getSpecFactory(dialect, null);
     }
 
@@ -216,12 +216,12 @@ public final class SqlDialectPluginRegistry {
      * <p>
      * <b>Example with SemVer:</b>
      * <pre>{@code
-     * Result<PreparedStatementSpecFactory> result = registry.getRenderer("mysql", "8.0.35");
+     * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("mysql", "8.0.35");
      * }</pre>
      * <p>
      * <b>Example with non-SemVer:</b>
      * <pre>{@code
-     * Result<PreparedStatementSpecFactory> result = registry.getRenderer("standardsql", "2008");
+     * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("standardsql", "2008");
      * }</pre>
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
@@ -260,7 +260,7 @@ public final class SqlDialectPluginRegistry {
      * @param version the version to match
      * @return a {@link lan.tlab.r4j.jdsql.functional.Result} containing either the PS renderer or an error message
      */
-    public Result<AstToPreparedStatementSpecVisitor> getPsRenderer(String dialect, String version) {
+    public Result<AstToPreparedStatementSpecVisitor> getPreparedStatementSpecFactory(String dialect, String version) {
         return getSpecFactory(dialect, version).map(PreparedStatementSpecFactory::astVisitor);
     }
 

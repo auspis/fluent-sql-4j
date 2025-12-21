@@ -7,5 +7,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface TrimPsStrategy {
 
-    PreparedStatementSpec handle(Trim functionCall, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            Trim functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

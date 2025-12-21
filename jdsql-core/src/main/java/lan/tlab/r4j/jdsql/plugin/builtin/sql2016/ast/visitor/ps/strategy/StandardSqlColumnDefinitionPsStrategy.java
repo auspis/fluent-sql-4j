@@ -14,7 +14,7 @@ public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPs
 
     @Override
     public PreparedStatementSpec handle(
-            ColumnDefinition columnDefinition, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            ColumnDefinition columnDefinition, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         if (columnDefinition.equals(ColumnDefinition.nullObject())) {
             return new PreparedStatementSpec("", List.of());
         }
@@ -23,11 +23,11 @@ public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPs
         List<Object> parameters = new ArrayList<>();
 
         // Handle column name - use escape strategy from visitor
-        String columnName = renderer.getEscapeStrategy().apply(columnDefinition.name());
+        String columnName = astToPsSpecVisitor.getEscapeStrategy().apply(columnDefinition.name());
         builder.append(columnName);
 
         // Handle data type - use AstToPreparedStatementSpecVisitor directly
-        PreparedStatementSpec typeDto = columnDefinition.type().accept(renderer, ctx);
+        PreparedStatementSpec typeDto = columnDefinition.type().accept(astToPsSpecVisitor, ctx);
         builder.append(" ").append(typeDto.sql());
         parameters.addAll(typeDto.parameters());
 
@@ -35,7 +35,7 @@ public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPs
         List<PreparedStatementSpec> constraintDtos = Stream.of(
                         columnDefinition.notNullConstraint(), columnDefinition.defaultConstraint())
                 .filter(c -> c != null)
-                .map(c -> c.accept(renderer, ctx))
+                .map(c -> c.accept(astToPsSpecVisitor, ctx))
                 .collect(Collectors.toList());
 
         if (!constraintDtos.isEmpty()) {

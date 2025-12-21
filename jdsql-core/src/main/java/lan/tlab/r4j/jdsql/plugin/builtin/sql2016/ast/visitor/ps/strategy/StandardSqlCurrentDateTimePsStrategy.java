@@ -11,7 +11,7 @@ public class StandardSqlCurrentDateTimePsStrategy implements CurrentDateTimePsSt
 
     @Override
     public PreparedStatementSpec handle(
-            CurrentDateTime currentDateTime, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            CurrentDateTime currentDateTime, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         return new PreparedStatementSpec("CURRENT_TIMESTAMP", List.of());
     }
 }

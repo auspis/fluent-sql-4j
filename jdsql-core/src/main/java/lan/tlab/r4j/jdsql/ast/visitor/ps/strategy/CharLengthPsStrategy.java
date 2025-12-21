@@ -6,5 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface CharLengthPsStrategy {
-    PreparedStatementSpec handle(CharLength charLength, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            CharLength charLength, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

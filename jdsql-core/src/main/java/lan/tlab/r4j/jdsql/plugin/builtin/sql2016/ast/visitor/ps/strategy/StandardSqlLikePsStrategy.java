@@ -11,8 +11,9 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.LikePsStrategy;
 public class StandardSqlLikePsStrategy implements LikePsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Like like, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec expressionDto = like.expression().accept(renderer, ctx);
+    public PreparedStatementSpec handle(
+            Like like, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec expressionDto = like.expression().accept(astToPsSpecVisitor, ctx);
 
         StringBuilder sql = new StringBuilder();
         sql.append(expressionDto.sql());

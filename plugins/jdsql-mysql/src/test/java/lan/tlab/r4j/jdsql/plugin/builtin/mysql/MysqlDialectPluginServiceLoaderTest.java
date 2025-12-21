@@ -61,7 +61,7 @@ class MysqlDialectPluginServiceLoaderTest {
     }
 
     @Test
-    void shouldProvideWorkingRenderer() {
+    void shouldProvideWorkingPreparedStatementSpecFactory() {
         ServiceLoader<SqlDialectPluginProvider> serviceLoader = ServiceLoader.load(SqlDialectPluginProvider.class);
 
         SqlDialectPlugin mysqlPlugin = StreamSupport.stream(serviceLoader.spliterator(), false)

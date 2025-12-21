@@ -12,8 +12,8 @@ public class StandardSqlTablePsStrategy implements TablePsStrategy {
     @Override
     public PreparedStatementSpec handle(
             TableIdentifier table, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
-        AstToPreparedStatementSpecVisitor psRenderer = (AstToPreparedStatementSpecVisitor) renderer;
-        String sql = psRenderer.getEscapeStrategy().apply(table.name());
+        AstToPreparedStatementSpecVisitor astToPsSpecVisitor = (AstToPreparedStatementSpecVisitor) renderer;
+        String sql = astToPsSpecVisitor.getEscapeStrategy().apply(table.name());
         String alias = table.alias() != null ? table.alias().name() : null;
         if (alias != null && !alias.isBlank()) {
             sql += " AS " + alias;

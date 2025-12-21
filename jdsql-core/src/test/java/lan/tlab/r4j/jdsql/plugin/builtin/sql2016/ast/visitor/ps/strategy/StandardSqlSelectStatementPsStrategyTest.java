@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 class StandardSqlSelectStatementPsStrategyTest {
 
     private final StandardSqlSelectStatementPsStrategy strategy = new StandardSqlSelectStatementPsStrategy();
-    private final AstToPreparedStatementSpecVisitor renderer = new AstToPreparedStatementSpecVisitor();
+    private final AstToPreparedStatementSpecVisitor astToPsSpecVisitor = new AstToPreparedStatementSpecVisitor();
     private final AstContext ctx = new AstContext();
     private final PreparedStatementSpecFactory specFactory = new PreparedStatementSpecFactory(
             AstToPreparedStatementSpecVisitor.builder().build());
@@ -38,7 +38,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .from(From.of(new TableIdentifier("users")))
                 .build();
 
-        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        PreparedStatementSpec spec = strategy.handle(statement, astToPsSpecVisitor, ctx);
         assertThat(spec.sql()).isEqualTo("SELECT * FROM \"users\"");
         assertThat(spec.parameters()).isEmpty();
     }
@@ -52,7 +52,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .from(From.fromTable("users", "u"))
                 .build();
 
-        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        PreparedStatementSpec spec = strategy.handle(statement, astToPsSpecVisitor, ctx);
         assertThat(spec.sql()).isEqualTo("""
             SELECT \"id\", \"name\" FROM \"users\" AS u\
             """);
@@ -68,7 +68,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                         Comparison.eq(ColumnReference.of("products", "category"), Literal.of("electronics"))))
                 .build();
 
-        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        PreparedStatementSpec spec = strategy.handle(statement, astToPsSpecVisitor, ctx);
         assertThat(spec.sql()).isEqualTo("""
             SELECT * FROM \"products\" \
             WHERE (\"price\" > ?) \
@@ -88,7 +88,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .having(Having.of(Comparison.gt(new CountStar(), Literal.of(10))))
                 .build();
 
-        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        PreparedStatementSpec spec = strategy.handle(statement, astToPsSpecVisitor, ctx);
         assertThat(spec.sql()).isEqualTo("""
             SELECT \"department\", COUNT(*) \
             FROM \"employees\" \
@@ -105,7 +105,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("orders", "orderDate"))))
                 .build();
 
-        PreparedStatementSpec spec = strategy.handle(statement, renderer, ctx);
+        PreparedStatementSpec spec = strategy.handle(statement, astToPsSpecVisitor, ctx);
         assertThat(spec.sql()).isEqualTo("""
             SELECT * \
             FROM \"orders\" \

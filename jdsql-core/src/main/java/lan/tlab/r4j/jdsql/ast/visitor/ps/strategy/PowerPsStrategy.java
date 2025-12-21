@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface PowerPsStrategy {
 
-    PreparedStatementSpec handle(Power power, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(Power power, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

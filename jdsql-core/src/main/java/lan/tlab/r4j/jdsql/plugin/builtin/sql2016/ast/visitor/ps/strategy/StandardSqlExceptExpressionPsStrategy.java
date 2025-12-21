@@ -12,9 +12,9 @@ public class StandardSqlExceptExpressionPsStrategy implements ExceptExpressionPs
 
     @Override
     public PreparedStatementSpec handle(
-            ExceptExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec leftDto = expression.left().accept(renderer, ctx);
-        PreparedStatementSpec rightDto = expression.right().accept(renderer, ctx);
+            ExceptExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec leftDto = expression.left().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec rightDto = expression.right().accept(astToPsSpecVisitor, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))", leftDto.sql(), expression.distinct() ? "EXCEPT" : "EXCEPT ALL", rightDto.sql());
