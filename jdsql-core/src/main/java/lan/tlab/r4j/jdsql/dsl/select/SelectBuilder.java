@@ -401,7 +401,7 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return updateHaving(having -> SelectBuilder.combineHavingConditions(having, condition, combinator));
     }
 
-    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+    public PreparedStatement build(Connection connection) throws SQLException {
         validateState();
         SelectStatement statement = getCurrentStatement();
         PreparedStatementSpec spec = specFactory.create(statement);

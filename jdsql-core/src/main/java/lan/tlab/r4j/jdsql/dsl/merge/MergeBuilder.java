@@ -177,7 +177,7 @@ public class MergeBuilder {
         return new WhenNotMatchedInsertBuilder(this, condition);
     }
 
-    public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+    public PreparedStatement build(Connection connection) throws SQLException {
         validateState();
         MergeStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);
@@ -317,9 +317,9 @@ public class MergeBuilder {
             return this;
         }
 
-        public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+        public PreparedStatement build(Connection connection) throws SQLException {
             commitAction();
-            return parent.buildPreparedStatement(connection);
+            return parent.build(connection);
         }
     }
 
@@ -418,9 +418,9 @@ public class MergeBuilder {
             return parent.whenNotMatched(condition);
         }
 
-        public PreparedStatement buildPreparedStatement(Connection connection) throws SQLException {
+        public PreparedStatement build(Connection connection) throws SQLException {
             commitAction();
-            return parent.buildPreparedStatement(connection);
+            return parent.build(connection);
         }
     }
 }

@@ -25,18 +25,18 @@ class SelectBuilderPreparedStatementTest {
     }
 
     @Test
-    void buildPreparedStatementRequiresConnection() {
+    void buildRequiresConnection() {
         SelectBuilder builder = new SelectBuilder(specFactory, "*")
                 .from("users")
                 .where()
                 .column("age")
                 .gt(20);
 
-        assertThatThrownBy(() -> builder.buildPreparedStatement(null)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> builder.build(null)).isInstanceOf(NullPointerException.class);
     }
 
     @Test
-    void buildPreparedStatementCompilesWithoutError() throws SQLException {
+    void buildCompilesWithoutError() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "name", "email")
                 .from("users")
                 .where()
@@ -45,7 +45,7 @@ class SelectBuilderPreparedStatementTest {
                 .and()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
@@ -55,7 +55,7 @@ class SelectBuilderPreparedStatementTest {
     }
 
     @Test
-    void buildPreparedStatementWithJoinCompilesWithoutError() throws SQLException {
+    void buildWithJoinCompilesWithoutError() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "name", "email")
                 .from("users")
                 .as("u")
@@ -65,7 +65,7 @@ class SelectBuilderPreparedStatementTest {
                 .where()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)

@@ -29,7 +29,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("metadata", "$.age")
                 .eq(25)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("= ?");
@@ -45,7 +45,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("attributes", "$.quantity")
                 .eq(50)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("= ?");
@@ -60,7 +60,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("stock_info", "$.reorder_point")
                 .ne(0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("<> ?");
@@ -75,7 +75,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("performance", "$.rating")
                 .gt(4.5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("> ?");
@@ -90,7 +90,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("details", "$.price")
                 .lt(99.99)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("< ?");
@@ -105,7 +105,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("totals", "$.amount")
                 .gte(1000.0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains(">= ?");
@@ -120,7 +120,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("payment", "$.fee")
                 .lte(5.0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("<= ?");
@@ -135,7 +135,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("preferences", "$.newsletter")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("IS NULL");
@@ -148,7 +148,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonValue("contact", "$.phone")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_VALUE");
         assertThatSql(sqlCaptureHelper).contains("IS NOT NULL");
@@ -161,7 +161,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonExists("metadata", "$.tags[0]")
                 .exists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_EXISTS");
         assertThatSql(sqlCaptureHelper).contains("= ?");
@@ -176,7 +176,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonExists("settings", "$.advanced")
                 .notExists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_EXISTS");
         assertThatSql(sqlCaptureHelper).contains("= ?");
@@ -192,7 +192,7 @@ class WhereJsonFunctionBuilderTest {
                 .jsonExists("json_col", "$.path")
                 .onError(BehaviorKind.NONE)
                 .exists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_EXISTS");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.path");
@@ -206,7 +206,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonQuery("data", "$.results")
                 .eq("[1, 2, 3]")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_QUERY");
         assertThatSql(sqlCaptureHelper).contains("= ?");
@@ -222,7 +222,7 @@ class WhereJsonFunctionBuilderTest {
                 .jsonQuery("items", "$.list")
                 .returning("VARCHAR(500)")
                 .ne("[]")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_QUERY");
         assertThatSql(sqlCaptureHelper).contains("<> ?");
@@ -237,7 +237,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonQuery("payload", "$.errors")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_QUERY");
         assertThatSql(sqlCaptureHelper).contains("IS NULL");
@@ -250,7 +250,7 @@ class WhereJsonFunctionBuilderTest {
                 .where()
                 .jsonQuery("details", "$.participants")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("JSON_QUERY");
         assertThatSql(sqlCaptureHelper).contains("IS NOT NULL");
@@ -266,7 +266,7 @@ class WhereJsonFunctionBuilderTest {
                 .and()
                 .jsonValue("profile", "$.verified")
                 .eq("true")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).containsInOrder("JSON_VALUE", "> ?", "AND", "JSON_VALUE", "= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.age");
@@ -285,7 +285,7 @@ class WhereJsonFunctionBuilderTest {
                 .or()
                 .jsonExists("metadata", "$.editor")
                 .exists()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).containsInOrder("JSON_EXISTS", "= ?", "OR", "JSON_EXISTS", "= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "$.author");

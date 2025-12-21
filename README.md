@@ -30,7 +30,7 @@ PreparedStatement ps = dsl.select("name", "email")
     .from("users")
     .where()
     .column("age").gt(18)
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### INSERT Statement
@@ -40,10 +40,10 @@ PreparedStatement ps = dsl.insertInto("users")
     .set("name", "John Doe")
     .set("email", "john@example.com")
     .set("age", 25)
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
-**Note**: All builders use `.buildPreparedStatement(connection)` which automatically handles parameter binding, preventing SQL injection attacks. The `Connection` object must be managed by the caller (not closed automatically by the builder).
+**Note**: All builders use `.build(connection)` which automatically handles parameter binding, preventing SQL injection attacks. The `Connection` object must be managed by the caller (not closed automatically by the builder).
 
 For more examples, see the [DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md).
 
