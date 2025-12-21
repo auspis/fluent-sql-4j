@@ -1,9 +1,9 @@
 # Test Coverage Analysis Report
 
-**Generated:** 2025-12-21 (Updated after Phase 6 - Validation & Visitor Enhancements)  
+**Generated:** 2025-12-21 (Updated after Phase 7 - MERGE WHEN Sequencing)  
 **Report Type:** Unit + Component Tests Only (Fast Feedback)  
 **Tool:** JaCoCo 0.8.14  
-**Total Tests:** 1,245 ✅ (+59 tests)
+**Total Tests:** 1,255 ✅ (+10 tests)
 
 ---
 
@@ -211,7 +211,7 @@ Critical areas where conditional logic is not fully tested:
 **3. CreateTable Strict Validation** - 100% ✓
 - ✅ Implemented Option B (fail-fast) validation across all constraint methods
 - ✅ Added 12 test cases for all validation scenarios
-- ✅ All 1,245 tests passing, no regressions
+- ✅ All 1,255 tests passing, no regressions
 - ✅ Comprehensive Javadoc added for all methods
 - ✅ Branch coverage improved for dsl.table package
 
@@ -223,6 +223,35 @@ Critical areas where conditional logic is not fully tested:
 **5. Visitor Fetch Clause** - Complete ✓
 - ✅ Added 1 test case for fetch clause no-op handling
 - ✅ Validates context unchanged after visiting Fetch
+
+### ✅ COMPLETED (Phase 7 - MERGE WHEN Sequencing)
+
+**Status:** DONE ✓  
+**Test File Added:** 1 new test file (`MergeBuilderWhenSequencingTest.java`)  
+**Test Cases Added:** 10 tests  
+**Expected Impact:** dsl.merge from 74.7% → **87%+** (estimated)
+
+|    Test Category    | Tests  |               Coverage Focus               |
+|---------------------|--------|--------------------------------------------|
+| WHEN MATCHED UPDATE | 3      | Single/multiple SET clauses, conditions    |
+| WHEN MATCHED DELETE | 2      | Conditions, multiple WHEN MATCHED sequence |
+| WHEN NOT MATCHED    | 2      | INSERT values, conditions, mixed types     |
+| Complex Sequences   | 3      | UPDATE→UPDATE, UPDATE→DELETE, MATCHED→NOT  |
+| **TOTAL**           | **10** | **dsl.merge branch coverage** ✅            |
+
+**Test Details:**
+- `multipleWhenMatchedUpdates()` - Tests parameter binding order with multiple SET clauses
+- `multipleWhenMatchedWithDeleteTransition()` - Tests WHEN MATCHED UPDATE followed by WHEN MATCHED DELETE (conditional)
+- `whenNotMatchedMultipleColumns()` - Tests INSERT with multiple columns and mixed types
+- `whenNotMatchedWithCondition()` - Tests WHEN NOT MATCHED with predicates
+- `complexSequenceUpdateThenDelete()` - Tests UPDATE action followed by DELETE action
+- `whenMatchedThenNotMatched()` - Tests WHEN MATCHED followed by WHEN NOT MATCHED
+- `parameterBindingOrderWithMultipleClauses()` - Validates parameter binding across multiple clauses
+- `multipleConditionsOnSameWhen()` - Tests complex AND/OR conditions on single WHEN clause
+- `whenNotMatchedThenMatchedSequence()` - Tests INSERT (WHEN NOT MATCHED) followed by UPDATE (WHEN MATCHED)
+- `multipleWhenMatchedWithDeleteTransition()` - Tests WHEN MATCHED UPDATE then WHEN MATCHED DELETE
+
+**All 1,255 tests passing** ✅, code formatted with Spotless ✅
 
 ### ✅ COMPLETED (Week 1)
 
@@ -239,32 +268,16 @@ Critical areas where conditional logic is not fully tested:
 
 ### 🔴 HIGH PRIORITY (Next)
 
-1. **MERGE Statement Coverage** - Add 25+ test cases
-   - WHEN MATCHED UPDATE/DELETE conditions
-   - WHEN NOT MATCHED INSERT conditions
-   - Multiple WHEN clauses combinations
-   - **Current:** dsl.merge at 74.7% (247 missed)
-   - **Expected impact:** +15% coverage = 89%+
-2. **Predicate Composition Testing** - Add 30+ branch tests
+1. **Predicate Composition Testing** - Add 30+ branch tests
    - Test nested predicate conditions
    - Test all comparison operators with type coercion
    - Test IS NULL/IS NOT NULL branches
    - **Current:** ast.core.predicate at 73.7% (103 missed)
    - **Expected impact:** +15-20% branch coverage improvement
-
-### 🟠 MEDIUM PRIORITY
-
-3. **MERGE Statement** - Add 25+ test cases
-   - WHEN MATCHED UPDATE/DELETE conditions
-   - WHEN NOT MATCHED INSERT conditions
-   - Multiple WHEN clauses combinations
-   - **Expected impact:** +18% coverage = 92.7%
-
-### 🟡 LOW PRIORITY
-
-4. **Scalar Expression Branches** - Add conditional tests
-   - NULL value handling branches
+2. **Scalar Arithmetic Coverage** - Add 20+ branch tests
+   - Null handling branches in arithmetic operations
    - Type coercion branches
+   - **Current:** ast.core.expression.scalar **0% branch coverage** ❌
    - **Expected impact:** 0% → 60%+ branch coverage
 
 ---
