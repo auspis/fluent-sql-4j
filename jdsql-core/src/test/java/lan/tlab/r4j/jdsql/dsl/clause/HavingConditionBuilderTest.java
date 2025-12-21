@@ -32,7 +32,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("category")
                 .eq("electronics")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"category\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "electronics");
@@ -46,7 +46,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("category")
                 .ne("discontinued")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"category\" <> ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "discontinued");
@@ -60,7 +60,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("name")
                 .gt("Widget")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"name\" > ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Widget");
@@ -74,7 +74,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("name")
                 .lt("Zebra")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"name\" < ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Zebra");
@@ -88,7 +88,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("code")
                 .gte("A001")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"code\" >= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "A001");
@@ -102,7 +102,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("code")
                 .lte("Z999")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"code\" <= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Z999");
@@ -117,7 +117,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("customer_id")
                 .eq(42)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"customer_id\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 42);
@@ -131,7 +131,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("total")
                 .ne(0)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" <> ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 0);
@@ -145,7 +145,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("customer_id")
                 .gt(100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"customer_id\" > ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100);
@@ -159,7 +159,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("category_id")
                 .lt(50)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"category_id\" < ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 50);
@@ -173,7 +173,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("total")
                 .gte(100.5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" >= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100.5);
@@ -187,7 +187,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("total")
                 .lte(500.99)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" <= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 500.99);
@@ -202,7 +202,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("active")
                 .eq(true)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"active\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
@@ -216,7 +216,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("verified")
                 .ne(false)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"verified\" <> ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, false);
@@ -232,7 +232,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .eq(testDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDate);
@@ -247,7 +247,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .ne(testDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" <> ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDate);
@@ -262,7 +262,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .gt(testDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" > ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDate);
@@ -277,7 +277,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .lt(testDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" < ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDate);
@@ -292,7 +292,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .gte(testDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" >= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDate);
@@ -307,7 +307,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .lte(testDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" <= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDate);
@@ -323,7 +323,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .eq(testDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" = ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDateTime);
@@ -338,7 +338,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .ne(testDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" <> ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDateTime);
@@ -353,7 +353,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .gt(testDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" > ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDateTime);
@@ -368,7 +368,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .lt(testDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" < ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDateTime);
@@ -383,7 +383,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .gte(testDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" >= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDateTime);
@@ -398,7 +398,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .lte(testDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" <= ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, testDateTime);
@@ -413,7 +413,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("email")
                 .isNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"email\" IS NULL");
     }
@@ -426,7 +426,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("email")
                 .isNotNull()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"email\" IS NOT NULL");
     }
@@ -440,7 +440,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("name")
                 .like("%electronics%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"name\" LIKE ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "%electronics%");
@@ -454,7 +454,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("name")
                 .like("Widget%")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"name\" LIKE ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "Widget%");
@@ -469,7 +469,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("category")
                 .in("electronics", "books", "toys")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"category\" IN (?, ?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "electronics");
@@ -485,7 +485,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("status_id")
                 .in(1, 2, 3, 4, 5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"status_id\" IN (?, ?, ?, ?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1);
@@ -503,7 +503,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("status")
                 .in(true, false)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"status\" IN (?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
@@ -521,7 +521,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .in(date1, date2, date3)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" IN (?, ?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, date1);
@@ -539,7 +539,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .in(dt1, dt2)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" IN (?, ?)");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, dt1);
@@ -555,7 +555,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("total")
                 .between(100, 500)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 100);
@@ -570,7 +570,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("total")
                 .between(99.99, 499.99)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"total\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 99.99);
@@ -587,7 +587,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_date")
                 .between(startDate, endDate)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_date\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDate);
@@ -604,7 +604,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("event_time")
                 .between(startDateTime, endDateTime)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING \"event_time\" BETWEEN ? AND ?");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, startDateTime);
@@ -621,7 +621,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("dept_id")
                 .eq(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
@@ -639,7 +639,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("dept_id")
                 .ne(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
@@ -657,7 +657,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("avg_salary")
                 .gt(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
@@ -675,7 +675,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("avg_salary")
                 .lt(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
@@ -693,7 +693,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("account_id")
                 .gte(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
@@ -711,7 +711,7 @@ class HavingConditionBuilderTest {
                 .having()
                 .column("account_id")
                 .lte(subquery)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
@@ -732,7 +732,7 @@ class HavingConditionBuilderTest {
                 .andHaving()
                 .column("customer_id")
                 .lt(500)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")
@@ -753,7 +753,7 @@ class HavingConditionBuilderTest {
                 .orHaving()
                 .column("status")
                 .eq("cancelled")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).contains("HAVING").contains("=").contains("OR");
     }
@@ -770,7 +770,7 @@ class HavingConditionBuilderTest {
                 .andHaving()
                 .column("status")
                 .in("active", "pending")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("GROUP BY")
@@ -793,7 +793,7 @@ class HavingConditionBuilderTest {
                 .andHaving()
                 .column("category")
                 .in("A", "B", "C")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("HAVING")

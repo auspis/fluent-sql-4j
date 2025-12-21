@@ -43,7 +43,7 @@ String userInput = "'; DROP TABLE users; --";
 PreparedStatement ps = dsl.select("name", "email")
     .from("users")
     .where().column("name").eq(userInput)  // Safe: becomes a parameter (?)
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Key Points:**
@@ -56,7 +56,7 @@ PreparedStatement ps = dsl.select("name", "email")
 ```java
 // Proper resource management
 try (Connection conn = dataSource.getConnection();
-     PreparedStatement ps = dsl.select("name").from("users").buildPreparedStatement(conn);
+     PreparedStatement ps = dsl.select("name").from("users").build(conn);
      ResultSet rs = ps.executeQuery()) {
     // Process results
 }
@@ -77,7 +77,7 @@ PreparedStatement ps = dsl.createTable("users")
     .column("name").varchar(100)
     .column("email").varchar(255)
     .primaryKey("id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Table with multiple data types
 PreparedStatement ps = dsl.createTable("products")
@@ -89,7 +89,7 @@ PreparedStatement ps = dsl.createTable("products")
     .column("created_at").timestamp()
     .column("birth_date").date()
     .primaryKey("id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ## SELECT Queries
@@ -104,19 +104,19 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 // Select specific columns
 PreparedStatement ps = dsl.select("name", "email")
     .from("users")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Select all columns
 PreparedStatement ps = dsl.selectAll()
     .from("users")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Column API with alias
 PreparedStatement ps = dsl.select()
     .column("name")
     .column("email").as("emailAddress")
     .from("users")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### WHERE Clause
@@ -131,14 +131,14 @@ PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .where()
     .column("name").eq("John Doe")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Greater than
 PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .where()
     .column("age").gt(25)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Multiple conditions with AND
 PreparedStatement ps = dsl.select("name", "age", "active")
@@ -147,7 +147,7 @@ PreparedStatement ps = dsl.select("name", "age", "active")
     .column("age").gt(18)
     .and()
     .column("active").eq(true)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Multiple conditions with OR
 PreparedStatement ps = dsl.select("name", "age")
@@ -156,7 +156,7 @@ PreparedStatement ps = dsl.select("name", "age")
     .column("name").eq("John Doe")
     .or()
     .column("name").eq("Jane Smith")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Complex conditions (AND + OR)
 PreparedStatement ps = dsl.select("name", "age", "active")
@@ -167,7 +167,7 @@ PreparedStatement ps = dsl.select("name", "age", "active")
     .column("active").eq(true)
     .or()
     .column("name").eq("Bob")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### JOIN Operations
@@ -182,41 +182,41 @@ PreparedStatement ps = dsl.select("*")
     .from("users")
     .innerJoin("orders")
     .on("users.id", "orders.user_id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // LEFT JOIN
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .leftJoin("profiles")
     .on("users.id", "profiles.user_id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // RIGHT JOIN
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .rightJoin("departments")
     .on("users.dept_id", "departments.id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // FULL JOIN
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .fullJoin("roles")
     .on("users.role_id", "roles.id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // CROSS JOIN
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .crossJoin("settings")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // JOIN with table aliases
 PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
     .on("u.id", "o.user_id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Multiple JOINs
 PreparedStatement ps = dsl.select("*")
@@ -225,7 +225,7 @@ PreparedStatement ps = dsl.select("*")
     .on("u.id", "o.user_id")
     .leftJoin("products").as("p")
     .on("o.product_id", "p.id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // JOIN with WHERE clause
 PreparedStatement ps = dsl.select("*")
@@ -234,7 +234,7 @@ PreparedStatement ps = dsl.select("*")
     .on("u.id", "o.user_id")
     .where()
     .column("status").eq("active")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### GROUP BY
@@ -248,13 +248,13 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 PreparedStatement ps = dsl.select("customer_id")
     .from("orders")
     .groupBy("customer_id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // GROUP BY with multiple columns
 PreparedStatement ps = dsl.select("customer_id", "status")
     .from("orders")
     .groupBy("customer_id", "status")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### HAVING Clause
@@ -270,7 +270,7 @@ PreparedStatement ps = dsl.select("customer_id")
     .groupBy("customer_id")
     .having()
     .column("customer_id").gt(100)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // HAVING with AND condition
 PreparedStatement ps = dsl.select("region")
@@ -280,7 +280,7 @@ PreparedStatement ps = dsl.select("region")
     .column("region").ne("South")
     .andHaving()
     .column("region").ne("East")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // HAVING with OR condition
 PreparedStatement ps = dsl.select("category")
@@ -290,7 +290,7 @@ PreparedStatement ps = dsl.select("category")
     .column("category").eq("Electronics")
     .orHaving()
     .column("category").eq("Books")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Complete query with WHERE, GROUP BY, HAVING, and ORDER BY
 PreparedStatement ps = dsl.select("user_id")
@@ -301,7 +301,7 @@ PreparedStatement ps = dsl.select("user_id")
     .having()
     .column("user_id").gt(0)
     .orderBy("user_id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### Subqueries
@@ -318,7 +318,7 @@ SelectBuilder subquery = dsl.select("name", "age")
 
 PreparedStatement ps = dsl.select("name", "age")
     .from(subquery, "u")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // FROM subquery with additional WHERE
 SelectBuilder subquery = dsl.select("name", "age")
@@ -328,7 +328,7 @@ SelectBuilder subquery = dsl.select("name", "age")
 PreparedStatement ps = dsl.select("name", "age")
     .from(subquery, "u")
     .where().column("age").gte(30)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Scalar subquery in WHERE clause
 SelectBuilder avgAgeSubquery = dsl.select("age")
@@ -338,7 +338,7 @@ SelectBuilder avgAgeSubquery = dsl.select("age")
 PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .where().column("age").gte(avgAgeSubquery)
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### ORDER BY and Pagination
@@ -352,26 +352,26 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .orderBy("age")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // ORDER BY descending
 PreparedStatement ps = dsl.select("name", "age")
     .from("users")
     .orderByDesc("age")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // FETCH (LIMIT)
 PreparedStatement ps = dsl.select("name")
     .from("users")
     .fetch(2)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // OFFSET
 PreparedStatement ps = dsl.select("name")
     .from("users")
     .offset(2)
     .fetch(2)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // Complete query with all clauses
 PreparedStatement ps = dsl.select("name", "email", "age")
@@ -381,7 +381,7 @@ PreparedStatement ps = dsl.select("name", "email", "age")
     .orderByDesc("age")
     .fetch(2)
     .offset(0)
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### Aggregate Functions
@@ -394,7 +394,7 @@ DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("standardsql", "2008").orElseThrow();
 
 // COUNT all users
-PreparedStatement ps = dsl.select().countStar().from("users").buildPreparedStatement(connection);
+PreparedStatement ps = dsl.select().countStar().from("users").build(connection);
 // → SELECT COUNT(*) FROM "users"
 
 // SUM with GROUP BY
@@ -402,7 +402,7 @@ PreparedStatement ps = dsl.select()
     .sum("amount").as("total")
     .from("orders")
     .groupBy("customer_id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 // → SELECT SUM("orders"."amount") AS total FROM "orders" GROUP BY "orders"."customer_id"
 
 // AVG with HAVING clause
@@ -412,7 +412,7 @@ PreparedStatement ps = dsl.select()
     .groupBy("department")
     .having()
     .column("department").ne("HR")
-    .buildPreparedStatement(connection);
+    .build(connection);
 // → SELECT AVG("employees"."salary") FROM "employees" 
 //   GROUP BY "employees"."department" 
 //   HAVING "employees"."department" != 'HR'
@@ -422,7 +422,7 @@ PreparedStatement ps = dsl.select()
     .countDistinct("email").as("unique_emails")
     .from("users")
     .where().column("active").eq(true)
-    .buildPreparedStatement(connection);
+    .build(connection);
 // → SELECT COUNT(DISTINCT "users"."email") AS unique_emails 
 //   FROM "users" WHERE "users"."active" = true
 
@@ -431,7 +431,7 @@ PreparedStatement ps = dsl.select()
     .sum("score").as("total_score")
     .max("createdAt").as("latest")
     .from("users")
-    .buildPreparedStatement(connection);
+    .build(connection);
 // → SELECT SUM("users"."score") AS total_score, MAX("users"."createdAt") AS latest FROM "users"
 
 // Table-qualified columns
@@ -439,7 +439,7 @@ PreparedStatement ps = dsl.select()
     .sum("orders", "amount").as("total_amount")
     .from("users").as("u")
     .innerJoin("orders").as("o").on("u.id", "o.user_id")
-    .buildPreparedStatement(connection);
+    .build(connection);
 // → SELECT SUM("orders"."amount") AS total_amount FROM "users" AS "u" 
 //   INNER JOIN "orders" AS "o" ON "u"."id" = "o"."user_id"
 ```
@@ -455,7 +455,7 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 PreparedStatement ps = dsl.insertInto("users")
     .set("id", 1)
     .set("name", "John")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // INSERT with multiple columns and mixed types
 PreparedStatement ps = dsl.insertInto("users")
@@ -466,7 +466,7 @@ PreparedStatement ps = dsl.insertInto("users")
     .set("active", true)
     .set("birthdate", LocalDate.of(1999, 5, 15))
     .set("createdAt", LocalDateTime.of(2023, 10, 10, 12, 0, 0))
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ## UPDATE Statements
@@ -480,21 +480,21 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 PreparedStatement ps = dsl.update("users")
     .set("name", "Johnny")
     .where().column("id").eq(1)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // UPDATE multiple columns
 PreparedStatement ps = dsl.update("users")
     .set("name", "Johnny")
     .set("age", 35)
     .where().column("id").eq(1)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // UPDATE with complex WHERE conditions
 PreparedStatement ps = dsl.update("users")
     .set("email", "jane.updated@example.com")
     .where().column("age").gt(18)
     .and().column("name").eq("Jane Smith")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ## DELETE Statements
@@ -507,18 +507,18 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 // DELETE with WHERE condition
 PreparedStatement ps = dsl.deleteFrom("users")
     .where().column("id").eq(2)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // DELETE with complex conditions
 PreparedStatement ps = dsl.deleteFrom("users")
     .where().column("age").lt(18)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // DELETE with AND condition
 PreparedStatement ps = dsl.deleteFrom("users")
     .where().column("age").gt(18)
     .and().column("name").eq("Alice")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ## MERGE Statements
@@ -540,7 +540,7 @@ PreparedStatement ps = dsl.mergeInto("users")
     .set("id", "src.id")
     .set("name", "src.name")
     .set("email", "src.email")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // MERGE with multiple columns
 PreparedStatement ps = dsl.mergeInto("users")
@@ -558,7 +558,7 @@ PreparedStatement ps = dsl.mergeInto("users")
     .set("email", "src.email")
     .set("age", "src.age")
     .set("active", "src.active")
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // MERGE with additional columns (timestamps, etc.)
 PreparedStatement ps = dsl.mergeInto("users")
@@ -580,7 +580,7 @@ PreparedStatement ps = dsl.mergeInto("users")
     .set("active", "src.active")
     .set("birthdate", "src.birthdate")
     .set("createdAt", "src.createdAt")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ## See Also

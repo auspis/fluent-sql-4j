@@ -43,7 +43,7 @@ class MergeBuilderWhenSequencingTest {
                 .whenNotMatched()
                 .set("id", 1)
                 .set("value", 50)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         // WHEN MATCHED must come before WHEN NOT MATCHED
         assertThatSql(sqlCaptureHelper)
@@ -64,7 +64,7 @@ class MergeBuilderWhenSequencingTest {
                 .whenNotMatched()
                 .set("id", ColumnReference.of("src", "id"))
                 .set("data", "new")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHEN MATCHED THEN DELETE")
@@ -86,7 +86,7 @@ class MergeBuilderWhenSequencingTest {
                 .whenNotMatched(notMatchedCondition)
                 .set("id", ColumnReference.of("src", "id"))
                 .set("status", "pending")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         // Parameters should be: 1000 (matched condition), true (matched update),
         // "active" (not matched condition), "pending" (not matched insert)
@@ -111,7 +111,7 @@ class MergeBuilderWhenSequencingTest {
                 .whenNotMatched()
                 .set("id", 1)
                 .set("status", "normal")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         // Both WHEN MATCHED clauses should appear before WHEN NOT MATCHED
         assertThatSql(sqlCaptureHelper)
@@ -136,7 +136,7 @@ class MergeBuilderWhenSequencingTest {
                 .set("updated", true)
                 .whenMatched(Comparison.eq(ColumnReference.of("src", "archive"), Literal.of(1)))
                 .delete()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).containsInOrder("WHEN MATCHED THEN UPDATE", "WHEN MATCHED AND", "THEN DELETE");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, true);
@@ -155,7 +155,7 @@ class MergeBuilderWhenSequencingTest {
                 .set("name", ColumnReference.of("src", "name"))
                 .set("email", ColumnReference.of("src", "email"))
                 .set("status", "new")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .contains("WHEN NOT MATCHED THEN INSERT (\"id\", \"name\", \"email\", \"status\")")
@@ -180,7 +180,7 @@ class MergeBuilderWhenSequencingTest {
                 .whenNotMatched(insertCondition)
                 .set("id", 999)
                 .set("action", "insert_new")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .containsInOrder("\"type\" = ?", "\"type\" = ?", "\"priority\" <> ?")
@@ -209,7 +209,7 @@ class MergeBuilderWhenSequencingTest {
                 .whenNotMatched(condition2)
                 .set("emp_id", ColumnReference.of("src", "emp_id"))
                 .set("dept_name", "eng")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .containsInOrder("WHEN NOT MATCHED AND", "WHEN NOT MATCHED AND")
@@ -229,7 +229,7 @@ class MergeBuilderWhenSequencingTest {
                 .set("status", "active")
                 .whenMatched(Comparison.eq(ColumnReference.of("source", "type"), Literal.of("ARCHIVE")))
                 .delete()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
                 .containsInOrder("WHEN MATCHED THEN UPDATE SET", "WHEN MATCHED AND", "THEN DELETE");
@@ -251,7 +251,7 @@ class MergeBuilderWhenSequencingTest {
                 .set("id", ColumnReference.of("src", "id"))
                 .set("qty", 1)
                 .set("price", 10.50)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         // Parameter binding order: matched condition (100), matched sets (500, 99.99),
         // not matched condition ("active"), not matched sets (1, 10.50)

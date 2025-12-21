@@ -50,7 +50,7 @@ PreparedStatement ps = mysql.select()
     ).as("employee_names")
     .from("employees")
     .groupBy("department")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -76,7 +76,7 @@ PreparedStatement ps = mysql.select()
     ).as("top_products")
     .from("products")
     .groupBy("category")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -109,7 +109,7 @@ PreparedStatement ps = mysql.select()
         .column("employee_count")
         .gt(5)
     .orderBy("avg_salary DESC")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -147,7 +147,7 @@ PreparedStatement ps = mysql.select()
         .as("region_total")
     .from("stores")
     .groupBy("region")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**

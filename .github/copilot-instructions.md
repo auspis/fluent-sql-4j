@@ -235,7 +235,7 @@ class MyBuilderTest {
 
     @Test
     void myTest() throws SQLException {
-        builder.buildPreparedStatement(sqlCaptureHelper.getConnection());
+        builder.build(sqlCaptureHelper.getConnection());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT \"name\" FROM \"users\"");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, value);
     }
@@ -295,7 +295,7 @@ Always run this before committing changes to ensure the CI/CD pipeline succeeds.
 
 ## DSL Builder API
 
-All DSL builders (SelectBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder, MergeBuilder, CreateTableBuilder) use **only** `.buildPreparedStatement(Connection connection)` to generate SQL with automatic parameter binding.
+All DSL builders (SelectBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder, MergeBuilder, CreateTableBuilder) use **only** `.build(Connection connection)` to generate SQL with automatic parameter binding.
 
 - **No `.build()` method**: The `.build()` method has been removed from all DML/DQL builders
 - **PreparedStatement only**: All builders return `PreparedStatement` with parameters already bound
@@ -310,7 +310,7 @@ PreparedStatement ps = dsl.select("name", "email")
     .from("users")
     .where()
     .column("age").gt(18)
-    .buildPreparedStatement(connection);
+    .build(connection);
 
 // execute query
 ResultSet rs = ps.executeQuery();

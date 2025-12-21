@@ -55,7 +55,7 @@ class MergeDSLComponentTest {
                                 (Expression) ColumnReference.of("np", "product_id"),
                                 (Expression) ColumnReference.of("np", "product_name"),
                                 (Expression) ColumnReference.of("np", "price")))
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue())
                 .contains("MERGE INTO")
@@ -95,7 +95,7 @@ class MergeDSLComponentTest {
                                 (Expression) ColumnReference.of("src", "id"),
                                 (Expression) ColumnReference.of("src", "name"),
                                 (Expression) ColumnReference.of("src", "price")))
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue())
                 .contains("MERGE INTO")
@@ -117,7 +117,7 @@ class MergeDSLComponentTest {
                         List.of(ColumnReference.of("i", "product_id"), ColumnReference.of("i", "quantity")),
                         List.of((Expression) ColumnReference.of("ns", "product_id"), (Expression)
                                 ColumnReference.of("ns", "quantity")))
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue())
                 .contains("WHEN MATCHED AND")
@@ -155,7 +155,7 @@ class MergeDSLComponentTest {
                                 (Expression) ColumnReference.of("src", "name"),
                                 (Expression) ColumnReference.of("src", "price"),
                                 (Expression) ColumnReference.of("src", "version")))
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue())
                 .contains("MERGE INTO \"target_products\"")

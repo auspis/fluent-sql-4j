@@ -33,7 +33,7 @@ class UpdateDSLComponentTest {
 
     @Test
     void createsUpdateBuilderWithPreparedStatementSpecFactory() throws SQLException {
-        dsl.update("users").set("name", "John").where().column("id").eq(1).buildPreparedStatement(connection);
+        dsl.update("users").set("name", "John").where().column("id").eq(1).build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "users" SET "name" = ? WHERE "id" = ?""");
@@ -43,7 +43,7 @@ class UpdateDSLComponentTest {
 
     @Test
     void appliesPreparedStatementSpecFactoryQuoting() throws SQLException {
-        dsl.update("temp_table").set("status", "active").buildPreparedStatement(connection);
+        dsl.update("temp_table").set("status", "active").build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "temp_table" SET "status" = ?""");
@@ -61,7 +61,7 @@ class UpdateDSLComponentTest {
                 .and()
                 .column("quantity")
                 .eq(0)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "products" SET "stock" = ?, "discontinued" = ? WHERE ("last_order_date" < ?) AND ("quantity" = ?)""");
@@ -80,7 +80,7 @@ class UpdateDSLComponentTest {
                 .where()
                 .column("user_id")
                 .eq(42)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "user_preferences" SET "settings" = ? WHERE "user_id" = ?""");
@@ -105,7 +105,7 @@ class UpdateDSLComponentTest {
                 .and()
                 .column("status")
                 .eq("active")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 UPDATE "developers" SET "full_name" = ?, "profile_json" = ?, "contact_info" = ?, "is_available" = ?, "updated_at" = ? WHERE ("developer_id" = ?) AND ("status" = ?)""");

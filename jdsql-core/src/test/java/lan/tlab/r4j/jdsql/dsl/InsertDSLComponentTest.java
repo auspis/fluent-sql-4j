@@ -33,7 +33,7 @@ class InsertDSLComponentTest {
 
     @Test
     void createsInsertBuilderWithPreparedStatementSpecFactory() throws SQLException {
-        dsl.insertInto("users").set("name", "John").buildPreparedStatement(connection);
+        dsl.insertInto("users").set("name", "John").build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "users" ("name") VALUES (?)""");
@@ -42,7 +42,7 @@ class InsertDSLComponentTest {
 
     @Test
     void appliesPreparedStatementSpecFactoryQuoting() throws SQLException {
-        dsl.insertInto("temp_table").defaultValues().buildPreparedStatement(connection);
+        dsl.insertInto("temp_table").defaultValues().build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "temp_table" DEFAULT VALUES""");
@@ -54,7 +54,7 @@ class InsertDSLComponentTest {
                 .set("id", 1)
                 .set("name", "Widget")
                 .set("price", 19.99)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "products" ("id", "name", "price") VALUES (?, ?, ?)""");
@@ -67,7 +67,7 @@ class InsertDSLComponentTest {
     void insertJsonObject() throws SQLException {
         String jsonData = "{\"name\":\"Alice\",\"email\":\"alice@example.com\",\"age\":28}";
 
-        dsl.insertInto("users").set("id", 42).set("metadata", jsonData).buildPreparedStatement(connection);
+        dsl.insertInto("users").set("id", 42).set("metadata", jsonData).build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "users" ("id", "metadata") VALUES (?, ?)""");
@@ -86,7 +86,7 @@ class InsertDSLComponentTest {
                 .set("preferences", preferences)
                 .set("profile_data", profile)
                 .set("is_active", true)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
                 INSERT INTO "user_profiles" ("user_id", "username", "preferences", "profile_data", "is_active") VALUES (?, ?, ?, ?, ?)""");

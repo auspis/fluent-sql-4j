@@ -119,7 +119,7 @@ PreparedStatement ps = dsl.select()
         .orderByDesc("salary")
         .as("rank")
     .from("employees")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -142,7 +142,7 @@ PreparedStatement ps = dsl.select()
     .jsonExists("settings", "$.notifications")
         .as("has_notifications")
     .from("users")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -172,7 +172,7 @@ PreparedStatement ps = mysql.select()
     ).as("employee_names")
     .from("employees")
     .groupBy("department")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -198,7 +198,7 @@ PreparedStatement ps = mysql.select()
     ).as("top_products")
     .from("products")
     .groupBy("category")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -231,7 +231,7 @@ PreparedStatement ps = mysql.select()
         .column("employee_count")
         .gt(5)
     .orderBy("avg_salary DESC")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -267,7 +267,7 @@ PreparedStatement ps = mysql.select()
         .as("region_total")
     .from("stores")
     .groupBy("region")
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -305,7 +305,7 @@ PreparedStatement ps = dsl.mergeInto("products")
         .set("name", ColumnReference.of("np", "name"))
         .set("price", ColumnReference.of("np", "price"))
         .set("created_at", LocalDateTime.now())
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -333,7 +333,7 @@ PreparedStatement ps = dsl.mergeInto("products")
     .whenMatched()
         .set("name", ColumnReference.of("src", "name"))
         .set("status", ColumnReference.of("src", "status"))
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 #### Conditional MERGE: Update or Delete Based on Condition
@@ -347,7 +347,7 @@ PreparedStatement ps = dsl.mergeInto("inventory")
         .set("last_updated", LocalDateTime.now())
     .whenMatched(Comparison.eq(ColumnReference.of("su", "quantity"), Literal.of(0)))
         .delete()
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 **Generated SQL:**
@@ -370,7 +370,7 @@ PreparedStatement ps = dsl.mergeInto("users")
         .set("email", ColumnReference.of("ns", "email"))
         .set("name", ColumnReference.of("ns", "name"))
         .set("created_at", LocalDateTime.now())
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 #### MERGE with Mixed Data Types
@@ -384,7 +384,7 @@ PreparedStatement ps = dsl.mergeInto("products")
         .set("price", 29.99)                       // Number literal
         .set("active", true)                       // Boolean literal
         .set("stock", ColumnReference.of("u", "stock"))  // Column reference
-    .buildPreparedStatement(connection);
+    .build(connection);
 ```
 
 ### Common Use Cases

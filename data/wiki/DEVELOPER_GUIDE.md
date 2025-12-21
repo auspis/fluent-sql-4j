@@ -142,7 +142,7 @@ class SelectDSLComponentTest {
                 .where()
                 .column("age")
                 .gt(18)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
         
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo("SELECT \"id\", \"name\" FROM \"users\" WHERE \"age\" > ?");
