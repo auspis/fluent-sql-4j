@@ -30,7 +30,7 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("id")
                 .eq(1)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
@@ -49,7 +49,7 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("user_id")
                 .eq(42)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "user_settings" SET "username" = ?, "preferences" = ?, "updated_at" = ? \
@@ -70,7 +70,7 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("profile_id")
                 .eq(100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "profiles" SET "profile_data" = ? WHERE "profile_id" = ?""");
@@ -85,7 +85,7 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("id")
                 .eq(5)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "users" SET "metadata" = ? WHERE "id" = ?""");
@@ -102,7 +102,7 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("doc_id")
                 .eq(7)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "documents" SET "properties" = ? WHERE "doc_id" = ?""");
@@ -119,7 +119,7 @@ class UpdateBuilderJsonTest {
                 .where()
                 .column("item_id")
                 .eq(15)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "tags" SET "tag_list" = ? WHERE "item_id" = ?""");
@@ -140,7 +140,7 @@ class UpdateBuilderJsonTest {
                 .and()
                 .column("version")
                 .gte("2.0")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 UPDATE "api_configs" SET "configuration" = ?, "last_modified" = ? WHERE ("api_name" = ?) AND ("version" >= ?)""");

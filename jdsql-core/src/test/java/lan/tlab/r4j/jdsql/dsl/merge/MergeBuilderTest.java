@@ -40,7 +40,7 @@ class MergeBuilderTest {
                 .whenNotMatched()
                 .set("id", ColumnReference.of("src", "id"))
                 .set("value", ColumnReference.of("src", "value"))
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 MERGE INTO "target_table" AS tgt \
@@ -61,7 +61,7 @@ class MergeBuilderTest {
                 .on("target.id", "src.id")
                 .whenMatched()
                 .set("name", "updated")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 MERGE INTO "target" \
@@ -81,7 +81,7 @@ class MergeBuilderTest {
                 .on("target.id", "src.id")
                 .whenMatched(condition)
                 .set("value", 200)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -100,7 +100,7 @@ class MergeBuilderTest {
                 .on("target.id", "src.id")
                 .whenMatched()
                 .delete()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -119,7 +119,7 @@ class MergeBuilderTest {
                 .set("updated", true)
                 .whenNotMatched()
                 .set("id", ColumnReference.of("src", "id"))
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -150,7 +150,7 @@ class MergeBuilderTest {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .on("target.id", "src.id")
                         .whenMatchedThenUpdate(List.of(UpdateItem.of("val", Literal.of(1))))
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("USING clause must be specified");
     }
@@ -160,7 +160,7 @@ class MergeBuilderTest {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .whenMatchedThenUpdate(List.of(UpdateItem.of("val", Literal.of(1))))
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ON condition must be specified");
     }
@@ -170,7 +170,7 @@ class MergeBuilderTest {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
                         .on("target.id", "source.id")
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("At least one WHEN clause must be specified");
     }
@@ -182,7 +182,7 @@ class MergeBuilderTest {
                         .on("target.id", "source.id")
                         .whenNotMatchedThenInsert(
                                 List.of(ColumnReference.of("target", "id")), List.of(Literal.of(1), Literal.of(2)))
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Number of columns must match number of values");
     }
@@ -196,7 +196,7 @@ class MergeBuilderTest {
                 .set("name", "updated")
                 .set("status", "active")
                 .set("count", 100)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -219,7 +219,7 @@ class MergeBuilderTest {
                 .set("age", 30)
                 .set("active", true)
                 .set("salary", 50000.50)
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -239,7 +239,7 @@ class MergeBuilderTest {
                         .using("source")
                         .on("target.id", "source.id")
                         .whenMatched()
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("At least one SET clause must be specified");
     }
@@ -250,7 +250,7 @@ class MergeBuilderTest {
                         .using("source")
                         .on("target.id", "source.id")
                         .whenNotMatched()
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("At least one column must be specified");
     }
@@ -263,7 +263,7 @@ class MergeBuilderTest {
                         .whenMatched()
                         .set("name", "test")
                         .delete()
-                        .buildPreparedStatement(sqlCaptureHelper.getConnection()))
+                        .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Cannot use delete() with SET clauses");
     }
@@ -275,7 +275,7 @@ class MergeBuilderTest {
                 .on("target.id", "src.id")
                 .whenMatched()
                 .set("target.value", ColumnReference.of("src", "new_value"))
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -294,7 +294,7 @@ class MergeBuilderTest {
                 .on("target.id", "src.id")
                 .whenMatched(condition)
                 .delete()
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -315,7 +315,7 @@ class MergeBuilderTest {
                 .whenNotMatched(condition)
                 .set("id", ColumnReference.of("src", "id"))
                 .set("value", ColumnReference.of("src", "value"))
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \
@@ -339,7 +339,7 @@ class MergeBuilderTest {
                 .set("id", "src.id")
                 .set("name", "src.name")
                 .set("email", "src.email")
-                .buildPreparedStatement(sqlCaptureHelper.getConnection());
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                         MERGE INTO "target" \

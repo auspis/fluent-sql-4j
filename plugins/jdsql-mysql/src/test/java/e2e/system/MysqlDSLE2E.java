@@ -92,7 +92,7 @@ class MysqlDSLE2E {
                 .where()
                 .column("email")
                 .eq("john@example.com")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(ResultSetUtil.list(ps, nameMapper)).hasSize(1).containsAll(List.of("John Doe"));
     }
@@ -106,7 +106,7 @@ class MysqlDSLE2E {
                 .orderBy("name")
                 .fetch(3)
                 .offset(1)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         assertThat(ResultSetUtil.list(ps, nameMapper)).hasSize(3).containsAll(List.of("Bob", "Charlie", "Diana"));
     }
@@ -138,7 +138,7 @@ class MysqlDSLE2E {
                 .set("createdAt", "src.createdAt")
                 .set("address", "src.address")
                 .set("preferences", "src.preferences")
-                .buildPreparedStatement(connection)) {
+                .build(connection)) {
             int affectedRows = ps.executeUpdate();
             // MySQL ON DUPLICATE KEY UPDATE returns affected rows count
             // 1 = inserted, 2 = updated (technically 1 deleted + 1 inserted in MySQL's logic)
@@ -195,7 +195,7 @@ class MysqlDSLE2E {
                 .orderBy("age");
 
         // prepared statement
-        PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
+        PreparedStatement ps = selectBuilder.build(connection);
         assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
     }
 
@@ -227,7 +227,7 @@ class MysqlDSLE2E {
                 .orderBy("name");
 
         // prepared statement
-        PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
+        PreparedStatement ps = selectBuilder.build(connection);
         assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
     }
 
@@ -246,7 +246,7 @@ class MysqlDSLE2E {
                         .jsonExists("address", "$.city")
                         .exists()
                         .orderBy("id")
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> r.getString("name"));
 
         assertThat(names).containsExactly("Frank", "Grace", "Henry");
@@ -263,7 +263,7 @@ class MysqlDSLE2E {
                         .where()
                         .column("id")
                         .eq(8)
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> r.getString("city"));
 
         assertThat(cities).containsExactly("Milan");
@@ -280,7 +280,7 @@ class MysqlDSLE2E {
                         .where()
                         .column("id")
                         .eq(9)
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> r.getString("addr"));
 
         assertThat(addresses).hasSize(1);
@@ -306,7 +306,7 @@ class MysqlDSLE2E {
                         .jsonValue("address", "$.city")
                         .eq("Rome")
                         .orderBy("city")
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 mapper);
 
         assertThat(results).hasSize(2);
@@ -331,7 +331,7 @@ class MysqlDSLE2E {
                 .from("users")
                 .orderByDesc("age")
                 .orderBy("id")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
 
@@ -368,7 +368,7 @@ class MysqlDSLE2E {
                 .orderByDesc("active")
                 .orderByDesc("age")
                 .orderBy("id")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
 
@@ -406,7 +406,7 @@ class MysqlDSLE2E {
     //              .orderBy("age");
     //
     //      // Build prepared statement
-    //      PreparedStatement ps = selectBuilder.buildPreparedStatement(connection);
+    //      PreparedStatement ps = selectBuilder.build(connection);
     //
     //      // Execute and verify results
     //      try (var rs = ps.executeQuery()) {

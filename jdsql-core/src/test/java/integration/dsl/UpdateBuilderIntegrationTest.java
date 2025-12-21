@@ -49,7 +49,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("id")
                 .eq(1)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -75,7 +75,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("id")
                 .eq(1)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -98,7 +98,7 @@ class UpdateBuilderIntegrationTest {
                 .and()
                 .column("name")
                 .eq("Jane Smith")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -126,7 +126,7 @@ class UpdateBuilderIntegrationTest {
                 .or()
                 .column("name")
                 .eq("Jane Smith")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(2);
@@ -145,7 +145,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("email")
                 .like("%example.com")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);
@@ -160,7 +160,7 @@ class UpdateBuilderIntegrationTest {
     @Test
     void allRows() throws SQLException {
         PreparedStatement ps =
-                dsl.update("users").set("email", "updated@example.com").buildPreparedStatement(connection);
+                dsl.update("users").set("email", "updated@example.com").build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(10);
@@ -179,7 +179,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("age")
                 .gt(30)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(3); // Alice (35), Frank (35), Eve (40)
@@ -204,7 +204,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("name")
                 .eq("John Doe")
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = ps.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -236,7 +236,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("id")
                 .eq(8)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = updatePs.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -272,7 +272,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("id")
                 .eq(8)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int rowsAffected = updatePs.executeUpdate();
         assertThat(rowsAffected).isEqualTo(1);
@@ -300,7 +300,7 @@ class UpdateBuilderIntegrationTest {
                 .where()
                 .column("id")
                 .eq(3)
-                .buildPreparedStatement(connection);
+                .build(connection);
 
         int productRowsAffected = updateProductPs.executeUpdate();
         assertThat(productRowsAffected).isEqualTo(1);

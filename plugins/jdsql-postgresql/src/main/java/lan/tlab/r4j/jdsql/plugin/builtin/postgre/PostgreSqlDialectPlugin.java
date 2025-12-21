@@ -135,7 +135,7 @@ public final class PostgreSqlDialectPlugin {
      *         .orderBy("name")
      *         .build()
      *         .as("names")
-     * ).from("users").buildPreparedStatement(connection);
+     * ).from("users").build(connection);
      * }</pre>
      *
      * @return a new {@link PostgreSqlDSL} instance configured for PostgreSQL, never {@code null}

@@ -96,7 +96,7 @@ class StandardSQLDialectPluginE2E {
 
         // Execute the query to verify it works with H2
         List<List<Object>> rows = ResultSetUtil.list(
-                dsl.select("name", "email").from("users").buildPreparedStatement(connection),
+                dsl.select("name", "email").from("users").build(connection),
                 r -> List.of(r.getString("name"), r.getString("email")));
 
         assertThat(rows)
@@ -119,7 +119,7 @@ class StandardSQLDialectPluginE2E {
                         .orderBy("name")
                         .offset(5)
                         .fetch(3)
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> List.of(r.getString("name")));
 
         // Verify OFFSET 5 and FETCH 3 returned correct users (ordered: Alice, Bob, Charlie, Diana, Eve, Frank, Grace,
@@ -142,7 +142,7 @@ class StandardSQLDialectPluginE2E {
                         .where()
                         .column("age")
                         .gt(25)
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> List.of(r.getString("name"), r.getInt("age")));
         assertThat(selectResults).isNotEmpty();
         assertThat(selectResults).allMatch(row -> ((Integer) row.get(1)) > 25);
@@ -153,7 +153,7 @@ class StandardSQLDialectPluginE2E {
                 .where()
                 .column("name")
                 .eq("John Doe")
-                .buildPreparedStatement(connection)
+                .build(connection)
                 .executeUpdate();
         assertThat(updateCount).isEqualTo(1);
 
@@ -162,7 +162,7 @@ class StandardSQLDialectPluginE2E {
                 .where()
                 .column("age")
                 .lt(18)
-                .buildPreparedStatement(connection)
+                .build(connection)
                 .executeUpdate();
         assertThat(deleteCount).isGreaterThanOrEqualTo(0);
 
@@ -171,7 +171,7 @@ class StandardSQLDialectPluginE2E {
                 .set("id", 123456789)
                 .set("name", "Test")
                 .set("age", 25)
-                .buildPreparedStatement(connection)
+                .build(connection)
                 .executeUpdate();
         assertThat(insertCount).isEqualTo(1);
 
@@ -182,7 +182,7 @@ class StandardSQLDialectPluginE2E {
                         .where()
                         .column("name")
                         .eq("Test")
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> List.of(r.getString("name"), r.getInt("age")));
         assertThat(verifyInsert).hasSize(1);
         assertThat(verifyInsert.get(0)).containsExactly("Test", 25);
@@ -255,7 +255,7 @@ class StandardSQLDialectPluginE2E {
                 .set("email", "src.email")
                 .set("age", "src.age")
                 .set("active", "src.active")
-                .buildPreparedStatement(connection)
+                .build(connection)
                 .executeUpdate();
 
         assertThat(affectedRows).isGreaterThanOrEqualTo(0);
@@ -267,7 +267,7 @@ class StandardSQLDialectPluginE2E {
                         .where()
                         .column("id")
                         .eq(1)
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> List.of(
                         r.getInt("id"),
                         r.getString("name"),
@@ -285,7 +285,7 @@ class StandardSQLDialectPluginE2E {
                         .where()
                         .column("id")
                         .eq(11)
-                        .buildPreparedStatement(connection),
+                        .build(connection),
                 r -> List.of(
                         r.getInt("id"),
                         r.getString("name"),
