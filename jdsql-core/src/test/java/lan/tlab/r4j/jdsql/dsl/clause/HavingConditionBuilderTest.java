@@ -1067,4 +1067,245 @@ class HavingConditionBuilderTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Dot notation not supported");
     }
+
+    // Column-to-column comparisons (new feature)
+    @Test
+    void columnToColumnComparisonInHavingWithEq() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("orders")
+                .as("o")
+                .innerJoin("targets")
+                .as("t")
+                .on("o.id", "t.order_id")
+                .groupBy("o.customer_id")
+                .having()
+                .column("o", "total")
+                .eq()
+                .column("t", "expected_total")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"o\".\"total\" = \"t\".\"expected_total\"");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingWithGt() throws SQLException {
+        new SelectBuilder(specFactory, "SUM(amount)")
+                .from("sales")
+                .as("s")
+                .innerJoin("quotas")
+                .as("q")
+                .on("s.region_id", "q.region_id")
+                .groupBy("s.region_id")
+                .having()
+                .column("s", "amount")
+                .gt()
+                .column("q", "quota")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("HAVING \"s\".\"amount\" > \"q\".\"quota\"");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingWithLt() throws SQLException {
+        new SelectBuilder(specFactory, "AVG(price)")
+                .from("items")
+                .as("i")
+                .innerJoin("benchmarks")
+                .as("b")
+                .on("i.category_id", "b.category_id")
+                .groupBy("i.category_id")
+                .having()
+                .column("i", "avg_price")
+                .lt()
+                .column("b", "market_price")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"i\".\"avg_price\" < \"b\".\"market_price\"");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingWithGte() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("events")
+                .as("e")
+                .innerJoin("thresholds")
+                .as("th")
+                .on("e.type_id", "th.type_id")
+                .groupBy("e.type_id")
+                .having()
+                .column("e", "count")
+                .gte()
+                .column("th", "min_count")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"e\".\"count\" >= \"th\".\"min_count\"");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingWithLte() throws SQLException {
+        new SelectBuilder(specFactory, "MAX(duration)")
+                .from("tasks")
+                .as("t")
+                .innerJoin("limits")
+                .as("l")
+                .on("t.category_id", "l.category_id")
+                .groupBy("t.category_id")
+                .having()
+                .column("t", "max_duration")
+                .lte()
+                .column("l", "time_limit")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"t\".\"max_duration\" <= \"l\".\"time_limit\"");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingWithNe() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("current_data")
+                .as("c")
+                .innerJoin("previous_data")
+                .as("p")
+                .on("c.id", "p.id")
+                .groupBy("c.id")
+                .having()
+                .column("c", "value")
+                .ne()
+                .column("p", "value")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper).contains("\"c\".\"value\" <> \"p\".\"value\"");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingWithAndCondition() throws SQLException {
+        new SelectBuilder(specFactory, "SUM(revenue)")
+                .from("sales")
+                .as("s")
+                .innerJoin("projections")
+                .as("p")
+                .on("s.product_id", "p.product_id")
+                .groupBy("s.product_id")
+                .having()
+                .column("s", "revenue")
+                .gt()
+                .column("p", "projected_revenue")
+                .and()
+                .column("s", "region")
+                .eq("EMEA")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"s\".\"revenue\" > \"p\".\"projected_revenue\"")
+                .contains("\"s\".\"region\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "EMEA");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingWithOrCondition() throws SQLException {
+        new SelectBuilder(specFactory, "COUNT(*)")
+                .from("orders")
+                .as("o")
+                .innerJoin("rules")
+                .as("r")
+                .on("o.status_id", "r.status_id")
+                .groupBy("o.status_id")
+                .having()
+                .column("o", "count")
+                .eq()
+                .column("r", "expected_count")
+                .or()
+                .column("o", "status")
+                .eq("pending")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .contains("\"o\".\"count\" = \"r\".\"expected_count\"")
+                .contains("\"o\".\"status\" = ?");
+        verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "pending");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingRejectsNullAliasInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "SUM(amount)")
+                        .from("sales")
+                        .as("s")
+                        .groupBy("s.region_id")
+                        .having()
+                        .column("s", "amount")
+                        .gt()
+                        .column(null, "quota"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingRejectsEmptyAliasInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("events")
+                        .as("e")
+                        .groupBy("e.type_id")
+                        .having()
+                        .column("e", "count")
+                        .eq()
+                        .column("", "expected_count"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingRejectsAliasWithDotInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "AVG(price)")
+                        .from("items")
+                        .as("i")
+                        .groupBy("i.category_id")
+                        .having()
+                        .column("i", "avg_price")
+                        .ne()
+                        .column("b.x", "market_price"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Alias must not contain dot");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingRejectsNullColumnInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "COUNT(*)")
+                        .from("orders")
+                        .as("o")
+                        .groupBy("o.customer_id")
+                        .having()
+                        .column("o", "total")
+                        .lte()
+                        .column("t", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingRejectsEmptyColumnInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "MAX(duration)")
+                        .from("tasks")
+                        .as("t")
+                        .groupBy("t.category_id")
+                        .having()
+                        .column("t", "max_duration")
+                        .gte()
+                        .column("l", ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column cannot be null or empty");
+    }
+
+    @Test
+    void columnToColumnComparisonInHavingRejectsColumnWithDotInRightColumn() {
+        assertThatThrownBy(() -> new SelectBuilder(specFactory, "SUM(revenue)")
+                        .from("sales")
+                        .as("s")
+                        .groupBy("s.product_id")
+                        .having()
+                        .column("s", "revenue")
+                        .lt()
+                        .column("p", "table.projected_revenue"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column must not contain dot");
+    }
 }

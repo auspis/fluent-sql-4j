@@ -45,7 +45,7 @@ public class HavingConditionBuilder {
         this.combinator = combinator;
     }
 
-    // String comparisons
+    // String comparisons - with value
     public SelectBuilder eq(String value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -70,7 +70,32 @@ public class HavingConditionBuilder {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
-    // Number comparisons
+    // String comparisons - column-to-column
+    public ColumnComparator eq() {
+        return new ColumnComparator(this, Comparison.ComparisonOperator.EQUALS);
+    }
+
+    public ColumnComparator ne() {
+        return new ColumnComparator(this, Comparison.ComparisonOperator.NOT_EQUALS);
+    }
+
+    public ColumnComparator gt() {
+        return new ColumnComparator(this, Comparison.ComparisonOperator.GREATER_THAN);
+    }
+
+    public ColumnComparator lt() {
+        return new ColumnComparator(this, Comparison.ComparisonOperator.LESS_THAN);
+    }
+
+    public ColumnComparator gte() {
+        return new ColumnComparator(this, Comparison.ComparisonOperator.GREATER_THAN_OR_EQUALS);
+    }
+
+    public ColumnComparator lte() {
+        return new ColumnComparator(this, Comparison.ComparisonOperator.LESS_THAN_OR_EQUALS);
+    }
+
+    // Number comparisons - with value
     public SelectBuilder eq(Number value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -95,7 +120,7 @@ public class HavingConditionBuilder {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
-    // Boolean comparisons
+    // Boolean comparisons - with value
     public SelectBuilder eq(Boolean value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -104,7 +129,7 @@ public class HavingConditionBuilder {
         return addCondition(Comparison.ne(getColumnRef(), Literal.of(value)));
     }
 
-    // LocalDate comparisons
+    // LocalDate comparisons - with value
     public SelectBuilder eq(LocalDate value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -129,7 +154,7 @@ public class HavingConditionBuilder {
         return addCondition(Comparison.lte(getColumnRef(), Literal.of(value)));
     }
 
-    // LocalDateTime comparisons
+    // LocalDateTime comparisons - with value
     public SelectBuilder eq(LocalDateTime value) {
         return addCondition(Comparison.eq(getColumnRef(), Literal.of(value)));
     }
@@ -271,5 +296,50 @@ public class HavingConditionBuilder {
 
     private SelectBuilder addCondition(Predicate condition) {
         return parent.addHavingCondition(condition, combinator);
+    }
+
+    /**
+     * Intermediate builder for column-to-column comparisons in HAVING clause.
+     * Allows fluent syntax: .having().column("o", "total").gt().column("c", "total")
+     */
+    public class ColumnComparator {
+        private final HavingConditionBuilder parent;
+        private final Comparison.ComparisonOperator operator;
+
+        public ColumnComparator(HavingConditionBuilder parent, Comparison.ComparisonOperator operator) {
+            this.parent = parent;
+            this.operator = operator;
+        }
+
+        /**
+         * Compare with a column from another table.
+         */
+        public SelectBuilder column(String alias, String column) {
+            if (alias == null || alias.isEmpty()) {
+                throw new IllegalArgumentException("Alias cannot be null or empty");
+            }
+            if (alias.contains(".")) {
+                throw new IllegalArgumentException("Alias must not contain dot");
+            }
+            if (column == null || column.isEmpty()) {
+                throw new IllegalArgumentException("Column cannot be null or empty");
+            }
+            if (column.contains(".")) {
+                throw new IllegalArgumentException("Column must not contain dot");
+            }
+
+            ColumnReference rightColumn = ColumnReference.of(alias, column);
+            Predicate condition =
+                    switch (operator) {
+                        case EQUALS -> Comparison.eq(parent.getColumnRef(), rightColumn);
+                        case NOT_EQUALS -> Comparison.ne(parent.getColumnRef(), rightColumn);
+                        case GREATER_THAN -> Comparison.gt(parent.getColumnRef(), rightColumn);
+                        case LESS_THAN -> Comparison.lt(parent.getColumnRef(), rightColumn);
+                        case GREATER_THAN_OR_EQUALS -> Comparison.gte(parent.getColumnRef(), rightColumn);
+                        case LESS_THAN_OR_EQUALS -> Comparison.lte(parent.getColumnRef(), rightColumn);
+                    };
+
+            return parent.addCondition(condition);
+        }
     }
 }
