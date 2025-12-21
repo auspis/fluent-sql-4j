@@ -44,16 +44,16 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>Using the registry:</b>
  * <pre>{@code
- * Result<SqlRenderer> result = registry.getSpecFactory("mysql", "8.0.35");
+ * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("mysql", "8.0.35");
  *
  * switch (result) {
- *     case Success<SqlRenderer>(SqlRenderer renderer) -> // use renderer
- * import lan.tlab.r4j.sql.functional.Result;
- * import lan.tlab.r4j.sql.functional.Result.Failure;
- * import lan.tlab.r4j.sql.functional.Result.Success;
+ *     case Success<PreparedStatementSpecFactory>(PreparedStatementSpecFactory specFactory) -> // use specFactory
+ *     case Failure<PreparedStatementSpecFactory>(String error) -> logger.error("Could not resolve dialect: {}", error);
+ * }
  *
  * // Or use helper methods
- * SqlRenderer renderer = registry.getSpecFactory("mysql", "8.0.35").orElseThrow();
+ * PreparedStatementSpecFactory specFactory = registry.getSpecFactory("mysql", "8.0.35").orElseThrow();
+ * DSL dsl = new DSL(specFactory);
  * }</pre>
  * <p>
  * <b>Registering plugins:</b>

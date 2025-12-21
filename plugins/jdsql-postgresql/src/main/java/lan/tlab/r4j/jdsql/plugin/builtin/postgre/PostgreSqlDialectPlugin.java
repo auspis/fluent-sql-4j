@@ -39,18 +39,18 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
  * <ul>
  *   <li><b>Immutable</b>: This class is a singleton with no mutable state</li>
  *   <li><b>Thread-safe</b>: Can be safely used from multiple threads</li>
- *   <li><b>Stateless</b>: All rendering logic is delegated to the SqlRenderer</li>
+ *   <li><b>Stateless</b>: Rendering logic lives in the {@link PreparedStatementSpecFactory} strategies</li>
  * </ul>
  * <p>
  * <b>Usage Example:</b>
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
- * SqlDialectRegistry registry = SqlDialectRegistry.createWithServiceLoader();
+ * SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
  * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("postgresql", "15.0.0");
  *
  * // Or created directly
  * SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
- * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
+ * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
  * }</pre>
  * <p>
  * <b>ServiceLoader Discovery:</b>
@@ -97,10 +97,9 @@ public final class PostgreSqlDialectPlugin {
     }
 
     /**
-     * Creates the PostgreSQL-specific renderers.
+     * Creates the PostgreSQL-specific {@link PreparedStatementSpecFactory}.
      * <p>
-     * This method creates both the {@link SqlRenderer} and {@link AstToPreparedStatementSpecVisitor}
-     * configured specifically for PostgreSQL syntax, including:
+     * The factory wires PostgreSQL rendering strategies into the {@link AstToPreparedStatementSpecVisitor}, including:
      * <ul>
      *   <li>STRING_AGG for string aggregation</li>
      *   <li>ARRAY_AGG for array aggregation</li>
@@ -124,19 +123,19 @@ public final class PostgreSqlDialectPlugin {
      * Creates a PostgreSQL-specific DSL instance.
      * <p>
      * Returns a {@link PostgreSqlDSL} instance configured with
-     * the PostgreSQL renderer. This DSL provides PostgreSQL-specific custom functions like
+     * the PostgreSQL PreparedStatement spec factory. This DSL provides PostgreSQL-specific custom functions like
      * {@code STRING_AGG}, {@code ARRAY_AGG}, {@code JSONB_AGG}, {@code TO_CHAR}, etc.
      * <p>
      * <b>Example usage:</b>
      * <pre>{@code
      * PostgreSqlDSL dsl = (PostgreSqlDSL) PostgreSqlDialectPlugin.instance().createDSL();
-     * String sql = dsl.select(
+     * PreparedStatement ps = dsl.select(
      *     dsl.stringAgg("name")
      *         .separator(", ")
      *         .orderBy("name")
      *         .build()
      *         .as("names")
-     * ).from("users").build();
+     * ).from("users").buildPreparedStatement(connection);
      * }</pre>
      *
      * @return a new {@link PostgreSqlDSL} instance configured for PostgreSQL, never {@code null}
@@ -154,7 +153,7 @@ public final class PostgreSqlDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
-     * PreparedStatementSpecFactory specFactory = plugin.createRenderer();
+     * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
      * }</pre>
      *
      * @return the singleton PostgreSQL dialect plugin instance, never {@code null}
