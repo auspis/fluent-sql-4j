@@ -70,8 +70,7 @@ class MysqlDSLE2E {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = (MysqlDSL) registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
-                .orElseThrow();
+        dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
         TestDatabaseUtil.truncateUsers(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
     }
@@ -390,291 +389,264 @@ class MysqlDSLE2E {
                         List.of("Bob", "false", "3"));
     }
 
-    //  @Test
-    //  void shouldExecuteMySQLGroupConcatFunctionWithPreparedStatement() throws SQLException {
-    //      // Get DSL from registry
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      // Use GROUP_CONCAT to concatenate names by age group
-    //      var selectBuilder = dsl.select()
-    //              .column("age")
-    //              .groupConcat("name")
-    //              .separator(", ")
-    //              .as("names")
-    //              .from("users")
-    //              .groupBy("age")
-    //              .orderBy("age");
-    //
-    //      // Build prepared statement
-    //      PreparedStatement ps = selectBuilder.build(connection);
-    //
-    //      // Execute and verify results
-    //      try (var rs = ps.executeQuery()) {
-    //          boolean found30YearOlds = false;
-    //          while (rs.next()) {
-    //              int age = rs.getInt("age");
-    //              String names = rs.getString("names");
-    //              assertThat(names).isNotNull();
-    //
-    //              // Verify 30-year-olds are concatenated
-    //              if (age == 30) {
-    //                  found30YearOlds = true;
-    //                  // Should contain multiple names separated by ", "
-    //                  assertThat(names).contains(", ");
-    //                  assertThat(names.split(", ")).hasSizeGreaterThanOrEqualTo(2);
-    //              }
-    //          }
-    //          assertThat(found30YearOlds).isTrue();
-    //      } finally {
-    //          ps.close();
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteMySQLDateFormatFunction() throws SQLException {
-    //      // Get DSL from registry
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      // Use DATE_FORMAT fluent API to format birthdates
-    //      String sql = dsl.select()
-    //              .column("name")
-    //              .dateFormat("birthdate", "%Y-%m-%d")
-    //              .as("formatted_date")
-    //              .from("users")
-    //              .orderBy("name")
-    //              .fetch(5)
-    //              .build();
-    //
-    //      // Verify SQL contains DATE_FORMAT
-    //      assertThat(sql).containsIgnoringCase("DATE_FORMAT");
-    //
-    //      // Execute and verify results
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          int count = 0;
-    //          while (rs.next()) {
-    //              count++;
-    //              String name = rs.getString("name");
-    //              String formattedDate = rs.getString("formatted_date");
-    //
-    //              assertThat(name).isNotNull();
-    //              assertThat(formattedDate).isNotNull();
-    //              // Verify format is YYYY-MM-DD
-    //              assertThat(formattedDate).matches("\\d{4}-\\d{2}-\\d{2}");
-    //          }
-    //          assertThat(count).isEqualTo(5);
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteComplexQueryWithMultipleMySQLFunctions() throws SQLException {
-    //      // Get DSL from registry
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      // Combine multiple MySQL custom functions: GROUP_CONCAT and COUNT
-    //      String sql = dsl.select()
-    //              .column("age")
-    //              .groupConcat("name")
-    //              .separator(" | ")
-    //              .as("users_list")
-    //              .countStar()
-    //              .as("user_count")
-    //              .from("users")
-    //              .where()
-    //              .column("active")
-    //              .eq(true)
-    //              .groupBy("age")
-    //              .orderBy("age")
-    //              .build();
-    //
-    //      // Verify SQL contains custom functions
-    //      assertThat(sql).containsIgnoringCase("GROUP_CONCAT");
-    //      assertThat(sql).containsIgnoringCase("COUNT");
-    //
-    //      // Execute and verify results
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          boolean foundResults = false;
-    //          while (rs.next()) {
-    //              foundResults = true;
-    //              int age = rs.getInt("age");
-    //              String usersList = rs.getString("users_list");
-    //              int userCount = rs.getInt("user_count");
-    //
-    //              assertThat(age).isGreaterThan(0);
-    //              assertThat(usersList).isNotNull();
-    //              assertThat(userCount).isGreaterThanOrEqualTo(1);
-    //
-    //              // Verify GROUP_CONCAT with custom separator
-    //              if (userCount > 1) {
-    //                  assertThat(usersList).contains(" | ");
-    //              }
-    //          }
-    //          assertThat(foundResults).isTrue();
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteConcatFunctionWithBuilder() throws SQLException {
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      String sql = dsl.select()
-    //              .concat()
-    //              .column("name")
-    //              .column("email")
-    //              .as("name_email")
-    //              .from("users")
-    //              .where()
-    //              .column("id")
-    //              .eq(1)
-    //              .build();
-    //
-    //      assertThat(sql).containsIgnoringCase("CONCAT");
-    //
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          assertThat(rs.next()).isTrue();
-    //          String result = rs.getString("name_email");
-    //          assertThat(result).isEqualTo("John Doejohn@example.com");
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteCoalesceFunctionWithBuilder() throws SQLException {
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      // COALESCE returns first non-NULL value
-    //      String sql = dsl.select()
-    //              .coalesce()
-    //              .column("email")
-    //              .column("name")
-    //              .as("contact")
-    //              .from("users")
-    //              .where()
-    //              .column("id")
-    //              .eq(1)
-    //              .build();
-    //
-    //      assertThat(sql).containsIgnoringCase("COALESCE");
-    //
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          assertThat(rs.next()).isTrue();
-    //          String result = rs.getString("contact");
-    //          assertThat(result).isEqualTo("john@example.com");
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteIfnullFunction() throws SQLException {
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      // Add a row with NULL email for testing
-    //      try (var stmt = connection.createStatement()) {
-    //          stmt.execute("INSERT INTO users VALUES (99, 'Test User', NULL, 30, true, '1990-01-01', '2023-01-01')");
-    //      }
-    //
-    //      String sql = dsl.select()
-    //              .column("name")
-    //              .ifnull("email", "no-email@example.com")
-    //              .as("contact_email")
-    //              .from("users")
-    //              .where()
-    //              .column("id")
-    //              .eq(99)
-    //              .build();
-    //
-    //      assertThat(sql).containsIgnoringCase("IFNULL");
-    //
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          assertThat(rs.next()).isTrue();
-    //          String name = rs.getString("name");
-    //          String email = rs.getString("contact_email");
-    //          assertThat(name).isEqualTo("Test User");
-    //          assertThat(email).isEqualTo("no-email@example.com");
-    //      }
-    //
-    //      // Clean up test data
-    //      try (var stmt = connection.createStatement()) {
-    //          stmt.execute("DELETE FROM users WHERE id = 99");
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteInheritedSumAggregateFunction() throws SQLException {
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      String sql = dsl.select().sum("age").as("total_age").from("users").build();
-    //
-    //      assertThat(sql).containsIgnoringCase("SUM");
-    //
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          assertThat(rs.next()).isTrue();
-    //          int totalAge = rs.getInt("total_age");
-    //          assertThat(totalAge).isEqualTo(293); // Sum of all ages: 30+25+15+35+30+25+40+35+28+30
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteInheritedCountDistinctAggregateFunction() throws SQLException {
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      String sql = dsl.select()
-    //              .countDistinct("age")
-    //              .as("distinct_ages")
-    //              .from("users")
-    //              .build();
-    //
-    //      assertThat(sql).containsIgnoringCase("COUNT");
-    //      assertThat(sql).containsIgnoringCase("DISTINCT");
-    //
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          assertThat(rs.next()).isTrue();
-    //          int distinctAges = rs.getInt("distinct_ages");
-    //          assertThat(distinctAges).isEqualTo(6); // Distinct ages: 15, 25, 28, 30, 35, 40
-    //      }
-    //  }
-    //
-    //  @Test
-    //  void shouldExecuteIfFunctionWithComplexCondition() throws SQLException {
-    //      var dsl = (MysqlDSL) pluginRegistry.getDsl(MysqlDialectPlugin.DIALECT_NAME, "8.0.35").orElseThrow();
-    //
-    //      String sql = dsl.select()
-    //              .column("name")
-    //              .ifExpr()
-    //              .when("age")
-    //              .gte(30)
-    //              .then("Adult")
-    //              .otherwise("Young")
-    //              .as("age_category")
-    //              .from("users")
-    //              .orderBy("id")
-    //              .build();
-    //
-    //      assertThat(sql).containsIgnoringCase("IF");
-    //
-    //      try (var ps = connection.prepareStatement(sql);
-    //              var rs = ps.executeQuery()) {
-    //          int count = 0;
-    //          while (rs.next()) {
-    //              count++;
-    //              String name = rs.getString("name");
-    //              String category = rs.getString("age_category");
-    //
-    //              assertThat(name).isNotNull();
-    //              assertThat(category).isIn("Adult", "Young");
-    //
-    //              // Verify specific cases
-    //              if (name.equals("John Doe")) {
-    //                  assertThat(category).isEqualTo("Adult"); // age = 30
-    //              } else if (name.equals("Bob")) {
-    //                  assertThat(category).isEqualTo("Young"); // age = 15
-    //              }
-    //          }
-    //          assertThat(count).isEqualTo(10);
-    //      }
-    //  }
+    @Test
+    void shouldExecuteMySQLGroupConcatFunctionWithPreparedStatement() throws SQLException {
+        // Get DSL from registry
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        // Use GROUP_CONCAT to concatenate names by age group
+        var selectBuilder = dsl.select()
+                .column("age")
+                .groupConcat("name")
+                .separator(", ")
+                .as("names")
+                .from("users")
+                .groupBy("age")
+                .orderBy("age");
+
+        PreparedStatement ps = selectBuilder.build(connection);
+
+        // Execute and verify results
+        try (var rs = ps.executeQuery()) {
+            boolean found30YearOlds = false;
+            while (rs.next()) {
+                int age = rs.getInt("age");
+                String names = rs.getString("names");
+                assertThat(names).isNotNull();
+
+                // Verify 30-year-olds are concatenated
+                if (age == 30) {
+                    found30YearOlds = true;
+                    // Should contain multiple names separated by ", "
+                    assertThat(names).contains(", ");
+                    assertThat(names.split(", ")).hasSizeGreaterThanOrEqualTo(2);
+                }
+            }
+            assertThat(found30YearOlds).isTrue();
+        } finally {
+            ps.close();
+        }
+    }
+
+    @Test
+    void shouldExecuteMySQLDateFormatFunction() throws SQLException {
+        // Get DSL from registry
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        // Use DATE_FORMAT fluent API to format birthdates
+        var selectBuilder = dsl.select()
+                .column("name")
+                .dateFormat("birthdate", "%Y-%m-%d")
+                .as("formatted_date")
+                .from("users")
+                .orderBy("name")
+                .fetch(5);
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                String name = rs.getString("name");
+                String formattedDate = rs.getString("formatted_date");
+
+                assertThat(name).isNotNull();
+                assertThat(formattedDate).isNotNull();
+                // Verify format is YYYY-MM-DD
+                assertThat(formattedDate).matches("\\d{4}-\\d{2}-\\d{2}");
+            }
+            assertThat(count).isEqualTo(5);
+        }
+    }
+
+    @Test
+    void shouldExecuteComplexQueryWithMultipleMySQLFunctions() throws SQLException {
+        // Get DSL from registry
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        // Combine multiple MySQL custom functions: GROUP_CONCAT and COUNT
+        var selectBuilder = dsl.select()
+                .column("age")
+                .groupConcat("name")
+                .separator(" | ")
+                .as("users_list")
+                .countStar()
+                .as("user_count")
+                .from("users")
+                .where()
+                .column("active")
+                .eq(true)
+                .groupBy("age")
+                .orderBy("age");
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            boolean foundResults = false;
+            while (rs.next()) {
+                foundResults = true;
+                int age = rs.getInt("age");
+                String usersList = rs.getString("users_list");
+                int userCount = rs.getInt("user_count");
+
+                assertThat(age).isGreaterThan(0);
+                assertThat(usersList).isNotNull();
+                assertThat(userCount).isGreaterThanOrEqualTo(1);
+
+                // Verify GROUP_CONCAT with custom separator
+                if (userCount > 1) {
+                    assertThat(usersList).contains(" | ");
+                }
+            }
+            assertThat(foundResults).isTrue();
+        }
+    }
+
+    @Test
+    void shouldExecuteConcatFunctionWithBuilder() throws SQLException {
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        var selectBuilder = dsl.select()
+                .concat()
+                .column("name")
+                .column("email")
+                .as("name_email")
+                .from("users")
+                .where()
+                .column("id")
+                .eq(1);
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            String result = rs.getString("name_email");
+            assertThat(result).isEqualTo("John Doejohn@example.com");
+        }
+    }
+
+    @Test
+    void shouldExecuteCoalesceFunctionWithBuilder() throws SQLException {
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        // COALESCE returns first non-NULL value
+        var selectBuilder = dsl.select()
+                .coalesce()
+                .column("email")
+                .column("name")
+                .as("contact")
+                .from("users")
+                .where()
+                .column("id")
+                .eq(1);
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            String result = rs.getString("contact");
+            assertThat(result).isEqualTo("john@example.com");
+        }
+    }
+
+    @Test
+    void shouldExecuteIfnullFunction() throws SQLException {
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        // Add a row with NULL email for testing
+        try (var stmt = connection.createStatement()) {
+            stmt.execute(
+                    "INSERT INTO users VALUES (99, 'Test User', NULL, 30, true, '1990-01-01', '2023-01-01', NULL, NULL)");
+        }
+
+        var selectBuilder = dsl.select()
+                .column("name")
+                .ifnull("email", "no-email@example.com")
+                .as("contact_email")
+                .from("users")
+                .where()
+                .column("id")
+                .eq(99);
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            String name = rs.getString("name");
+            String email = rs.getString("contact_email");
+            assertThat(name).isEqualTo("Test User");
+            assertThat(email).isEqualTo("no-email@example.com");
+        }
+    }
+
+    @Test
+    void shouldExecuteInheritedSumAggregateFunction() throws SQLException {
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        var selectBuilder = dsl.select().sum("age").as("total_age").from("users");
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            int totalAge = rs.getInt("total_age");
+            assertThat(totalAge).isEqualTo(293); // Sum of all ages: 30+25+15+35+30+25+40+35+28+30
+        }
+    }
+
+    @Test
+    void shouldExecuteInheritedCountDistinctAggregateFunction() throws SQLException {
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        var selectBuilder =
+                dsl.select().countDistinct("age").as("distinct_ages").from("users");
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            int distinctAges = rs.getInt("distinct_ages");
+            assertThat(distinctAges).isEqualTo(6); // Distinct ages: 15, 25, 28, 30, 35, 40
+        }
+    }
+
+    @Test
+    void shouldExecuteIfFunctionWithComplexCondition() throws SQLException {
+        var dsl =
+                registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
+
+        var selectBuilder = dsl.select()
+                .column("name")
+                .ifExpr()
+                .when("age")
+                .gte(30)
+                .then("Adult")
+                .otherwise("Young")
+                .as("age_category")
+                .from("users")
+                .orderBy("id");
+
+        PreparedStatement ps = selectBuilder.build(connection);
+        try (var rs = ps.executeQuery()) {
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                String name = rs.getString("name");
+                String category = rs.getString("age_category");
+
+                assertThat(name).isNotNull();
+                assertThat(category).isIn("Adult", "Young");
+
+                // Verify specific cases
+                if (name.equals("John Doe")) {
+                    assertThat(category).isEqualTo("Adult"); // age = 30
+                } else if (name.equals("Bob")) {
+                    assertThat(category).isEqualTo("Young"); // age = 15
+                }
+            }
+            assertThat(count).isEqualTo(10);
+        }
+    }
 }
