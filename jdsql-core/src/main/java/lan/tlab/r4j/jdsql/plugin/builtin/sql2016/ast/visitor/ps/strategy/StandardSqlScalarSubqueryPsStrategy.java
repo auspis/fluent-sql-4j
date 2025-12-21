@@ -12,10 +12,10 @@ public class StandardSqlScalarSubqueryPsStrategy implements ScalarSubqueryPsStra
 
     @Override
     public PreparedStatementSpec handle(
-            ScalarSubquery subquery, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            ScalarSubquery subquery, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         // Scalar subqueries contain table expressions that may have parameters
         // Use hybrid approach: delegate to visitor for parameter handling
-        PreparedStatementSpec innerResult = subquery.tableExpression().accept(renderer, ctx);
+        PreparedStatementSpec innerResult = subquery.tableExpression().accept(astToPsSpecVisitor, ctx);
 
         // Wrap in parentheses as required for scalar subqueries
         String sql = "(" + innerResult.sql() + ")";

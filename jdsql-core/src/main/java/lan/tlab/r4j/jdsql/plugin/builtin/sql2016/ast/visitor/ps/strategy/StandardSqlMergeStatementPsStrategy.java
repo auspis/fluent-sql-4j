@@ -15,22 +15,22 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
     @Override
     public PreparedStatementSpec handle(
-            MergeStatement stmt, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            MergeStatement stmt, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         List<Object> params = new ArrayList<>();
 
         // MERGE INTO target
-        PreparedStatementSpec targetDto = stmt.getTargetTable().accept(renderer, ctx);
+        PreparedStatementSpec targetDto = stmt.getTargetTable().accept(astToPsSpecVisitor, ctx);
         String sql = "MERGE INTO " + targetDto.sql();
         params.addAll(targetDto.parameters());
 
         // USING source
-        PreparedStatementSpec usingDto = stmt.getUsing().accept(renderer, ctx);
+        PreparedStatementSpec usingDto = stmt.getUsing().accept(astToPsSpecVisitor, ctx);
         sql += " USING " + usingDto.sql();
         params.addAll(usingDto.parameters());
 
         // ON condition - use JOIN_ON scope to qualify column references
         AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
-        PreparedStatementSpec onDto = stmt.getOnCondition().accept(renderer, onCtx);
+        PreparedStatementSpec onDto = stmt.getOnCondition().accept(astToPsSpecVisitor, onCtx);
         sql += " ON " + onDto.sql();
         params.addAll(onDto.parameters());
 
@@ -39,7 +39,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
             if (action instanceof WhenMatchedUpdate whenMatched) {
                 sql += " WHEN MATCHED";
                 if (whenMatched.condition() != null) {
-                    PreparedStatementSpec condDto = whenMatched.condition().accept(renderer, onCtx);
+                    PreparedStatementSpec condDto = whenMatched.condition().accept(astToPsSpecVisitor, onCtx);
                     sql += " AND " + condDto.sql();
                     params.addAll(condDto.parameters());
                 }
@@ -47,8 +47,8 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
 
                 List<String> updateClauses = new ArrayList<>();
                 for (var item : whenMatched.updateItems()) {
-                    PreparedStatementSpec colDto = item.column().accept(renderer, ctx);
-                    PreparedStatementSpec valDto = item.value().accept(renderer, onCtx);
+                    PreparedStatementSpec colDto = item.column().accept(astToPsSpecVisitor, ctx);
+                    PreparedStatementSpec valDto = item.value().accept(astToPsSpecVisitor, onCtx);
                     updateClauses.add(colDto.sql() + " = " + valDto.sql());
                     params.addAll(valDto.parameters());
                 }
@@ -57,7 +57,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
             } else if (action instanceof WhenNotMatchedInsert whenNotMatched) {
                 sql += " WHEN NOT MATCHED";
                 if (whenNotMatched.condition() != null) {
-                    PreparedStatementSpec condDto = whenNotMatched.condition().accept(renderer, onCtx);
+                    PreparedStatementSpec condDto = whenNotMatched.condition().accept(astToPsSpecVisitor, onCtx);
                     sql += " AND " + condDto.sql();
                     params.addAll(condDto.parameters());
                 }
@@ -66,7 +66,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
                 if (!whenNotMatched.columns().isEmpty()) {
                     List<String> columns = new ArrayList<>();
                     for (var col : whenNotMatched.columns()) {
-                        PreparedStatementSpec colDto = col.accept(renderer, ctx);
+                        PreparedStatementSpec colDto = col.accept(astToPsSpecVisitor, ctx);
                         columns.add(colDto.sql());
                     }
                     sql += " (" + String.join(", ", columns) + ")";
@@ -77,7 +77,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
                 if (whenNotMatched.insertData() instanceof InsertData.InsertValues insertValues) {
                     List<String> valueClauses = new ArrayList<>();
                     for (var expr : insertValues.valueExpressions()) {
-                        PreparedStatementSpec exprDto = expr.accept(renderer, onCtx);
+                        PreparedStatementSpec exprDto = expr.accept(astToPsSpecVisitor, onCtx);
                         valueClauses.add(exprDto.sql());
                         params.addAll(exprDto.parameters());
                     }
@@ -85,7 +85,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
                 } else {
                     // Fallback for other insert data types
                     PreparedStatementSpec insertDto =
-                            whenNotMatched.insertData().accept(renderer, onCtx);
+                            whenNotMatched.insertData().accept(astToPsSpecVisitor, onCtx);
                     sql += " VALUES (" + insertDto.sql() + ")";
                     params.addAll(insertDto.parameters());
                 }
@@ -94,7 +94,7 @@ public class StandardSqlMergeStatementPsStrategy implements MergeStatementPsStra
                 sql += " WHEN MATCHED";
                 if (whenMatchedDelete.condition() != null) {
                     PreparedStatementSpec condDto =
-                            whenMatchedDelete.condition().accept(renderer, onCtx);
+                            whenMatchedDelete.condition().accept(astToPsSpecVisitor, onCtx);
                     sql += " AND " + condDto.sql();
                     params.addAll(condDto.parameters());
                 }

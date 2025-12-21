@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface CurrentDateTimePsStrategy {
     PreparedStatementSpec handle(
-            CurrentDateTime currentDateTime, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            CurrentDateTime currentDateTime, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

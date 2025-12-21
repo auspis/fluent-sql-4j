@@ -10,7 +10,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.FetchPsStrategy;
 public class StandardSqlPaginationPsStrategy implements FetchPsStrategy {
 
     @Override
-    public PreparedStatementSpec handle(Fetch pagination, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+    public PreparedStatementSpec handle(
+            Fetch pagination, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         StringBuilder sql = new StringBuilder();
 
         // SQL 2008 standard uses OFFSET ... ROWS FETCH NEXT ... ROWS ONLY

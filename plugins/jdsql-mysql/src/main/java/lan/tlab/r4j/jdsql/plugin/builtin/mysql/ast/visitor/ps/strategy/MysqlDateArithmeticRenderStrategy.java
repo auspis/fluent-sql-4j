@@ -12,9 +12,9 @@ public class MysqlDateArithmeticRenderStrategy implements DateArithmeticPsStrate
 
     @Override
     public PreparedStatementSpec handle(
-            DateArithmetic dateArithmetic, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec dateExprDto = dateArithmetic.dateExpression().accept(renderer, ctx);
-        PreparedStatementSpec valueDto = dateArithmetic.interval().value().accept(renderer, ctx);
+            DateArithmetic dateArithmetic, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec dateExprDto = dateArithmetic.dateExpression().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec valueDto = dateArithmetic.interval().value().accept(astToPsSpecVisitor, ctx);
 
         String sql = String.format(
                 "%s(%s, INTERVAL %s %s)",

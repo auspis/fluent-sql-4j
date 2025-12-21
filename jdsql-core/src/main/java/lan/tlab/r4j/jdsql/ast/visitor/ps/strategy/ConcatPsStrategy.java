@@ -6,5 +6,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface ConcatPsStrategy {
-    PreparedStatementSpec handle(Concat concat, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(Concat concat, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

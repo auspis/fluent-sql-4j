@@ -13,8 +13,8 @@ public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsSt
     @Override
     public PreparedStatementSpec handle(ColumnReference col, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
         EscapeStrategy escapeStrategy = renderer.getEscapeStrategy();
-        if (renderer instanceof AstToPreparedStatementSpecVisitor psRenderer) {
-            escapeStrategy = psRenderer.getEscapeStrategy();
+        if (renderer instanceof AstToPreparedStatementSpecVisitor astToPsSpecVisitor) {
+            escapeStrategy = astToPsSpecVisitor.getEscapeStrategy();
         }
 
         // Asterisk (*) is a special SQL wildcard and should not be escaped

@@ -8,5 +8,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 public interface ExceptExpressionPsStrategy {
 
     PreparedStatementSpec handle(
-            ExceptExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            ExceptExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

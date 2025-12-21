@@ -6,5 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface JsonExistsPsStrategy {
-    PreparedStatementSpec handle(JsonExists jsonExists, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            JsonExists jsonExists, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

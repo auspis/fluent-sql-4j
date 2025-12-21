@@ -7,5 +7,5 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface DateArithmeticPsStrategy {
     PreparedStatementSpec handle(
-            DateArithmetic dateArithmetic, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+            DateArithmetic dateArithmetic, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

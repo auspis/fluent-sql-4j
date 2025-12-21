@@ -5,7 +5,7 @@ import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
 
 /**
- * Test helper for creating SQL dialect plugins in tests.
+ * Test util for creating SQL dialect plugins in tests.
  * Provides factory methods to simplify plugin creation with common test defaults.
  */
 public final class SqlDialectPluginUtil {

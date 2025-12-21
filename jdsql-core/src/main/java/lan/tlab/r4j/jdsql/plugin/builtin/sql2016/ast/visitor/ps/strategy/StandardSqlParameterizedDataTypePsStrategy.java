@@ -11,9 +11,9 @@ public class StandardSqlParameterizedDataTypePsStrategy implements Parameterized
 
     @Override
     public PreparedStatementSpec handle(
-            ParameterizedDataType type, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            ParameterizedDataType type, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         var parameterResults = type.parameters().stream()
-                .map(param -> param.accept(renderer, ctx))
+                .map(param -> param.accept(astToPsSpecVisitor, ctx))
                 .collect(Collectors.toList());
 
         var combinedParameters = parameterResults.stream()

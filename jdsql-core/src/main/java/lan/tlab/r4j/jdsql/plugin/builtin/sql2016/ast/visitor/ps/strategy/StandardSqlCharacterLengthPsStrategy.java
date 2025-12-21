@@ -10,8 +10,8 @@ public class StandardSqlCharacterLengthPsStrategy implements CharacterLengthPsSt
 
     @Override
     public PreparedStatementSpec handle(
-            CharacterLength characterLength, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        var expressionResult = characterLength.expression().accept(renderer, ctx);
+            CharacterLength characterLength, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        var expressionResult = characterLength.expression().accept(astToPsSpecVisitor, ctx);
 
         String sql = String.format("CHARACTER_LENGTH(%s)", expressionResult.sql());
         return new PreparedStatementSpec(sql, expressionResult.parameters());

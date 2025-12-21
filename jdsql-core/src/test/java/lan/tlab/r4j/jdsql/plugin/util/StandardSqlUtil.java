@@ -1,8 +1,9 @@
-package lan.tlab.r4j.jdsql.plugin.builtin.sql2016;
+package lan.tlab.r4j.jdsql.plugin.util;
 
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
+import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 
 /**
  * Test utility factory for creating Standard SQL renderers.
@@ -12,11 +13,11 @@ import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
  *
  * @since 1.0
  */
-public final class StandardSqlRendererFactory {
+public final class StandardSqlUtil {
 
     private static final SqlDialectPluginRegistry REGISTRY = SqlDialectPluginRegistry.createWithServiceLoader();
 
-    private StandardSqlRendererFactory() {
+    private StandardSqlUtil() {
         // Utility class - prevent instantiation
     }
 
@@ -26,7 +27,7 @@ public final class StandardSqlRendererFactory {
      * @return PreparedStatementSpecFactory configured for Standard SQL:2008
      * @throws IllegalArgumentException if the StandardSQL plugin is not available
      */
-    public static PreparedStatementSpecFactory dialectRendererStandardSql() {
+    public static PreparedStatementSpecFactory preparedStatementSpecFactory() {
         return REGISTRY.getSpecFactory(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();
     }
@@ -37,7 +38,7 @@ public final class StandardSqlRendererFactory {
      * @return DSL instance configured for Standard SQL:2008
      * @throws IllegalStateException if the StandardSQL plugin is not available
      */
-    public static DSL dslStandardSql() {
-        return new DSL(dialectRendererStandardSql());
+    public static DSL dsl() {
+        return new DSL(preparedStatementSpecFactory());
     }
 }

@@ -6,5 +6,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 
 public interface JsonQueryPsStrategy {
-    PreparedStatementSpec handle(JsonQuery jsonQuery, AstToPreparedStatementSpecVisitor renderer, AstContext ctx);
+    PreparedStatementSpec handle(
+            JsonQuery jsonQuery, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx);
 }

@@ -12,9 +12,9 @@ public class StandardSqlIntersectExpressionPsStrategy implements IntersectExpres
 
     @Override
     public PreparedStatementSpec handle(
-            IntersectExpression expression, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
-        PreparedStatementSpec leftDto = expression.leftSetExpression().accept(renderer, ctx);
-        PreparedStatementSpec rightDto = expression.rightSetExpression().accept(renderer, ctx);
+            IntersectExpression expression, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
+        PreparedStatementSpec leftDto = expression.leftSetExpression().accept(astToPsSpecVisitor, ctx);
+        PreparedStatementSpec rightDto = expression.rightSetExpression().accept(astToPsSpecVisitor, ctx);
 
         String sql = String.format(
                 "((%s) %s (%s))",

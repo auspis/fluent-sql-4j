@@ -92,9 +92,9 @@ class MysqlPluginRegistryComponentTest {
     }
 
     @Test
-    void getRendererWithoutVersion() {
+    void getSpecFactoryWithoutVersion() {
         // When version is not specified, should return available plugin
-        Result<PreparedStatementSpecFactory> result = pluginRegistry.getRenderer(MysqlDialectPlugin.DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result = pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();

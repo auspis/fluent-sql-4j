@@ -10,10 +10,12 @@ public class StandardSqlDefaultConstraintPsStrategy implements DefaultConstraint
 
     @Override
     public PreparedStatementSpec handle(
-            DefaultConstraintDefinition constraint, AstToPreparedStatementSpecVisitor renderer, AstContext ctx) {
+            DefaultConstraintDefinition constraint,
+            AstToPreparedStatementSpecVisitor astToPsSpecVisitor,
+            AstContext ctx) {
         // Default constraints are static DDL elements without parameters
         // Inline rendering logic from StandardSqlDefaultConstraintRenderStrategy
-        PreparedStatementSpec valueDto = constraint.value().accept(renderer, ctx);
+        PreparedStatementSpec valueDto = constraint.value().accept(astToPsSpecVisitor, ctx);
         String sql = String.format("DEFAULT %s", valueDto.sql());
         return new PreparedStatementSpec(sql, valueDto.parameters());
     }
