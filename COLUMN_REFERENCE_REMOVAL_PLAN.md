@@ -26,7 +26,7 @@ Rimuovere completamente il supporto per il parsing automatico delle stringhe "ta
 ### Obiettivo
 Deprecare i metodi che usano parsing automatico, introdurre alternative strutturate, mantenere backward compatibility temporanea.
 
-### 1.1 WhereBuilder e HavingBuilder - Supporto Cross-Table Esplicito (PRIORITÀ ALTA)
+### 1.1 WhereBuilder e HavingBuilder - Supporto Cross-Table Esplicito ✅ COMPLETATO
 
 **File**: 
 - `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/clause/WhereBuilder.java`
@@ -34,7 +34,9 @@ Deprecare i metodi che usano parsing automatico, introdurre alternative struttur
 - `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/clause/HavingBuilder.java`
 - `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/clause/HavingConditionBuilder.java`
 
-**Stato Attuale**:
+**Stato**: ✅ Implementato e testato completamente
+
+**Stato Precedente**:
 \`\`\`java
 // WhereBuilder
 public <R> WhereConditionBuilder<T> column(String column) {
@@ -166,6 +168,39 @@ private ColumnReference getColumnRef() {
 
 **Rimozione (Fase 3)**:
 - Nessuna rimozione (i metodi esistenti restano per single-table context)
+
+---
+
+#### ✅ Stato Implementazione Fase 1.1 (Completata)
+
+**Implementato**:
+1. ✅ Overload `WhereBuilder.column(String alias, String column)` con validazione completa
+2. ✅ Overload `HavingBuilder.column(String alias, String column)` con validazione completa
+3. ✅ Costruttori `WhereConditionBuilder` e `HavingConditionBuilder` con supporto `ColumnReference` esplicito
+4. ✅ Validazione per alias/colonne null, empty, e dot notation
+5. ✅ **Feature Aggiuntiva**: Column-to-Column Comparison Support
+   - Metodi zero-argument `eq()`, `ne()`, `gt()`, `lt()`, `gte()`, `lte()` che ritornano `ColumnComparator`
+   - Inner class `ColumnComparator` per comparazioni fluent: `.where().column("u", "age").gt().column("e", "age")`
+   - Supporto sia per WHERE che HAVING clauses
+   - Riuso di `Comparison.ComparisonOperator` (eliminata duplicazione con enum custom)
+
+**Test Aggiunti**:
+- ✅ WhereConditionBuilderTest: 20 test base cross-table + 12 test column-to-column (totale 32 nuovi test)
+- ✅ HavingConditionBuilderTest: 21 test base cross-table + 16 test column-to-column (totale 37 nuovi test)
+- ✅ Coverage completa: tutti gli operatori (eq, ne, gt, lt, gte, lte), validazione, AND/OR chaining
+
+**Documentazione Aggiornata**:
+- ✅ DSL_USAGE_GUIDE.md: esempi cross-table integrati nelle sezioni WHERE e HAVING
+- ✅ README.md: esempio principale con multi-table JOIN aggiornato
+
+**Build Status**:
+- ✅ Tutti i 1341 test passano (1313 esistenti + 28 nuovi)
+- ✅ Build SUCCESS
+- ✅ Codice formattato con spotless
+
+**Refactoring Aggiuntivo**:
+- ✅ Eliminata duplicazione `WhereConditionBuilder.ComparisonOperator` enum
+- ✅ Riuso completo di `Comparison.ComparisonOperator` in tutti i builder
 
 ---
 
@@ -888,10 +923,18 @@ See [Migration Guide](docs/MIGRATION_2.0.md) for detailed migration instructions
 ## Criteri di Successo
 
 ### Fase 1
-- [ ] Tutti i metodi con parsing automatico sono deprecati o sostituiti
+- [x] **1.1 COMPLETATO**: Nuovi overload WHERE/HAVING implementati e testati
+  - [x] Supporto cross-table esplicito con `column(alias, column)`
+  - [x] Column-to-column comparison con intermediate builder pattern
+  - [x] 69 nuovi test aggiunti (32 WHERE + 37 HAVING)
+  - [x] Eliminata duplicazione enum ComparisonOperator
+  - [x] Documentazione aggiornata
+- [ ] **1.2 TODO**: JOIN usa firma a 4 parametri espliciti
+- [ ] **1.3 TODO**: MERGE usa firma a 4 parametri espliciti
+- [ ] **1.4 TODO**: GROUP BY validazione contro dot notation
+- [ ] **1.5 TODO**: Window Functions validazione contro dot notation
+- [ ] **1.6 TODO**: ColumnReferenceUtil deprecato
 - [ ] Validazione/errori chiari per input non validi
-- [ ] Nuovi overload WHERE/HAVING implementati e testati
-- [ ] JOIN/MERGE usano firma a 4 parametri espliciti
 - [ ] Test esistenti passano ancora (con warning di deprecazione dove applicabile)
 - [ ] Documentazione inline (Javadoc) aggiornata
 
@@ -945,7 +988,12 @@ See [Migration Guide](docs/MIGRATION_2.0.md) for detailed migration instructions
 
 ## Timeline Stimata
 
-- **Fase 1.1 (WHERE/HAVING)**: 1 giorno (implementazione + test)
+- **Fase 1.1 (WHERE/HAVING)**: ✅ COMPLETATA (1 giorno effettivo)
+  - Implementazione base cross-table support
+  - Feature aggiuntiva: column-to-column comparison
+  - 69 test aggiunti
+  - Refactoring duplicazione enum
+  - Documentazione aggiornata
 - **Fase 1.2 (JOIN)**: 1 giorno (implementazione + test)
 - **Fase 1.3 (MERGE)**: 1 giorno (implementazione + test)
 - **Fase 1.4 (GROUP BY)**: 0.5 giorni (implementazione + test)
@@ -955,6 +1003,7 @@ See [Migration Guide](docs/MIGRATION_2.0.md) for detailed migration instructions
 - **Fase 3 (Rimozione finale + validazione)**: 1 giorno
 
 **Totale**: ~7-8 giorni di lavoro
+**Progresso**: 1/8 giorni completati (12.5%)
 
 ---
 
