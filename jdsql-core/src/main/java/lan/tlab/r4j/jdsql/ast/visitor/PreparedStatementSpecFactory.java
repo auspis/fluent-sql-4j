@@ -29,7 +29,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
  * List<Object> params = spec.parameters();
  * }</pre>
  *
- * @param astVisitor the PreparedStatement renderer for this dialect
+ * @param astVisitor the AstToPreparedStatementSpecVisitor astVisitor for this dialect
  * @since 1.0
  */
 public record PreparedStatementSpecFactory(AstToPreparedStatementSpecVisitor astVisitor) {
