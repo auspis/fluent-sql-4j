@@ -302,7 +302,7 @@ public class HavingConditionBuilder {
      * Intermediate builder for column-to-column comparisons in HAVING clause.
      * Allows fluent syntax: .having().column("o", "total").gt().column("c", "total")
      */
-    public class ColumnComparator {
+    public static class ColumnComparator {
         private final HavingConditionBuilder parent;
         private final Comparison.ComparisonOperator operator;
 
