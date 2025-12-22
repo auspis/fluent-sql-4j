@@ -1,5 +1,6 @@
 package lan.tlab.r4j.jdsql.dsl.select;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
@@ -90,6 +91,8 @@ public class GroupByBuilder {
     /**
      * Complete the GROUP BY clause and return to the parent SelectBuilder.
      *
+     * <p>Internal method - use delegation methods (having, orderBy, fetch, offset, build(Connection)) for fluent API.
+     *
      * @return the parent SelectBuilder for continued query building
      * @throws IllegalStateException if no columns were added
      */
@@ -98,6 +101,20 @@ public class GroupByBuilder {
             throw new IllegalStateException("GROUP BY must contain at least one column");
         }
         return parent.updateGroupBy(GroupBy.of(columns.toArray(new ColumnReference[0])));
+    }
+
+    /**
+     * Complete the GROUP BY clause and build the prepared statement with parameters bound.
+     *
+     * <p>This is the terminal operation for the fluent GROUP BY builder chain.
+     *
+     * @param connection the database connection used to create the PreparedStatement
+     * @return a PreparedStatement with all parameters bound
+     * @throws SQLException if an error occurs while creating the PreparedStatement
+     * @throws IllegalStateException if no columns were added
+     */
+    public java.sql.PreparedStatement build(java.sql.Connection connection) throws java.sql.SQLException {
+        return build().build(connection);
     }
 
     /**
@@ -113,19 +130,10 @@ public class GroupByBuilder {
     /**
      * Alias for {@link #build()} to maintain fluent method chaining.
      *
-     * @return the parent SelectBuilder
+     * @return an OrderByBuilder to build the ORDER BY clause
      */
-    public SelectBuilder orderBy(String column) {
-        return build().orderBy(column);
-    }
-
-    /**
-     * Alias for {@link #build()} to maintain fluent method chaining.
-     *
-     * @return the parent SelectBuilder
-     */
-    public SelectBuilder orderByDesc(String column) {
-        return build().orderByDesc(column);
+    public OrderByBuilder orderBy() {
+        return build().orderBy();
     }
 
     /**

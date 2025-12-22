@@ -268,7 +268,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void orderByAscending() throws SQLException {
         PreparedStatement ps =
-                dsl.select("name", "age").from("users").orderBy("age").build(connection);
+                dsl.select("name", "age").from("users").orderBy().asc("age").build(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -304,7 +304,7 @@ class SelectBuilderIntegrationTest {
     @Test
     void orderByDescending() throws SQLException {
         PreparedStatement ps =
-                dsl.select("name", "age").from("users").orderByDesc("age").build(connection);
+                dsl.select("name", "age").from("users").orderBy().desc("age").build(connection);
 
         try (ResultSet rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
@@ -368,7 +368,8 @@ class SelectBuilderIntegrationTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .orderByDesc("age")
+                .orderBy()
+                .desc("age")
                 .fetch(2)
                 .offset(0)
                 .build(connection)) {
@@ -407,7 +408,8 @@ class SelectBuilderIntegrationTest {
                 .where()
                 .column("active")
                 .eq(true)
-                .orderBy("age")
+                .orderBy()
+                .asc("age")
                 .fetch(2)
                 .build(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getString("name"), r.getInt("age")));
@@ -550,7 +552,8 @@ class SelectBuilderIntegrationTest {
                 .having()
                 .column("age")
                 .gte(30)
-                .orderBy("age")
+                .orderBy()
+                .asc("age")
                 .build(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age")));
 
@@ -585,7 +588,8 @@ class SelectBuilderIntegrationTest {
                 .from("users")
                 .groupBy()
                 .column("age")
-                .orderBy("age")
+                .orderBy()
+                .asc("age")
                 .build(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("total_ids")));
 
@@ -614,7 +618,8 @@ class SelectBuilderIntegrationTest {
                 .having()
                 .column("age")
                 .gte(30)
-                .orderBy("age")
+                .orderBy()
+                .asc("age")
                 .build(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getDouble("avg_id")));
 
@@ -761,7 +766,8 @@ class SelectBuilderIntegrationTest {
                 .from("users")
                 .groupBy()
                 .column("age")
-                .orderBy("age")
+                .orderBy()
+                .asc("age")
                 .build(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age"), r.getInt("user_count")));
 
