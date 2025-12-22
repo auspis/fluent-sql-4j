@@ -4,6 +4,7 @@ import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
+import lan.tlab.r4j.jdsql.plugin.builtin.postgre.ast.visitor.ps.strategy.PostgreSqlCustomFunctionCallPsStrategy;
 import lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl.PostgreSqlDSL;
 import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlEscapeStrategy;
 
@@ -114,6 +115,7 @@ public final class PostgreSqlDialectPlugin {
     private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
         AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
+                .customFunctionCallStrategy(new PostgreSqlCustomFunctionCallPsStrategy())
                 .build();
 
         return new PreparedStatementSpecFactory(astToPsSpecVisitor);
