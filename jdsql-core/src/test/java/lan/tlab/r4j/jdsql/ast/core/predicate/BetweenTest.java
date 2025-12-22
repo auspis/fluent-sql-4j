@@ -158,7 +158,8 @@ class BetweenTest {
     void betweenInHavingClauseNumeric() throws SQLException {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("orders")
-                .groupBy("customer_id")
+                .groupBy()
+                .column("customer_id")
                 .having()
                 .column("COUNT(*)")
                 .between(5, 20)
@@ -176,7 +177,8 @@ class BetweenTest {
 
         new SelectBuilder(specFactory, "MIN(created_at)")
                 .from("orders")
-                .groupBy("customer_id")
+                .groupBy()
+                .column("customer_id")
                 .having()
                 .column("MIN(created_at)")
                 .between(start, end)
