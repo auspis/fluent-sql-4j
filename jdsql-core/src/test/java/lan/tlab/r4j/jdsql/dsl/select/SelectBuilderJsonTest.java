@@ -234,7 +234,12 @@ class SelectBuilderJsonTest {
                 new ScalarExpressionProjection(ColumnReference.of("products", "name")),
                 new ScalarExpressionProjection(jsonValue, "rating"));
 
-        new SelectBuilder(specFactory, select).from("products").orderBy("name").build(sqlCaptureHelper.getConnection());
+        new SelectBuilder(specFactory, select)
+                .from("products")
+                .orderBy()
+                .asc("name")
+                .build()
+                .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", JSON_VALUE("data", ? RETURNING DECIMAL(3,1)) AS "rating" FROM "products" ORDER BY "name" ASC\

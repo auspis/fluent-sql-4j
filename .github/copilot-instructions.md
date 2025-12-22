@@ -295,25 +295,30 @@ Always run this before committing changes to ensure the CI/CD pipeline succeeds.
 
 ## DSL Builder API
 
-All DSL builders (SelectBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder, MergeBuilder, CreateTableBuilder) use **only** `.build(Connection connection)` to generate SQL with automatic parameter binding.
+- Terminal builders (SelectBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder, MergeBuilder, CreateTableBuilder) are closed with **only** `.build(Connection connection)` which returns a `PreparedStatement` with bound parameters.
+- Intermediate builders (GroupByBuilder, OrderByBuilder, HavingBuilder, WhereConditionBuilder, etc.) provide **delegation methods** (e.g., `orderBy()`, `fetch()`, `offset()`, `build(Connection)`) that implicitly close the intermediate step; do not call an extra `.build()` before the terminal `build(Connection)`.
+- Connection management: caller owns the `Connection` lifecycle; builders never close it.
 
-- **No `.build()` method**: The `.build()` method has been removed from all DML/DQL builders
-- **PreparedStatement only**: All builders return `PreparedStatement` with parameters already bound
-- **SQL Injection Prevention**: Parameter binding is automatic, preventing SQL injection attacks
-- **Connection Management**: The `Connection` parameter is required and must be managed by the caller (not closed automatically by builders)
-
-Example:
+Examples:
 
 ```java
-// Correct usage
 PreparedStatement ps = dsl.select("name", "email")
     .from("users")
     .where()
     .column("age").gt(18)
     .build(connection);
+```
 
-// execute query
-ResultSet rs = ps.executeQuery();
+```java
+PreparedStatement ps = dsl.select("id", "name")
+    .from("orders")
+    .groupBy()
+    .column("customer_id")
+    .orderBy()
+    .asc("name")
+    .fetch(10)
+    .offset(5)
+    .build(connection);
 ```
 
 ## Additional Notes
