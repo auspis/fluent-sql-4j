@@ -91,7 +91,10 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
             String column,
             int offset) {
         this(projectionBuilder, defaultTableReference, functionType);
-        this.lagLeadExpression = parseColumnReference(column);
+        this.lagLeadExpression = toDefaultColumnReference(
+                column,
+                "LAG/LEAD column cannot be null or empty",
+                "LAG/LEAD column must not contain dot notation. Use lag(table, column, offset) or lead(table, column, offset) with separate parameters");
         this.lagLeadOffset = offset;
     }
 
@@ -106,7 +109,13 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
             String column,
             int offset) {
         this(projectionBuilder, defaultTableReference, functionType);
-        this.lagLeadExpression = ColumnReference.of(table, column);
+        this.lagLeadExpression = toQualifiedColumnReference(
+                table,
+                column,
+                "LAG/LEAD table cannot be null or empty",
+                "LAG/LEAD column cannot be null or empty",
+                "LAG/LEAD table must not contain dot notation: '",
+                "LAG/LEAD column must not contain dot notation: '");
         this.lagLeadOffset = offset;
     }
 
@@ -117,7 +126,11 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> partitionBy(String column) {
-        partitionByColumns.add(parseColumnReference(column));
+        partitionByColumns.add(
+                toDefaultColumnReference(
+                        column,
+                        "PARTITION BY column cannot be null or empty",
+                        "PARTITION BY column must not contain dot notation. Use partitionBy(table, column) with separate parameters"));
         return this;
     }
 
@@ -129,7 +142,14 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> partitionBy(String table, String column) {
-        partitionByColumns.add(ColumnReference.of(table, column));
+        partitionByColumns.add(
+                toQualifiedColumnReference(
+                        table,
+                        column,
+                        "PARTITION BY table cannot be null or empty",
+                        "PARTITION BY column cannot be null or empty",
+                        "PARTITION BY table must not contain dot notation: '",
+                        "PARTITION BY column must not contain dot notation. Use partitionBy(table, column) with separate parameters: '"));
         return this;
     }
 
@@ -140,7 +160,10 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByAsc(String column) {
-        ColumnReference columnRef = parseColumnReference(column);
+        ColumnReference columnRef = toDefaultColumnReference(
+                column,
+                "ORDER BY column cannot be null or empty",
+                "ORDER BY column must not contain dot notation. Use orderByAsc(table, column) with separate parameters");
         orderByList.add(Sorting.asc(columnRef));
         return this;
     }
@@ -152,7 +175,10 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByDesc(String column) {
-        ColumnReference columnRef = parseColumnReference(column);
+        ColumnReference columnRef = toDefaultColumnReference(
+                column,
+                "ORDER BY column cannot be null or empty",
+                "ORDER BY column must not contain dot notation. Use orderByDesc(table, column) with separate parameters");
         orderByList.add(Sorting.desc(columnRef));
         return this;
     }
@@ -165,7 +191,13 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByAsc(String table, String column) {
-        ColumnReference columnRef = ColumnReference.of(table, column);
+        ColumnReference columnRef = toQualifiedColumnReference(
+                table,
+                column,
+                "ORDER BY table cannot be null or empty",
+                "ORDER BY column cannot be null or empty",
+                "ORDER BY table must not contain dot notation: '",
+                "ORDER BY column must not contain dot notation. Use orderByAsc(table, column) with separate parameters: '");
         orderByList.add(Sorting.asc(columnRef));
         return this;
     }
@@ -178,7 +210,13 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByDesc(String table, String column) {
-        ColumnReference columnRef = ColumnReference.of(table, column);
+        ColumnReference columnRef = toQualifiedColumnReference(
+                table,
+                column,
+                "ORDER BY table cannot be null or empty",
+                "ORDER BY column cannot be null or empty",
+                "ORDER BY table must not contain dot notation: '",
+                "ORDER BY column must not contain dot notation. Use orderByDesc(table, column) with separate parameters: '");
         orderByList.add(Sorting.desc(columnRef));
         return this;
     }
@@ -286,11 +324,35 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
     /**
      * Parses a column reference, handling both "table.column" and "column" formats.
      */
-    private ColumnReference parseColumnReference(String column) {
+    private ColumnReference toDefaultColumnReference(String column, String nullOrEmptyMessage, String dotMessage) {
+        if (column == null || column.trim().isEmpty()) {
+            throw new IllegalArgumentException(nullOrEmptyMessage);
+        }
         if (column.contains(".")) {
-            String[] parts = column.split("\\.", 2);
-            return ColumnReference.of(parts[0], parts[1]);
+            throw new IllegalArgumentException(dotMessage + ": '" + column + "'");
         }
         return ColumnReference.of(defaultTableReference, column);
+    }
+
+    private ColumnReference toQualifiedColumnReference(
+            String table,
+            String column,
+            String tableNullOrEmptyMessage,
+            String columnNullOrEmptyMessage,
+            String tableDotMessagePrefix,
+            String columnDotMessagePrefix) {
+        if (table == null || table.trim().isEmpty()) {
+            throw new IllegalArgumentException(tableNullOrEmptyMessage);
+        }
+        if (table.contains(".")) {
+            throw new IllegalArgumentException(tableDotMessagePrefix + table + "'");
+        }
+        if (column == null || column.trim().isEmpty()) {
+            throw new IllegalArgumentException(columnNullOrEmptyMessage);
+        }
+        if (column.contains(".")) {
+            throw new IllegalArgumentException(columnDotMessagePrefix + column + "'");
+        }
+        return ColumnReference.of(table, column);
     }
 }
