@@ -35,7 +35,6 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.clause.HavingBuilder;
 import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
 import lan.tlab.r4j.jdsql.dsl.clause.SupportsWhere;
-import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
 import lan.tlab.r4j.jdsql.dsl.util.PsUtil;
 
 public class SelectBuilder implements SupportsWhere<SelectBuilder> {
@@ -252,22 +251,24 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                 this, lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator.AND);
     }
 
-    public SelectBuilder groupBy(String... columns) {
-        if (columns == null || columns.length == 0) {
-            throw new IllegalArgumentException("At least one column must be specified for GROUP BY");
-        }
+    /**
+     * Start a GROUP BY clause with explicit column references supporting aliases.
+     * Use this method for multi-table queries where you need to group by columns from different tables.
+     * <pre>
+     * .groupBy()
+     *     .column("country")
+     *     .column("o", "year")
+     *     .having()...
+     * </pre>
+     *
+     * @return a GroupByBuilder to specify columns with optional aliases
+     */
+    public GroupByBuilder groupBy() {
+        return new GroupByBuilder(this);
+    }
 
-        ColumnReference[] groupingColumns = java.util.Arrays.stream(columns)
-                .filter(column -> {
-                    if (column == null || column.trim().isEmpty()) {
-                        throw new IllegalArgumentException("Column name cannot be null or empty");
-                    }
-                    return true;
-                })
-                .map(column -> ColumnReferenceUtil.parseColumnReference(column, getTableReference()))
-                .toArray(ColumnReference[]::new);
-
-        statementBuilder = statementBuilder.groupBy(GroupBy.of(groupingColumns));
+    SelectBuilder updateGroupBy(GroupBy groupBy) {
+        statementBuilder = statementBuilder.groupBy(groupBy);
         return this;
     }
 
