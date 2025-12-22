@@ -59,6 +59,8 @@ class MysqlDSLE2E {
 
         TestDatabaseUtil.dropUsersTable(connection);
         TestDatabaseUtil.createUsersTableWithBackTicks(connection);
+        TestDatabaseUtil.dropOrdersTable(connection);
+        TestDatabaseUtil.createOrderTableWithBackTicks(connection);
 
         nameMapper = r -> r.getString("name");
     }
@@ -73,6 +75,8 @@ class MysqlDSLE2E {
         dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
         TestDatabaseUtil.truncateUsers(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.truncateOrders(connection);
+        TestDatabaseUtil.insertSampleOrders(connection);
     }
 
     @Test
@@ -108,6 +112,29 @@ class MysqlDSLE2E {
                 .build(connection);
 
         assertThat(ResultSetUtil.list(ps, nameMapper)).hasSize(3).containsAll(List.of("Bob", "Charlie", "Diana"));
+    }
+
+    @Test
+    void innerJoinUsersWithOrders() throws SQLException {
+        PreparedStatement ps = dsl.select()
+                .column("users", "name")
+                .sum("orders", "total")
+                .as("order_total")
+                .from("users")
+                .innerJoin("orders")
+                .on("users", "id", "orders", "userId")
+                .groupBy("name")
+                .orderBy("name")
+                .build(connection);
+
+        List<List<String>> results = ResultSetUtil.list(
+                ps,
+                r -> List.of(r.getString("name"), r.getBigDecimal("order_total").toPlainString()));
+
+        List<List<String>> expected =
+                List.of(List.of("Alice", "39.99"), List.of("Charlie", "49.99"), List.of("John Doe", "40.98"));
+
+        assertThat(results).containsExactlyElementsOf(expected);
     }
 
     @Test

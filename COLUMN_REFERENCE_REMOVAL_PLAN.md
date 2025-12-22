@@ -10,8 +10,9 @@ Rimuovere completamente il supporto per il parsing automatico delle stringhe "ta
 1. **WHERE/HAVING**: Abilitare riferimenti cross-table espliciti con overload `column(alias, column)` (prima attività)
 2. **JOIN/MERGE**: Sostituire parsing con firma a 4 parametri espliciti (nessun overload da mantenere)
 3. **GROUP BY**: Validare contro dot notation
-4. **Window Functions**: Validare contro dot notation, rimuovere parsing interno duplicato
-5. **ColumnReferenceUtil**: Deprecare completamente la classe utility
+4. **ORDER BY**: Supportare alias espliciti in `SelectBuilder.orderBy/orderByDesc`
+5. **Window Functions**: Validare contro dot notation, rimuovere parsing interno duplicato
+6. **ColumnReferenceUtil**: Deprecare completamente la classe utility
 
 ## Branch Git
 
@@ -204,98 +205,26 @@ private ColumnReference getColumnRef() {
 
 ---
 
-### 1.2 JoinSpecBuilder.on() - Firma Esplicita a 4 Parametri
+### 1.2 JoinSpecBuilder.on() - Firma Esplicita a 4 Parametri ✅ COMPLETATO
 
 **File**: `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/clause/JoinSpecBuilder.java`
 
-**Stato Attuale**:
-\`\`\`java
-public SelectBuilder on(String leftColumn, String rightColumn) {
-    ColumnReference leftColRef = ColumnReferenceUtil.parseColumnReference(leftColumn, "");
-    ColumnReference rightColRef = ColumnReferenceUtil.parseColumnReference(rightColumn, "");
-    // ...
-}
-\`\`\`
+**Stato**: completato.
 
-**Problema**: 
-- Parsing automatico di "alias.column" crea ambiguità
-- Non validazione dell'esistenza degli alias
-- Approccio non coerente con WHERE/HAVING
+**Implementato**:
+- Sostituita la firma con `on(String leftAlias, String leftColumn, String rightAlias, String rightColumn)` con validazione (alias/colonne non vuoti, niente dot).
+- Rimosso parsing dot-notation e deprecato il vecchio `on(String, String)`.
+- Fix aggiuntivo in `SelectBuilder`: le proiezioni/aggregati già qualificati (es. `o.total`) non vengono più riscritti quando si applicano alias, evitando regressioni nei JOIN con SUM.
 
-**Azione**:
-1. Sostituire completamente con `on(String leftAlias, String leftColumn, String rightAlias, String rightColumn)`
-2. Deprecare il metodo esistente `on(String, String)`
-3. Validare alias e colonne non vuoti e senza dot
+**Test**:
+- `JoinSpecBuilderTest` aggiornato; nuovo test regressione su aggregate qualificato in `SelectBuilderJoinTest`.
+- Suite `SelectBuilderJoinTest` verde (18 test).
 
-**Nuovo Comportamento**:
-
-\`\`\`java
-// Nuovo metodo a 4 parametri (unica firma supportata)
-public SelectBuilder on(String leftAlias, String leftColumn, String rightAlias, String rightColumn) {
-    validateJoinColumn(leftAlias, leftColumn, "left");
-    validateJoinColumn(rightAlias, rightColumn, "right");
-    
-    ColumnReference leftColRef = ColumnReference.of(leftAlias, leftColumn);
-    ColumnReference rightColRef = ColumnReference.of(rightAlias, rightColumn);
-    
-    return parent.addJoinCondition(leftColRef, rightColRef);
-}
-
-private void validateJoinColumn(String alias, String column, String side) {
-    if (alias == null || alias.trim().isEmpty()) {
-        throw new IllegalArgumentException(
-            "JOIN ON " + side + " alias cannot be null or empty"
-        );
-    }
-    if (alias.contains(".")) {
-        throw new IllegalArgumentException(
-            "JOIN ON " + side + " alias must not contain dot: '" + alias + "'"
-        );
-    }
-    if (column == null || column.trim().isEmpty()) {
-        throw new IllegalArgumentException(
-            "JOIN ON " + side + " column cannot be null or empty"
-        );
-    }
-    if (column.contains(".")) {
-        throw new IllegalArgumentException(
-            "JOIN ON " + side + " column must not contain dot: '" + column + "'"
-        );
-    }
-}
-
-// Deprecato
-@Deprecated(forRemoval = true, since = "2.0.0")
-public SelectBuilder on(String leftColumn, String rightColumn) {
-    throw new UnsupportedOperationException(
-        "on(String, String) is deprecated. " +
-        "Use on(leftAlias, leftColumn, rightAlias, rightColumn) with explicit 4 parameters. " +
-        "Example: .on(\"o\", \"customer_id\", \"c\", \"id\")"
-    );
-}
-\`\`\`
-
-**Esempio Utilizzo**:
-\`\`\`java
-// PRIMA
-.on("o.customer_id", "c.id")  // Parsing automatico
-
-// DOPO
-.on("o", "customer_id", "c", "id")  // Esplicito, validato
-\`\`\`
-
-**Test da Modificare**:
-- `JoinSpecBuilderTest.java`: aggiornare tutti i test per usare la firma a 4 parametri
-- Aggiungere test di validazione per alias/colonne vuoti o con dot
-- Test per self-join con stesso alias
-
-**Documentazione da Aggiornare**:
-- `DSL_USAGE_GUIDE.md`: aggiornare tutti gli esempi di JOIN con sintassi a 4 parametri
-- `README.md`: esempio principale con la nuova sintassi
+**Documentazione**:
+- Esempi JOIN da aggiornare in `DSL_USAGE_GUIDE.md` e `README.md` (TODO Fase 2).
 
 **Rimozione (Fase 3)**:
-- Rimuovere `on(String, String)` completamente
-- Rimuovere import di `ColumnReferenceUtil`
+- Eliminare definitivamente `on(String, String)` e import di `ColumnReferenceUtil` (quando si passerà alla rimozione totale).
 
 ---
 
@@ -512,7 +441,19 @@ public SelectBuilder groupBy(String... columns) {
 
 ---
 
-### 1.5 WindowFunctionBuilder - Validazione Against Dot Notation
+### 1.5 SelectBuilder.orderBy() - Supporto Alias Esplicito
+
+**Obiettivo**: estendere `orderBy`/`orderByDesc` per accettare alias espliciti, allineando il comportamento a WHERE/HAVING e JOIN.
+
+**Azione**:
+- Aggiungere overload `orderBy(String alias, String column)` e `orderByDesc(String alias, String column)` con validazione (alias/colonna non vuoti, senza dot).
+- Mantenere le versioni a singolo parametro per single-table, ma senza parsing della dot notation.
+- Aggiornare i test `SelectBuilderJoinTest`/`SelectBuilderOrderByTest` (o equivalenti) e l’esempio ORDER BY in `DSL_USAGE_GUIDE.md`.
+
+**Rimozione (Fase 3)**:
+- Nessuna API da rimuovere, solo evitare parsing implicito; documentare la preferenza per gli overload con alias in contesti multi-table.
+
+### 1.6 WindowFunctionBuilder - Validazione Against Dot Notation
 
 **File**: `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/select/WindowFunctionBuilder.java`
 
@@ -590,7 +531,7 @@ WindowFunctionBuilder(/* ... */, String column, int offset) {
 
 ---
 
-### 1.6 ColumnReferenceUtil - Deprecazione Completa
+### 1.7 ColumnReferenceUtil - Deprecazione Completa
 
 **File**: `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/util/ColumnReferenceUtil.java`
 
@@ -906,139 +847,25 @@ The DSL no longer supports automatic parsing of dot-separated column names.
 
 ### Deprecated
 - `JoinSpecBuilder.on(String, String)` - Use 4-parameter version instead
-- `MergeBuilder.on(String, String)` - Use 4-parameter version instead
-- `MergeBuilder.WhenMatchedUpdateBuilder.set(String, String)` - Ambiguous, use set(String, Object) for literals or set(String, ColumnReference) for columns
-- `ColumnReferenceUtil` - Entire class deprecated, will be removed in 3.0.0
+### 1.3 MergeBuilder - Firma Esplicita a 4 Parametri per on() e set() ✅ COMPLETATO
 
-### Removed (Breaking Changes)
-- Automatic parsing of "table.column" strings throughout the DSL
-- `ColumnReferenceUtil.parseColumnReference()` method (throws UnsupportedOperationException)
+**File**: `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/merge/MergeBuilder.java`
 
-### Migration
-See [Migration Guide](docs/MIGRATION_2.0.md) for detailed migration instructions.
-\`\`\`
+**Stato**: completato.
 
----
+**Implementato**:
+- `on(targetAlias, targetColumn, sourceAlias, sourceColumn)` con validazione, rimozione parsing dot-notation; metodi a 2 parametri deprecati.
+- `set(String, ColumnReference)` introdotto per riferimenti a colonne; `set(String, String)` deprecato; `set(String, Object)` resta per i literal.
+- Allineate le catene WhenMatched/WhenNotMatched.
 
-## Criteri di Successo
+**Test**:
+- `MergeBuilderTest`, `MergeBuilderWhenSequencingTest` e `StandardSQLDialectPluginE2E` aggiornati alle nuove firme; suite verdi.
 
-### Fase 1
-- [x] **1.1 COMPLETATO**: Nuovi overload WHERE/HAVING implementati e testati
-  - [x] Supporto cross-table esplicito con `column(alias, column)`
-  - [x] Column-to-column comparison con intermediate builder pattern
-  - [x] 69 nuovi test aggiunti (32 WHERE + 37 HAVING)
-  - [x] Eliminata duplicazione enum ComparisonOperator
-  - [x] Documentazione aggiornata
-- [ ] **1.2 TODO**: JOIN usa firma a 4 parametri espliciti
-- [ ] **1.3 TODO**: MERGE usa firma a 4 parametri espliciti
-- [ ] **1.4 TODO**: GROUP BY validazione contro dot notation
-- [ ] **1.5 TODO**: Window Functions validazione contro dot notation
-- [ ] **1.6 TODO**: ColumnReferenceUtil deprecato
-- [ ] Validazione/errori chiari per input non validi
-- [ ] Test esistenti passano ancora (con warning di deprecazione dove applicabile)
-- [ ] Documentazione inline (Javadoc) aggiornata
+**Documentazione**:
+- Esempi MERGE da aggiornare in `DSL_USAGE_GUIDE.md` e `README.md` (TODO Fase 2).
 
-### Fase 2
-- [ ] Tutti i test usano solo approccio strutturato
-- [ ] Nessun warning di deprecazione nei test
-- [ ] Documentazione utente aggiornata (DSL_USAGE_GUIDE, README)
-- [ ] Guide di migrazione disponibili
-- [ ] Esempi di codice aggiornati
-
-### Fase 3
-- [ ] `ColumnReferenceUtil` rimosso completamente
-- [ ] Nessun parsing automatico nel codice
-- [ ] Metodi deprecati rimossi
-- [ ] Build pulita senza errori o warning
-- [ ] `./mvnw spotless:apply` eseguito
-- [ ] Tutti i test passano (unit, component, integration, E2E)
-- [ ] Release notes complete
-- [ ] CHANGELOG aggiornato
-
----
-
-## Rischi e Mitigazioni
-
-### Rischio 1: Breaking Changes per Utenti Esistenti
-**Mitigazione**: 
-- Seguire processo di deprecazione in 3 fasi
-- Fornire release notes dettagliate
-- Creare migration guide con esempi concreti
-- Mantenere backward compatibility in versione intermedia (2.0.0 con deprecation warnings)
-
-### Rischio 2: Test che Falliscono
-**Mitigazione**:
-- Migrare test gradualmente, sezione per sezione
-- Eseguire suite completa dopo ogni modifica
-- Commit incrementali per facilitare rollback se necessario
-
-### Rischio 3: Complessità API Aumentata
-**Mitigazione**:
-- Documentazione chiara con molti esempi
-- Overload multipli per supportare diversi use case
-- Messaggi di errore esplicativi che suggeriscono la sintassi corretta
-
-### Rischio 4: Regressioni Funzionali
-**Mitigazione**:
-- Mantenere test coverage elevata (>80%)
-- Eseguire integration ed E2E tests dopo ogni modifica
-- Code review accurata per ogni fase
-
----
-
-## Timeline Stimata
-
-- **Fase 1.1 (WHERE/HAVING)**: ✅ COMPLETATA (1 giorno effettivo)
-  - Implementazione base cross-table support
-  - Feature aggiuntiva: column-to-column comparison
-  - 69 test aggiunti
-  - Refactoring duplicazione enum
-  - Documentazione aggiornata
-- **Fase 1.2 (JOIN)**: 1 giorno (implementazione + test)
-- **Fase 1.3 (MERGE)**: 1 giorno (implementazione + test)
-- **Fase 1.4 (GROUP BY)**: 0.5 giorni (implementazione + test)
-- **Fase 1.5 (Window Functions)**: 0.5 giorni (implementazione + test)
-- **Fase 1.6 (ColumnReferenceUtil deprecation)**: 0.5 giorni
-- **Fase 2 (Migrazione test + documentazione)**: 2 giorni
-- **Fase 3 (Rimozione finale + validazione)**: 1 giorno
-
-**Totale**: ~7-8 giorni di lavoro
-**Progresso**: 1/8 giorni completati (12.5%)
-
----
-
-## Note Implementative
-
-### Ordine di Implementazione
-
-1. **WHERE/HAVING** (priorità assoluta): Richiesto per supportare query multi-table corrette
-2. **JOIN**: Seconda priorità, uso frequente
-3. **MERGE**: Terza priorità, ambiguità critica da risolvere
-4. **GROUP BY**: Validazione semplice, bassa priorità
-5. **Window Functions**: Validazione semplice, bassa priorità
-6. **ColumnReferenceUtil**: Deprecazione finale
-
-### Commit Strategy
-
-Ogni sottosezione della Fase 1 deve essere un commit separato:
-
-\`\`\`bash
-git commit -m "feat(dsl): add WHERE/HAVING cross-table support with explicit alias
-
-- Add WhereBuilder.column(alias, column) overload
-- Add HavingBuilder.column(alias, column) overload
-- Add validation for dot notation in column names
-- Add tests for multi-table WHERE/HAVING conditions
-
-BREAKING CHANGE: Dot notation in WHERE/HAVING single-table context now throws IllegalArgumentException"
-
-git commit -m "feat(dsl): replace JOIN on() with 4-parameter explicit signature
-
-- Replace JoinSpecBuilder.on(String, String) with on(leftAlias, leftColumn, rightAlias, rightColumn)
-- Deprecate old on(String, String) method
-- Add validation for alias/column parameters
-- Update all JOIN tests to use new signature
-
+**Rimozione (Fase 3)**:
+- Eliminare definitivamente `on(String, String)` e `set(String, String)` e gli import di `ColumnReferenceUtil` residui.
 BREAKING CHANGE: JoinSpecBuilder.on(String, String) is deprecated, use 4-parameter version"
 
 # ...e così via per ogni sezione
