@@ -111,9 +111,9 @@ public class MergeBuilder {
                     "Right column must not contain dot. Use on(table, column, table, column) with separate parameters");
         }
 
-        ColumnReference left = ColumnReference.of(leftTableReference, leftColumn);
-        ColumnReference right = ColumnReference.of(rightTableReference, rightColumn);
-        onCondition = Comparison.eq(left, right);
+        ColumnReference targetColRef = ColumnReference.of(leftTableReference, leftColumn);
+        ColumnReference sourceColRef = ColumnReference.of(rightTableReference, rightColumn);
+        onCondition = Comparison.eq(targetColRef, sourceColRef);
         return this;
     }
 
