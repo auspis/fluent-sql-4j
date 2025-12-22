@@ -37,7 +37,7 @@ class MergeBuilderWhenSequencingTest {
     void whenMatchedUpdateThenWhenNotMatchedInsert() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("value", 100)
                 .whenNotMatched()
@@ -58,7 +58,7 @@ class MergeBuilderWhenSequencingTest {
     void whenMatchedDeleteThenWhenNotMatchedInsert() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .delete()
                 .whenNotMatched()
@@ -80,7 +80,7 @@ class MergeBuilderWhenSequencingTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched(matchedCondition)
                 .set("updated", true)
                 .whenNotMatched(notMatchedCondition)
@@ -103,7 +103,7 @@ class MergeBuilderWhenSequencingTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched(condition1)
                 .set("status", "high")
                 .whenMatched(condition2)
@@ -131,7 +131,7 @@ class MergeBuilderWhenSequencingTest {
         // First WHEN MATCHED UPDATE, then separate WHEN MATCHED DELETE
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("updated", true)
                 .whenMatched(Comparison.eq(ColumnReference.of("src", "archive"), Literal.of(1)))
@@ -147,7 +147,7 @@ class MergeBuilderWhenSequencingTest {
     void notMatchedInsertWithMultipleColumns() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("last_updated", "2025-12-21")
                 .whenNotMatched()
@@ -172,7 +172,7 @@ class MergeBuilderWhenSequencingTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched(condition1)
                 .set("action", "update_a")
                 .whenMatched(condition2)
@@ -202,7 +202,7 @@ class MergeBuilderWhenSequencingTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.emp_id", "src.emp_id")
+                .on("target", "emp_id", "src", "emp_id")
                 .whenNotMatched(condition1)
                 .set("emp_id", ColumnReference.of("src", "emp_id"))
                 .set("salary_tier", "high")
@@ -224,7 +224,7 @@ class MergeBuilderWhenSequencingTest {
     void multipleWhenMatchedWithDeleteTransition() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source")
-                .on("target.id", "source.id")
+                .on("target", "id", "source", "id")
                 .whenMatched()
                 .set("status", "active")
                 .whenMatched(Comparison.eq(ColumnReference.of("source", "type"), Literal.of("ARCHIVE")))
@@ -243,7 +243,7 @@ class MergeBuilderWhenSequencingTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched(matched1)
                 .set("quantity", 500)
                 .set("price", 99.99)

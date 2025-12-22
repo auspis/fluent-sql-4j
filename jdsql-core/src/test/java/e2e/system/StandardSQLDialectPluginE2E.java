@@ -243,7 +243,7 @@ class StandardSQLDialectPluginE2E {
         int affectedRows = dsl.mergeInto("users")
                 .as("tgt")
                 .using("users_updates", "src")
-                .on("tgt.id", "src.id")
+                .on("tgt", "id", "src", "id")
                 .whenMatched()
                 .set("name", "src.name")
                 .set("email", "src.email")
