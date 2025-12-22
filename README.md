@@ -64,16 +64,98 @@ For more examples, see the [DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md).
 
 ## Project Structure
 
-The project is organized as a multi-module Maven project:
+The project is organized as a multi-module Maven project with two main artifacts for users:
 
-- **[`jdsql-core/`](jdsql-core/)**: Core SQL AST, DSL builders, and plugin system
+### Published Artifacts
+
+- **[`jdsql-api/`](jdsql-api/)**: **Public API for DSL users**
+  - Use this dependency in your application to build SQL queries
+  - Provides DSL, builders (SELECT, INSERT, UPDATE, DELETE, MERGE, CREATE TABLE), and PreparedStatement support
+  - Maven dependency:
+
+    ```xml
+    <dependency>
+      <groupId>lan.tlab</groupId>
+      <artifactId>jdsql-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    ```
+- **[`jdsql-spi/`](jdsql-spi/)**: **Service Provider Interface for plugin developers**
+  - Use this dependency to develop custom SQL dialect plugins
+  - Provides AST interfaces, Visitor pattern, rendering strategies, and plugin registry
+  - Maven dependency:
+
+    ```xml
+    <dependency>
+      <groupId>lan.tlab</groupId>
+      <artifactId>jdsql-spi</artifactId>
+      <version>1.0</version>
+    </dependency>
+    ```
+
+### Internal Modules (Not Published)
+
+- **[`jdsql-core/`](jdsql-core/)**: Internal implementation (AST, DSL builders, plugin system)
+  - Not intended for direct use - access via `jdsql-api` or `jdsql-spi`
+  - Contains all implementation code
 - **[`plugins/`](plugins/)**: Dialect-specific plugins
   - **[`jdsql-mysql/`](plugins/jdsql-mysql/)**: MySQL dialect plugin
+  - **[`jdsql-postgresql/`](plugins/jdsql-postgresql/)**: PostgreSQL dialect plugin
 - **[`test-support/`](test-support/)**: Shared test utilities and helpers
 
-Dependencies (see [jdsql-core/README.md](jdsql-core/README.md) for more details):
-- Each module provides specific functionalities
-- Modules are version-controlled together for consistency
+### Usage Patterns
+
+**For Application Developers (using the DSL):**
+
+```xml
+<dependency>
+  <groupId>lan.tlab</groupId>
+  <artifactId>jdsql-api</artifactId>
+  <version>1.0</version>
+</dependency>
+<!-- Add dialect plugins as needed -->
+<dependency>
+  <groupId>lan.tlab</groupId>
+  <artifactId>jdsql-mysql</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+**For Plugin Developers (creating custom dialects):**
+
+```xml
+<dependency>
+  <groupId>lan.tlab</groupId>
+  <artifactId>jdsql-spi</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+## Building the Project
+
+To build all modules locally:
+
+```bash
+./mvnw clean install
+```
+
+To build without running tests:
+
+```bash
+./mvnw clean install -DskipTests
+```
+
+To run only unit and component tests (fast):
+
+```bash
+./mvnw clean test
+```
+
+To run all tests including integration and E2E tests:
+
+```bash
+./mvnw clean verify
+```
 
 ## Documentation
 
