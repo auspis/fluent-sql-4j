@@ -106,7 +106,11 @@ public class GroupByBuilder {
     /**
      * Complete the GROUP BY clause and build the prepared statement with parameters bound.
      *
-     * <p>This is the terminal operation for the fluent GROUP BY builder chain.
+     * <p>This is a convenience method that chains both {@link #build()} (which completes the
+     * GROUP BY clause and returns the parent SelectBuilder) and
+     * {@link SelectBuilder#build(Connection)} (the terminal operation that creates the
+     * PreparedStatement). This allows direct statement creation from the GROUP BY builder
+     * without explicit intermediate steps.
      *
      * @param connection the database connection used to create the PreparedStatement
      * @return a PreparedStatement with all parameters bound
