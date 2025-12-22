@@ -123,7 +123,8 @@ class MysqlDSLE2E {
                 .from("users")
                 .innerJoin("orders")
                 .on("users", "id", "orders", "userId")
-                .groupBy("name")
+                .groupBy()
+                .column("users", "name")
                 .orderBy("name")
                 .build(connection);
 
@@ -217,7 +218,8 @@ class MysqlDSLE2E {
                 .separator(", ")
                 .as("names")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .orderBy("age");
 
         // prepared statement
@@ -425,7 +427,8 @@ class MysqlDSLE2E {
                 .separator(", ")
                 .as("names")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .orderBy("age");
 
         PreparedStatement ps = selectBuilder.build(connection);
@@ -498,7 +501,8 @@ class MysqlDSLE2E {
                 .where()
                 .column("active")
                 .eq(true)
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .orderBy("age");
 
         try (PreparedStatement ps = selectBuilder.build(connection);
