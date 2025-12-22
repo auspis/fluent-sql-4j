@@ -4,7 +4,6 @@ import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.core.identifier.TableIdentifier;
 import lan.tlab.r4j.jdsql.ast.dql.source.FromSource;
 import lan.tlab.r4j.jdsql.ast.dql.source.join.OnJoin;
-import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
 
 public class JoinSpecBuilder {
     private final SelectBuilder parent;
@@ -28,16 +27,39 @@ public class JoinSpecBuilder {
         return this;
     }
 
-    public SelectBuilder on(String leftColumn, String rightColumn) {
+    public SelectBuilder on(
+            String leftTableReference, String leftColumn, String rightTableReference, String rightColumn) {
+        if (leftTableReference == null || leftTableReference.trim().isEmpty()) {
+            throw new IllegalArgumentException("Left table reference cannot be null or empty");
+        }
+        if (leftTableReference.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Left table reference must not contain dot: '" + leftTableReference + "'");
+        }
         if (leftColumn == null || leftColumn.trim().isEmpty()) {
             throw new IllegalArgumentException("Left column cannot be null or empty");
+        }
+        if (leftColumn.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Left column must not contain dot. Use on(table, column, table, column) with separate parameters");
+        }
+        if (rightTableReference == null || rightTableReference.trim().isEmpty()) {
+            throw new IllegalArgumentException("Right table reference cannot be null or empty");
+        }
+        if (rightTableReference.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Right table reference must not contain dot: '" + rightTableReference + "'");
         }
         if (rightColumn == null || rightColumn.trim().isEmpty()) {
             throw new IllegalArgumentException("Right column cannot be null or empty");
         }
+        if (rightColumn.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Right column must not contain dot. Use on(table, column, table, column) with separate parameters");
+        }
 
-        ColumnReference leftColRef = ColumnReferenceUtil.parseColumnReference(leftColumn, "");
-        ColumnReference rightColRef = ColumnReferenceUtil.parseColumnReference(rightColumn, "");
+        ColumnReference leftColRef = ColumnReference.of(leftTableReference, leftColumn);
+        ColumnReference rightColRef = ColumnReference.of(rightTableReference, rightColumn);
 
         FromSource right = rightTableAlias != null
                 ? new TableIdentifier(rightTableName, rightTableAlias)
