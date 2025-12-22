@@ -173,7 +173,7 @@ PreparedStatement ps = dsl.select("name", "age", "active")
 PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
-    .on("u.id", "o.user_id")
+    .on("u", "id", "o", "user_id")
     .where()
     .column("u", "age").gt(18)           // Column from users table
     .and()
@@ -186,9 +186,9 @@ PreparedStatement ps = dsl.select("*")
 PreparedStatement ps = dsl.select("*")
     .from("customers").as("c")
     .leftJoin("orders").as("o")
-    .on("c.id", "o.customer_id")
+    .on("c", "id", "o", "customer_id")
     .innerJoin("products").as("p")
-    .on("o.product_id", "p.id")
+    .on("o", "product_id", "p", "id")
     .where()
     .column("c", "country").eq("IT")     // Customer from Italy
     .and()
@@ -211,28 +211,28 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .innerJoin("orders")
-    .on("users.id", "orders.user_id")
+    .on("users", "id", "orders", "user_id")
     .build(connection);
 
 // LEFT JOIN
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .leftJoin("profiles")
-    .on("users.id", "profiles.user_id")
+    .on("users", "id", "profiles", "user_id")
     .build(connection);
 
 // RIGHT JOIN
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .rightJoin("departments")
-    .on("users.dept_id", "departments.id")
+    .on("users", "dept_id", "departments", "id")
     .build(connection);
 
 // FULL JOIN
 PreparedStatement ps = dsl.select("*")
     .from("users")
     .fullJoin("roles")
-    .on("users.role_id", "roles.id")
+    .on("users", "role_id", "roles", "id")
     .build(connection);
 
 // CROSS JOIN
@@ -245,23 +245,23 @@ PreparedStatement ps = dsl.select("*")
 PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
-    .on("u.id", "o.user_id")
+    .on("u", "id", "o", "user_id")
     .build(connection);
 
 // Multiple JOINs
 PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
-    .on("u.id", "o.user_id")
+    .on("u", "id", "o", "user_id")
     .leftJoin("products").as("p")
-    .on("o.product_id", "p.id")
+    .on("o", "product_id", "p", "id")
     .build(connection);
 
 // JOIN with WHERE clause
 PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
-    .on("u.id", "o.user_id")
+    .on("u", "id", "o", "user_id")
     .where()
     .column("status").eq("active")
     .build(connection);
@@ -480,7 +480,7 @@ PreparedStatement ps = dsl.select()
 PreparedStatement ps = dsl.select()
     .sum("orders", "amount").as("total_amount")
     .from("users").as("u")
-    .innerJoin("orders").as("o").on("u.id", "o.user_id")
+    .innerJoin("orders").as("o").on("u", "id", "o", "user_id")
     .build(connection);
 // → SELECT SUM("orders"."amount") AS total_amount FROM "users" AS "u" 
 //   INNER JOIN "orders" AS "o" ON "u"."id" = "o"."user_id"
@@ -566,6 +566,10 @@ PreparedStatement ps = dsl.deleteFrom("users")
 ## MERGE Statements
 
 ```java
+import lan.tlab.r4j.jdsql.dsl.DSL;
+import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+
 // Get a DSL instance
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
@@ -574,54 +578,54 @@ DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 PreparedStatement ps = dsl.mergeInto("users")
     .as("tgt")
     .using("users_updates", "src")
-    .on("tgt.id", "src.id")
+    .on("tgt", "id", "src", "id")
     .whenMatched()
-    .set("name", "src.name")
-    .set("email", "src.email")
+    .set("name", ColumnReference.of("src", "name"))
+    .set("email", ColumnReference.of("src", "email"))
     .whenNotMatched()
-    .set("id", "src.id")
-    .set("name", "src.name")
-    .set("email", "src.email")
+    .set("id", ColumnReference.of("src", "id"))
+    .set("name", ColumnReference.of("src", "name"))
+    .set("email", ColumnReference.of("src", "email"))
     .build(connection);
 
 // MERGE with multiple columns
 PreparedStatement ps = dsl.mergeInto("users")
     .as("tgt")
     .using("users_updates", "src")
-    .on("tgt.id", "src.id")
+    .on("tgt", "id", "src", "id")
     .whenMatched()
-    .set("name", "src.name")
-    .set("email", "src.email")
-    .set("age", "src.age")
-    .set("active", "src.active")
+    .set("name", ColumnReference.of("src", "name"))
+    .set("email", ColumnReference.of("src", "email"))
+    .set("age", ColumnReference.of("src", "age"))
+    .set("active", ColumnReference.of("src", "active"))
     .whenNotMatched()
-    .set("id", "src.id")
-    .set("name", "src.name")
-    .set("email", "src.email")
-    .set("age", "src.age")
-    .set("active", "src.active")
+    .set("id", ColumnReference.of("src", "id"))
+    .set("name", ColumnReference.of("src", "name"))
+    .set("email", ColumnReference.of("src", "email"))
+    .set("age", ColumnReference.of("src", "age"))
+    .set("active", ColumnReference.of("src", "active"))
     .build(connection);
 
 // MERGE with additional columns (timestamps, etc.)
 PreparedStatement ps = dsl.mergeInto("users")
     .as("tgt")
     .using("users_updates", "src")
-    .on("tgt.id", "src.id")
+    .on("tgt", "id", "src", "id")
     .whenMatched()
-    .set("name", "src.name")
-    .set("email", "src.email")
-    .set("age", "src.age")
-    .set("active", "src.active")
-    .set("birthdate", "src.birthdate")
-    .set("createdAt", "src.createdAt")
+    .set("name", ColumnReference.of("src", "name"))
+    .set("email", ColumnReference.of("src", "email"))
+    .set("age", ColumnReference.of("src", "age"))
+    .set("active", ColumnReference.of("src", "active"))
+    .set("birthdate", ColumnReference.of("src", "birthdate"))
+    .set("createdAt", ColumnReference.of("src", "createdAt"))
     .whenNotMatched()
-    .set("id", "src.id")
-    .set("name", "src.name")
-    .set("email", "src.email")
-    .set("age", "src.age")
-    .set("active", "src.active")
-    .set("birthdate", "src.birthdate")
-    .set("createdAt", "src.createdAt")
+    .set("id", ColumnReference.of("src", "id"))
+    .set("name", ColumnReference.of("src", "name"))
+    .set("email", ColumnReference.of("src", "email"))
+    .set("age", ColumnReference.of("src", "age"))
+    .set("active", ColumnReference.of("src", "active"))
+    .set("birthdate", ColumnReference.of("src", "birthdate"))
+    .set("createdAt", ColumnReference.of("src", "createdAt"))
     .build(connection);
 ```
 
