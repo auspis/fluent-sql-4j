@@ -160,7 +160,8 @@ class LikeTest {
     void likeInGroupBy() throws SQLException {
         new SelectBuilder(specFactory, "COUNT(*)")
                 .from("users")
-                .groupBy("category")
+                .groupBy()
+                .column("category")
                 .having()
                 .column("category")
                 .like("premium%")
