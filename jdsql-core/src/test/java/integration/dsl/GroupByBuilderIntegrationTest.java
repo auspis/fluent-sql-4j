@@ -102,7 +102,8 @@ class GroupByBuilderIntegrationTest {
                 .from("customers")
                 .groupBy()
                 .column("country")
-                .orderBy("country")
+                .orderBy()
+                .asc("country")
                 .build(connection);
 
         ResultSet rs = ps.executeQuery();
