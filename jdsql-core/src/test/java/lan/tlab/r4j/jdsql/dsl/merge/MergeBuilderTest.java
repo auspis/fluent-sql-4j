@@ -274,7 +274,7 @@ class MergeBuilderTest {
                 .using("source", "src")
                 .on("target", "id", "src", "id")
                 .whenMatched()
-                .set("target.value", ColumnReference.of("src", "new_value"))
+                .set("value", ColumnReference.of("src", "new_value"))
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -327,18 +327,18 @@ class MergeBuilderTest {
     }
 
     @Test
-    void fluentApiWithDotNotationForColumnReferences() throws SQLException {
+    void fluentApiWithExplicitColumnReferences() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
                 .on("target", "id", "src", "id")
                 .whenMatched()
-                .set("name", "src.name")
-                .set("email", "src.email")
-                .set("age", "src.age")
+                .set("name", ColumnReference.of("src", "name"))
+                .set("email", ColumnReference.of("src", "email"))
+                .set("age", ColumnReference.of("src", "age"))
                 .whenNotMatched()
-                .set("id", "src.id")
-                .set("name", "src.name")
-                .set("email", "src.email")
+                .set("id", ColumnReference.of("src", "id"))
+                .set("name", ColumnReference.of("src", "name"))
+                .set("email", ColumnReference.of("src", "email"))
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -348,5 +348,29 @@ class MergeBuilderTest {
                         WHEN MATCHED THEN UPDATE SET "name" = "src"."name", "email" = "src"."email", "age" = "src"."age" \
                         WHEN NOT MATCHED THEN INSERT ("id", "name", "email") VALUES ("src"."id", "src"."name", "src"."email")\
                         """);
+    }
+
+    @Test
+    void whenMatchedRejectsDotNotationInColumnName() {
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
+                        .using("source", "src")
+                        .on("target", "id", "src", "id")
+                        .whenMatched()
+                        .set("target.name", "value")
+                        .build(sqlCaptureHelper.getConnection()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name must not contain dot notation: 'target.name'");
+    }
+
+    @Test
+    void whenNotMatchedRejectsDotNotationInColumnName() {
+        assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
+                        .using("source", "src")
+                        .on("target", "id", "src", "id")
+                        .whenNotMatched()
+                        .set("target.id", ColumnReference.of("src", "id"))
+                        .build(sqlCaptureHelper.getConnection()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name must not contain dot notation: 'target.id'");
     }
 }
