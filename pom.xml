@@ -9,6 +9,8 @@
   <modules>
     <module>test-support</module>
     <module>jdsql-core</module>
+    <module>jdsql-api</module>
+    <module>jdsql-spi</module>
     <module>plugins</module>
   </modules>
 
@@ -51,6 +53,16 @@
       <dependency>
         <groupId>lan.tlab</groupId>
         <artifactId>jdsql-core</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>lan.tlab</groupId>
+        <artifactId>jdsql-api</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>lan.tlab</groupId>
+        <artifactId>jdsql-spi</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
