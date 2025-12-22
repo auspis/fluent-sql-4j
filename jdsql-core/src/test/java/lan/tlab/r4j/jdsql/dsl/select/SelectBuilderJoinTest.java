@@ -5,6 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
 import java.sql.SQLException;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
@@ -202,6 +207,26 @@ class SelectBuilderJoinTest {
                         "SELECT \"u\".\"name\", \"u\".\"email\", \"u\".\"order_total\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" LEFT JOIN \"payments\" AS p ON \"o\".\"id\" = \"p\".\"order_id\" WHERE (\"u\".\"status\" = ?) AND (\"u\".\"amount\" > ?) ORDER BY \"u\".\"created_at\" DESC FETCH NEXT 20 ROWS ONLY");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "completed");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 100);
+    }
+
+    @Test
+    void joinWithQualifiedAggregateKeepsTableReference() throws SQLException {
+        Select select = Select.of(
+                new ScalarExpressionProjection(ColumnReference.of("u", "name")),
+                new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("o", "total"))));
+
+        new SelectBuilder(specFactory, select)
+                .from("users")
+                .as("u")
+                .innerJoin("orders")
+                .as("o")
+                .on("u", "id", "o", "user_id")
+                .groupBy("u.name")
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .isEqualTo(
+                        "SELECT \"u\".\"name\", SUM(\"o\".\"total\") FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" GROUP BY \"u\".\"name\"");
     }
 
     @Test
