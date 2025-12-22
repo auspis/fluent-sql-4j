@@ -50,7 +50,7 @@ PreparedStatement ps = dsl.insertInto("users")
 PreparedStatement ps = dsl.select("*")
     .from("users").as("u")
     .innerJoin("orders").as("o")
-    .on("u.id", "o.user_id")
+    .on("u", "id", "o", "user_id")
     .where()
     .column("u", "age").gt(18)           // Column from users table
     .and()
