@@ -8,6 +8,11 @@
   </parent>
   <artifactId>jdsql-core</artifactId>
 
+  <properties>
+    <!-- Skip deployment of jdsql-core, it's an internal implementation module -->
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>lan.tlab</groupId>
