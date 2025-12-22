@@ -158,7 +158,9 @@ class SelectBuilderJoinTest {
                 .from("users")
                 .innerJoin("orders")
                 .on("users", "id", "orders", "user_id")
-                .orderBy("created_at")
+                .orderBy()
+                .asc("created_at")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -198,7 +200,9 @@ class SelectBuilderJoinTest {
                 .and()
                 .column("amount")
                 .gt(100)
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
+                .build()
                 .fetch(20)
                 .build(sqlCaptureHelper.getConnection());
 

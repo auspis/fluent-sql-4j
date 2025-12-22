@@ -999,3 +999,47 @@ dsl.select()
 ---
 
 ## Fine del Piano
+---
+
+## Riepilogo Stato Fase 1
+
+### ✅ Completate
+- **1.1**: WHERE/HAVING - Supporto Cross-Table Esplicito + Column-to-Column Comparison
+- **1.2**: JoinSpecBuilder.on() - Firma Esplicita a 4 Parametri
+- **1.3**: MergeBuilder - Firma Esplicita a 4 Parametri per on() e set()
+- **1.4**: SelectBuilder.groupBy() - Fluent Builder con Supporto Alias
+- **1.5**: SelectBuilder.orderBy() - Fluent Builder Pattern (OrderByBuilder) con Supporto Alias
+
+### 🔄 In Progress
+- **1.6**: WindowFunctionBuilder - Validazione Against Dot Notation
+- **1.7**: ColumnReferenceUtil - Deprecazione Completa
+
+---
+
+## Note Implementazione Fase 1.5 (OrderByBuilder)
+
+### Decisione API Design
+- **Pattern Scelto**: Option A (direction-first) con delega implicita: `.orderBy().asc("col").desc("col").fetch(10).build(connection)` senza doppio `.build()` intermedio
+- **Motivazione**: Preserva l'ordine semantico SQL, chiaro e flessibile, ed evita `.build().build(connection)` poco fluente
+- **Consistenza**: Allineato con GroupByBuilder e Where/Having condition builders che ritornano il parent tramite metodi di delega
+
+### Files Modificati
+- **Creati**: `OrderByBuilder.java` (nuovo builder con metodi asc/desc)
+- **Modificati**: `SelectBuilder.java` (rimossi metodi diretti, aggiunto orderBy() che restituisce OrderByBuilder)
+- **Modificati**: `GroupByBuilder.java` (chaining orderBy()/fetch()/offset() con build(Connection) delegato)
+- **Test Aggiornati**: SelectBuilderOrderByTest, SelectBuilderGroupByTest, SelectDSLComponentTest allineati al chaining senza doppio `.build()`
+
+### Test Coverage
+- ✅ Tutti i 1363 test passano
+- ✅ Validazione completa: null/empty/dot notation per alias e column
+- ✅ Empty ORDER BY validation (deve contenere almeno un sorting)
+- ✅ Single-table e multi-table contexts testati
+- ✅ Chaining da GroupByBuilder testato
+
+### Benefici
+- API consistente con GroupByBuilder e condition builders (delega implicita, niente doppio build)
+- Ordine di inserzione preservato (semanticamente significativo in SQL)
+- Validazione preventiva contro errori comuni
+- Fluent API più espressiva e leggibile
+
+---

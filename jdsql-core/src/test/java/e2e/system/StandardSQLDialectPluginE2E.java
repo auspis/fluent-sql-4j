@@ -116,7 +116,8 @@ class StandardSQLDialectPluginE2E {
         List<List<Object>> rows = ResultSetUtil.list(
                 dsl.select("name")
                         .from("users")
-                        .orderBy("name")
+                        .orderBy()
+                        .asc("name")
                         .offset(5)
                         .fetch(3)
                         .build(connection),

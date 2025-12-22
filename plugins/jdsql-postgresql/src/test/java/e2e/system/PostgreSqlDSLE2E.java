@@ -104,7 +104,8 @@ class PostgreSqlDSLE2E {
                 .column("users", "name")
                 .column("users", "email")
                 .from("users")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .fetch(3)
                 .offset(1)
                 .build(connection);
@@ -124,8 +125,9 @@ class PostgreSqlDSLE2E {
                 .orderByAsc("users", "id")
                 .as("age_rank")
                 .from("users")
-                .orderByDesc("age")
-                .orderBy("id")
+                .orderBy()
+                .desc("age")
+                .asc("id")
                 .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
@@ -161,9 +163,10 @@ class PostgreSqlDSLE2E {
                 .orderByAsc("users", "id")
                 .as("active_rank")
                 .from("users")
-                .orderByDesc("active")
-                .orderByDesc("age")
-                .orderBy("id")
+                .orderBy()
+                .desc("active")
+                .desc("age")
+                .asc("id")
                 .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));

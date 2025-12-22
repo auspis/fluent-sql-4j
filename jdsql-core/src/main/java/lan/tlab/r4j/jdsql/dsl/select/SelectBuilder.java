@@ -21,7 +21,6 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.GroupBy;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Having;
 import lan.tlab.r4j.jdsql.ast.dql.clause.OrderBy;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
-import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.Projection;
@@ -272,21 +271,30 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return this;
     }
 
-    public SelectBuilder orderBy(String column) {
-        return orderBy(column, Sorting::asc);
+    /**
+     * Create a fluent ORDER BY builder for defining query ordering.
+     *
+     * <p>Use this method to define the ordering of query results with a fluent API that supports
+     * both ascending and descending order for columns from single-table or multi-table contexts.
+     *
+     * <p>Example usage:
+     * <pre>{@code
+     * dsl.select("name", "age")
+     *     .from("users")
+     *     .orderBy()
+     *         .asc("name")
+     *         .desc("age")
+     *     .build(connection);
+     * }</pre>
+     *
+     * @return a new OrderByBuilder for defining ORDER BY clauses
+     */
+    public OrderByBuilder orderBy() {
+        return new OrderByBuilder(this);
     }
 
-    public SelectBuilder orderByDesc(String column) {
-        return orderBy(column, Sorting::desc);
-    }
-
-    private SelectBuilder orderBy(String column, Function<ColumnReference, Sorting> sortingFactory) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        ColumnReference columnRef = ColumnReference.of(getTableReference(), column);
-        Sorting sorting = sortingFactory.apply(columnRef);
-        statementBuilder = statementBuilder.orderBy(OrderBy.of(sorting));
+    SelectBuilder updateOrderBy(OrderBy orderBy) {
+        statementBuilder = statementBuilder.orderBy(orderBy);
         return this;
     }
 
