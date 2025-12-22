@@ -81,16 +81,39 @@ public class MergeBuilder {
         return this;
     }
 
-    public MergeBuilder on(String leftColumn, String rightColumn) {
+    public MergeBuilder on(
+            String leftTableReference, String leftColumn, String rightTableReference, String rightColumn) {
+        if (leftTableReference == null || leftTableReference.trim().isEmpty()) {
+            throw new IllegalArgumentException("Left table reference cannot be null or empty");
+        }
+        if (leftTableReference.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Left table reference must not contain dot: '" + leftTableReference + "'");
+        }
         if (leftColumn == null || leftColumn.trim().isEmpty()) {
             throw new IllegalArgumentException("Left column cannot be null or empty");
+        }
+        if (leftColumn.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Left column must not contain dot. Use on(table, column, table, column) with separate parameters");
+        }
+        if (rightTableReference == null || rightTableReference.trim().isEmpty()) {
+            throw new IllegalArgumentException("Right table reference cannot be null or empty");
+        }
+        if (rightTableReference.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Right table reference must not contain dot: '" + rightTableReference + "'");
         }
         if (rightColumn == null || rightColumn.trim().isEmpty()) {
             throw new IllegalArgumentException("Right column cannot be null or empty");
         }
+        if (rightColumn.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Right column must not contain dot. Use on(table, column, table, column) with separate parameters");
+        }
 
-        ColumnReference left = ColumnReferenceUtil.parseColumnReference(leftColumn, "");
-        ColumnReference right = ColumnReferenceUtil.parseColumnReference(rightColumn, "");
+        ColumnReference left = ColumnReference.of(leftTableReference, leftColumn);
+        ColumnReference right = ColumnReference.of(rightTableReference, rightColumn);
         onCondition = Comparison.eq(left, right);
         return this;
     }

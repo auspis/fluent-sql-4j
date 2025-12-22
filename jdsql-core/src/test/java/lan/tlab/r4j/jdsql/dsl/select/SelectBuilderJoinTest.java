@@ -27,7 +27,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
-                .on("users.id", "orders.user_id")
+                .on("users", "id", "orders", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -40,7 +40,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .leftJoin("profiles")
-                .on("users.id", "profiles.user_id")
+                .on("users", "id", "profiles", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -53,7 +53,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .rightJoin("departments")
-                .on("users.dept_id", "departments.id")
+                .on("users", "dept_id", "departments", "id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -66,7 +66,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .fullJoin("roles")
-                .on("users.role_id", "roles.id")
+                .on("users", "role_id", "roles", "id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -87,7 +87,7 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -102,10 +102,10 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .leftJoin("products")
                 .as("p")
-                .on("o.product_id", "p.id")
+                .on("o", "product_id", "p", "id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -120,7 +120,7 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -135,7 +135,7 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .where()
                 .column("status")
                 .eq("active")
@@ -152,7 +152,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
-                .on("users.id", "orders.user_id")
+                .on("users", "id", "orders", "user_id")
                 .orderBy("created_at")
                 .build(sqlCaptureHelper.getConnection());
 
@@ -166,7 +166,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
-                .on("users.id", "orders.user_id")
+                .on("users", "id", "orders", "user_id")
                 .fetch(10)
                 .offset(5)
                 .build(sqlCaptureHelper.getConnection());
@@ -183,10 +183,10 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .leftJoin("payments")
                 .as("p")
-                .on("o.id", "p.order_id")
+                .on("o", "id", "p", "order_id")
                 .where()
                 .column("status")
                 .eq("completed")
@@ -216,7 +216,7 @@ class SelectBuilderJoinTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .innerJoin("orders")
-                        .on("", "orders.user_id"))
+                        .on("users", "", "orders", "user_id"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Left column cannot be null or empty");
     }
@@ -226,7 +226,7 @@ class SelectBuilderJoinTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .innerJoin("orders")
-                        .on("users.id", ""))
+                        .on("users", "id", "orders", ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Right column cannot be null or empty");
     }
