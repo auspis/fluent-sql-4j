@@ -34,7 +34,7 @@ class MergeBuilderTest {
         new MergeBuilder(specFactory, "target_table")
                 .as("tgt")
                 .using("source_table", "src")
-                .on("tgt.id", "src.id")
+                .on("tgt", "id", "src", "id")
                 .whenMatched()
                 .set("value", "new_value")
                 .whenNotMatched()
@@ -58,7 +58,7 @@ class MergeBuilderTest {
 
         new MergeBuilder(specFactory, "target")
                 .using(subquery, "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("name", "updated")
                 .build(sqlCaptureHelper.getConnection());
@@ -78,7 +78,7 @@ class MergeBuilderTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched(condition)
                 .set("value", 200)
                 .build(sqlCaptureHelper.getConnection());
@@ -97,7 +97,7 @@ class MergeBuilderTest {
     void mergeWithDelete() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .delete()
                 .build(sqlCaptureHelper.getConnection());
@@ -114,7 +114,7 @@ class MergeBuilderTest {
     void mergeWithMultipleActions() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("updated", true)
                 .whenNotMatched()
@@ -148,7 +148,7 @@ class MergeBuilderTest {
     @Test
     void throwsExceptionWhenUsingNotSpecified() {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
-                        .on("target.id", "src.id")
+                        .on("target", "id", "src", "id")
                         .whenMatchedThenUpdate(List.of(UpdateItem.of("val", Literal.of(1))))
                         .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
@@ -169,7 +169,7 @@ class MergeBuilderTest {
     void throwsExceptionWhenNoActionsSpecified() {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
-                        .on("target.id", "source.id")
+                        .on("target", "id", "source", "id")
                         .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("At least one WHEN clause must be specified");
@@ -179,7 +179,7 @@ class MergeBuilderTest {
     void throwsExceptionWhenColumnsAndValuesMismatch() {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
-                        .on("target.id", "source.id")
+                        .on("target", "id", "source", "id")
                         .whenNotMatchedThenInsert(
                                 List.of(ColumnReference.of("target", "id")), List.of(Literal.of(1), Literal.of(2)))
                         .build(sqlCaptureHelper.getConnection()))
@@ -191,7 +191,7 @@ class MergeBuilderTest {
     void fluentApiWithMultipleSets() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("name", "updated")
                 .set("status", "active")
@@ -213,7 +213,7 @@ class MergeBuilderTest {
     void fluentApiWithMixedTypes() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenNotMatched()
                 .set("name", "John")
                 .set("age", 30)
@@ -237,7 +237,7 @@ class MergeBuilderTest {
     void fluentApiThrowsExceptionWhenUpdateWithoutSets() {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
-                        .on("target.id", "source.id")
+                        .on("target", "id", "source", "id")
                         .whenMatched()
                         .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
@@ -248,7 +248,7 @@ class MergeBuilderTest {
     void fluentApiThrowsExceptionWhenInsertWithoutColumns() {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
-                        .on("target.id", "source.id")
+                        .on("target", "id", "source", "id")
                         .whenNotMatched()
                         .build(sqlCaptureHelper.getConnection()))
                 .isInstanceOf(IllegalStateException.class)
@@ -259,7 +259,7 @@ class MergeBuilderTest {
     void fluentApiThrowsExceptionWhenDeleteWithUpdateItems() {
         assertThatThrownBy(() -> new MergeBuilder(specFactory, "target")
                         .using("source")
-                        .on("target.id", "source.id")
+                        .on("target", "id", "source", "id")
                         .whenMatched()
                         .set("name", "test")
                         .delete()
@@ -272,7 +272,7 @@ class MergeBuilderTest {
     void fluentApiWithColumnReferences() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("target.value", ColumnReference.of("src", "new_value"))
                 .build(sqlCaptureHelper.getConnection());
@@ -291,7 +291,7 @@ class MergeBuilderTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched(condition)
                 .delete()
                 .build(sqlCaptureHelper.getConnection());
@@ -311,7 +311,7 @@ class MergeBuilderTest {
 
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenNotMatched(condition)
                 .set("id", ColumnReference.of("src", "id"))
                 .set("value", ColumnReference.of("src", "value"))
@@ -330,7 +330,7 @@ class MergeBuilderTest {
     void fluentApiWithDotNotationForColumnReferences() throws SQLException {
         new MergeBuilder(specFactory, "target")
                 .using("source", "src")
-                .on("target.id", "src.id")
+                .on("target", "id", "src", "id")
                 .whenMatched()
                 .set("name", "src.name")
                 .set("email", "src.email")

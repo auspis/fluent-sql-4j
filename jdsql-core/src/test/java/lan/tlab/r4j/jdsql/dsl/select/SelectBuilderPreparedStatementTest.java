@@ -61,7 +61,7 @@ class SelectBuilderPreparedStatementTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .where()
                 .column("status")
                 .eq("active")
