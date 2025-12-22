@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.Literal;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
 import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil;
@@ -58,6 +60,8 @@ class PostgreSqlDSLE2E {
 
         TestDatabaseUtil.dropUsersTable(connection);
         TestDatabaseUtil.createUsersTable(connection);
+        TestDatabaseUtil.dropOrdersTable(connection);
+        TestDatabaseUtil.createOrderTable(connection);
 
         nameMapper = r -> r.getString("name");
     }
@@ -74,6 +78,8 @@ class PostgreSqlDSLE2E {
                         .orElseThrow();
         TestDatabaseUtil.truncateUsers(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.truncateOrders(connection);
+        TestDatabaseUtil.insertSampleOrders(connection);
     }
 
     @Test
@@ -191,135 +197,143 @@ class PostgreSqlDSLE2E {
     }
 
     @Test
-    void stringAggFunctionExecutesOnRealDatabase() throws SQLException {
-        // Execute STRING_AGG on real database and verify results
+    void innerJoinUsersWithOrders() throws SQLException {
+        PreparedStatement ps = dsl.select()
+                .column("users", "name")
+                .sum("orders", "total")
+                .as("order_total")
+                .from("users")
+                .innerJoin("orders")
+                .on("users", "id", "orders", "userId")
+                .groupBy()
+                .column("users", "name")
+                .orderBy()
+                .asc("name")
+                .build(connection);
+
+        RowMapper<List<String>> mapper =
+                r -> List.of(r.getString("name"), r.getBigDecimal("order_total").toPlainString());
+
+        assertThat(ResultSetUtil.list(ps, mapper))
+                .containsExactly(List.of("Alice", "39.99"), List.of("Charlie", "49.99"), List.of("John Doe", "40.98"));
+    }
+
+    @Test
+    void stringAggFunctionWithBuilder() throws SQLException {
+        PreparedStatement ps = dsl.select()
+                .column("age")
+                .expression(
+                        dsl.stringAgg("name").orderBy("name").separator(", ").build())
+                .as("names")
+                .from("users")
+                .groupBy()
+                .column("age")
+                .orderBy()
+                .asc("age")
+                .build(connection);
+
         RowMapper<List<String>> mapper = r -> List.of(r.getString("names"), r.getString("age"));
 
-        // Use raw SQL to execute STRING_AGG since PostgreSQL DSL doesn't have fluent API integration
-        PreparedStatement ps = connection.prepareStatement(
-                "SELECT age, STRING_AGG(name, ', ' ORDER BY name) as names FROM users GROUP BY age ORDER BY age");
-
-        List<List<String>> results = ResultSetUtil.list(ps, mapper);
-
-        // Verify results contain aggregated names
-        assertThat(results).isNotEmpty();
-        // Verify at least one age group has multiple concatenated names
-        assertThat(results.stream().anyMatch(r -> r.get(0).contains(","))).isTrue();
-
-        // Verify specific age groups
-        String age30Names = results.stream()
-                .filter(r -> r.get(1).equals("30"))
-                .map(r -> r.get(0))
-                .findFirst()
-                .orElse("");
-        assertThat(age30Names).contains("Charlie", "Henry", "John Doe");
+        assertThat(ResultSetUtil.list(ps, mapper))
+                .containsExactly(
+                        List.of("Bob", "15"),
+                        List.of("Diana, Jane Smith", "25"),
+                        List.of("Grace", "28"),
+                        List.of("Charlie, Henry, John Doe", "30"),
+                        List.of("Alice, Frank", "35"),
+                        List.of("Eve", "40"));
     }
 
     @Test
-    void arrayAggFunctionExecutesOnRealDatabase() throws SQLException {
-        // Execute ARRAY_AGG on real database and verify results
-        PreparedStatement ps = connection.prepareStatement(
-                "SELECT age, ARRAY_AGG(name ORDER BY name) as names_array FROM users WHERE age = 30 GROUP BY age");
+    void arrayAggFunctionWithBuilder() throws SQLException {
+        PreparedStatement ps = dsl.select()
+                .column("age")
+                .expression(dsl.arrayAgg("name").orderBy("name").build())
+                .as("names_array")
+                .from("users")
+                .where()
+                .column("age")
+                .eq(30)
+                .groupBy()
+                .column("age")
+                .build(connection);
 
-        try (var rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("age")).isEqualTo(30);
+        RowMapper<List<String>> mapper = r -> {
+            String[] names = (String[]) r.getArray("names_array").getArray();
+            return List.of(names);
+        };
 
-            // PostgreSQL returns Array type which can be converted to Java array
-            java.sql.Array array = rs.getArray("names_array");
-            assertThat(array).isNotNull();
-
-            String[] names = (String[]) array.getArray();
-            assertThat(names).contains("Charlie", "Henry", "John Doe");
-        }
+        assertThat(ResultSetUtil.list(ps, mapper)).containsExactly(List.of("Charlie", "Henry", "John Doe"));
     }
 
     @Test
-    void coalesceFunctionExecutesOnRealDatabase() throws SQLException {
-        // Insert a test row with NULL email
-        try (var stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO users (id, name, email, age, active, birthdate, \"createdAt\") "
-                    + "VALUES (99, 'Test User', NULL, 30, true, '1990-01-01', '2023-01-01 00:00:00')");
-        }
+    void coalesceAndNullIfFunctionsWithBuilder() throws SQLException {
+        PreparedStatement ps = dsl.select()
+                .column("name")
+                .expression(dsl.coalesce(
+                        dsl.nullIf(ColumnReference.of("users", "email"), Literal.of("john@example.com")),
+                        Literal.of("no-email@example.com")))
+                .as("contact_email")
+                .from("users")
+                .where()
+                .column("id")
+                .eq(1)
+                .or()
+                .column("id")
+                .eq(2)
+                .orderBy()
+                .asc("id")
+                .build(connection);
 
-        // Execute COALESCE to replace NULL email with default value
-        PreparedStatement ps = connection.prepareStatement(
-                "SELECT name, COALESCE(email, 'no-email@example.com') as contact_email FROM users WHERE id = 99");
+        RowMapper<List<String>> mapper = r -> List.of(r.getString("name"), r.getString("contact_email"));
 
-        try (var rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Test User");
-            assertThat(rs.getString("contact_email")).isEqualTo("no-email@example.com");
-        }
-
-        // Clean up test data
-        try (var stmt = connection.createStatement()) {
-            stmt.execute("DELETE FROM users WHERE id = 99");
-        }
+        assertThat(ResultSetUtil.list(ps, mapper))
+                .containsExactly(
+                        List.of("John Doe", "no-email@example.com"), List.of("Jane Smith", "jane@example.com"));
     }
 
     @Test
-    void nullIfFunctionExecutesOnRealDatabase() throws SQLException {
-        // Execute NULLIF to convert matching email to NULL
-        PreparedStatement ps =
-                connection.prepareStatement("SELECT name, NULLIF(email, 'john@example.com') as modified_email "
-                        + "FROM users WHERE id IN (1, 2) ORDER BY id");
-
-        try (var rs = ps.executeQuery()) {
-            // First user (John Doe) should have NULL email (since it matches the literal)
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getString("modified_email")).isNull();
-
-            // Second user should have their original email
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("Jane Smith");
-            assertThat(rs.getString("modified_email")).isEqualTo("jane@example.com");
-        }
-    }
-
-    @Test
-    void toCharFunctionFormatsTimestamps() throws SQLException {
-        // Test TO_CHAR for date/time formatting
-        PreparedStatement ps = connection.prepareStatement(
-                "SELECT name, TO_CHAR(birthdate, 'YYYY-MM-DD') as formatted_date " + "FROM users WHERE id = 1");
+    void toCharAndDateTruncFunctionsWithBuilder() throws SQLException {
+        PreparedStatement ps = dsl.select()
+                .column("name")
+                .expression(dsl.toChar(ColumnReference.of("users", "birthdate"), "YYYY-MM-DD"))
+                .as("formatted_date")
+                .expression(dsl.dateTrunc("month", ColumnReference.of("users", "birthdate")))
+                .as("month_start")
+                .from("users")
+                .where()
+                .column("id")
+                .eq(1)
+                .build(connection);
 
         try (var rs = ps.executeQuery()) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getString("name")).isEqualTo("John Doe");
-            String formattedDate = rs.getString("formatted_date");
-            assertThat(formattedDate).matches("\\d{4}-\\d{2}-\\d{2}");
-        }
-    }
-
-    @Test
-    void dateTruncFunctionTruncatesTimestamps() throws SQLException {
-        // Test DATE_TRUNC for date truncation
-        PreparedStatement ps = connection.prepareStatement(
-                "SELECT name, DATE_TRUNC('month', birthdate) as month_start " + "FROM users WHERE id = 1");
-
-        try (var rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
+            assertThat(rs.getString("formatted_date")).matches("\\d{4}-\\d{2}-\\d{2}");
             assertThat(rs.getDate("month_start")).isNotNull();
         }
     }
 
     @Test
-    void jsonbAggFunctionAggregatesJsonData() throws SQLException {
-        // Test JSONB_AGG aggregation
-        PreparedStatement ps = connection.prepareStatement(
-                "SELECT age, JSONB_AGG(name ORDER BY name) as names_json " + "FROM users WHERE age = 30 GROUP BY age");
+    void jsonbAggFunctionWithBuilder() throws SQLException {
+        PreparedStatement ps = dsl.select()
+                .column("age")
+                .expression(dsl.jsonbAgg("name").orderBy("name").build())
+                .as("names_json")
+                .from("users")
+                .where()
+                .column("age")
+                .eq(30)
+                .groupBy()
+                .column("age")
+                .build(connection);
 
-        try (var rs = ps.executeQuery()) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("age")).isEqualTo(30);
+        RowMapper<String> mapper = r -> r.getString("names_json");
 
-            String jsonResult = rs.getString("names_json");
-            assertThat(jsonResult).isNotNull();
-            // Should be a JSON array with names
-            assertThat(jsonResult).contains("Charlie", "Henry", "John Doe");
-        }
+        List<String> results = ResultSetUtil.list(ps, mapper);
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0)).contains("Charlie", "Henry", "John Doe");
     }
 
     @Test
