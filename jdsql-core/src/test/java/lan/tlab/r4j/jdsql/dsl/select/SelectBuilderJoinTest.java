@@ -5,6 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
 import java.sql.SQLException;
+import lan.tlab.r4j.jdsql.ast.core.expression.aggregate.AggregateCall;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
+import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
+import lan.tlab.r4j.jdsql.ast.dql.projection.ScalarExpressionProjection;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
 import lan.tlab.r4j.jdsql.test.helper.SqlCaptureHelper;
@@ -27,7 +32,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
-                .on("users.id", "orders.user_id")
+                .on("users", "id", "orders", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -40,7 +45,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .leftJoin("profiles")
-                .on("users.id", "profiles.user_id")
+                .on("users", "id", "profiles", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -53,7 +58,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .rightJoin("departments")
-                .on("users.dept_id", "departments.id")
+                .on("users", "dept_id", "departments", "id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -66,7 +71,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .fullJoin("roles")
-                .on("users.role_id", "roles.id")
+                .on("users", "role_id", "roles", "id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -87,7 +92,7 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -102,10 +107,10 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .leftJoin("products")
                 .as("p")
-                .on("o.product_id", "p.id")
+                .on("o", "product_id", "p", "id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -120,7 +125,7 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -135,7 +140,7 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .where()
                 .column("status")
                 .eq("active")
@@ -152,8 +157,10 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
-                .on("users.id", "orders.user_id")
-                .orderBy("created_at")
+                .on("users", "id", "orders", "user_id")
+                .orderBy()
+                .asc("created_at")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -166,7 +173,7 @@ class SelectBuilderJoinTest {
         new SelectBuilder(specFactory, "*")
                 .from("users")
                 .innerJoin("orders")
-                .on("users.id", "orders.user_id")
+                .on("users", "id", "orders", "user_id")
                 .fetch(10)
                 .offset(5)
                 .build(sqlCaptureHelper.getConnection());
@@ -183,17 +190,19 @@ class SelectBuilderJoinTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .leftJoin("payments")
                 .as("p")
-                .on("o.id", "p.order_id")
+                .on("o", "id", "p", "order_id")
                 .where()
                 .column("status")
                 .eq("completed")
                 .and()
                 .column("amount")
                 .gt(100)
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
+                .build()
                 .fetch(20)
                 .build(sqlCaptureHelper.getConnection());
 
@@ -202,6 +211,28 @@ class SelectBuilderJoinTest {
                         "SELECT \"u\".\"name\", \"u\".\"email\", \"u\".\"order_total\" FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" LEFT JOIN \"payments\" AS p ON \"o\".\"id\" = \"p\".\"order_id\" WHERE (\"u\".\"status\" = ?) AND (\"u\".\"amount\" > ?) ORDER BY \"u\".\"created_at\" DESC FETCH NEXT 20 ROWS ONLY");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "completed");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, 100);
+    }
+
+    @Test
+    void joinWithQualifiedAggregateKeepsTableReference() throws SQLException {
+        Select select = Select.of(
+                new ScalarExpressionProjection(ColumnReference.of("u", "name")),
+                new AggregateCallProjection(AggregateCall.sum(ColumnReference.of("o", "total"))));
+
+        new SelectBuilder(specFactory, select)
+                .from("users")
+                .as("u")
+                .innerJoin("orders")
+                .as("o")
+                .on("u", "id", "o", "user_id")
+                .groupBy()
+                .column("u", "name")
+                .build()
+                .build(sqlCaptureHelper.getConnection());
+
+        assertThatSql(sqlCaptureHelper)
+                .isEqualTo(
+                        "SELECT \"u\".\"name\", SUM(\"o\".\"total\") FROM \"users\" AS u INNER JOIN \"orders\" AS o ON \"u\".\"id\" = \"o\".\"user_id\" GROUP BY \"u\".\"name\"");
     }
 
     @Test
@@ -216,7 +247,7 @@ class SelectBuilderJoinTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .innerJoin("orders")
-                        .on("", "orders.user_id"))
+                        .on("users", "", "orders", "user_id"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Left column cannot be null or empty");
     }
@@ -226,7 +257,7 @@ class SelectBuilderJoinTest {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
                         .innerJoin("orders")
-                        .on("users.id", ""))
+                        .on("users", "id", "orders", ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Right column cannot be null or empty");
     }

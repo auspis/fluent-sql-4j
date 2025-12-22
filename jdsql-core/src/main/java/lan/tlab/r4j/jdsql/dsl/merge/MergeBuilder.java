@@ -26,7 +26,6 @@ import lan.tlab.r4j.jdsql.ast.dml.statement.MergeStatement;
 import lan.tlab.r4j.jdsql.ast.dql.statement.SelectStatement;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
-import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
 
 public class MergeBuilder {
     private final PreparedStatementSpecFactory specFactory;
@@ -81,17 +80,40 @@ public class MergeBuilder {
         return this;
     }
 
-    public MergeBuilder on(String leftColumn, String rightColumn) {
+    public MergeBuilder on(
+            String leftTableReference, String leftColumn, String rightTableReference, String rightColumn) {
+        if (leftTableReference == null || leftTableReference.trim().isEmpty()) {
+            throw new IllegalArgumentException("Left table reference cannot be null or empty");
+        }
+        if (leftTableReference.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Left table reference must not contain dot: '" + leftTableReference + "'");
+        }
         if (leftColumn == null || leftColumn.trim().isEmpty()) {
             throw new IllegalArgumentException("Left column cannot be null or empty");
+        }
+        if (leftColumn.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Left column must not contain dot. Use on(table, column, table, column) with separate parameters");
+        }
+        if (rightTableReference == null || rightTableReference.trim().isEmpty()) {
+            throw new IllegalArgumentException("Right table reference cannot be null or empty");
+        }
+        if (rightTableReference.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Right table reference must not contain dot: '" + rightTableReference + "'");
         }
         if (rightColumn == null || rightColumn.trim().isEmpty()) {
             throw new IllegalArgumentException("Right column cannot be null or empty");
         }
+        if (rightColumn.contains(".")) {
+            throw new IllegalArgumentException(
+                    "Right column must not contain dot. Use on(table, column, table, column) with separate parameters");
+        }
 
-        ColumnReference left = ColumnReferenceUtil.parseColumnReference(leftColumn, "");
-        ColumnReference right = ColumnReferenceUtil.parseColumnReference(rightColumn, "");
-        onCondition = Comparison.eq(left, right);
+        ColumnReference targetColRef = ColumnReference.of(leftTableReference, leftColumn);
+        ColumnReference sourceColRef = ColumnReference.of(rightTableReference, rightColumn);
+        onCondition = Comparison.eq(targetColRef, sourceColRef);
         return this;
     }
 
@@ -224,46 +246,49 @@ public class MergeBuilder {
             this.condition = condition;
         }
 
-        public WhenMatchedUpdateBuilder set(String column, String value) {
+        private ColumnReference validateAndCreateColumnReference(String column) {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
-            ScalarExpression expr = value == null
-                    ? Literal.ofNull()
-                    : (value.contains(".") ? ColumnReferenceUtil.parseColumnReference(value, "") : Literal.of(value));
+            if (column.contains(".")) {
+                throw new IllegalArgumentException("Column name must not contain dot notation: '" + column + "'");
+            }
+            return ColumnReference.of("", column);
+        }
+
+        public WhenMatchedUpdateBuilder set(String column, String value) {
+            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
         public WhenMatchedUpdateBuilder set(String column, Number value) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
+            ColumnReference colRef = validateAndCreateColumnReference(column);
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
         public WhenMatchedUpdateBuilder set(String column, Boolean value) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
+            ColumnReference colRef = validateAndCreateColumnReference(column);
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
+        public WhenMatchedUpdateBuilder set(String column, ColumnReference value) {
+            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ScalarExpression expr = value == null ? Literal.ofNull() : value;
+            updateItems.add(new UpdateItem(colRef, expr));
+            return this;
+        }
+
         public WhenMatchedUpdateBuilder set(String column, Expression value) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            if (!(value instanceof ScalarExpression)) {
+            ColumnReference colRef = validateAndCreateColumnReference(column);
+            if (value != null && !(value instanceof ScalarExpression)) {
                 throw new IllegalArgumentException("Value must be a ScalarExpression");
             }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
             ScalarExpression expr = value == null ? Literal.ofNull() : (ScalarExpression) value;
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
@@ -335,24 +360,26 @@ public class MergeBuilder {
             this.condition = condition;
         }
 
-        public WhenNotMatchedInsertBuilder set(String column, String value) {
+        private ColumnReference validateAndCreateColumnReference(String column) {
             if (column == null || column.trim().isEmpty()) {
                 throw new IllegalArgumentException("Column name cannot be null or empty");
             }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
-            Expression expr = value == null
-                    ? Literal.ofNull()
-                    : (value.contains(".") ? ColumnReferenceUtil.parseColumnReference(value, "") : Literal.of(value));
+            if (column.contains(".")) {
+                throw new IllegalArgumentException("Column name must not contain dot notation: '" + column + "'");
+            }
+            return ColumnReference.of("", column);
+        }
+
+        public WhenNotMatchedInsertBuilder set(String column, String value) {
+            ColumnReference colRef = validateAndCreateColumnReference(column);
+            Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             columns.add(colRef);
             values.add(expr);
             return this;
         }
 
         public WhenNotMatchedInsertBuilder set(String column, Number value) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
+            ColumnReference colRef = validateAndCreateColumnReference(column);
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             columns.add(colRef);
             values.add(expr);
@@ -360,21 +387,23 @@ public class MergeBuilder {
         }
 
         public WhenNotMatchedInsertBuilder set(String column, Boolean value) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
+            ColumnReference colRef = validateAndCreateColumnReference(column);
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             columns.add(colRef);
             values.add(expr);
             return this;
         }
 
+        public WhenNotMatchedInsertBuilder set(String column, ColumnReference value) {
+            ColumnReference colRef = validateAndCreateColumnReference(column);
+            Expression expr = value == null ? Literal.ofNull() : value;
+            columns.add(colRef);
+            values.add(expr);
+            return this;
+        }
+
         public WhenNotMatchedInsertBuilder set(String column, Expression value) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            ColumnReference colRef = ColumnReferenceUtil.parseColumnReference(column, "");
+            ColumnReference colRef = validateAndCreateColumnReference(column);
             Expression expr = value == null ? Literal.ofNull() : value;
             columns.add(colRef);
             values.add(expr);

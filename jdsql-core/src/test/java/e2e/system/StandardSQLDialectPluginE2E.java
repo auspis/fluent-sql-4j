@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil;
@@ -116,7 +117,8 @@ class StandardSQLDialectPluginE2E {
         List<List<Object>> rows = ResultSetUtil.list(
                 dsl.select("name")
                         .from("users")
-                        .orderBy("name")
+                        .orderBy()
+                        .asc("name")
                         .offset(5)
                         .fetch(3)
                         .build(connection),
@@ -243,18 +245,18 @@ class StandardSQLDialectPluginE2E {
         int affectedRows = dsl.mergeInto("users")
                 .as("tgt")
                 .using("users_updates", "src")
-                .on("tgt.id", "src.id")
+                .on("tgt", "id", "src", "id")
                 .whenMatched()
-                .set("name", "src.name")
-                .set("email", "src.email")
-                .set("age", "src.age")
-                .set("active", "src.active")
+                .set("name", ColumnReference.of("src", "name"))
+                .set("email", ColumnReference.of("src", "email"))
+                .set("age", ColumnReference.of("src", "age"))
+                .set("active", ColumnReference.of("src", "active"))
                 .whenNotMatched()
-                .set("id", "src.id")
-                .set("name", "src.name")
-                .set("email", "src.email")
-                .set("age", "src.age")
-                .set("active", "src.active")
+                .set("id", ColumnReference.of("src", "id"))
+                .set("name", ColumnReference.of("src", "name"))
+                .set("email", ColumnReference.of("src", "email"))
+                .set("age", ColumnReference.of("src", "age"))
+                .set("active", ColumnReference.of("src", "active"))
                 .build(connection)
                 .executeUpdate();
 

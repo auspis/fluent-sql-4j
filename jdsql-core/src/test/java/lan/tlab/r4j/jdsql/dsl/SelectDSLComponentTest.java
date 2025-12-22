@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +68,8 @@ class SelectDSLComponentTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .fetch(10)
                 .build(connection);
 
@@ -122,7 +124,8 @@ class SelectDSLComponentTest {
                 .defaultOnEmpty("0.00")
                 .as("discount")
                 .from("products")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -197,6 +200,18 @@ class SelectDSLComponentTest {
     }
 
     @Test
+    void windowFunctionPartitionByRejectsDotNotation() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> dsl.select()
+                        .column("employees", "name")
+                        .rowNumber()
+                        .partitionBy("employees.department")
+                        .as("rank")
+                        .from("employees"))
+                .withMessageContaining("PARTITION BY column must not contain dot notation");
+    }
+
+    @Test
     void windowFunctionRankAndDenseRank() throws SQLException {
         dsl.select()
                 .column("products", "name")
@@ -216,6 +231,18 @@ class SelectDSLComponentTest {
                 DENSE_RANK() OVER (ORDER BY "price" DESC) AS "price_dense_rank" \
                 FROM "products"\
                 """);
+    }
+
+    @Test
+    void windowFunctionOrderByRejectsDotNotation() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> dsl.select()
+                        .column("employees", "name")
+                        .rowNumber()
+                        .orderByAsc("employees.salary")
+                        .as("rank")
+                        .from("employees"))
+                .withMessageContaining("ORDER BY column must not contain dot notation");
     }
 
     @Test
@@ -334,7 +361,7 @@ class SelectDSLComponentTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .where()
                 .column("status")
                 .eq("active")
@@ -360,11 +387,12 @@ class SelectDSLComponentTest {
                 .as("u")
                 .leftJoin("profiles")
                 .as("p")
-                .on("u.id", "p.user_id")
+                .on("u", "id", "p", "user_id")
                 .where()
                 .column("active")
                 .eq(true)
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
                 .fetch(10)
                 .build(connection);
 
@@ -386,14 +414,16 @@ class SelectDSLComponentTest {
                 .as("u")
                 .innerJoin("orders")
                 .as("o")
-                .on("u.id", "o.user_id")
+                .on("u", "id", "o", "user_id")
                 .leftJoin("payments")
                 .as("p")
-                .on("o.id", "p.order_id")
+                .on("o", "id", "p", "order_id")
                 .where()
                 .column("status")
                 .eq("active")
-                .groupBy("name", "city")
+                .groupBy()
+                .column("name")
+                .column("city")
                 .having()
                 .column("city")
                 .like("New%")
@@ -419,7 +449,7 @@ class SelectDSLComponentTest {
                 .as("d")
                 .rightJoin("employees")
                 .as("e")
-                .on("d.id", "e.dept_id")
+                .on("d", "id", "e", "dept_id")
                 .where()
                 .column("budget")
                 .between(50000, 100000)
@@ -429,7 +459,8 @@ class SelectDSLComponentTest {
                 .or()
                 .column("manager_id")
                 .isNull()
-                .orderByDesc("budget")
+                .orderBy()
+                .desc("budget")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -452,11 +483,13 @@ class SelectDSLComponentTest {
                 .where()
                 .column("status")
                 .eq("active")
-                .groupBy("department")
+                .groupBy()
+                .column("department")
                 .having()
                 .column("department")
                 .like("Engineering%")
-                .orderBy("department")
+                .orderBy()
+                .asc("department")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -476,15 +509,18 @@ class SelectDSLComponentTest {
         dsl.select("region", "category", "COUNT(*)", "MAX(price)")
                 .from("products")
                 .as("p")
-                .groupBy("region", "category")
+                .groupBy()
+                .column("region")
+                .column("category")
                 .having()
                 .column("region")
                 .in("North", "South", "East")
                 .andHaving()
                 .column("category")
                 .ne("discontinued")
-                .orderBy("region")
-                .orderBy("category")
+                .orderBy()
+                .asc("region")
+                .asc("category")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -492,7 +528,7 @@ class SelectDSLComponentTest {
                 FROM "products" AS p \
                 GROUP BY "region", "category" \
                 HAVING ("region" IN (?, ?, ?)) AND ("category" <> ?) \
-                ORDER BY "category" ASC\
+                ORDER BY "region" ASC, "category" ASC\
                 """);
         verify(ps).setObject(1, "North");
         verify(ps).setObject(2, "South");
@@ -508,14 +544,16 @@ class SelectDSLComponentTest {
                 .where()
                 .column("order_date")
                 .between(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 12, 31))
-                .groupBy("customer_id")
+                .groupBy()
+                .column("customer_id")
                 .having()
                 .column("customer_id")
                 .gt(1000)
                 .andHaving()
                 .column("customer_id")
                 .lt(9999)
-                .orderByDesc("customer_id")
+                .orderBy()
+                .desc("customer_id")
                 .fetch(10)
                 .build(connection);
 
@@ -568,7 +606,8 @@ class SelectDSLComponentTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -597,7 +636,8 @@ class SelectDSLComponentTest {
                 .or()
                 .jsonExists("o", "details", "$.discount")
                 .notExists()
-                .orderByDesc("order_date")
+                .orderBy()
+                .desc("order_date")
                 .fetch(20)
                 .build(connection);
 

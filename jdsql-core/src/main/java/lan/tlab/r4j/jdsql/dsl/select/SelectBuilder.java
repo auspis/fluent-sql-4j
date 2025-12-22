@@ -21,7 +21,6 @@ import lan.tlab.r4j.jdsql.ast.dql.clause.GroupBy;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Having;
 import lan.tlab.r4j.jdsql.ast.dql.clause.OrderBy;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Select;
-import lan.tlab.r4j.jdsql.ast.dql.clause.Sorting;
 import lan.tlab.r4j.jdsql.ast.dql.clause.Where;
 import lan.tlab.r4j.jdsql.ast.dql.projection.AggregateCallProjection;
 import lan.tlab.r4j.jdsql.ast.dql.projection.Projection;
@@ -35,10 +34,8 @@ import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
 import lan.tlab.r4j.jdsql.dsl.clause.HavingBuilder;
 import lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator;
 import lan.tlab.r4j.jdsql.dsl.clause.SupportsWhere;
-import lan.tlab.r4j.jdsql.dsl.util.ColumnReferenceUtil;
 import lan.tlab.r4j.jdsql.dsl.util.PsUtil;
 
-// TODO: Add support for SELECT AggregateCalls, subqueries, and other SQL features as needed.
 public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final PreparedStatementSpecFactory specFactory;
@@ -170,18 +167,18 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
             for (var projection : currentSelect.projections()) {
                 if (projection instanceof ScalarExpressionProjection scalarProj
                         && scalarProj.expression() instanceof ColumnReference colRef) {
-
-                    if (!"*".equals(colRef.column())) {
+                    boolean hasTable = colRef.table() != null && !colRef.table().isEmpty();
+                    boolean retargetToCurrent = !hasTable || colRef.table().equals(table.name());
+                    if ("*".equals(colRef.column()) || !retargetToCurrent) {
+                        updatedProjections.add(scalarProj);
+                    } else {
+                        ColumnReference updatedCol = ColumnReference.of(table.getTableReference(), colRef.column());
                         // Preserve the alias if present
                         if (scalarProj.as() != null && !scalarProj.as().name().isEmpty()) {
-                            updatedProjections.add(new ScalarExpressionProjection(
-                                    ColumnReference.of(table.getTableReference(), colRef.column()), scalarProj.as()));
+                            updatedProjections.add(new ScalarExpressionProjection(updatedCol, scalarProj.as()));
                         } else {
-                            updatedProjections.add(new ScalarExpressionProjection(
-                                    ColumnReference.of(table.getTableReference(), colRef.column())));
+                            updatedProjections.add(new ScalarExpressionProjection(updatedCol));
                         }
-                    } else {
-                        updatedProjections.add(scalarProj);
                     }
                 } else if (projection instanceof AggregateCallProjection aggProj) {
                     // Update aggregate call projections with table reference
@@ -207,21 +204,27 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return switch (aggCall) {
             case AggregateCallImpl impl -> {
                 if (impl.expression() instanceof ColumnReference colRef) {
-                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.column());
+                    boolean hasTable = colRef.table() != null && !colRef.table().isEmpty();
+                    boolean retargetToCurrent = !hasTable || colRef.table().equals(table.name());
+                    ColumnReference targetCol =
+                            retargetToCurrent ? ColumnReference.of(table.getTableReference(), colRef.column()) : colRef;
                     yield switch (impl.operator()) {
-                        case MAX -> AggregateCall.max(updatedColRef);
-                        case MIN -> AggregateCall.min(updatedColRef);
-                        case AVG -> AggregateCall.avg(updatedColRef);
-                        case SUM -> AggregateCall.sum(updatedColRef);
-                        case COUNT -> AggregateCall.count(updatedColRef);
+                        case MAX -> AggregateCall.max(targetCol);
+                        case MIN -> AggregateCall.min(targetCol);
+                        case AVG -> AggregateCall.avg(targetCol);
+                        case SUM -> AggregateCall.sum(targetCol);
+                        case COUNT -> AggregateCall.count(targetCol);
                     };
                 }
                 yield impl;
             }
             case CountDistinct cd -> {
                 if (cd.expression() instanceof ColumnReference colRef) {
-                    ColumnReference updatedColRef = ColumnReference.of(table.getTableReference(), colRef.column());
-                    yield AggregateCall.countDistinct(updatedColRef);
+                    boolean hasTable = colRef.table() != null && !colRef.table().isEmpty();
+                    boolean retargetToCurrent = !hasTable || colRef.table().equals(table.name());
+                    ColumnReference targetCol =
+                            retargetToCurrent ? ColumnReference.of(table.getTableReference(), colRef.column()) : colRef;
+                    yield AggregateCall.countDistinct(targetCol);
                 }
                 yield cd;
             }
@@ -247,40 +250,51 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
                 this, lan.tlab.r4j.jdsql.dsl.clause.LogicalCombinator.AND);
     }
 
-    public SelectBuilder groupBy(String... columns) {
-        if (columns == null || columns.length == 0) {
-            throw new IllegalArgumentException("At least one column must be specified for GROUP BY");
-        }
+    /**
+     * Start a GROUP BY clause with explicit column references supporting aliases.
+     * Use this method for multi-table queries where you need to group by columns from different tables.
+     * <pre>
+     * .groupBy()
+     *     .column("country")
+     *     .column("o", "year")
+     *     .having()...
+     * </pre>
+     *
+     * @return a GroupByBuilder to specify columns with optional aliases
+     */
+    public GroupByBuilder groupBy() {
+        return new GroupByBuilder(this);
+    }
 
-        ColumnReference[] groupingColumns = java.util.Arrays.stream(columns)
-                .filter(column -> {
-                    if (column == null || column.trim().isEmpty()) {
-                        throw new IllegalArgumentException("Column name cannot be null or empty");
-                    }
-                    return true;
-                })
-                .map(column -> ColumnReferenceUtil.parseColumnReference(column, getTableReference()))
-                .toArray(ColumnReference[]::new);
-
-        statementBuilder = statementBuilder.groupBy(GroupBy.of(groupingColumns));
+    SelectBuilder updateGroupBy(GroupBy groupBy) {
+        statementBuilder = statementBuilder.groupBy(groupBy);
         return this;
     }
 
-    public SelectBuilder orderBy(String column) {
-        return orderBy(column, Sorting::asc);
+    /**
+     * Create a fluent ORDER BY builder for defining query ordering.
+     *
+     * <p>Use this method to define the ordering of query results with a fluent API that supports
+     * both ascending and descending order for columns from single-table or multi-table contexts.
+     *
+     * <p>Example usage:
+     * <pre>{@code
+     * dsl.select("name", "age")
+     *     .from("users")
+     *     .orderBy()
+     *         .asc("name")
+     *         .desc("age")
+     *     .build(connection);
+     * }</pre>
+     *
+     * @return a new OrderByBuilder for defining ORDER BY clauses
+     */
+    public OrderByBuilder orderBy() {
+        return new OrderByBuilder(this);
     }
 
-    public SelectBuilder orderByDesc(String column) {
-        return orderBy(column, Sorting::desc);
-    }
-
-    private SelectBuilder orderBy(String column, Function<ColumnReference, Sorting> sortingFactory) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        ColumnReference columnRef = ColumnReference.of(getTableReference(), column);
-        Sorting sorting = sortingFactory.apply(columnRef);
-        statementBuilder = statementBuilder.orderBy(OrderBy.of(sorting));
+    SelectBuilder updateOrderBy(OrderBy orderBy) {
+        statementBuilder = statementBuilder.orderBy(orderBy);
         return this;
     }
 

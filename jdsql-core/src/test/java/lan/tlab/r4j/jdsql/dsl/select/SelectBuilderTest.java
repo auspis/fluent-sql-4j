@@ -150,7 +150,9 @@ class SelectBuilderTest {
     void orderBy() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "name", "age")
                 .from("users")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
@@ -161,7 +163,9 @@ class SelectBuilderTest {
     void orderByDesc() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("products")
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"products\" ORDER BY \"created_at\" DESC");
@@ -261,7 +265,9 @@ class SelectBuilderTest {
                 .or()
                 .column("role")
                 .eq("admin")
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
+                .build()
                 .fetch(50)
                 .offset(100)
                 .build(sqlCaptureHelper.getConnection());
@@ -543,7 +549,8 @@ class SelectBuilderTest {
     void havingWithSingleCondition() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .having()
                 .column("age")
                 .gt(18)
@@ -559,7 +566,8 @@ class SelectBuilderTest {
     void havingWithAndCondition() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .having()
                 .column("age")
                 .gt(18)
@@ -581,7 +589,8 @@ class SelectBuilderTest {
     void havingWithOrCondition() throws SQLException {
         PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("status")
+                .groupBy()
+                .column("status")
                 .having()
                 .column("status")
                 .eq("active")
@@ -605,7 +614,8 @@ class SelectBuilderTest {
     void havingWithComplexConditions() throws SQLException {
         PreparedStatement sql = new SelectBuilder(specFactory, "*")
                 .from("orders")
-                .groupBy("customer_id")
+                .groupBy()
+                .column("customer_id")
                 .having()
                 .column("customer_id")
                 .gt(100)
@@ -638,11 +648,15 @@ class SelectBuilderTest {
                 .where()
                 .column("category")
                 .eq("electronics")
-                .groupBy("brand")
+                .groupBy()
+                .column("brand")
+                .build()
                 .having()
                 .column("brand")
                 .like("%Apple%")
-                .orderBy("brand")
+                .orderBy()
+                .asc("brand")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThat(sql).isSameAs(sqlCaptureHelper.getPreparedStatement());
@@ -661,7 +675,8 @@ class SelectBuilderTest {
     void invalidHavingColumn() {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
-                        .groupBy("age")
+                        .groupBy()
+                        .column("age")
                         .having()
                         .column(""))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -674,7 +689,9 @@ class SelectBuilderTest {
     void havingStringComparisons() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("products")
-                .groupBy("category")
+                .groupBy()
+                .column("category")
+                .build()
                 .having()
                 .column("category")
                 .eq("electronics")
@@ -685,7 +702,9 @@ class SelectBuilderTest {
 
         new SelectBuilder(specFactory, "*")
                 .from("products")
-                .groupBy("category")
+                .groupBy()
+                .column("category")
+                .build()
                 .having()
                 .column("category")
                 .ne("books")
@@ -700,7 +719,9 @@ class SelectBuilderTest {
         // Test additional number comparison operators
         new SelectBuilder(specFactory, "*")
                 .from("orders")
-                .groupBy("total")
+                .groupBy()
+                .column("total")
+                .build()
                 .having()
                 .column("total")
                 .gte(100.0)
@@ -710,7 +731,9 @@ class SelectBuilderTest {
 
         new SelectBuilder(specFactory, "*")
                 .from("orders")
-                .groupBy("total")
+                .groupBy()
+                .column("total")
+                .build()
                 .having()
                 .column("total")
                 .lte(500)
@@ -723,7 +746,9 @@ class SelectBuilderTest {
     void havingBooleanComparisons() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("active")
+                .groupBy()
+                .column("active")
+                .build()
                 .having()
                 .column("active")
                 .eq(true)
@@ -734,7 +759,9 @@ class SelectBuilderTest {
 
         new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("active")
+                .groupBy()
+                .column("active")
+                .build()
                 .having()
                 .column("active")
                 .ne(false)
@@ -748,7 +775,9 @@ class SelectBuilderTest {
     void havingNullChecks() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("email")
+                .groupBy()
+                .column("email")
+                .build()
                 .having()
                 .column("email")
                 .isNull()
@@ -758,7 +787,9 @@ class SelectBuilderTest {
 
         new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("email")
+                .groupBy()
+                .column("email")
+                .build()
                 .having()
                 .column("email")
                 .isNotNull()
@@ -771,7 +802,9 @@ class SelectBuilderTest {
     void havingBetweenNumbers() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("products")
-                .groupBy("price")
+                .groupBy()
+                .column("price")
+                .build()
                 .having()
                 .column("price")
                 .between(10.0, 100.0)
@@ -787,7 +820,9 @@ class SelectBuilderTest {
     void havingBetweenDates() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("orders")
-                .groupBy("order_date")
+                .groupBy()
+                .column("order_date")
+                .build()
                 .having()
                 .column("order_date")
                 .between(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
@@ -810,7 +845,9 @@ class SelectBuilderTest {
 
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("departments")
-                .groupBy("budget")
+                .groupBy()
+                .column("budget")
+                .build()
                 .having()
                 .column("budget")
                 .gt(subquery)
@@ -827,7 +864,9 @@ class SelectBuilderTest {
     void havingWithNullSubquery_throwsException() {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
-                        .groupBy("age")
+                        .groupBy()
+                        .column("age")
+                        .build()
                         .having()
                         .column("age")
                         .eq((SelectBuilder) null))
@@ -839,7 +878,9 @@ class SelectBuilderTest {
     void havingInOperatorWithStrings() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("products")
-                .groupBy("category")
+                .groupBy()
+                .column("category")
+                .build()
                 .having()
                 .column("category")
                 .in("electronics", "books", "toys")
@@ -855,7 +896,9 @@ class SelectBuilderTest {
     void havingInOperatorWithNumbers() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("orders")
-                .groupBy("customer_id")
+                .groupBy()
+                .column("customer_id")
+                .build()
                 .having()
                 .column("customer_id")
                 .in(100, 200, 300)
@@ -871,7 +914,9 @@ class SelectBuilderTest {
     void havingInOperatorWithBooleans() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("users")
-                .groupBy("active")
+                .groupBy()
+                .column("active")
+                .build()
                 .having()
                 .column("active")
                 .in(true)
@@ -885,7 +930,9 @@ class SelectBuilderTest {
     void havingInOperatorWithDates() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("events")
-                .groupBy("event_date")
+                .groupBy()
+                .column("event_date")
+                .build()
                 .having()
                 .column("event_date")
                 .in(java.time.LocalDate.of(2023, 1, 1), java.time.LocalDate.of(2023, 12, 31))
@@ -900,7 +947,10 @@ class SelectBuilderTest {
     void havingInOperatorWithAndCondition() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("products")
-                .groupBy("category", "brand")
+                .groupBy()
+                .column("category")
+                .column("brand")
+                .build()
                 .having()
                 .column("category")
                 .in("electronics", "computers")
@@ -920,7 +970,9 @@ class SelectBuilderTest {
     void havingInOperatorWithOrCondition() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "*")
                 .from("orders")
-                .groupBy("status")
+                .groupBy()
+                .column("status")
+                .build()
                 .having()
                 .column("status")
                 .in("completed", "shipped")
@@ -940,7 +992,9 @@ class SelectBuilderTest {
     void havingInOperatorEmptyValues_throwsException() {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
-                        .groupBy("age")
+                        .groupBy()
+                        .column("age")
+                        .build()
                         .having()
                         .column("age")
                         .in(new String[0]))
@@ -952,7 +1006,9 @@ class SelectBuilderTest {
     void havingInOperatorNullValues_throwsException() {
         assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
                         .from("users")
-                        .groupBy("age")
+                        .groupBy()
+                        .column("age")
+                        .build()
                         .having()
                         .column("age")
                         .in((String[]) null))
@@ -1140,7 +1196,9 @@ class SelectBuilderTest {
         PreparedStatement result = new SelectProjectionBuilder<>(specFactory)
                 .sum("amount")
                 .from("orders")
-                .groupBy("customer_id")
+                .groupBy()
+                .column("customer_id")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("""
@@ -1169,7 +1227,9 @@ class SelectBuilderTest {
         new SelectProjectionBuilder<>(specFactory)
                 .avg("salary")
                 .from("employees")
-                .groupBy("department")
+                .groupBy()
+                .column("department")
+                .build()
                 .having()
                 .column("department")
                 .ne("HR")

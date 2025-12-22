@@ -46,8 +46,20 @@ public final class TestDatabaseUtil {
     }
 
     public static void dropUsersTable(Connection connection) throws SQLException {
+        dropTable(connection, "users");
+    }
+
+    public static void dropOrdersTable(Connection connection) throws SQLException {
+        dropTable(connection, "orders");
+    }
+
+    public static void dropUsersUpdatesTable(Connection connection) throws SQLException {
+        dropTable(connection, "users_updates");
+    }
+
+    private static void dropTable(Connection connection, String table) throws SQLException {
         try (var stmt = connection.createStatement()) {
-            stmt.execute("DROP TABLE IF EXISTS users");
+            stmt.execute("DROP TABLE IF EXISTS " + table);
         }
     }
     /**
@@ -109,9 +121,43 @@ public final class TestDatabaseUtil {
         }
     }
 
-    public static void truncateUsers(Connection connection) throws SQLException {
+    public static void createOrderTable(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("TRUNCATE TABLE users");
+            stmt.execute("""
+                CREATE TABLE orders (\
+                "id" INTEGER PRIMARY KEY, \
+                "userId" INTEGER, \
+                "total" DECIMAL(10,2))
+                """);
+        }
+    }
+
+    public static void createOrderTableWithBackTicks(Connection connection) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("""
+                    CREATE TABLE orders (\
+                    `id` INTEGER PRIMARY KEY, \
+                    `userId` VARCHAR(50), \
+                    `total` DECIMAL(10,2))
+                    """);
+        }
+    }
+
+    public static void truncateUsers(Connection connection) throws SQLException {
+        truncateTable(connection, "users");
+    }
+
+    public static void truncateOrders(Connection connection) throws SQLException {
+        truncateTable(connection, "orders");
+    }
+
+    public static void truncateUsersUpdates(Connection connection) throws SQLException {
+        truncateTable(connection, "users_updates");
+    }
+
+    private static void truncateTable(Connection connection, String table) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate("TRUNCATE TABLE " + table);
         }
     }
     /**
@@ -184,6 +230,15 @@ public final class TestDatabaseUtil {
                     INSERT INTO products VALUES (5, 'Keyboard', 49.99, 75, \
                     '{"tags":["electronics","accessories"],"featured":true,"backlit":true}')
                     """);
+        }
+    }
+
+    public static void insertSampleOrders(Connection connection) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("INSERT INTO orders VALUES (1, 1, 10.99)");
+            stmt.execute("INSERT INTO orders VALUES (2, 1, 29.99)");
+            stmt.execute("INSERT INTO orders VALUES (3, 4, 39.99)");
+            stmt.execute("INSERT INTO orders VALUES (4, 5, 49.99)");
         }
     }
 

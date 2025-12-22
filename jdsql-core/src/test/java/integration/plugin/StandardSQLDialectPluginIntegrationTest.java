@@ -120,7 +120,13 @@ class StandardSQLDialectPluginIntegrationTest {
         DSL dsl = new DSL(specFactory);
 
         // Verify it generates standard SQL:2008 syntax for pagination using the DSL
-        dsl.select("name").from("users").orderBy("name").offset(5).fetch(3).build(mockConnection);
+        dsl.select("name")
+                .from("users")
+                .orderBy()
+                .asc("name")
+                .offset(5)
+                .fetch(3)
+                .build(mockConnection);
 
         assertThat(sqlCaptor.getValue()).contains("OFFSET 5 ROWS");
         assertThat(sqlCaptor.getValue()).contains("FETCH NEXT 3 ROWS ONLY");
