@@ -455,79 +455,20 @@ public SelectBuilder groupBy(String... columns) {
 
 ### 1.6 WindowFunctionBuilder - Validazione Against Dot Notation
 
+**Stato**: ✅ Completato
+
 **File**: `jdsql-core/src/main/java/lan/tlab/r4j/jdsql/dsl/select/WindowFunctionBuilder.java`
 
-**Stato Attuale**: Ha un metodo interno `parseColumnReference()` duplicato
+**Azione Implementata**:
+1. Rimosso il parsing implicito `parseColumnReference()`
+2. Validazione per colonne/alias null o vuoti e contro la dot notation
+3. Guidance esplicita sugli overload con alias (`partitionBy(table, column)`, `orderByAsc/Desc(table, column)`, `lag/lead(table, column, offset)`)
 
-**Azione**:
-1. Rimuovere il metodo interno `parseColumnReference()`
-2. Modificare tutti i metodi per usare solo `defaultTableReference`
-3. Validare che le colonne non contengano dot
+**Test Aggiornati**:
+- `SelectDSLComponentTest`: aggiunti test di validazione per dot notation in `partitionBy()` e `orderByAsc()`
 
-**Metodi da Modificare**:
-
-\`\`\`java
-public WindowFunctionBuilder<PARENT> partitionBy(String column) {
-    if (column == null || column.trim().isEmpty()) {
-        throw new IllegalArgumentException("PARTITION BY column cannot be null or empty");
-    }
-    if (column.contains(".")) {
-        throw new IllegalArgumentException(
-            "Qualified column names not supported in partitionBy(). " +
-            "Use partitionBy(String table, String column) or simple column name"
-        );
-    }
-    partitionByColumns.add(ColumnReference.of(defaultTableReference, column));
-    return this;
-}
-
-public WindowFunctionBuilder<PARENT> orderByAsc(String column) {
-    if (column == null || column.trim().isEmpty()) {
-        throw new IllegalArgumentException("ORDER BY column cannot be null or empty");
-    }
-    if (column.contains(".")) {
-        throw new IllegalArgumentException(
-            "Qualified column names not supported in orderByAsc(). " +
-            "Use orderByAsc(String table, String column) or simple column name"
-        );
-    }
-    // ...
-}
-
-public WindowFunctionBuilder<PARENT> orderByDesc(String column) {
-    if (column == null || column.trim().isEmpty()) {
-        throw new IllegalArgumentException("ORDER BY column cannot be null or empty");
-    }
-    if (column.contains(".")) {
-        throw new IllegalArgumentException(
-            "Qualified column names not supported in orderByDesc(). " +
-            "Use orderByDesc(String table, String column) or simple column name"
-        );
-    }
-    // ...
-}
-
-// Costruttori LAG/LEAD
-WindowFunctionBuilder(/* ... */, String column, int offset) {
-    if (column == null || column.trim().isEmpty()) {
-        throw new IllegalArgumentException("Column cannot be null or empty");
-    }
-    if (column.contains(".")) {
-        throw new IllegalArgumentException(
-            "Qualified column names not supported. Use constructor with table parameter"
-        );
-    }
-    this.valueExpression = ColumnReference.of(defaultTableReference, column);
-    // ...
-}
-\`\`\`
-
-**Test da Modificare**:
-- `WindowFunctionsIntegrationTest.java`: rimuovere uso di "table.column"
-- Aggiungere test per validazione errori (dot notation non permessa)
-
-**Rimozione (Fase 3)**:
-- Rimuovere metodo interno `parseColumnReference()`
+**Note**:
+- Le chiamate senza alias usano il `defaultTableReference` senza parsing; le versioni con alias convalidano alias/colonne senza dot
 
 ---
 
@@ -913,11 +854,8 @@ dsl.select()
 ### Esempio 2: MERGE Completo
 
 \`\`\`java
-// Scenario: Merge di dati da staging a produzione
-
 // PRIMA (ambiguo)
 dsl.merge()
-    .into("products").as("target")
     .using("staging_products").as("source")
     .on("target.product_id", "source.product_id")
     .whenMatched()
@@ -928,10 +866,8 @@ dsl.merge()
         .set("product_id", "source.product_id")
         .set("name", "source.name")
         .set("price", "source.price")
-    .build(connection);
 
 // DOPO (esplicito)
-dsl.merge()
     .into("products").as("target")
     .using("staging_products").as("source")
     .on("target", "product_id", "source", "product_id")
@@ -1009,9 +945,9 @@ dsl.select()
 - **1.3**: MergeBuilder - Firma Esplicita a 4 Parametri per on() e set()
 - **1.4**: SelectBuilder.groupBy() - Fluent Builder con Supporto Alias
 - **1.5**: SelectBuilder.orderBy() - Fluent Builder Pattern (OrderByBuilder) con Supporto Alias
+- **1.6**: WindowFunctionBuilder - Validazione Against Dot Notation
 
 ### 🔄 In Progress
-- **1.6**: WindowFunctionBuilder - Validazione Against Dot Notation
 - **1.7**: ColumnReferenceUtil - Deprecazione Completa
 
 ---
