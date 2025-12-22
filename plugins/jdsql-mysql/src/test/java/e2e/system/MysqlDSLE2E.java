@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
-import lan.tlab.r4j.jdsql.dsl.select.SelectBuilder;
+import lan.tlab.r4j.jdsql.dsl.select.OrderByBuilder;
 import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil;
 import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil.RowMapper;
 import lan.tlab.r4j.jdsql.functional.Result;
@@ -106,7 +106,8 @@ class MysqlDSLE2E {
                 .column("users", "name")
                 .column("users", "email")
                 .from("users")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .fetch(3)
                 .offset(1)
                 .build(connection);
@@ -125,7 +126,8 @@ class MysqlDSLE2E {
                 .on("users", "id", "orders", "userId")
                 .groupBy()
                 .column("users", "name")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .build(connection);
 
         List<List<String>> results = ResultSetUtil.list(
@@ -212,7 +214,7 @@ class MysqlDSLE2E {
                 List.of("John Doe, Charlie, Henry", "30"),
                 List.of("Alice, Frank", "35"),
                 List.of("Eve", "40"));
-        SelectBuilder selectBuilder = dsl.select()
+        OrderByBuilder selectBuilder = dsl.select()
                 .column("age")
                 .groupConcat("name")
                 .separator(", ")
@@ -220,11 +222,13 @@ class MysqlDSLE2E {
                 .from("users")
                 .groupBy()
                 .column("age")
-                .orderBy("age");
+                .orderBy()
+                .asc("age");
 
         // prepared statement
-        PreparedStatement ps = selectBuilder.build(connection);
-        assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
+        try (PreparedStatement ps = selectBuilder.build(connection)) {
+            assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
+        }
     }
 
     @Test
@@ -242,7 +246,7 @@ class MysqlDSLE2E {
                 List.of("Henry", "30", "adult"),
                 List.of("Jane Smith", "25", "adult"),
                 List.of("John Doe", "30", "adult"));
-        SelectBuilder selectBuilder = dsl.select()
+        var builder = dsl.select()
                 .column("name")
                 .column("age")
                 .ifExpr()
@@ -252,11 +256,13 @@ class MysqlDSLE2E {
                 .otherwise("minor")
                 .as("age_group")
                 .from("users")
-                .orderBy("name");
+                .orderBy()
+                .asc("name");
 
         // prepared statement
-        PreparedStatement ps = selectBuilder.build(connection);
-        assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
+        try (PreparedStatement ps = builder.build(connection)) {
+            assertThat(ResultSetUtil.list(ps, mapper)).containsAll(expected);
+        }
     }
 
     // JSON Functions E2E Tests
@@ -273,7 +279,8 @@ class MysqlDSLE2E {
                         .where()
                         .jsonExists("address", "$.city")
                         .exists()
-                        .orderBy("id")
+                        .orderBy()
+                        .asc("id")
                         .build(connection),
                 r -> r.getString("name"));
 
@@ -333,7 +340,8 @@ class MysqlDSLE2E {
                         .or()
                         .jsonValue("address", "$.city")
                         .eq("Rome")
-                        .orderBy("city")
+                        .orderBy()
+                        .asc("city")
                         .build(connection),
                 mapper);
 
@@ -357,8 +365,9 @@ class MysqlDSLE2E {
                 .orderByAsc("users", "id")
                 .as("age_rank")
                 .from("users")
-                .orderByDesc("age")
-                .orderBy("id")
+                .orderBy()
+                .desc("age")
+                .asc("id")
                 .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
@@ -393,9 +402,10 @@ class MysqlDSLE2E {
                 .orderByAsc("users", "id")
                 .as("active_rank")
                 .from("users")
-                .orderByDesc("active")
-                .orderByDesc("age")
-                .orderBy("id")
+                .orderBy()
+                .desc("active")
+                .desc("age")
+                .asc("id")
                 .build(connection);
 
         List<List<String>> results = new ArrayList<>(ResultSetUtil.list(ps, mapper));
@@ -429,12 +439,12 @@ class MysqlDSLE2E {
                 .from("users")
                 .groupBy()
                 .column("age")
-                .orderBy("age");
-
-        PreparedStatement ps = selectBuilder.build(connection);
+                .orderBy()
+                .asc("age");
 
         // Execute and verify results
-        try (var rs = ps.executeQuery()) {
+        try (PreparedStatement ps = selectBuilder.build(connection);
+                var rs = ps.executeQuery()) {
             boolean found30YearOlds = false;
             while (rs.next()) {
                 int age = rs.getInt("age");
@@ -450,8 +460,6 @@ class MysqlDSLE2E {
                 }
             }
             assertThat(found30YearOlds).isTrue();
-        } finally {
-            ps.close();
         }
     }
 
@@ -467,7 +475,8 @@ class MysqlDSLE2E {
                 .dateFormat("birthdate", "%Y-%m-%d")
                 .as("formatted_date")
                 .from("users")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .fetch(5);
 
         try (PreparedStatement ps = selectBuilder.build(connection);
@@ -503,7 +512,8 @@ class MysqlDSLE2E {
                 .eq(true)
                 .groupBy()
                 .column("age")
-                .orderBy("age");
+                .orderBy()
+                .asc("age");
 
         try (PreparedStatement ps = selectBuilder.build(connection);
                 var rs = ps.executeQuery()) {
@@ -631,7 +641,8 @@ class MysqlDSLE2E {
                 .otherwise("Young")
                 .as("age_category")
                 .from("users")
-                .orderBy("id");
+                .orderBy()
+                .asc("id");
 
         try (PreparedStatement ps = selectBuilder.build(connection);
                 var rs = ps.executeQuery()) {
