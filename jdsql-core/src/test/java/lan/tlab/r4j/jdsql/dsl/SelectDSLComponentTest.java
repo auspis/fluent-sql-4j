@@ -1,6 +1,7 @@
 package lan.tlab.r4j.jdsql.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -199,6 +200,18 @@ class SelectDSLComponentTest {
     }
 
     @Test
+    void windowFunctionPartitionByRejectsDotNotation() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> dsl.select()
+                        .column("employees", "name")
+                        .rowNumber()
+                        .partitionBy("employees.department")
+                        .as("rank")
+                        .from("employees"))
+                .withMessageContaining("PARTITION BY column must not contain dot notation");
+    }
+
+    @Test
     void windowFunctionRankAndDenseRank() throws SQLException {
         dsl.select()
                 .column("products", "name")
@@ -218,6 +231,18 @@ class SelectDSLComponentTest {
                 DENSE_RANK() OVER (ORDER BY "price" DESC) AS "price_dense_rank" \
                 FROM "products"\
                 """);
+    }
+
+    @Test
+    void windowFunctionOrderByRejectsDotNotation() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> dsl.select()
+                        .column("employees", "name")
+                        .rowNumber()
+                        .orderByAsc("employees.salary")
+                        .as("rank")
+                        .from("employees"))
+                .withMessageContaining("ORDER BY column must not contain dot notation");
     }
 
     @Test
