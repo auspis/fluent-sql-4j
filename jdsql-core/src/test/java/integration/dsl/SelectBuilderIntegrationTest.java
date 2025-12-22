@@ -477,7 +477,8 @@ class SelectBuilderIntegrationTest {
     void groupByWithHaving() throws SQLException {
         try (PreparedStatement ps = dsl.select("age")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .having()
                 .column("age")
                 .gt(25)
@@ -497,7 +498,8 @@ class SelectBuilderIntegrationTest {
     void groupByWithHavingAndCondition() throws SQLException {
         try (PreparedStatement ps = dsl.select("age")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .having()
                 .column("age")
                 .ne(25)
@@ -520,7 +522,8 @@ class SelectBuilderIntegrationTest {
     void groupByWithHavingOrCondition() throws SQLException {
         try (PreparedStatement ps = dsl.select("age")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .having()
                 .column("age")
                 .eq(25)
@@ -542,7 +545,8 @@ class SelectBuilderIntegrationTest {
                 .where()
                 .column("active")
                 .eq(true)
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .having()
                 .column("age")
                 .gte(30)
@@ -579,7 +583,8 @@ class SelectBuilderIntegrationTest {
                 .sum("id")
                 .as("total_ids")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .orderBy("age")
                 .build(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("total_ids")));
@@ -604,7 +609,8 @@ class SelectBuilderIntegrationTest {
                 .avg("id")
                 .as("avg_id")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .having()
                 .column("age")
                 .gte(30)
@@ -753,7 +759,8 @@ class SelectBuilderIntegrationTest {
                 .count("id")
                 .as("user_count")
                 .from("users")
-                .groupBy("age")
+                .groupBy()
+                .column("age")
                 .orderBy("age")
                 .build(connection)) {
             List<List<Object>> rows = ResultSetUtil.list(ps, r -> List.of(r.getInt("age"), r.getInt("user_count")));

@@ -269,21 +269,51 @@ PreparedStatement ps = dsl.select("*")
 
 ### GROUP BY
 
+The GROUP BY clause uses a fluent builder API for type-safe column specification. For multi-table queries with JOINs, use the two-parameter `.column(alias, column)` method to explicitly specify which table each grouping column belongs to.
+
 ```java
 // Get a DSL instance
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 
-// Simple GROUP BY
+// Single-table GROUP BY with one column
 PreparedStatement ps = dsl.select("customer_id")
     .from("orders")
-    .groupBy("customer_id")
+    .groupBy()
+        .column("customer_id")
     .build(connection);
 
-// GROUP BY with multiple columns
+// Single-table GROUP BY with multiple columns
 PreparedStatement ps = dsl.select("customer_id", "status")
     .from("orders")
-    .groupBy("customer_id", "status")
+    .groupBy()
+        .column("customer_id")
+        .column("status")
+    .build(connection);
+
+// Multi-table GROUP BY with explicit table aliases (recommended for JOINs)
+PreparedStatement ps = dsl.select()
+    .column("o", "customer_id")
+    .column("o", "status")
+    .sum("o", "total").as("total_amount")
+    .from("orders").as("o")
+    .innerJoin("customers").as("c")
+    .on("o", "customer_id", "c", "id")
+    .groupBy()
+        .column("o", "customer_id")  // Explicit alias required for multi-table
+        .column("o", "status")
+    .build(connection);
+
+// GROUP BY with aggregate functions and HAVING clause
+PreparedStatement ps = dsl.select()
+    .column("country")
+    .count().as("total")
+    .from("customers")
+    .groupBy()
+        .column("country")
+    .having()
+        .column("country").ne("USA")
+    .orderBy("country")
     .build(connection);
 ```
 
