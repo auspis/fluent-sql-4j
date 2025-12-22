@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
 import lan.tlab.r4j.jdsql.dsl.DSL;
 import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
 import lan.tlab.r4j.jdsql.dsl.select.OrderByBuilder;
@@ -149,24 +150,24 @@ class MysqlDSLE2E {
                 .using("users_updates", "src")
                 .on("tgt", "id", "src", "id")
                 .whenMatched()
-                .set("name", "src.name")
-                .set("email", "src.email")
-                .set("age", "src.age")
-                .set("active", "src.active")
-                .set("birthdate", "src.birthdate")
-                .set("createdAt", "src.createdAt")
-                .set("address", "src.address")
-                .set("preferences", "src.preferences")
+                .set("name", ColumnReference.of("src", "name"))
+                .set("email", ColumnReference.of("src", "email"))
+                .set("age", ColumnReference.of("src", "age"))
+                .set("active", ColumnReference.of("src", "active"))
+                .set("birthdate", ColumnReference.of("src", "birthdate"))
+                .set("createdAt", ColumnReference.of("src", "createdAt"))
+                .set("address", ColumnReference.of("src", "address"))
+                .set("preferences", ColumnReference.of("src", "preferences"))
                 .whenNotMatched()
-                .set("id", "src.id")
-                .set("name", "src.name")
-                .set("email", "src.email")
-                .set("age", "src.age")
-                .set("active", "src.active")
-                .set("birthdate", "src.birthdate")
-                .set("createdAt", "src.createdAt")
-                .set("address", "src.address")
-                .set("preferences", "src.preferences")
+                .set("id", ColumnReference.of("src", "id"))
+                .set("name", ColumnReference.of("src", "name"))
+                .set("email", ColumnReference.of("src", "email"))
+                .set("age", ColumnReference.of("src", "age"))
+                .set("active", ColumnReference.of("src", "active"))
+                .set("birthdate", ColumnReference.of("src", "birthdate"))
+                .set("createdAt", ColumnReference.of("src", "createdAt"))
+                .set("address", ColumnReference.of("src", "address"))
+                .set("preferences", ColumnReference.of("src", "preferences"))
                 .build(connection)) {
             int affectedRows = ps.executeUpdate();
             // MySQL ON DUPLICATE KEY UPDATE returns affected rows count
