@@ -42,7 +42,7 @@ class MergeDSLComponentTest {
         dsl.mergeInto("products")
                 .as("p")
                 .using("new_products", "np")
-                .on("p.product_id", "np.product_id")
+                .on("p", "product_id", "np", "product_id")
                 .whenMatchedThenUpdate(List.of(
                         UpdateItem.of("product_name", ColumnReference.of("np", "product_name")),
                         UpdateItem.of("price", ColumnReference.of("np", "price"))))
@@ -82,7 +82,7 @@ class MergeDSLComponentTest {
         dsl.mergeInto("products")
                 .as("p")
                 .using(subquery, "src")
-                .on("p.id", "src.id")
+                .on("p", "id", "src", "id")
                 .whenMatchedThenUpdate(List.of(
                         UpdateItem.of("name", ColumnReference.of("src", "name")),
                         UpdateItem.of("price", ColumnReference.of("src", "price"))))
@@ -108,7 +108,7 @@ class MergeDSLComponentTest {
         dsl.mergeInto("inventory")
                 .as("i")
                 .using("new_stock", "ns")
-                .on("i.product_id", "ns.product_id")
+                .on("i", "product_id", "ns", "product_id")
                 .whenMatchedThenUpdate(
                         Comparison.gt(ColumnReference.of("ns", "quantity"), Literal.of(0)),
                         List.of(UpdateItem.of("quantity", ColumnReference.of("ns", "quantity"))))
@@ -137,7 +137,7 @@ class MergeDSLComponentTest {
         dsl.mergeInto("target_products")
                 .as("tgt")
                 .using("source_products", "src")
-                .on("tgt.sku", "src.sku")
+                .on("tgt", "sku", "src", "sku")
                 .whenMatchedThenUpdate(
                         Comparison.gt(ColumnReference.of("src", "version"), ColumnReference.of("tgt", "version")),
                         List.of(

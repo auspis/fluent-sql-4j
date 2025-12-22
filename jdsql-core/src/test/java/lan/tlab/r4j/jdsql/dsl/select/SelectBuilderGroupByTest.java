@@ -113,7 +113,7 @@ class SelectBuilderGroupByTest {
                 .as("o")
                 .innerJoin("customers")
                 .as("c")
-                .on("o.customer_id", "c.id")
+                .on("o", "customer_id", "c", "id")
                 .groupBy("c.id", "c.name")
                 .build(sqlCaptureHelper.getConnection());
 
@@ -129,7 +129,7 @@ class SelectBuilderGroupByTest {
                 .as("o")
                 .innerJoin("customers")
                 .as("c")
-                .on("o.customer_id", "c.id")
+                .on("o", "customer_id", "c", "id")
                 .where()
                 .column("status")
                 .eq("completed")
@@ -176,7 +176,7 @@ class SelectBuilderGroupByTest {
                 .as("o")
                 .innerJoin("customers")
                 .as("c")
-                .on("o.customer_id", "c.id")
+                .on("o", "customer_id", "c", "id")
                 .where()
                 .column("status")
                 .eq("completed")
