@@ -221,7 +221,9 @@ class SelectBuilderJoinTest {
                 .innerJoin("orders")
                 .as("o")
                 .on("u", "id", "o", "user_id")
-                .groupBy("u.name")
+                .groupBy()
+                .column("u", "name")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
