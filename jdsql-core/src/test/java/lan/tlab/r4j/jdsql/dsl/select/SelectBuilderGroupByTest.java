@@ -29,7 +29,6 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .groupBy()
                 .column("customer_id")
-                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\"");
@@ -42,7 +41,6 @@ class SelectBuilderGroupByTest {
                 .groupBy()
                 .column("customer_id")
                 .column("product_id")
-                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
@@ -56,7 +54,6 @@ class SelectBuilderGroupByTest {
                 .groupBy()
                 .column("customer_id")
                 .column("product_id")
-                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -70,7 +67,6 @@ class SelectBuilderGroupByTest {
                 .groupBy()
                 .column("orders", "customer_id")
                 .column("orders", "product_id")
-                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"orders\" GROUP BY \"customer_id\", \"product_id\"");
@@ -84,7 +80,6 @@ class SelectBuilderGroupByTest {
                 .groupBy()
                 .column("o", "customer_id")
                 .column("o", "product_id")
-                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -115,8 +110,8 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .groupBy()
                 .column("customer_id")
-                .build()
-                .orderBy("customer_id")
+                .orderBy()
+                .asc("customer_id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -134,7 +129,6 @@ class SelectBuilderGroupByTest {
                 .groupBy()
                 .column("c", "id")
                 .column("c", "name")
-                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -151,18 +145,18 @@ class SelectBuilderGroupByTest {
                 .as("c")
                 .on("o", "customer_id", "c", "id")
                 .where()
-                .column("status")
+                .column("o", "status")
                 .eq("completed")
                 .groupBy()
                 .column("c", "id")
-                .build()
-                .orderBy("c.id")
+                .orderBy()
+                .asc("c", "id")
                 .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper)
                 .isEqualTo(
-                        "SELECT * FROM \"orders\" AS o INNER JOIN \"customers\" AS c ON \"o\".\"customer_id\" = \"c\".\"id\" WHERE \"o\".\"status\" = ? GROUP BY \"c\".\"id\" ORDER BY \"o\".\"c.id\" ASC");
+                        "SELECT * FROM \"orders\" AS o INNER JOIN \"customers\" AS c ON \"o\".\"customer_id\" = \"c\".\"id\" WHERE \"o\".\"status\" = ? GROUP BY \"c\".\"id\" ORDER BY \"c\".\"id\" ASC");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, "completed");
     }
 
@@ -172,7 +166,6 @@ class SelectBuilderGroupByTest {
                 .from("orders")
                 .groupBy()
                 .column("customer_id")
-                .build()
                 .fetch(10)
                 .offset(5)
                 .build(sqlCaptureHelper.getConnection());
@@ -191,7 +184,6 @@ class SelectBuilderGroupByTest {
                 .column("region")
                 .column("status")
                 .column("payment_method")
-                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper)
@@ -216,8 +208,8 @@ class SelectBuilderGroupByTest {
                 .groupBy()
                 .column("o", "customer_id")
                 .column("o", "product_id")
-                .build()
-                .orderByDesc("total")
+                .orderBy()
+                .desc("total")
                 .fetch(20)
                 .offset(10)
                 .build(sqlCaptureHelper.getConnection());

@@ -67,7 +67,8 @@ class SelectDSLComponentTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .fetch(10)
                 .build(connection);
 
@@ -122,7 +123,8 @@ class SelectDSLComponentTest {
                 .defaultOnEmpty("0.00")
                 .as("discount")
                 .from("products")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -364,7 +366,8 @@ class SelectDSLComponentTest {
                 .where()
                 .column("active")
                 .eq(true)
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
                 .fetch(10)
                 .build(connection);
 
@@ -431,7 +434,8 @@ class SelectDSLComponentTest {
                 .or()
                 .column("manager_id")
                 .isNull()
-                .orderByDesc("budget")
+                .orderBy()
+                .desc("budget")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -459,7 +463,8 @@ class SelectDSLComponentTest {
                 .having()
                 .column("department")
                 .like("Engineering%")
-                .orderBy("department")
+                .orderBy()
+                .asc("department")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -488,8 +493,9 @@ class SelectDSLComponentTest {
                 .andHaving()
                 .column("category")
                 .ne("discontinued")
-                .orderBy("region")
-                .orderBy("category")
+                .orderBy()
+                .asc("region")
+                .asc("category")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -497,7 +503,7 @@ class SelectDSLComponentTest {
                 FROM "products" AS p \
                 GROUP BY "region", "category" \
                 HAVING ("region" IN (?, ?, ?)) AND ("category" <> ?) \
-                ORDER BY "category" ASC\
+                ORDER BY "region" ASC, "category" ASC\
                 """);
         verify(ps).setObject(1, "North");
         verify(ps).setObject(2, "South");
@@ -521,7 +527,8 @@ class SelectDSLComponentTest {
                 .andHaving()
                 .column("customer_id")
                 .lt(9999)
-                .orderByDesc("customer_id")
+                .orderBy()
+                .desc("customer_id")
                 .fetch(10)
                 .build(connection);
 
@@ -574,7 +581,8 @@ class SelectDSLComponentTest {
                 .and()
                 .column("active")
                 .eq(true)
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
                 .build(connection);
 
         assertThat(sqlCaptor.getValue()).isEqualTo("""
@@ -603,7 +611,8 @@ class SelectDSLComponentTest {
                 .or()
                 .jsonExists("o", "details", "$.discount")
                 .notExists()
-                .orderByDesc("order_date")
+                .orderBy()
+                .desc("order_date")
                 .fetch(20)
                 .build(connection);
 

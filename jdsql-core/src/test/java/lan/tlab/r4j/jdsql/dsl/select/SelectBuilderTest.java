@@ -150,7 +150,9 @@ class SelectBuilderTest {
     void orderBy() throws SQLException {
         PreparedStatement result = new SelectBuilder(specFactory, "name", "age")
                 .from("users")
-                .orderBy("name")
+                .orderBy()
+                .asc("name")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
@@ -161,7 +163,9 @@ class SelectBuilderTest {
     void orderByDesc() throws SQLException {
         new SelectBuilder(specFactory, "*")
                 .from("products")
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"products\" ORDER BY \"created_at\" DESC");
@@ -261,7 +265,9 @@ class SelectBuilderTest {
                 .or()
                 .column("role")
                 .eq("admin")
-                .orderByDesc("created_at")
+                .orderBy()
+                .desc("created_at")
+                .build()
                 .fetch(50)
                 .offset(100)
                 .build(sqlCaptureHelper.getConnection());
@@ -648,7 +654,9 @@ class SelectBuilderTest {
                 .having()
                 .column("brand")
                 .like("%Apple%")
-                .orderBy("brand")
+                .orderBy()
+                .asc("brand")
+                .build()
                 .build(sqlCaptureHelper.getConnection());
 
         assertThat(sql).isSameAs(sqlCaptureHelper.getPreparedStatement());
