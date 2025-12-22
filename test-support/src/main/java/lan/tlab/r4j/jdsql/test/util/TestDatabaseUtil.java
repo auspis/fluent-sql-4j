@@ -53,6 +53,10 @@ public final class TestDatabaseUtil {
         dropTable(connection, "orders");
     }
 
+    public static void dropUsersUpdatesTable(Connection connection) throws SQLException {
+        dropTable(connection, "users_updates");
+    }
+
     private static void dropTable(Connection connection, String table) throws SQLException {
         try (var stmt = connection.createStatement()) {
             stmt.execute("DROP TABLE IF EXISTS " + table);
@@ -120,11 +124,11 @@ public final class TestDatabaseUtil {
     public static void createOrderTable(Connection connection) throws SQLException {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute("""
-                    CREATE TABLE orders (\
-                    "id" INTEGER PRIMARY KEY, \
-                    "userId" VARCHAR(50), \
-                    "total" DECIMAL(10,2))
-                    """);
+                CREATE TABLE orders (\
+                "id" INTEGER PRIMARY KEY, \
+                "userId" INTEGER, \
+                "total" DECIMAL(10,2))
+                """);
         }
     }
 
@@ -145,6 +149,10 @@ public final class TestDatabaseUtil {
 
     public static void truncateOrders(Connection connection) throws SQLException {
         truncateTable(connection, "orders");
+    }
+
+    public static void truncateUsersUpdates(Connection connection) throws SQLException {
+        truncateTable(connection, "users_updates");
     }
 
     private static void truncateTable(Connection connection, String table) throws SQLException {
