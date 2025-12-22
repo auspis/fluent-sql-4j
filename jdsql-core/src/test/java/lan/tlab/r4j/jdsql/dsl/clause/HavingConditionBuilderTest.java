@@ -735,11 +735,7 @@ class HavingConditionBuilderTest {
                 .lt(500)
                 .build(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .contains("HAVING")
-                .contains(">")
-                .contains("<")
-                .contains("AND");
+        assertThatSql(sqlCaptureHelper).contains("HAVING (\"customer_id\" > ?) AND (\"customer_id\" < ?)");
     }
 
     // Multiple HAVING conditions with OR
@@ -773,12 +769,10 @@ class HavingConditionBuilderTest {
                 .in("active", "pending")
                 .build(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .contains("GROUP BY")
-                .contains("HAVING")
-                .contains(">=")
-                .contains("IN")
-                .contains("AND");
+        assertThatSql(sqlCaptureHelper).contains("""
+                GROUP BY \"customer_id\", \"status\" \
+                HAVING (\"customer_id\" >= ?) \
+                AND (\"status\" IN (?, ?))""");
     }
 
     @Test
@@ -796,11 +790,10 @@ class HavingConditionBuilderTest {
                 .in("A", "B", "C")
                 .build(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .contains("HAVING")
-                .contains("BETWEEN")
-                .contains("IN")
-                .contains("AND");
+        assertThatSql(sqlCaptureHelper).contains("""
+                GROUP BY \"event_date\", \"category\" \
+                HAVING (\"event_date\" BETWEEN ? AND ?) \
+                AND (\"category\" IN (?, ?, ?))""");
     }
 
     // Cross-table HAVING conditions (multi-table context)
@@ -821,10 +814,13 @@ class HavingConditionBuilderTest {
                 .eq("IT")
                 .build(sqlCaptureHelper.getConnection());
 
-        assertThatSql(sqlCaptureHelper)
-                .contains("HAVING")
-                .contains("\"o\".\"total\" > ?")
-                .contains("\"c\".\"country\" = ?");
+        assertThatSql(sqlCaptureHelper).isEqualTo("""
+                SELECT \"o\".\"COUNT(*)\" \
+                FROM \"orders\" AS o \
+                INNER JOIN \"customers\" AS c ON \"o\".\"customer_id\" = \"c\".\"id\" \
+                GROUP BY \"o\".\"customer_id\" \
+                HAVING (\"o\".\"total\" > ?) \
+                AND (\"c\".\"country\" = ?)""");
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(1, 1000);
         verify(sqlCaptureHelper.getPreparedStatement()).setObject(2, "IT");
     }
