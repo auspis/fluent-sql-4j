@@ -6,6 +6,26 @@
   <version>1.0</version>
   <packaging>pom</packaging>
 
+  <!-- Project metadata required for publishing on Maven Central -->
+  <name>jdsql</name>
+  <description>Repository for java</description>
+  <url>https://github.com/massimiliano/jdsql</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>massimiliano</id>
+      <name>Massi</name>
+    </developer>
+  </developers>
+
   <modules>
     <module>test-support</module>
     <module>jdsql-core</module>
@@ -13,6 +33,24 @@
     <module>jdsql-spi</module>
     <module>plugins</module>
   </modules>
+
+  <scm>
+    <connection>scm:git:git://github.com/massimiliano/jdsql.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:massimiliano/jdsql.git</developerConnection>
+    <url>https://github.com/massimiliano/jdsql</url>
+  </scm>
+
+  <!-- Distribution settings for Sonatype OSSRH (Maven Central) -->
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <properties>
     <java.version>21</java.version>
@@ -63,23 +101,23 @@
       <dependency>
         <groupId>lan.tlab</groupId>
         <artifactId>jdsql-spi</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
         <artifactId>test-support</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
         <artifactId>jdsql-mysql</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>lan.tlab</groupId>
         <artifactId>jdsql-postgresql</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
@@ -307,8 +345,67 @@
             </execution>
           </executions>
         </plugin>
+        <!-- Attach sources jar -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.2.1</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Attach javadoc jar -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.12.0</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- GPG signing plugin (artifacts will be signed during verify/deploy) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>3.2.8</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+              <phase>verify</phase>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Nexus Staging plugin to automate staging close and release -->
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.7.0</version>
+          <extensions>true</extensions>
+          <configuration>
+            <serverId>ossrh</serverId>
+            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -431,4 +528,16 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+    </profile>
+  </profiles>
 </project>
