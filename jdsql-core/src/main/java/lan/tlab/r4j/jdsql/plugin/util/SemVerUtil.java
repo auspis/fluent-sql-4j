@@ -1,8 +1,9 @@
 package lan.tlab.r4j.jdsql.plugin.util;
 
-import com.vdurmont.semver4j.Requirement;
-import com.vdurmont.semver4j.Semver;
-import com.vdurmont.semver4j.SemverException;
+import org.semver4j.Semver;
+import org.semver4j.SemverException;
+import org.semver4j.range.RangeList;
+import org.semver4j.range.RangeListFactory;
 
 /**
  * Utility class for semantic version matching operations.
@@ -13,7 +14,7 @@ import com.vdurmont.semver4j.SemverException;
  * <p>
  * This is a utility class and cannot be instantiated.
  *
- * @see <a href="https://github.com/vdurmont/semver4j">semver4j library</a>
+ * @see <a href="https://github.com/semver4j/semver4j">semver4j library</a>
  */
 public final class SemVerUtil {
 
@@ -55,9 +56,8 @@ public final class SemVerUtil {
      */
     public static boolean matches(String version, String versionRange) {
         try {
-            Semver semver = new Semver(version);
-            Requirement requirement = Requirement.buildNPM(versionRange);
-            return requirement.isSatisfiedBy(semver);
+            Semver semver = Semver.parse(version);
+            return semver.satisfies(versionRange);
         } catch (SemverException | NullPointerException e) {
             throw new IllegalArgumentException(
                     "Invalid version or range: version='" + version + "', range='" + versionRange + "'", e);
@@ -83,12 +83,7 @@ public final class SemVerUtil {
         if (version == null || version.trim().isEmpty()) {
             return false;
         }
-        try {
-            new Semver(version);
-            return true;
-        } catch (SemverException e) {
-            return false;
-        }
+        return Semver.isValid(version);
     }
 
     /**
@@ -110,11 +105,7 @@ public final class SemVerUtil {
         if (versionRange == null || versionRange.trim().isEmpty()) {
             return false;
         }
-        try {
-            Requirement.buildNPM(versionRange);
-            return true;
-        } catch (SemverException e) {
-            return false;
-        }
+        RangeList rangeList = RangeListFactory.create(versionRange);
+        return rangeList.get().size() > 0;
     }
 }
