@@ -4,6 +4,9 @@ module lan.tlab.r4j.jdsql.plugin.mysql {
     requires static lombok;
 
     // Provide MySQL dialect plugin implementation
+    // Allow this module to call ServiceLoader for SqlDialectPluginProvider in tests
+    uses lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider;
+
     provides lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider with
             lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPluginProvider;
 
