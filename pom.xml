@@ -68,7 +68,7 @@
 
     <dep.lombok.version>1.18.42</dep.lombok.version>
     <dep.jackson-core.version>2.20.1</dep.jackson-core.version>
-    <dep.semver4j.version>3.1.0</dep.semver4j.version>
+    <dep.semver4j.version>6.0.0</dep.semver4j.version>
     <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
     <dep.h2.version>2.4.240</dep.h2.version>
@@ -136,9 +136,15 @@
         <version>${dep.jackson-core.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.vdurmont</groupId>
+        <groupId>org.semver4j</groupId>
         <artifactId>semver4j</artifactId>
         <version>${dep.semver4j.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>

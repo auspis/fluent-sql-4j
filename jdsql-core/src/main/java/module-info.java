@@ -1,6 +1,6 @@
 module lan.tlab.r4j.jdsql.core {
     requires transitive org.slf4j;
-    requires transitive semver4j;
+    requires org.semver4j;
     requires transitive java.sql;
     requires static lombok;
 
