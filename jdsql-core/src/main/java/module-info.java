@@ -1,7 +1,7 @@
 module lan.tlab.r4j.jdsql.core {
     requires transitive org.slf4j;
     requires transitive semver4j;
-    requires java.sql;
+    requires transitive java.sql;
     requires static lombok;
 
     // Export all packages with actual Java files - visibility will be controlled by jdsql-api and jdsql-spi
