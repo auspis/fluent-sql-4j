@@ -3,7 +3,7 @@ module lan.tlab.r4j.jdsql.spi {
     requires transitive lan.tlab.r4j.jdsql.api;
     requires transitive lan.tlab.r4j.jdsql.core;
     requires transitive org.slf4j;
-    requires transitive semver4j;
+    requires org.semver4j;
     requires java.sql;
 
     // ServiceLoader support for plugin discovery

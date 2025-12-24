@@ -67,10 +67,8 @@ class SemVerUtilTest {
     }
 
     @Test
-    void matches_throwsExceptionForInvalidRangeFormat() {
-        assertThatThrownBy(() -> SemVerUtil.matches("14.0.0", "invalid-range"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid version or range");
+    void matches_invalidRangeFormat() {
+        assertThat(SemVerUtil.matches("14.0.0", "invalid-range")).isFalse();
     }
 
     @Test

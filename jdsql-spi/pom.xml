@@ -24,7 +24,7 @@
     </dependency>
     <!-- SemVer support for version matching -->
     <dependency>
-      <groupId>com.vdurmont</groupId>
+      <groupId>org.semver4j</groupId>
       <artifactId>semver4j</artifactId>
     </dependency>
   </dependencies>
