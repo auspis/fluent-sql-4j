@@ -21,7 +21,7 @@
     <maven.failsafe.plugin.version>3.5.4</maven.failsafe.plugin.version>
     <maven.spotless.plugin.version>3.1.0</maven.spotless.plugin.version>
     <maven.resource.plugin.version>3.4.0</maven.resource.plugin.version>
-    <maven.exec.plugin.version>3.6.2</maven.exec.plugin.version>
+    <maven.exec.plugin.version>3.6.3</maven.exec.plugin.version>
     <maven.versions.plugin.version>2.20.1</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
     <maven.jacoco.plugin.version>0.8.14</maven.jacoco.plugin.version>
