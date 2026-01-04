@@ -6,14 +6,14 @@
     <artifactId>plugins</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>jdsql-mysql</artifactId>
-  <name>jdsql mysql</name>
+  <artifactId>plugin-mysql</artifactId>
+  <name>fluent-sql-4j MySQL DSL plugin</name>
   <description>MySQL DSL plugin</description>
 
   <dependencies>
     <dependency>
       <groupId>io.github.massimiliano.fluentsql4j</groupId>
-      <artifactId>jdsql-spi</artifactId>
+      <artifactId>spi</artifactId>
     </dependency>
     <dependency>
       <groupId>io.github.massimiliano.fluentsql4j</groupId>
