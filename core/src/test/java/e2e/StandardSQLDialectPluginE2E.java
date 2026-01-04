@@ -1,4 +1,4 @@
-package e2e.system;
+package e2e;
 
 import static io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_NAME;
 import static io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
