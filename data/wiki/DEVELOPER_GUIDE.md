@@ -186,7 +186,7 @@ class AstToPreparedStatementSpecVisitorE2E {
 
 ### Test Annotations
 
-Custom test annotations are located in `lan.tlab.r4j.jdsql.test.util.annotation`:
+Custom test annotations are located in `io.github.massimiliano.fluentsql4j.test.util.annotation`:
 
 - `@ComponentTest` - Marks component tests (tagged with `component`)
 - `@IntegrationTest` - Marks integration tests (tagged with `integration`)

@@ -25,8 +25,8 @@ This guide provides comprehensive examples of using the JDSQL DSL to build SQL s
 The DSL provides a fluent API for building SQL statements. Get started by obtaining a DSL instance for your target database:
 
 ```java
-import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
+import io.github.massimiliano.fluentsql4j.dsl.DSL;
+import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
 
 // Create a registry and get a DSL instance for your database
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
@@ -596,9 +596,9 @@ PreparedStatement ps = dsl.deleteFrom("users")
 ## MERGE Statements
 
 ```java
-import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
-import lan.tlab.r4j.jdsql.ast.core.expression.scalar.ColumnReference;
+import io.github.massimiliano.fluentsql4j.dsl.DSL;
+import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
+import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 
 // Get a DSL instance
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();

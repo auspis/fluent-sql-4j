@@ -18,8 +18,8 @@ A type-safe SQL builder for Java with multi-dialect support through a plugin sys
 ### Basic SELECT Query
 
 ```java
-import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
+import io.github.massimiliano.fluentsql4j.dsl.DSL;
+import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
 
 // Get a DSL instance for your database
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();

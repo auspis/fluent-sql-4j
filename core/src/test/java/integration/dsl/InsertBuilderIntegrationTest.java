@@ -1,8 +1,12 @@
 package integration.dsl;
 
-import static lan.tlab.r4j.jdsql.test.JsonAssert.assertThatJson;
+import static io.github.massimiliano.fluentsql4j.test.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.massimiliano.fluentsql4j.dsl.DSL;
+import io.github.massimiliano.fluentsql4j.plugin.util.StandardSqlUtil;
+import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
+import io.github.massimiliano.fluentsql4j.test.util.annotation.IntegrationTest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,10 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.plugin.util.StandardSqlUtil;
-import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
-import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
