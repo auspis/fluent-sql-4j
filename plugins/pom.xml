@@ -3,15 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.massimiliano.fluentsql4j</groupId>
-    <artifactId>jdsql</artifactId>
+    <artifactId>fluentsql4j-parent</artifactId>
     <version>1.0</version>
   </parent>
   <artifactId>plugins</artifactId>
   <packaging>pom</packaging>
-  <name>jdsql plugins</name>
+  <name>fluent-sql-4j plugins</name>
 
   <modules>
-    <module>jdsql-mysql</module>
-    <module>jdsql-postgresql</module>
+    <module>plugin-mysql</module>
+    <module>plugin-postgresql</module>
   </modules>
 </project>

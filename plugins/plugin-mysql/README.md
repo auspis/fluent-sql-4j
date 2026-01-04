@@ -13,7 +13,7 @@ Add the dependency to your `pom.xml`:
 ```xml
 <dependency>
     <groupId>lan.tlab.r4j</groupId>
-    <artifactId>jdsql-mysql</artifactId>
+    <artifactId>plugin-mysql</artifactId>
     <version>${jdsql.version}</version>
 </dependency>
 ```
