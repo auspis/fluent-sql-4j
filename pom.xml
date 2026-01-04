@@ -57,12 +57,12 @@
     <maven.failsafe.plugin.version>3.5.4</maven.failsafe.plugin.version>
     <maven.spotless.plugin.version>3.1.0</maven.spotless.plugin.version>
     <maven.resource.plugin.version>3.4.0</maven.resource.plugin.version>
-    <maven.exec.plugin.version>3.6.2</maven.exec.plugin.version>
+    <maven.exec.plugin.version>3.6.3</maven.exec.plugin.version>
     <maven.versions.plugin.version>2.20.1</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
     <maven.jacoco.plugin.version>0.8.14</maven.jacoco.plugin.version>
     <!-- Release-only plugin versions -->
-    <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
+    <maven.source.plugin.version>3.4.0</maven.source.plugin.version>
     <maven.javadoc.plugin.version>3.12.0</maven.javadoc.plugin.version>
     <maven.gpg.plugin.version>3.2.8</maven.gpg.plugin.version>
     <nexus.staging.plugin.version>1.7.0</nexus.staging.plugin.version>
