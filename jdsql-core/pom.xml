@@ -7,9 +7,9 @@
     <version>1.0</version>
   </parent>
   <artifactId>jdsql-core</artifactId>
+  <name>jdsql-core</name>
 
   <properties>
-    <!-- Skip deployment of jdsql-core, it's an internal implementation module -->
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
