@@ -548,6 +548,7 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
+              <tokenAuth>true</tokenAuth>
               <!-- autoPublish: false = manual publishing required (conservative), true = auto-publish -->
               <autoPublish>false</autoPublish>
               <!-- waitUntil: validated (default) = wait for upload and validation -->
