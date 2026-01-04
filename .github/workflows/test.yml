@@ -42,11 +42,11 @@ jobs:
       with:
         name: surefire-reports
         path: |
-          jdsql/target/surefire-reports/
+          fluentsql4j/target/surefire-reports/
     - name: Upload Failsafe reports
       if: always()
       uses: actions/upload-artifact@v6
       with:
         name: failsafe-reports
         path: |
-          jdsql/target/failsafe-reports/
+          fluentsql4j/target/failsafe-reports/

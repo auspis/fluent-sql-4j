@@ -26,7 +26,7 @@ This guide covers the development workflow, testing strategies, code coverage, a
 
 ## Running Tests
 
-This project uses a structured approach to test execution with three distinct test categories organized within the `jdsql-core` module.
+This project uses a structured approach to test execution with three distinct test categories organized within the `core` module.
 
 ### Test Categories (Test Pyramid)
 
@@ -96,7 +96,7 @@ core/src/test/java/
 ./mvnw clean verify
 
 # Integration check (skip unit + component tests)
-./mvnw verify -pl jdsql-core -Dgroups=integration
+./mvnw verify -pl core -Dgroups=integration
 
 # Full e2e validation with real databases
 ./mvnw verify -pl core -Dgroups=e2e
@@ -221,15 +221,15 @@ To generate coverage reports after running all tests:
 To generate coverage for a specific module and its dependencies:
 
 ```bash
-./mvnw clean test -pl jdsql-core -am jacoco:report
-./mvnw clean verify -pl jdsql-core -am jacoco:report
+./mvnw clean test -pl core -am jacoco:report
+./mvnw clean verify -pl core -am jacoco:report
 ```
 
 ### Viewing Reports
 
 Coverage reports are generated as HTML files in each module's `target/site/jacoco/` directory:
 
-- **jdsql-core Module**: `jdsql-core/target/site/jacoco/index.html`
+- **core Module**: `core/target/site/jacoco/index.html`
 
 Open the `index.html` file in your browser to view detailed coverage information including:
 - Overall coverage percentages (instructions, branches, lines, methods, classes)
