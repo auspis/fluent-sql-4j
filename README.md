@@ -1,4 +1,4 @@
-# JDSQL - Java Domain Structured Query Language
+# Fluent SQL 4J
 
 A type-safe SQL builder for Java with multi-dialect support through a plugin system. Build SQL statements programmatically using a fluent DSL with compile-time validation.
 

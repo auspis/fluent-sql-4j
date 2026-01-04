@@ -5,18 +5,18 @@
 #
 # Uso:
 #   ./generate-gpg-secrets.sh --name "CI Signing" --email ci@example.com \
-#       [--comment "jdsql-ci"] [--expiry 1y] [--length 4096] \
+#       [--comment "fluent-sql-4j-ci"] [--expiry 1y] [--length 4096] \
 #       [--repo owner/repo] [--set-secrets]
 #
 # Se --repo e --set-secrets sono passati, lo script proverà a impostare secrets
 # GPG_PRIVATE_KEY e GPG_PASSPHRASE nel repo (richiede gh CLI autenticato).
 #
 # #### example ####
-# ./generate-gpg-secrets.sh --email ci@t-lab.lan --name "jdsql CI" --comment "jdsql-ci" --expiry 1y
+# ./generate-gpg-secrets.sh --email ci@t-lab.lan --name "fluent-sql-4j CI" --comment "fluent-sql-4j-ci" --expiry 1y
 #
 # Per impostare i secrets direttamente su GitHub (richiede gh CLI autenticato e permessi repo:admin): 
 # grep -qxF "allow-loopback-pinentry" ~/.gnupg/gpg-agent.conf || echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf && gpgconf --kill gpg-agent && sleep 1
-# ./data/scripts/generate-gpg-secrets.sh --email ci@t-lab.lan --repo massimiliano/jdsql --set-secrets --length 4096 2>&1 | tee /tmp/gpg-generate.log
+# ./data/scripts/generate-gpg-secrets.sh --email ci@t-lab.lan --repo massimiliano/fluent-sql-4j --set-secrets --length 4096 2>&1 | tee /tmp/gpg-generate.log
 
 
 set -euo pipefail
@@ -24,7 +24,7 @@ set -euo pipefail
 # Defaults
 NAME="CI Signing"
 EMAIL=""
-COMMENT="jdsql-ci"
+COMMENT="fluent-sql-4j-ci"
 EXPIRY="1y"
 KEY_LENGTH="4096"
 TMPDIR=$(mktemp -d)
@@ -40,7 +40,7 @@ Usage: $0 --email you@example.com [options]
 Options:
   --name "Name"           : UID name (default: "CI Signing")
   --email "email"         : UID email (required)
-  --comment "comment"     : UID comment (default: "jdsql-ci")
+  --comment "comment"     : UID comment (default: "fluent-sql-4j-ci")
   --expiry 1y             : key expiry (default: 1y)
   --length 4096           : RSA key length (default: 4096)
   --repo owner/repo       : GitHub repo to set secrets (optional)
