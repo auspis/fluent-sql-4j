@@ -268,7 +268,7 @@ public final class SqlDialectPluginRegistry {
      * Retrieves a {@link io.github.massimiliano.fluentsql4j.dsl.DSL} instance for the specified SQL dialect and version.
      * <p>
      * This method returns the DSL instance created by the plugin's {@code createDSL()} method.
-     * This allows dialect-specific DSL extensions (like {@link lan.tlab.r4j.sql.dsl.mysql.MySQLDSL})
+     * This allows dialect-specific DSL extensions (like {@link io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MySQLDSL})
      * to be properly returned to callers.
      * <p>
      * The dialect name is matched case-insensitively. The registry finds all plugins
