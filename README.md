@@ -68,26 +68,26 @@ The project is organized as a multi-module Maven project with two main artifacts
 
 ### Published Artifacts
 
-- **[`jdsql-api/`](jdsql-api/)**: **Public API for DSL users**
+- **[`api/`](api/)**: **Public API for DSL users**
   - Use this dependency in your application to build SQL queries
   - Provides DSL, builders (SELECT, INSERT, UPDATE, DELETE, MERGE, CREATE TABLE), and PreparedStatement support
   - Maven dependency:
 
     ```xml
     <dependency>
-      <groupId>lan.tlab</groupId>
+      <groupId>io.github.massimiliano.fluentsql4j</groupId>
       <artifactId>api</artifactId>
       <version>1.0</version>
     </dependency>
     ```
-- **[`jdsql-spi/`](jdsql-spi/)**: **Service Provider Interface for plugin developers**
+- **[`spi/`](spi/)**: **Service Provider Interface for plugin developers**
   - Use this dependency to develop custom SQL dialect plugins
   - Provides AST interfaces, Visitor pattern, rendering strategies, and plugin registry
   - Maven dependency:
 
     ```xml
     <dependency>
-      <groupId>lan.tlab</groupId>
+      <groupId>io.github.massimiliano.fluentsql4j</groupId>
       <artifactId>spi</artifactId>
       <version>1.0</version>
     </dependency>
@@ -95,12 +95,12 @@ The project is organized as a multi-module Maven project with two main artifacts
 
 ### Internal Modules (Not Published)
 
-- **[`jdsql-core/`](jdsql-core/)**: Internal implementation (AST, DSL builders, plugin system)
-  - Not intended for direct use - access via `jdsql-api` or `jdsql-spi`
+- **[`core/`](core/)**: Internal implementation (AST, DSL builders, plugin system)
+  - Not intended for direct use - access via `api` or `spi`
   - Contains all implementation code
 - **[`plugins/`](plugins/)**: Dialect-specific plugins
-  - **[`jdsql-mysql/`](plugins/jdsql-mysql/)**: MySQL dialect plugin
-  - **[`jdsql-postgresql/`](plugins/jdsql-postgresql/)**: PostgreSQL dialect plugin
+  - **[`plugins/plugin-mysql/`](plugins/plugin-mysql/)**: MySQL dialect plugin
+  - **[`plugins/plugin-postgresql/`](plugins/plugin-postgresql/)**: PostgreSQL dialect plugin
 - **[`test-support/`](test-support/)**: Shared test utilities and helpers
 
 ### Usage Patterns
@@ -109,13 +109,13 @@ The project is organized as a multi-module Maven project with two main artifacts
 
 ```xml
 <dependency>
-  <groupId>lan.tlab</groupId>
+  <groupId>io.github.massimiliano.fluentsql4j</groupId>
   <artifactId>api</artifactId>
   <version>1.0</version>
 </dependency>
 <!-- Add dialect plugins as needed -->
 <dependency>
-  <groupId>lan.tlab</groupId>
+  <groupId>io.github.massimiliano.fluentsql4j</groupId>
   <artifactId>plugin-mysql</artifactId>
   <version>1.0</version>
 </dependency>
@@ -125,7 +125,7 @@ The project is organized as a multi-module Maven project with two main artifacts
 
 ```xml
 <dependency>
-  <groupId>lan.tlab</groupId>
+  <groupId>io.github.massimiliano.fluentsql4j</groupId>
   <artifactId>spi</artifactId>
   <version>1.0</version>
 </dependency>
