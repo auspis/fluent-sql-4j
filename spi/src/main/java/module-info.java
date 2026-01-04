@@ -1,11 +1,11 @@
-module lan.tlab.r4j.jdsql.spi {
+module io.github.massimiliano.fluentsql4j.spi {
     // Transitive requirement on API and core - users get all SPI classes
-    requires transitive lan.tlab.r4j.jdsql.api;
-    requires transitive lan.tlab.r4j.jdsql.core;
+    requires transitive io.github.massimiliano.fluentsql4j.api;
+    requires transitive io.github.massimiliano.fluentsql4j.core;
     requires transitive org.slf4j;
     requires org.semver4j;
     requires java.sql;
 
     // ServiceLoader support for plugin discovery
-    uses lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider;
+    uses io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
 }

@@ -1,17 +1,17 @@
-module lan.tlab.r4j.jdsql.plugin.postgresql {
-    requires transitive lan.tlab.r4j.jdsql.spi;
+module io.github.massimiliano.fluentsql4j.plugin.postgresql {
+    requires transitive io.github.massimiliano.fluentsql4j.spi;
     requires java.sql;
     requires static lombok;
 
     // Provide PostgreSQL dialect plugin implementation
     // Allow this module to call ServiceLoader for SqlDialectPluginProvider in tests
-    uses lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider;
+    uses io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
 
-    provides lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider with
-            lan.tlab.r4j.jdsql.plugin.builtin.postgre.PostgreSqlDialectPluginProvider;
+    provides io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider with
+            io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.PostgreSqlDialectPluginProvider;
 
     // Export plugin packages (optional, for advanced use)
-    exports lan.tlab.r4j.jdsql.plugin.builtin.postgre;
-    exports lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl;
-    exports lan.tlab.r4j.jdsql.plugin.builtin.postgre.ast.visitor.ps.strategy;
+    exports io.github.massimiliano.fluentsql4j.plugin.builtin.postgre;
+    exports io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.dsl;
+    exports io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.ast.visitor.ps.strategy;
 }

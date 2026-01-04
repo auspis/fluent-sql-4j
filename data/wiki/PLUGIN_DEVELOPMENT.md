@@ -107,7 +107,7 @@ plugins/
         │   └── resources/
         │       └── META-INF/
         │           └── services/
-        │               └── lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider
+        │               └── io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider
         └── test/
             └── java/
                 └── lan/tlab/r4j/jdsql/plugin/builtin/postgresql/
@@ -120,13 +120,13 @@ plugins/
 Create the provider that ServiceLoader will discover:
 
 ```java
-package lan.tlab.r4j.jdsql.plugin.builtin.postgresql;
+package io.github.massimiliano.fluentsql4j.plugin.builtin.postgresql;
 
-import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider;
-import lan.tlab.r4j.jdsql.plugin.builtin.postgre.dsl.PostgreSqlDSL;
+import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
+import io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.dsl.PostgreSqlDSL;
 
 /**
  * Service provider for PostgreSQL dialect plugin.
@@ -157,15 +157,15 @@ public final class PostgreSqlDialectPluginProvider implements SqlDialectPluginPr
 
 Create the ServiceLoader configuration file:
 
-**File**: `src/main/resources/META-INF/services/lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider`
+**File**: `src/main/resources/META-INF/services/io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider`
 
 ```
-lan.tlab.r4j.jdsql.plugin.builtin.postgresql.PostgreSqlDialectPluginProvider
+io.github.massimiliano.fluentsql4j.plugin.builtin.postgresql.PostgreSqlDialectPluginProvider
 ```
 
 **CRITICAL**: The file path and name must be exact:
 - Directory: `META-INF/services/`
-- Filename: `lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider` (interface FQN)
+- Filename: `io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider` (interface FQN)
 - Content: Fully qualified class name of your provider implementation
 
 ### Step 4: Create Custom Rendering Strategy
@@ -173,16 +173,16 @@ lan.tlab.r4j.jdsql.plugin.builtin.postgresql.PostgreSqlDialectPluginProvider
 Implement dialect-specific SQL rendering for prepared statements:
 
 ```java
-package lan.tlab.r4j.jdsql.plugin.builtin.postgresql.visitor.ps.strategy;
+package io.github.massimiliano.fluentsql4j.plugin.builtin.postgresql.visitor.ps.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lan.tlab.r4j.jdsql.ast.core.expression.function.CustomFunctionCall;
-import lan.tlab.r4j.jdsql.ast.visitor.AstContext;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.PreparedStatementSpec;
-import lan.tlab.r4j.jdsql.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
+import io.github.massimiliano.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
+import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 
 public class PostgreSqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsStrategy {
 
@@ -238,10 +238,10 @@ public class PostgreSqlCustomFunctionCallPsStrategy implements CustomFunctionCal
 Create dialect-specific DSL extensions:
 
 ```java
-package lan.tlab.r4j.jdsql.plugin.builtin.postgresql.dsl;
+package io.github.massimiliano.fluentsql4j.plugin.builtin.postgresql.dsl;
 
-import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
+import io.github.massimiliano.fluentsql4j.dsl.DSL;
+import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 
 public class PostgreSqlDSL extends DSL {
     
@@ -472,7 +472,7 @@ try {
 - src/META-INF/services/
 
 ✅ CORRECT path:
-- src/main/resources/META-INF/services/lan.tlab.r4j.jdsql.plugin.SqlDialectPluginProvider
+- src/main/resources/META-INF/services/io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider
 ```
 
 ### 2. Non-Thread-Safe Strategy
@@ -527,7 +527,7 @@ public class MyStrategy implements CustomFunctionCallPsStrategy {
 com.example.MyProvider  (class doesn't exist or typo)
 
 ✅ File content:
-lan.tlab.r4j.jdsql.plugin.builtin.postgresql.PostgreSqlDialectPluginProvider
+io.github.massimiliano.fluentsql4j.plugin.builtin.postgresql.PostgreSqlDialectPluginProvider
 (fully qualified, correct class name)
 ```
 
