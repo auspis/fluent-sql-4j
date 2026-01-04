@@ -42,4 +42,4 @@ jobs:
         run: |
           # Maven will use MAVEN_GPG_PASSPHRASE automatically for GPG signing
           export GPG_TTY=/dev/console
-          mvn -B -DskipTests -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} clean deploy -P release
+          mvn -B -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} clean deploy -P release
