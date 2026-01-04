@@ -91,12 +91,12 @@ Create a new module under `plugins/`:
 
 ```
 plugins/
-└── jdsql-postgresql/
+└── plugin-postgresql/
     ├── pom.xml
     └── src/
         ├── main/
         │   ├── java/
-        │   │   └── lan/tlab/r4j/jdsql/plugin/builtin/postgresql/
+        │   │   └── io/github/massimiliano/fluentsql4j/plugin/builtin/postgresql/
         │   │       ├── PostgreSqlDialectPluginProvider.java
         │   │       ├── PostgreSqlDialectPlugin.java
         │   │       ├── renderer/
@@ -110,7 +110,7 @@ plugins/
         │               └── io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider
         └── test/
             └── java/
-                └── lan/tlab/r4j/jdsql/plugin/builtin/postgresql/
+                └── io/github/massimiliano/fluentsql4j/plugin/builtin/postgresql/
                     ├── PostgreSqlDialectPluginProviderTest.java
                     └── PostgreSqlCustomFunctionRenderStrategyTest.java
 ```

@@ -12,9 +12,9 @@ Add the dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>lan.tlab.r4j</groupId>
+    <groupId>io.github.massimiliano.fluentsql4j</groupId>
     <artifactId>plugin-mysql</artifactId>
-    <version>${jdsql.version}</version>
+    <version>${fluentsql4j.version}</version>
 </dependency>
 ```
 
