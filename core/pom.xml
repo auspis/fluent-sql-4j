@@ -3,31 +3,29 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.massimiliano.fluentsql4j</groupId>
-    <artifactId>plugins</artifactId>
+    <artifactId>fluentsql4j-parent</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>jdsql-postgresql</artifactId>
-  <name>jdsql postgresql</name>
-  <description>PostgreSQL DSL plugin</description>
+  <artifactId>core</artifactId>
+  <name>fluent-sql-4j core</name>
+
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>io.github.massimiliano.fluentsql4j</groupId>
-      <artifactId>jdsql-spi</artifactId>
-    </dependency>
     <dependency>
       <groupId>io.github.massimiliano.fluentsql4j</groupId>
       <artifactId>test-support</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <scope>test</scope>
+      <groupId>org.semver4j</groupId>
+      <artifactId>semver4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -37,12 +35,36 @@
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>mysql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy-agent</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- PostgreSQL support for integration and E2E tests -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+      <scope>test</scope>
     </dependency>
+    <!-- JSON support for test data -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
