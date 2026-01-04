@@ -41,12 +41,12 @@ The project uses a structured test pyramid with four main categories:
 
 ### Project Structure
 
-All tests are consolidated within the `jdsql-core` module with the following organization:
+All tests are consolidated within the `core` module with the following organization:
 
 ```
-jdsql-core/src/test/java/
-├── lan/tlab/r4j/jdsql/                    # Unit tests (~200)
-├── lan/tlab/r4j/jdsql/dsl/*ComponentTest  # Component tests (~50)
+core/src/test/java/
+├── io/github/massimiliano/fluentsql4j/                    # Unit tests (~200)
+├── io/github/massimiliano/fluentsql4j/dsl/*ComponentTest  # Component tests (~50)
 ├── integration/                           # Integration tests (~20)
 └── e2e/system/                            # E2E tests (~3)
 ```
@@ -55,35 +55,35 @@ jdsql-core/src/test/java/
 
 ```bash
 # Run unit + component tests (fast feedback, no database)
-./mvnw test -pl jdsql-core
+./mvnw test -pl core
 
 # Run all tests (unit + component + integration + e2e)
-./mvnw verify -pl jdsql-core
+./mvnw verify -pl core
 
 # Run tests with dependencies
-./mvnw clean verify -am -pl jdsql-core
+./mvnw clean verify -am -pl core
 ```
 
 ### Selective Test Execution
 
 ```bash
 # Run only unit tests
-./mvnw test -pl jdsql-core -Dgroups="\!component,\!integration,\!e2e"
+./mvnw test -pl core -Dgroups="\!component,\!integration,\!e2e"
 
 # Run unit + component tests (fast feedback, no database)
-./mvnw test -pl jdsql-core -Dgroups="\!integration,\!e2e"
+./mvnw test -pl core -Dgroups="\!integration,\!e2e"
 
 # Run only component tests
-./mvnw test -pl jdsql-core -Dgroups=component
+./mvnw test -pl core -Dgroups=component
 
 # Run only integration tests
-./mvnw verify -pl jdsql-core -Dgroups=integration
+./mvnw verify -pl core -Dgroups=integration
 
 # Run only e2e tests
-./mvnw verify -pl jdsql-core -Dgroups=e2e
+./mvnw verify -pl core -Dgroups=e2e
 
 # Run integration + e2e (skip unit + component)
-./mvnw verify -pl jdsql-core -Dgroups=integration,e2e
+./mvnw verify -pl core -Dgroups=integration,e2e
 ```
 
 ### Development Workflow
@@ -99,7 +99,7 @@ jdsql-core/src/test/java/
 ./mvnw verify -pl jdsql-core -Dgroups=integration
 
 # Full e2e validation with real databases
-./mvnw verify -pl jdsql-core -Dgroups=e2e
+./mvnw verify -pl core -Dgroups=e2e
 ```
 
 ### CI/CD Pipeline
