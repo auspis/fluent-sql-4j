@@ -3,26 +3,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.massimiliano.fluentsql4j</groupId>
-    <artifactId>jdsql</artifactId>
+    <artifactId>fluentsql4j-parent</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>jdsql-spi</artifactId>
-  <name>jdsql-spi</name>
-  <description>Service Provider Interface for plugins - AST, visitors, and strategies</description>
+  <artifactId>api</artifactId>
+  <name>fluent-sql-4j API</name>
+  <description>Public DSL API</description>
 
   <dependencies>
     <dependency>
       <groupId>io.github.massimiliano.fluentsql4j</groupId>
-      <artifactId>jdsql-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.github.massimiliano.fluentsql4j</groupId>
-      <artifactId>jdsql-core</artifactId>
+      <artifactId>core</artifactId>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.semver4j</groupId>
-      <artifactId>semver4j</artifactId>
     </dependency>
   </dependencies>
 </project>

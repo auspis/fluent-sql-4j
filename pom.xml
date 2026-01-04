@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.massimiliano.fluentsql4j</groupId>
-  <artifactId>jdsql</artifactId>
+  <artifactId>fluentsql4j-parent</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
 
   <!-- Project metadata required for publishing on Maven Central -->
-  <name>jdsql</name>
+  <name>fluent-sql-4j</name>
   <description>Java DSL for SQL</description>
-  <url>https://github.com/massimiliano/jdsql</url>
+  <url>https://github.com/massimiliano/fluent-sql-4j</url>
 
   <licenses>
     <license>
@@ -28,16 +28,16 @@
 
   <modules>
     <module>test-support</module>
-    <module>jdsql-core</module>
-    <module>jdsql-api</module>
-    <module>jdsql-spi</module>
+    <module>core</module>
+    <module>api</module>
+    <module>spi</module>
     <module>plugins</module>
   </modules>
 
   <scm>
-    <connection>scm:git:git://github.com/massimiliano/jdsql.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:massimiliano/jdsql.git</developerConnection>
-    <url>https://github.com/massimiliano/jdsql</url>
+    <connection>scm:git:git://github.com/massimiliano/fluent-sql-4j.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:massimiliano/fluent-sql-4j.git</developerConnection>
+    <url>https://github.com/massimiliano/fluent-sql-4j</url>
   </scm>
 
   <!-- Distribution settings for Sonatype Central Publishing Portal -->
@@ -91,17 +91,17 @@
     <dependencies>
       <dependency>
         <groupId>io.github.massimiliano.fluentsql4j</groupId>
-        <artifactId>jdsql-core</artifactId>
+        <artifactId>core</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>io.github.massimiliano.fluentsql4j</groupId>
-        <artifactId>jdsql-api</artifactId>
+        <artifactId>api</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>io.github.massimiliano.fluentsql4j</groupId>
-        <artifactId>jdsql-spi</artifactId>
+        <artifactId>spi</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -112,12 +112,12 @@
       </dependency>
       <dependency>
         <groupId>io.github.massimiliano.fluentsql4j</groupId>
-        <artifactId>jdsql-mysql</artifactId>
+        <artifactId>plugin-mysql</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.github.massimiliano.fluentsql4j</groupId>
-        <artifactId>jdsql-postgresql</artifactId>
+        <artifactId>plugin-postgresql</artifactId>
         <version>${project.version}</version>
       </dependency>
 
