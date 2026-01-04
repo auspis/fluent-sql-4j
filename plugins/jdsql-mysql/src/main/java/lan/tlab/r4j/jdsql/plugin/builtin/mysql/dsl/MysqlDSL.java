@@ -48,8 +48,8 @@ public class MysqlDSL extends DSL {
     /**
      * Creates a MySQL-specific DSL instance.
      *
-     * @param renderer the MySQL dialect renderer
-     * @throws NullPointerException if {@code renderer} is {@code null}
+     * @param specFactory the PreparedStatementSpecFactory used to create prepared statement specs
+     * @throws NullPointerException if {@code specFactory} is {@code null}
      */
     public MysqlDSL(PreparedStatementSpecFactory specFactory) {
         super(specFactory);
