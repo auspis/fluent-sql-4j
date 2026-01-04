@@ -8,6 +8,7 @@
   </parent>
   <artifactId>plugins</artifactId>
   <packaging>pom</packaging>
+  <name>jdsql plugins</name>
 
   <modules>
     <module>jdsql-mysql</module>

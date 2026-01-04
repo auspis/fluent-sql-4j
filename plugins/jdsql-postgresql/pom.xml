@@ -7,6 +7,8 @@
     <version>1.0</version>
   </parent>
   <artifactId>jdsql-postgresql</artifactId>
+  <name>jdsql postgresql</name>
+  <description>PostgreSQL DSL plugin</description>
 
   <dependencies>
     <dependency>
@@ -18,15 +20,6 @@
       <artifactId>test-support</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>com.vdurmont</groupId>-->
-    <!--      <artifactId>semver4j</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>com.h2database</groupId>-->
-    <!--      <artifactId>h2</artifactId>-->
-    <!--      <scope>test</scope>-->
-    <!--    </dependency>-->
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
@@ -50,11 +43,6 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>net.bytebuddy</groupId>-->
-    <!--      <artifactId>byte-buddy-agent</artifactId>-->
-    <!--      <scope>test</scope>-->
-    <!--    </dependency>-->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>

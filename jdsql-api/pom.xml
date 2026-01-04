@@ -7,11 +7,10 @@
     <version>1.0</version>
   </parent>
   <artifactId>jdsql-api</artifactId>
-  <name>JDSQL API</name>
-  <description>Public API for JDSQL - SQL query builder DSL for Java</description>
+  <name>jdsql api</name>
+  <description>Public DSL API</description>
 
   <dependencies>
-    <!-- Compile-time dependency on jdsql-core for implementation -->
     <dependency>
       <groupId>io.github.massimiliano</groupId>
       <artifactId>jdsql-core</artifactId>
