@@ -1,0 +1,14 @@
+package io.github.massimiliano.fluentsql4j.ast.core.expression.function.string;
+
+import io.github.massimiliano.fluentsql4j.ast.core.expression.function.FunctionCall;
+import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
+import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
+import io.github.massimiliano.fluentsql4j.ast.visitor.Visitor;
+
+public record Length(ScalarExpression expression) implements FunctionCall {
+
+    @Override
+    public <T> T accept(Visitor<T> visitor, AstContext ctx) {
+        return visitor.visit(this, ctx);
+    }
+}
