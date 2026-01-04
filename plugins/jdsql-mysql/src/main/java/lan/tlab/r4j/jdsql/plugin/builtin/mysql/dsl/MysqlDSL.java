@@ -30,14 +30,6 @@ import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionB
  *     dsl.ifExpr(dsl.gt("age", 18), "'adult'", "'minor'").as("age_group")
  * ).from("users").build();
  * }</pre>
- * <p>
- * <b>Supported MySQL Custom Functions:</b>
- * <ul>
- *   <li>{@link #groupConcat(String, String)} - GROUP_CONCAT aggregation</li>
- *   <li>{@link #ifExpr(Object, Object, Object)} - IF conditional expression</li>
- *   <li>{@link #dateFormat(String, String)} - DATE_FORMAT for date formatting</li>
- *   <li>More to be added as needed</li>
- * </ul>
  *
  * @see DSL
  * @see lan.tlab.r4j.jdsql.plugin.builtin.mysql.MysqlDialectPlugin
