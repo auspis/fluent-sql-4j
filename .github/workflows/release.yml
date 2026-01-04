@@ -4,6 +4,16 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      autoPublish:
+        description: 'Auto-publish to Maven Central (true = immediate, false = manual review required)'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 jobs:
   build-and-publish:
@@ -18,14 +28,14 @@ jobs:
           distribution: 'corretto'
           java-version: '21'
           cache: maven
-          server-id: ossrh
-          server-username: ${{ secrets.OSSRH_USERNAME }}
-          server-password: ${{ secrets.OSSRH_PASSWORD }}
+          server-id: central
+          server-username: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          server-password: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Build and deploy to OSSRH (Maven Central)
+      - name: Build and deploy to Maven Central Portal
         env:
           GPG_TTY: /dev/console
         run: |
-          mvn -B -DskipTests clean deploy -P release
+          mvn -B -DskipTests -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} clean deploy -P release
