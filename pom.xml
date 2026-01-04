@@ -484,6 +484,66 @@
       </activation>
       <build>
         <plugins>
+          <!-- Delombok using lombok jar copied locally (exec-based, no external Lombok plugin needed) -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>${maven.dependency.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>copy-lombok-jar</id>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <phase>generate-sources</phase>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.projectlombok</groupId>
+                      <artifactId>lombok</artifactId>
+                      <version>${dep.lombok.version}</version>
+                      <outputDirectory>${project.build.directory}/lombok</outputDirectory>
+                      <destFileName>lombok.jar</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>${maven.exec.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>delombok</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>generate-sources</phase>
+                <configuration>
+                  <mainClass>lombok.launch.Main</mainClass>
+                  <classpathScope>system</classpathScope>
+                  <arguments>
+                    <argument>delombok</argument>
+                    <argument>${project.basedir}/src/main/java</argument>
+                    <argument>-d</argument>
+                    <argument>${project.build.directory}/generated-sources/delombok</argument>
+                  </arguments>
+                  <systemProperties>
+                    <systemProperty>
+                      <key>lombok.disableConfig</key>
+                      <value>false</value>
+                    </systemProperty>
+                  </systemProperties>
+                  <additionalClasspathElements>
+                    <additionalClasspathElement>${project.build.directory}/lombok/lombok.jar</additionalClasspathElement>
+                  </additionalClasspathElements>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -503,8 +563,9 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>${maven.javadoc.plugin.version}</version>
             <configuration>
-              <doclint>none</doclint>
-              <failOnError>false</failOnError>
+              <!-- <doclint>none</doclint>
+              <failOnError>false</failOnError> -->
+              <sourcepath>${project.build.directory}/generated-sources/delombok</sourcepath>
             </configuration>
             <executions>
               <execution>
