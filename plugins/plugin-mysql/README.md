@@ -25,8 +25,8 @@ The plugin is automatically discovered via Java ServiceLoader.
 ### Getting the MySQL DSL
 
 ```java
-import lan.tlab.r4j.jdsql.dsl.DSLRegistry;
-import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
+import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
+import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 MysqlDSL mysql = registry.dslFor("mysql", "8.0.35", MysqlDSL.class).orElseThrow();

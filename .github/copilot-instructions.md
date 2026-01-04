@@ -67,12 +67,12 @@ A helper class can be instantiated and may contain instance variables, instance,
 
 Multiple instances of a helper class can exist in our application. When different classes have common functionalities, we can group these functionalities together to form a helper class that's accessible across certain classes in our application.
 
-**Package Convention**: Helper classes must be placed in a package named `*.helper` (e.g., `lan.tlab.r4j.jdsql.dsl.helper`).
+**Package Convention**: Helper classes must be placed in a package named `*.helper` (e.g., `io.github.massimiliano.fluentsql4j.dsl.helper`).
 
 **Example of a Helper Class**:
 
 ```java
-package lan.tlab.r4j.jdsql.dsl.helper;
+package io.github.massimiliano.fluentsql4j.dsl.helper;
 
 public class QueryBuilderHelper {
     private String schema;
@@ -105,7 +105,7 @@ Methods of a utility are accessed via the class name. It makes our code more fle
 
 Java has utility classes such as java.util.Arrays, java.lang.Math, java.util.Scanner, java.util.Collections, etc.
 
-**Package Convention**: Utility classes must be placed in a package named `*.util` (e.g., `lan.tlab.r4j.jdsql.dsl.util`).
+**Package Convention**: Utility classes must be placed in a package named `*.util` (e.g., `io.github.massimiliano.fluentsql4j.dsl.util`).
 
 **Mandatory Requirements for Utility Classes**:
 - The class must be declared as `final`
@@ -116,9 +116,9 @@ Java has utility classes such as java.util.Arrays, java.lang.Math, java.util.Sca
 **Example of a Utility Class**:
 
 ```java
-package lan.tlab.r4j.jdsql.dsl.util;
+package io.github.massimiliano.fluentsql4j.dsl.util;
 
-import lan.tlab.r4j.jdsql.ast.expression.scalar.ColumnReference;
+import io.github.massimiliano.fluentsql4j.ast.expression.scalar.ColumnReference;
 
 public final class ColumnReferenceUtil {
 
@@ -256,7 +256,7 @@ class MyBuilderTest {
 **Usage**:
 
 ```java
-import static lan.tlab.r4j.jdsql.test.SqlAssert.assertThatSql;
+import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
 
 assertThatSql(sql)
     .isEqualTo("SELECT \"name\" FROM \"users\"")
