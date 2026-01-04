@@ -1,11 +1,84 @@
 **Publish to Maven Central**
 
-Set the repository secrets in *Settings → Secrets and variables → Actions*:
+As of June 30, 2025, OSSRH (Sonatype Open Source Repository Hosting) has reached end-of-life. This project now publishes via the **Central Publishing Portal** (https://central.sonatype.com/).
 
-- `OSSRH_USERNAME`
-- `OSSRH_PASSWORD`
-- `GPG_PRIVATE_KEY` (ASCII-armored) (use data/scripts/generate-gpg-secrets.sh)
-- `GPG_PASSPHRASE` (if applicable) (see data/scripts/generate-gpg-secrets.sh)
+## Setup
+
+### 1. Generate a Central Portal User Token
+
+1. Log in to [Central Portal](https://central.sonatype.com/) with your OSSRH credentials (same account)
+2. Go to "View Account" → "Generate User Token"
+3. Save the token username and password
+
+### 2. Set Repository Secrets in GitHub
+
+Set these secrets in *Settings → Secrets and variables → Actions*:
+
+- `CENTRAL_TOKEN_USERNAME` - User token username from step 1
+- `CENTRAL_TOKEN_PASSWORD` - User token password from step 1
+- `GPG_PRIVATE_KEY` (ASCII-armored) (use `data/scripts/generate-gpg-secrets.sh`)
+- `GPG_PASSPHRASE` (if applicable) (see `data/scripts/generate-gpg-secrets.sh`)
+
+## Release Workflow
+
+### Default Behavior: Manual Publishing (Conservative)
+
+By default, the release workflow uploads and validates artifacts without automatically publishing them. This allows for review before they go public to Maven Central.
+
+**Option 1: Push a tag (automatic trigger, manual review)**
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The GitHub Actions workflow will automatically:
+1. Build the release artifacts
+2. Sign them with GPG
+3. Upload to Central Publishing Portal
+4. Validate the bundle
+5. **Stop** (waiting for manual publishing)
+6. You review at https://central.sonatype.com/publishing/deployments
+7. You click "Publish" to make them live on Maven Central
+
+**Option 2: Manual workflow dispatch (manual review)**
+
+Go to GitHub → Actions → "Release to Maven Central" → "Run workflow" → Set `autoPublish = false` → "Run workflow"
+
+This gives you the same result as pushing a tag: artifacts are uploaded and validated, waiting for manual publishing.
+
+### Auto-Publishing to Maven Central
+
+**Option 3: Auto-publish via workflow dispatch**
+
+Go to GitHub → Actions → "Release to Maven Central" → "Run workflow" → Set `autoPublish = true` → "Run workflow"
+
+This will:
+1. Build and upload artifacts
+2. Validate the bundle
+3. Automatically publish to Maven Central (no manual review)
+4. Artifacts appear on Maven Central after ~10 minutes
+
+---
+
+## How the Release Workflow Works
+
+The workflow is configured with two trigger modes:
+
+1. **Tag push** (`git push` with a tag matching `v*.*.*`):
+   - Automatic trigger (no manual action needed)
+   - Uses `autoPublish = false` (default)
+   - Artifacts are uploaded and validated, waiting for manual publishing
+2. **Manual dispatch** (GitHub Actions UI):
+   - Manual trigger via "Run workflow" button
+   - User chooses `autoPublish = true` or `false`
+   - Control over manual vs. automatic publishing
+
+The Maven command parameter `-DautoPublish` controls the Central Publishing Plugin behavior:
+- `false`: Artifacts uploaded and validated; you publish manually via https://central.sonatype.com/publishing/deployments (conservative, recommended)
+- `true`: Artifacts uploaded, validated, and automatically published (immediate release)
+
+---
 
 Optional: run a build/verify in CI before creating the release tag.
 
@@ -19,7 +92,7 @@ The release publishes these modules and attached artifacts:
 - `plugins/jdsql-mysql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `plugins/jdsql-postgresql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 
-Note: `jdsql-core` is built locally but has `<maven.deploy.skip>true</maven.deploy.skip>` and is not published to OSSRH.
+Note: `jdsql-core` is built locally but has `<maven.deploy.skip>true</maven.deploy.skip>` and is not published.
 
 **Why `packaging = pom` modules publish only a POM**
 
@@ -51,7 +124,15 @@ test -f plugins/target/plugins-1.0.jar && echo "unexpected JAR for plugins" || e
 
 **Notes**
 
-- The CI release workflow config in `.github/workflows/release.yml` runs `mvn -B -DskipTests clean deploy -P release` and uses `actions/setup-java` to configure OSSRH credentials and GPG signing.
+- The CI release workflow config in `.github/workflows/release.yml` runs `mvn -B -DskipTests -DautoPublish=<value> clean deploy -P release` and uses `actions/setup-java` to configure Central Portal credentials and GPG signing.
 - Source and Javadoc jars are attached via the source/javadoc plugins configured in the parent POM. GPG signatures (`.asc`) are produced during the verify phase when signing is enabled (CI supplies the GPG key).
+- By default, `autoPublish=false`, which provides a conservative manual-review approach.
+- **OSSRH has been sunset as of June 30, 2025.** This project now uses the Central Publishing Portal exclusively.
 
-If you want, I can also add a short checklist with exact expected file paths including the concrete version numbers, or add an aggregate `-pl` command that builds only the publishable modules.
+**References**
+
+- [Central Publishing Portal Documentation](https://central.sonatype.org/)
+- [Generate Portal User Token](https://central.sonatype.org/publish/generate-portal-token/)
+- [Maven Publishing Guide](https://central.sonatype.org/publish/publish-portal-maven/)
+- [OSSRH EOL Migration Guide](https://central.sonatype.org/pages/ossrh-eol/)
+
