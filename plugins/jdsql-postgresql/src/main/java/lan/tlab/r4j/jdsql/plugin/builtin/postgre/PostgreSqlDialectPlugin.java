@@ -32,7 +32,7 @@ import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.ast.visitor.ps.strategy.Standar
  * <b>PostgreSQL Version Compatibility:</b>
  * <p>
  * This plugin is designed to work with PostgreSQL 15.x and later versions. It uses the semantic
- * version range "^15.0.0" which matches all PostgreSQL 15.x versions (>=15.0.0 and <16.0.0).
+ * version range "^15.0.0" which matches all PostgreSQL 15.x versions ({@code >=15.0.0 and <16.0.0}).
  * Many features are also compatible with PostgreSQL 12+, but the plugin is optimized for
  * PostgreSQL 15 and newer.
  * <p>
@@ -79,7 +79,7 @@ public final class PostgreSqlDialectPlugin {
      * The version range of PostgreSQL supported by this plugin.
      * <p>
      * This uses semantic versioning with a caret range "^15.0.0", which means it supports
-     * all PostgreSQL 15.x versions (>=15.0.0 and <16.0.0). The registry will perform semantic
+     * all PostgreSQL 15.x versions ({@code >=15.0.0 and <16.0.0}). The registry will perform semantic
      * version matching when resolving this plugin.
      */
     public static final String DIALECT_VERSION = "^15.0.0";
