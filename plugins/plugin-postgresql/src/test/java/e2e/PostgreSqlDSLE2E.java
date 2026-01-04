@@ -1,4 +1,4 @@
-package e2e.system;
+package e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
