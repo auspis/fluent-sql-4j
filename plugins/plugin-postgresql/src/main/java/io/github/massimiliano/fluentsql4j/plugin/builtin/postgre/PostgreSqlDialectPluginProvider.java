@@ -8,7 +8,7 @@ import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
  * <p>
  * This class enables automatic discovery of the PostgreSQL dialect plugin through
  * Java's {@link java.util.ServiceLoader} mechanism. It is registered in the
- * {@code META-INF/services/lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider} file.
+ * {@code META-INF/services/io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider} file.
  * <p>
  * <b>Service Loading Process:</b>
  * <ol>

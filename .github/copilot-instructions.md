@@ -22,11 +22,11 @@ This repository is a multi-module Java project managed with Maven. It is structu
 
 - Root directory contains:
   - `pom.xml` (parent POM)
-  - Subfolders for each module (e.g., `jdsql-core/`, `plugins/`, `test-support/`)
+  - Subfolders for each module (e.g., `core/`, `plugins/`, `test-support/`)
   - `.github/` for GitHub-specific configuration
 - Common modules:
-  - `jdsql-core/`: Core SQL AST and DSL logic, plus all tests (unit, integration, E2E)
-  - `plugins/jdsql-mysql/`: MySQL dialect plugin
+  - `core/`: Core SQL AST and DSL logic, plus all tests (unit, integration, E2E)
+  - `plugins/plugin-mysql/`: MySQL dialect plugin
   - `test-support/`: Shared test utilities and helpers
 
 ## Conventions
@@ -144,29 +144,29 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 2. Add a `pom.xml` for the module
 3. Register the module in the root `pom.xml` under `<modules>`
 
-**Note**: All tests (unit, integration, E2E) are now consolidated in the `jdsql-core/` module. Do not create separate test modules.
+**Note**: All tests (unit, integration, E2E) are now consolidated in the `core/` module. Do not create separate test modules.
 
 ## How to Run Tests
 
 - make sure you are in the root folder or `cd` to it
-- Use `./mvnw clean test -am -pl jdsql-core` to run unit and component tests (fast feedback, no database)
-- Use `./mvnw clean verify -am -pl jdsql-core` to run all tests (unit + component + integration + E2E)
-- Use `./mvnw test -am -pl jdsql-core -Dgroups=component` to run only component tests
-- Use `./mvnw verify -am -pl jdsql-core -Dgroups=integration` to run only integration tests
-- Use `./mvnw verify -am -pl jdsql-core -Dgroups=e2e` to run only E2E tests
+- Use `./mvnw clean test -am -pl core` to run unit and component tests (fast feedback, no database)
+- Use `./mvnw clean verify -am -pl core` to run all tests (unit + component + integration + E2E)
+- Use `./mvnw test -am -pl core -Dgroups=component` to run only component tests
+- Use `./mvnw verify -am -pl core -Dgroups=integration` to run only integration tests
+- Use `./mvnw verify -am -pl core -Dgroups=e2e` to run only E2E tests
 - The project is a multi module maven project, so in some cases you may need to add -am to compile dependencies
 - When you need to run integration tests try to run only the needed ones
-- All tests are now consolidated in the `jdsql-core/` module with the following structure:
-  - `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/`: Unit tests (fast, isolated, single class)
-  - `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/*ComponentTest.java`: Component tests (fast, multiple classes, mocked JDBC)
-  - `jdsql-core/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
-  - `jdsql-core/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
+- All tests are now consolidated in the `core/` module with the following structure:
+  - `core/src/test/java/io/github/massimiliano/fluentsql4j/`: Unit tests (fast, isolated, single class)
+  - `core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/*ComponentTest.java`: Component tests (fast, multiple classes, mocked JDBC)
+  - `core/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
+  - `core/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
 
 ## Test Categories (Test Pyramid)
 
 The project uses a structured test pyramid with four main categories:
 
-### Unit Tests (`jdsql-core/src/test/java/lan/tlab/r4j/jdsql/`)
+### Unit Tests (`core/src/test/java/io/github/massimiliano/fluentsql4j/`)
 
 - **Purpose**: Test individual components in isolation
 - **Speed**: Very fast (🚀)
@@ -174,7 +174,7 @@ The project uses a structured test pyramid with four main categories:
 - **Database**: No database access
 - **Examples**: `SemVerUtilTest`, `StandardSqlColumnReferencePsStrategyTest`
 
-### Component Tests (`jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/*ComponentTest.java`)
+### Component Tests (`core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/*ComponentTest.java`)
 
 - **Purpose**: Test interaction between multiple classes within a component (DSL → AST → Visitor → SQL Renderer)
 - **Speed**: Fast (🚀)
@@ -183,7 +183,7 @@ The project uses a structured test pyramid with four main categories:
 - **Annotation**: `@ComponentTest` (JUnit tag: `component`)
 - **Examples**: `SelectDSLComponentTest`, `DSLRegistryComponentTest`
 
-### Integration Tests (`jdsql-core/src/test/java/integration/`)
+### Integration Tests (`core/src/test/java/integration/`)
 
 - **Purpose**: Test component interactions and data flow
 - **Speed**: Medium (🏃)
@@ -191,7 +191,7 @@ The project uses a structured test pyramid with four main categories:
 - **Database**: Embedded H2 or Testcontainers
 - **Examples**: `SelectBuilderIntegrationTest`, `MysqlDialectPluginIntegrationTest`
 
-### End-to-End Tests (`jdsql-core/src/test/java/e2e/system/`)
+### End-to-End Tests (`core/src/test/java/e2e/system/`)
 
 - **Purpose**: Test complete workflows from start to finish
 - **Speed**: Slow (🐌)
@@ -207,10 +207,10 @@ The project uses a structured test pyramid with four main categories:
 
 ### Writing New Tests
 
-- **Unit tests**: Place in `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/` following existing package structure
-- **Component tests**: Place in `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/` with `@ComponentTest` annotation and suffix `*ComponentTest.java`
-- **Integration tests**: Place in `jdsql-core/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
-- **E2E tests**: Place in `jdsql-core/src/test/java/e2e/system/` with `@E2ETest` annotation
+- **Unit tests**: Place in `core/src/test/java/io/github/massimiliano/fluentsql4j/` following existing package structure
+- **Component tests**: Place in `core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/` with `@ComponentTest` annotation and suffix `*ComponentTest.java`
+- **Integration tests**: Place in `core/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
+- **E2E tests**: Place in `core/src/test/java/e2e/system/` with `@E2ETest` annotation
 
 ## Test Helper and Assertion Utilities
 
@@ -218,7 +218,7 @@ The project provides helper and utility classes to reduce boilerplate in mocked 
 
 ### SqlCaptureHelper (Helper Class)
 
-**Location**: `test-support/src/main/java/lan/tlab/r4j/jdsql/test/helper/SqlCaptureHelper.java`
+**Location**: `test-support/src/main/java/io/github/massimiliano/fluentsql4j/test/helper/SqlCaptureHelper.java`
 
 **Purpose**: Encapsulates common JDBC mock setup (Connection, PreparedStatement, SQL ArgumentCaptor).
 
@@ -249,7 +249,7 @@ class MyBuilderTest {
 
 ### SqlAssert (Custom AssertJ Assertion)
 
-**Location**: `test-support/src/main/java/lan/tlab/r4j/jdsql/test/SqlAssert.java`
+**Location**: `test-support/src/main/java/io/github/massimiliano/fluentsql4j/test/SqlAssert.java`
 
 **Purpose**: Fluent assertions for SQL strings, similar to JsonAssert.
 
@@ -275,8 +275,8 @@ assertThatSql(sql)
 
 ### Related Documentation
 
-- **Full guide**: `jdsql-core/data/test-helpers-usage-guide.md`
-- **Example**: `jdsql-core/src/test/java/lan/tlab/r4j/jdsql/dsl/select/SelectBuilderRefactoredExampleTest.java`
+- **Full guide**: `core/data/test-helpers-usage-guide.md`
+- **Example**: `core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/select/SelectBuilderRefactoredExampleTest.java`
 
 ## Code Formatting
 
