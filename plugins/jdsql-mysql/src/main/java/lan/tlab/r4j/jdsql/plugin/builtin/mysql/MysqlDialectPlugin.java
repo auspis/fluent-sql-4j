@@ -40,7 +40,7 @@ import lan.tlab.r4j.jdsql.plugin.builtin.mysql.dsl.MysqlDSL;
  * <b>MySQL Version Compatibility:</b>
  * <p>
  * This plugin is designed to work with MySQL 8.x and later versions. It uses the semantic
- * version range "^8.0.0" which matches all MySQL 8.x versions (>=8.0.0 and <9.0.0).
+ * version range "^8.0.0" which matches all MySQL 8.x versions ({@code >=8.0.0 and <9.0.0}).
  * Many features are also compatible with MySQL 5.7, but the plugin is optimized for
  * MySQL 8.0 and newer.
  * <p>
@@ -127,7 +127,7 @@ public final class MysqlDialectPlugin {
      * The version range of MySQL supported by this plugin.
      * <p>
      * This uses semantic versioning with a caret range "^8.0.0", which means it supports
-     * all MySQL 8.x versions (>=8.0.0 and <9.0.0). The registry will perform semantic
+     * all MySQL 8.x versions ({@code >=8.0.0 and <9.0.0}). The registry will perform semantic
      * version matching when resolving this plugin.
      * <p>
      * For exact version requirements or MySQL 5.7 support, additional plugins can be
