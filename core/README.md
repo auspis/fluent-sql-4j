@@ -422,7 +422,7 @@ The SQL DSL uses a plugin system to support multiple database dialects. Each plu
 ### Available Plugins
 
 - **Standard SQL**: SQL:2008/2016 compliant (built-in)
-- **MySQL**: MySQL 8.0+ support (see [`plugins/jdsql-mysql/`](../plugins/jdsql-mysql/))
+- **MySQL**: MySQL 8.0+ support (see [`plugins/plugin-mysql/`](../plugins/plugin-mysql/))
 - **Custom Dialects**: Create your own (see [Plugin Development Guide](../data/wiki/PLUGIN_DEVELOPMENT.md))
 
 ### Creating Custom Plugins
@@ -436,7 +436,7 @@ To add support for a new database dialect:
 For complete examples and step-by-step instructions, see:
 
 - **[Plugin Development Guide](../data/wiki/PLUGIN_DEVELOPMENT.md)**: Comprehensive guide with PostgreSQL example
-- **[MySQL Plugin](../plugins/jdsql-mysql/)**: Reference implementation
+- **[MySQL Plugin](../plugins/plugin-mysql/)**: Reference implementation
 
 ---
 
