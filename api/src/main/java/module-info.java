@@ -1,6 +1,5 @@
-module lan.tlab.r4j.jdsql.api {
-    // Required dependencies - make jdsql-core transitive so users get all API classes
-    requires transitive lan.tlab.r4j.jdsql.core;
+module io.github.massimiliano.fluentsql4j.api {
+    requires transitive io.github.massimiliano.fluentsql4j.core;
     requires transitive org.slf4j;
     requires java.sql;
 }

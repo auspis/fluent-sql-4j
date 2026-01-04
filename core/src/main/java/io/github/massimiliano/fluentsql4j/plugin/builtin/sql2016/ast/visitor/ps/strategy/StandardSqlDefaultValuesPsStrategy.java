@@ -1,0 +1,17 @@
+package io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
+
+import io.github.massimiliano.fluentsql4j.ast.dml.component.InsertData.DefaultValues;
+import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
+import io.github.massimiliano.fluentsql4j.ast.visitor.Visitor;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.strategy.DefaultValuesPsStrategy;
+import java.util.List;
+
+public class StandardSqlDefaultValuesPsStrategy implements DefaultValuesPsStrategy {
+    @Override
+    public PreparedStatementSpec handle(
+            DefaultValues defaultValues, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
+        // For SQL DEFAULT VALUES
+        return new PreparedStatementSpec("DEFAULT VALUES", List.of());
+    }
+}
