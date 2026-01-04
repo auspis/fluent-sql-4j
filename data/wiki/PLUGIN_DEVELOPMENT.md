@@ -689,7 +689,7 @@ String result = strategy.render(call, renderer, ctx);
 
 See the MySQL plugin implementation as a reference:
 
-- [`jdsql-mysql/`](../../plugins/jdsql-mysql/) - Complete working example
+- [`plugin-mysql/`](../../plugins/plugin-mysql/) - Complete working example
 - Provider: `MysqlDialectPluginProvider`
 - DSL extension: `MysqlDSL` with `GROUP_CONCAT` support
 - Custom rendering: `MysqlCustomFunctionCallRenderStrategy`
@@ -699,5 +699,5 @@ See the MySQL plugin implementation as a reference:
 
 - [DSL Usage Guide](DSL_USAGE_GUIDE.md) - Examples of using the JDSQL DSL
 - [Developer Guide](DEVELOPER_GUIDE.md) - Testing and development workflow
-- [jdsql-core README](../../jdsql-core/README.md) - Core architecture and AST
+- [core README](../../core/README.md) - Core architecture and AST
 

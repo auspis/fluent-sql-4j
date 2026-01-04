@@ -163,7 +163,7 @@ GROUP BY "stores"."region"
 
 ## Additional Resources
 
-- **[Core Documentation](../../jdsql-core/)**: SQL AST and plugin architecture
+- **[Core Documentation](../../core/)**: SQL AST and plugin architecture
 - **[DSL Usage Guide](../../data/wiki/DSL_USAGE_GUIDE.md)**: Complete DSL reference
 - **[Plugin Development Guide](../../data/wiki/PLUGIN_DEVELOPMENT.md)**: How to create custom plugins
 

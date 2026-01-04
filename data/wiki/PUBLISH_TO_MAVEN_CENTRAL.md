@@ -108,13 +108,13 @@ You can verify this locally:
 ./mvnw -P release -DskipTests clean install
 
 # Check module target artifacts (replace '1.0' with the actual version if different)
-ls -l jdsql-api/target/jdsql-api-*.jar jdsql-api/target/jdsql-api-*-sources.jar jdsql-api/target/jdsql-api-*-javadoc.jar
-ls -l jdsql-spi/target/jdsql-spi-*.jar jdsql-spi/target/jdsql-spi-*-sources.jar jdsql-spi/target/jdsql-spi-*-javadoc.jar
+ls -l api/target/api-*.jar api/target/api-*-sources.jar api/target/api-*-javadoc.jar
+ls -l spi/target/spi-*.jar spi/target/spi-*-sources.jar spi/target/spi-*-javadoc.jar
 ls -l test-support/target/test-support-*.jar
-ls -l plugins/jdsql-mysql/target/jdsql-mysql-*.jar plugins/jdsql-postgresql/target/jdsql-postgresql-*.jar
+ls -l plugins/plugin-mysql/target/plugin-mysql-*.jar plugins/plugin-postgresql/target/plugin-postgresql-*.jar
 
 # After 'install' verify local repository coordinates
-ls -l ~/.m2/repository/lan/tlab/jdsql-api/* ~/.m2/repository/lan/tlab/jdsql-spi/*
+ls -l ~/.m2/repository/lan/tlab/api/* ~/.m2/repository/lan/tlab/spi/*
 
 # Verify packaging=pom modules produce a POM and no JAR
 ls -l plugins/target/plugins-*.pom

@@ -4,7 +4,7 @@ module io.github.massimiliano.fluentsql4j.core {
     requires transitive java.sql;
     requires static lombok;
 
-    // Export all packages with actual Java files - visibility will be controlled by jdsql-api and jdsql-spi
+    // Export all packages with actual Java files - visibility will be controlled by api and spi
     exports io.github.massimiliano.fluentsql4j.dsl;
     exports io.github.massimiliano.fluentsql4j.dsl.select;
     exports io.github.massimiliano.fluentsql4j.dsl.insert;
