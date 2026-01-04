@@ -7,22 +7,19 @@
     <version>1.0</version>
   </parent>
   <artifactId>jdsql-spi</artifactId>
-  <name>JDSQL SPI</name>
-  <description>Service Provider Interface for JDSQL plugins - AST, visitors, and strategies</description>
+  <name>jdsql-spi</name>
+  <description>Service Provider Interface for plugins - AST, visitors, and strategies</description>
 
   <dependencies>
-    <!-- Transitive dependency on jdsql-api -->
     <dependency>
       <groupId>io.github.massimiliano</groupId>
       <artifactId>jdsql-api</artifactId>
     </dependency>
-    <!-- Compile-time dependency on jdsql-core for implementation -->
     <dependency>
       <groupId>io.github.massimiliano</groupId>
       <artifactId>jdsql-core</artifactId>
       <scope>compile</scope>
     </dependency>
-    <!-- SemVer support for version matching -->
     <dependency>
       <groupId>org.semver4j</groupId>
       <artifactId>semver4j</artifactId>
