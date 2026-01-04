@@ -104,7 +104,7 @@ import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
  * <p>
  * This plugin is automatically discovered through Java's {@link java.util.ServiceLoader}
  * mechanism via {@link MysqlDialectPluginProvider}. The provider is registered in
- * {@code META-INF/services/lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider}.
+ * module-info.java.
  *
  * @see SqlDialectPlugin
  * @see MysqlDialectPluginProvider
@@ -195,7 +195,7 @@ public final class MysqlDialectPlugin {
      * ).from("users").build(connection);
      * }</pre>
      *
-     * @return a new {@link lan.tlab.r4j.sql.dsl.mysql.MysqlDSL} instance configured for MySQL, never {@code null}
+     * @return a new {@link io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL} instance configured for MySQL, never {@code null}
      */
     private static DSL createDSL() {
         return new MysqlDSL(createPreparedStatementSpecFactory());
