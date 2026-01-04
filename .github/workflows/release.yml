@@ -37,5 +37,8 @@ jobs:
       - name: Build and deploy to Maven Central Portal
         env:
           GPG_TTY: /dev/console
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
+          # ensure gpg agent uses the passphrase from env for the signing command
+          export GPG_TTY=/dev/console
           mvn -B -DskipTests -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} clean deploy -P release
