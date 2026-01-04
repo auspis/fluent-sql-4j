@@ -8,7 +8,7 @@
 
   <!-- Project metadata required for publishing on Maven Central -->
   <name>jdsql</name>
-  <description>Repository for java</description>
+  <description>Java DSL for SQL</description>
   <url>https://github.com/massimiliano/jdsql</url>
 
   <licenses>
@@ -174,10 +174,6 @@
         <groupId>org.testcontainers</groupId>
         <artifactId>mysql</artifactId>
         <version>${dep.testcontainer.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
       </dependency>
       <dependency>
         <groupId>com.mysql</groupId>
@@ -415,7 +411,6 @@
           <excludedGroups>${test.groups.slow}</excludedGroups>
         </configuration>
       </plugin>
-      <!-- Failsafe: run only integration and e2e tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -489,7 +484,6 @@
       </activation>
       <build>
         <plugins>
-          <!-- Attach sources jar -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -504,13 +498,11 @@
             </executions>
           </plugin>
 
-          <!-- Attach javadoc jar -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>${maven.javadoc.plugin.version}</version>
             <configuration>
-              <!-- Ignore Javadoc errors caused by Lombok-generated inner classes (e.g., SelectStatement.SelectStatementBuilder) -->
               <doclint>none</doclint>
               <failOnError>false</failOnError>
             </configuration>
@@ -524,7 +516,6 @@
             </executions>
           </plugin>
 
-          <!-- GPG signing plugin (artifacts will be signed during verify/deploy) -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
@@ -540,7 +531,6 @@
             </executions>
           </plugin>
 
-          <!-- Central Publishing Maven Plugin for Maven Central -->
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
@@ -549,9 +539,7 @@
             <configuration>
               <publishingServerId>central</publishingServerId>
               <tokenAuth>true</tokenAuth>
-              <!-- autoPublish: false = manual publishing required (conservative), true = auto-publish -->
               <autoPublish>false</autoPublish>
-              <!-- waitUntil: validated (default) = wait for upload and validation -->
               <waitUntil>validated</waitUntil>
             </configuration>
           </plugin>
