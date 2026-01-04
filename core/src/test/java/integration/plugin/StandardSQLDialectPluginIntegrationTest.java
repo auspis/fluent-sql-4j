@@ -1,26 +1,26 @@
 package integration.plugin;
 
-import static lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_NAME;
-import static lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
+import static io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_NAME;
+import static io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.massimiliano.fluentsql4j.dsl.DSL;
+import io.github.massimiliano.fluentsql4j.dsl.util.ResultSetUtil;
+import io.github.massimiliano.fluentsql4j.functional.Result;
+import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
+import io.github.massimiliano.fluentsql4j.test.util.annotation.IntegrationTest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import lan.tlab.r4j.jdsql.ast.visitor.PreparedStatementSpecFactory;
-import lan.tlab.r4j.jdsql.dsl.DSL;
-import lan.tlab.r4j.jdsql.dsl.util.ResultSetUtil;
-import lan.tlab.r4j.jdsql.functional.Result;
-import lan.tlab.r4j.jdsql.plugin.SqlDialectPlugin;
-import lan.tlab.r4j.jdsql.plugin.SqlDialectPluginRegistry;
-import lan.tlab.r4j.jdsql.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import lan.tlab.r4j.jdsql.test.util.TestDatabaseUtil;
-import lan.tlab.r4j.jdsql.test.util.annotation.IntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

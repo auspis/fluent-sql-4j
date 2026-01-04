@@ -1,0 +1,54 @@
+package io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
+
+import io.github.massimiliano.fluentsql4j.ast.ddl.definition.ColumnDefinition;
+import io.github.massimiliano.fluentsql4j.ast.ddl.definition.DataType.SimpleDataType;
+import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.massimiliano.fluentsql4j.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+class StandardSqlColumnDefinitionPsStrategyTest {
+
+    private final ColumnDefinitionPsStrategy strategy = new StandardSqlColumnDefinitionPsStrategy();
+    private final AstToPreparedStatementSpecVisitor specFactory =
+            AstToPreparedStatementSpecVisitor.builder().build();
+    private final AstContext context = new AstContext();
+
+    @Test
+    void shouldHandleNullObject() {
+        ColumnDefinition nullColumnDefinition = ColumnDefinition.nullObject();
+
+        PreparedStatementSpec result = strategy.handle(nullColumnDefinition, specFactory, context);
+
+        Assertions.assertThat(result.sql()).isEmpty();
+        Assertions.assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void shouldHandleSimpleColumn() {
+        ColumnDefinition columnDefinition = ColumnDefinition.builder()
+                .name("id")
+                .type(new SimpleDataType("INTEGER"))
+                .build();
+
+        PreparedStatementSpec result = strategy.handle(columnDefinition, specFactory, context);
+
+        Assertions.assertThat(result.sql()).isEqualTo("\"id\" INTEGER");
+        Assertions.assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void shouldHandleColumnWithDifferentDataType() {
+        ColumnDefinition columnDefinition = ColumnDefinition.builder()
+                .name("name")
+                .type(new SimpleDataType("VARCHAR"))
+                .build();
+
+        PreparedStatementSpec result = strategy.handle(columnDefinition, specFactory, context);
+
+        Assertions.assertThat(result.sql()).isEqualTo("\"name\" VARCHAR");
+        Assertions.assertThat(result.parameters()).isEmpty();
+    }
+}
