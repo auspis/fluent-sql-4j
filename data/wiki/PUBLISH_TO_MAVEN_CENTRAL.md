@@ -86,13 +86,13 @@ Optional: run a build/verify in CI before creating the release tag.
 
 The release publishes these modules and attached artifacts:
 
-- `jdsql-api`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
-- `jdsql-spi`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
+- `api`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
+- `spi`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `test-support`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
-- `plugins/jdsql-mysql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
-- `plugins/jdsql-postgresql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
+- `plugin-mysql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
+- `plugin-postgresql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 
-Note: `jdsql-core` is built locally but has `<maven.deploy.skip>true</maven.deploy.skip>` and is not published.
+Note: `core` is built locally but has `<maven.deploy.skip>true</maven.deploy.skip>` and is not published.
 
 **Why `packaging = pom` modules publish only a POM**
 
