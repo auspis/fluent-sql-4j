@@ -52,7 +52,7 @@ import io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.
  * <p>
  * This plugin is automatically discovered through Java's {@link java.util.ServiceLoader}
  * mechanism via {@link StandardSQLDialectPluginProvider}. The provider is registered in
- * {@code META-INF/services/lan.tlab.r4j.sql.plugin.SqlDialectPluginProvider}.
+ * module-info.java.
  *
  * @see SqlDialectPlugin
  * @see StandardSQLDialectPluginProvider
