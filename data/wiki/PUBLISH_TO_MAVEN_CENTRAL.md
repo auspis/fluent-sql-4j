@@ -9,19 +9,6 @@ Set the repository secrets in *Settings → Secrets and variables → Actions*:
 
 Optional: run a build/verify in CI before creating the release tag.
 
-Local checks:
-
-**Publish to Maven Central**
-
-Set the repository secrets in *Settings → Secrets and variables → Actions*:
-
-- `OSSRH_USERNAME`
-- `OSSRH_PASSWORD`
-- `GPG_PRIVATE_KEY` (ASCII-armored) — see `data/scripts/generate-gpg-secrets.sh`
-- `GPG_PASSPHRASE` (if applicable) — see `data/scripts/generate-gpg-secrets.sh`
-
-Optional: run a build/verify in CI before creating the release tag.
-
 **Artifacts published by the release**
 
 The release publishes these modules and attached artifacts:
