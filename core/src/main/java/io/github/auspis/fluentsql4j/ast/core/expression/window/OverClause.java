@@ -1,11 +1,11 @@
 package io.github.auspis.fluentsql4j.ast.core.expression.window;
 
-import java.util.List;
-import java.util.stream.Stream;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Represents the OVER clause used with window functions. The OVER clause defines the window

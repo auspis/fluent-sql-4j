@@ -1,9 +1,7 @@
 package io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.dialect.sql2016;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
@@ -12,6 +10,9 @@ import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVis
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCustomFunctionCallPsStrategy;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 class StandardSqlCustomFunctionCallPsStrategyTest {
     private final CustomFunctionCallPsStrategy strategy = new StandardSqlCustomFunctionCallPsStrategy();

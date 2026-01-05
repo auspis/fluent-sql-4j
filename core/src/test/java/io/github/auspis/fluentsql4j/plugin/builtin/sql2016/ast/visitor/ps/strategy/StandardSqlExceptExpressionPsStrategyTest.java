@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.set.ExceptExpression;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.NullSetExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.ExceptExpressionPsStrategy;
-import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlExceptExpressionPsStrategy;
+import org.junit.jupiter.api.Test;
 
 class StandardSqlExceptExpressionPsStrategyTest {
 

@@ -1,8 +1,8 @@
 package io.github.auspis.fluentsql4j.plugin;
 
+import io.github.auspis.fluentsql4j.dsl.DSL;
 import java.util.Objects;
 import java.util.function.Supplier;
-import io.github.auspis.fluentsql4j.dsl.DSL;
 
 /**
  * Immutable record representing a SQL dialect plugin.

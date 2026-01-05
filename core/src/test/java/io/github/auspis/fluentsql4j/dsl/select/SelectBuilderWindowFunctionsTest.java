@@ -1,7 +1,8 @@
 package io.github.auspis.fluentsql4j.dsl.select;
 
-import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
+import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
 import static org.mockito.Mockito.verify;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.OverClause;
@@ -10,9 +11,8 @@ import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
 import io.github.auspis.fluentsql4j.ast.dql.projection.ScalarExpressionProjection;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.SQLException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

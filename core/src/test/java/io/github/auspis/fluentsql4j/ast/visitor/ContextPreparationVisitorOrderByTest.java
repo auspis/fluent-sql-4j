@@ -1,8 +1,7 @@
 package io.github.auspis.fluentsql4j.ast.visitor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.dql.clause.From;
@@ -11,8 +10,8 @@ import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
 import io.github.auspis.fluentsql4j.ast.dql.projection.ScalarExpressionProjection;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
-import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
-import io.github.auspis.fluentsql4j.ast.visitor.ContextPreparationVisitor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ContextPreparationVisitorOrderByTest {
 
@@ -81,10 +80,8 @@ class ContextPreparationVisitorOrderByTest {
                         new ScalarExpressionProjection(ColumnReference.of("products", "price"))))
                 .from(From.fromTable("products"))
                 .orderBy(OrderBy.of(Sorting.desc(
-                        io.github.auspis.fluentsql4j.ast.core.expression.scalar.ArithmeticExpression
-                                .multiplication(
-                                        ColumnReference.of("products", "price"),
-                                        ColumnReference.of("products", "quantity")))))
+                        io.github.auspis.fluentsql4j.ast.core.expression.scalar.ArithmeticExpression.multiplication(
+                                ColumnReference.of("products", "price"), ColumnReference.of("products", "quantity")))))
                 .build();
 
         AstContext result = statement.accept(visitor, new AstContext());

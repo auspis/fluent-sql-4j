@@ -1,12 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl.select;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCallImpl;
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.CountDistinct;
@@ -35,6 +28,13 @@ import io.github.auspis.fluentsql4j.dsl.clause.HavingBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
 import io.github.auspis.fluentsql4j.dsl.clause.SupportsWhere;
 import io.github.auspis.fluentsql4j.dsl.util.PsUtil;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class SelectBuilder implements SupportsWhere<SelectBuilder> {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();

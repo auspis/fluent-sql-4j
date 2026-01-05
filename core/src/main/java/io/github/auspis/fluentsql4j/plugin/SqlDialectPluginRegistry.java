@@ -1,5 +1,12 @@
 package io.github.auspis.fluentsql4j.plugin;
 
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.functional.Result.Failure;
+import io.github.auspis.fluentsql4j.functional.Result.Success;
+import io.github.auspis.fluentsql4j.plugin.util.SemVerUtil;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,13 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.auspis.fluentsql4j.dsl.DSL;
-import io.github.auspis.fluentsql4j.functional.Result;
-import io.github.auspis.fluentsql4j.functional.Result.Failure;
-import io.github.auspis.fluentsql4j.functional.Result.Success;
-import io.github.auspis.fluentsql4j.plugin.util.SemVerUtil;
 
 /**
  * Immutable registry for SQL dialect plugins.
@@ -268,7 +268,7 @@ public final class SqlDialectPluginRegistry {
      * Retrieves a {@link io.github.auspis.fluentsql4j.dsl.DSL} instance for the specified SQL dialect and version.
      * <p>
      * This method returns the DSL instance created by the plugin's {@code createDSL()} method.
-     * This allows dialect-specific DSL extensions (like {@link io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MySQLDSL})
+     * This allows dialect-specific DSL extensions (like {@link io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MySQLDSL})
      * to be properly returned to callers.
      * <p>
      * The dialect name is matched case-insensitively. The registry finds all plugins

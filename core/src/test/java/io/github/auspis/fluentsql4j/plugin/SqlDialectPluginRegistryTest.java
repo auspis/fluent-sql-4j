@@ -3,12 +3,11 @@ package io.github.auspis.fluentsql4j.plugin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.functional.Result.Failure;
 import io.github.auspis.fluentsql4j.functional.Result.Success;
-import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
-import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 import io.github.auspis.fluentsql4j.plugin.util.SqlDialectPluginUtil;
 import io.github.auspis.fluentsql4j.plugin.util.TestDialectPlugin;
 import java.util.Collections;

@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.dsl;
 
+import io.github.auspis.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.functional.Result.Failure;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import io.github.auspis.fluentsql4j.functional.Result;
-import io.github.auspis.fluentsql4j.functional.Result.Failure;
-import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 
 /**
  * Registry for managing dialect-specific DSL instances.

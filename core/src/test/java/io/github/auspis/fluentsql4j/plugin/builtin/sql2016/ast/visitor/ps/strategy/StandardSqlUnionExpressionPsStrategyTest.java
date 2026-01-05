@@ -1,7 +1,5 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.UnionExpression;
@@ -13,7 +11,8 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.UnionExpressionPsStrategy;
-import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUnionExpressionPsStrategy;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class StandardSqlUnionExpressionPsStrategyTest {
     @Test

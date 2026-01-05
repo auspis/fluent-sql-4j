@@ -3,15 +3,15 @@ package io.github.auspis.fluentsql4j.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.Expression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
 import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
-import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.ComponentTest;
+import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

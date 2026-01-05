@@ -1,11 +1,11 @@
 package io.github.auspis.fluentsql4j.ast.dml.statement;
 
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.TableExpression;
 import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
 
 public record UpdateStatement(TableExpression table, List<UpdateItem> set, Where where)
         implements DataManipulationStatement {

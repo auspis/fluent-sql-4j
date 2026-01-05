@@ -1,10 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl.delete;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Optional;
-import java.util.function.Function;
 import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.core.predicate.NullPredicate;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
@@ -14,6 +9,11 @@ import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
 import io.github.auspis.fluentsql4j.dsl.clause.SupportsWhere;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
     private DeleteStatement.DeleteStatementBuilder statementBuilder = DeleteStatement.builder();

@@ -2,12 +2,12 @@ package io.github.auspis.fluentsql4j.plugin.builtin.postgre.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.PostgreSqlAstToPreparedStatementSpecVisitorFactory;
-import io.github.auspis.fluentsql4j.plugin.builtin.postgre.dsl.PostgreSqlDSL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
