@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.dsl.mysql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;

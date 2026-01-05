@@ -1,7 +1,5 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.json.BehaviorKind;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.json.JsonQuery;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.json.WrapperBehavior;
@@ -9,6 +7,8 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.JsonQueryPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StandardSqlJsonQueryPsStrategy implements JsonQueryPsStrategy {
 

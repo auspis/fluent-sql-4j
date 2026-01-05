@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil;
 
 class ResultSetUtilExceptionTest {
 

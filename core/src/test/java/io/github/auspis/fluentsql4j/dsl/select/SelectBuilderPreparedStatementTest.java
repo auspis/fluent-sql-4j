@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.dsl.select;
 
-import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
+import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
+
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;

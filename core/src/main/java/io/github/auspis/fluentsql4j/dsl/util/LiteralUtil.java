@@ -1,9 +1,9 @@
 package io.github.auspis.fluentsql4j.dsl.util;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Utility class for creating Literal expressions from Java values.

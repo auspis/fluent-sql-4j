@@ -1,11 +1,11 @@
 package io.github.auspis.fluentsql4j.ast.dml.component;
 
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitable;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
 
 public interface MergeAction extends Visitable {
 

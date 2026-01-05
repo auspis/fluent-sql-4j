@@ -1,11 +1,11 @@
 package io.github.auspis.fluentsql4j.ast.core.expression.function.number;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
-import io.github.auspis.fluentsql4j.ast.core.expression.function.number.Round;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.NullScalarExpression;
+import org.junit.jupiter.api.Test;
 
 class RoundTest {
 

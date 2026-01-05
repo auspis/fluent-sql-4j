@@ -1,11 +1,11 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Fetch;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.FetchPsStrategy;
+import java.util.List;
 
 public class MySqlFetchPsStrategy implements FetchPsStrategy {
 

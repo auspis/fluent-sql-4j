@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.ast.dql.clause;
 
-import java.util.List;
-import java.util.stream.Stream;
 import io.github.auspis.fluentsql4j.ast.core.clause.Clause;
 import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.dql.source.FromSource;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
+import java.util.stream.Stream;
 
 public record From(List<FromSource> sources) implements Clause {
 

@@ -1,10 +1,10 @@
 package io.github.auspis.fluentsql4j.ast.ddl.definition;
 
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.Expression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
 
 public interface DataType extends Expression {
 

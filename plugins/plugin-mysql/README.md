@@ -12,7 +12,7 @@ Add the dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>io.github.massimiliano.fluentsql4j</groupId>
+    <groupId>io.github.auspis.fluentsql4j</groupId>
     <artifactId>plugin-mysql</artifactId>
     <version>${fluentsql4j.version}</version>
 </dependency>
@@ -25,8 +25,8 @@ The plugin is automatically discovered via Java ServiceLoader.
 ### Getting the MySQL DSL
 
 ```java
-import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
-import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
+import io.github.auspis.fluentsql4j.dsl.DSLRegistry;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 MysqlDSL mysql = registry.dslFor("mysql", "8.0.35", MysqlDSL.class).orElseThrow();

@@ -67,12 +67,12 @@ A helper class can be instantiated and may contain instance variables, instance,
 
 Multiple instances of a helper class can exist in our application. When different classes have common functionalities, we can group these functionalities together to form a helper class that's accessible across certain classes in our application.
 
-**Package Convention**: Helper classes must be placed in a package named `*.helper` (e.g., `io.github.massimiliano.fluentsql4j.dsl.helper`).
+**Package Convention**: Helper classes must be placed in a package named `*.helper` (e.g., `io.github.auspis.fluentsql4j.dsl.helper`).
 
 **Example of a Helper Class**:
 
 ```java
-package io.github.massimiliano.fluentsql4j.dsl.helper;
+package io.github.auspis.fluentsql4j.dsl.helper;
 
 public class QueryBuilderHelper {
     private String schema;
@@ -105,7 +105,7 @@ Methods of a utility are accessed via the class name. It makes our code more fle
 
 Java has utility classes such as java.util.Arrays, java.lang.Math, java.util.Scanner, java.util.Collections, etc.
 
-**Package Convention**: Utility classes must be placed in a package named `*.util` (e.g., `io.github.massimiliano.fluentsql4j.dsl.util`).
+**Package Convention**: Utility classes must be placed in a package named `*.util` (e.g., `io.github.auspis.fluentsql4j.dsl.util`).
 
 **Mandatory Requirements for Utility Classes**:
 - The class must be declared as `final`
@@ -116,9 +116,9 @@ Java has utility classes such as java.util.Arrays, java.lang.Math, java.util.Sca
 **Example of a Utility Class**:
 
 ```java
-package io.github.massimiliano.fluentsql4j.dsl.util;
+package io.github.auspis.fluentsql4j.dsl.util;
 
-import io.github.massimiliano.fluentsql4j.ast.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.expression.scalar.ColumnReference;
 
 public final class ColumnReferenceUtil {
 
@@ -157,8 +157,8 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 - The project is a multi module maven project, so in some cases you may need to add -am to compile dependencies
 - When you need to run integration tests try to run only the needed ones
 - All tests are now consolidated in the `core/` module with the following structure:
-  - `core/src/test/java/io/github/massimiliano/fluentsql4j/`: Unit tests (fast, isolated, single class)
-  - `core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/*ComponentTest.java`: Component tests (fast, multiple classes, mocked JDBC)
+  - `core/src/test/java/io/github/auspis/fluentsql4j/`: Unit tests (fast, isolated, single class)
+  - `core/src/test/java/io/github/auspis/fluentsql4j/dsl/*ComponentTest.java`: Component tests (fast, multiple classes, mocked JDBC)
   - `core/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
   - `core/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
 
@@ -166,7 +166,7 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 
 The project uses a structured test pyramid with four main categories:
 
-### Unit Tests (`core/src/test/java/io/github/massimiliano/fluentsql4j/`)
+### Unit Tests (`core/src/test/java/io/github/auspis/fluentsql4j/`)
 
 - **Purpose**: Test individual components in isolation
 - **Speed**: Very fast (🚀)
@@ -174,7 +174,7 @@ The project uses a structured test pyramid with four main categories:
 - **Database**: No database access
 - **Examples**: `SemVerUtilTest`, `StandardSqlColumnReferencePsStrategyTest`
 
-### Component Tests (`core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/*ComponentTest.java`)
+### Component Tests (`core/src/test/java/io/github/auspis/fluentsql4j/dsl/*ComponentTest.java`)
 
 - **Purpose**: Test interaction between multiple classes within a component (DSL → AST → Visitor → SQL Renderer)
 - **Speed**: Fast (🚀)
@@ -207,8 +207,8 @@ The project uses a structured test pyramid with four main categories:
 
 ### Writing New Tests
 
-- **Unit tests**: Place in `core/src/test/java/io/github/massimiliano/fluentsql4j/` following existing package structure
-- **Component tests**: Place in `core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/` with `@ComponentTest` annotation and suffix `*ComponentTest.java`
+- **Unit tests**: Place in `core/src/test/java/io/github/auspis/fluentsql4j/` following existing package structure
+- **Component tests**: Place in `core/src/test/java/io/github/auspis/fluentsql4j/dsl/` with `@ComponentTest` annotation and suffix `*ComponentTest.java`
 - **Integration tests**: Place in `core/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
 - **E2E tests**: Place in `core/src/test/java/e2e/system/` with `@E2ETest` annotation
 
@@ -218,7 +218,7 @@ The project provides helper and utility classes to reduce boilerplate in mocked 
 
 ### SqlCaptureHelper (Helper Class)
 
-**Location**: `test-support/src/main/java/io/github/massimiliano/fluentsql4j/test/helper/SqlCaptureHelper.java`
+**Location**: `test-support/src/main/java/io/github/auspis/fluentsql4j/test/helper/SqlCaptureHelper.java`
 
 **Purpose**: Encapsulates common JDBC mock setup (Connection, PreparedStatement, SQL ArgumentCaptor).
 
@@ -249,14 +249,14 @@ class MyBuilderTest {
 
 ### SqlAssert (Custom AssertJ Assertion)
 
-**Location**: `test-support/src/main/java/io/github/massimiliano/fluentsql4j/test/SqlAssert.java`
+**Location**: `test-support/src/main/java/io/github/auspis/fluentsql4j/test/SqlAssert.java`
 
 **Purpose**: Fluent assertions for SQL strings, similar to JsonAssert.
 
 **Usage**:
 
 ```java
-import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
+import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
 
 assertThatSql(sql)
     .isEqualTo("SELECT \"name\" FROM \"users\"")
@@ -276,7 +276,7 @@ assertThatSql(sql)
 ### Related Documentation
 
 - **Full guide**: `core/data/test-helpers-usage-guide.md`
-- **Example**: `core/src/test/java/io/github/massimiliano/fluentsql4j/dsl/select/SelectBuilderRefactoredExampleTest.java`
+- **Example**: `core/src/test/java/io/github/auspis/fluentsql4j/dsl/select/SelectBuilderRefactoredExampleTest.java`
 
 ## Code Formatting
 

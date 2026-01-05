@@ -1,10 +1,10 @@
 package io.github.auspis.fluentsql4j.dsl.table;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.github.auspis.fluentsql4j.dsl.DSL;
-import io.github.auspis.fluentsql4j.dsl.table.CreateTableBuilder;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

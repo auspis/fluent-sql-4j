@@ -1,4 +1,4 @@
-module io.github.massimiliano.fluentsql4j.core {
+module io.github.auspis.fluentsql4j.core {
     requires transitive org.slf4j;
     requires org.semver4j;
     requires transitive java.sql;

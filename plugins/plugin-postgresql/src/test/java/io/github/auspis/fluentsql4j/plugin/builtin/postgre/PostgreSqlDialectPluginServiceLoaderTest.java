@@ -1,13 +1,12 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.postgre;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
-import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
-import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
-import io.github.auspis.fluentsql4j.plugin.builtin.postgre.PostgreSqlDialectPlugin;
-import io.github.auspis.fluentsql4j.plugin.builtin.postgre.PostgreSqlDialectPluginProvider;
 
 class PostgreSqlDialectPluginServiceLoaderTest {
 

@@ -1,8 +1,7 @@
 package io.github.auspis.fluentsql4j.ast.visitor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.DenseRank;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.Lag;
@@ -14,8 +13,8 @@ import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
 import io.github.auspis.fluentsql4j.ast.dql.projection.ScalarExpressionProjection;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
-import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
-import io.github.auspis.fluentsql4j.ast.visitor.ContextPreparationVisitor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ContextPreparationVisitorWindowFunctionsTest {
 

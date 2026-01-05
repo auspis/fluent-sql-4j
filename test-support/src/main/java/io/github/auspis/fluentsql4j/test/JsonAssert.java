@@ -1,4 +1,4 @@
-package io.github.massimiliano.fluentsql4j.test;
+package io.github.auspis.fluentsql4j.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

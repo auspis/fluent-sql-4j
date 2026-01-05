@@ -1,6 +1,5 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
@@ -8,6 +7,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVis
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.ColumnReferencePsStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.EscapeStrategy;
+import java.util.List;
 
 public class StandardSqlColumnReferencePsStrategy implements ColumnReferencePsStrategy {
     @Override

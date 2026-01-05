@@ -18,8 +18,8 @@ A type-safe SQL builder for Java with multi-dialect support through a plugin sys
 ### Basic SELECT Query
 
 ```java
-import io.github.massimiliano.fluentsql4j.dsl.DSL;
-import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.dsl.DSLRegistry;
 
 // Get a DSL instance for your database
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
@@ -75,7 +75,7 @@ The project is organized as a multi-module Maven project with two main artifacts
 
     ```xml
     <dependency>
-      <groupId>io.github.massimiliano.fluentsql4j</groupId>
+      <groupId>io.github.auspis.fluentsql4j</groupId>
       <artifactId>api</artifactId>
       <version>1.0</version>
     </dependency>
@@ -87,7 +87,7 @@ The project is organized as a multi-module Maven project with two main artifacts
 
     ```xml
     <dependency>
-      <groupId>io.github.massimiliano.fluentsql4j</groupId>
+      <groupId>io.github.auspis.fluentsql4j</groupId>
       <artifactId>spi</artifactId>
       <version>1.0</version>
     </dependency>
@@ -109,13 +109,13 @@ The project is organized as a multi-module Maven project with two main artifacts
 
 ```xml
 <dependency>
-  <groupId>io.github.massimiliano.fluentsql4j</groupId>
+  <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>api</artifactId>
   <version>1.0</version>
 </dependency>
 <!-- Add dialect plugins as needed -->
 <dependency>
-  <groupId>io.github.massimiliano.fluentsql4j</groupId>
+  <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>plugin-mysql</artifactId>
   <version>1.0</version>
 </dependency>
@@ -125,7 +125,7 @@ The project is organized as a multi-module Maven project with two main artifacts
 
 ```xml
 <dependency>
-  <groupId>io.github.massimiliano.fluentsql4j</groupId>
+  <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>spi</artifactId>
   <version>1.0</version>
 </dependency>

@@ -2,12 +2,12 @@ package io.github.auspis.fluentsql4j.dsl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
-import io.github.auspis.fluentsql4j.dsl.util.LiteralUtil;
 
 class LiteralUtilTest {
 
