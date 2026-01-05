@@ -1,8 +1,7 @@
 package io.github.auspis.fluentsql4j.ast.visitor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
@@ -21,8 +20,8 @@ import io.github.auspis.fluentsql4j.ast.dql.projection.ScalarExpressionProjectio
 import io.github.auspis.fluentsql4j.ast.dql.source.FromSubquery;
 import io.github.auspis.fluentsql4j.ast.dql.source.join.OnJoin;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
-import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
-import io.github.auspis.fluentsql4j.ast.visitor.ContextPreparationVisitor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ContextPreparationVisitorTest {
 

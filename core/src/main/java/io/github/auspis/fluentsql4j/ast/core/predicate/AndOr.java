@@ -1,9 +1,9 @@
 package io.github.auspis.fluentsql4j.ast.core.predicate;
 
-import java.util.List;
-import java.util.stream.Stream;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
+import java.util.stream.Stream;
 
 public record AndOr(LogicalOperator operator, List<Predicate> operands) implements LogicalExpression {
 

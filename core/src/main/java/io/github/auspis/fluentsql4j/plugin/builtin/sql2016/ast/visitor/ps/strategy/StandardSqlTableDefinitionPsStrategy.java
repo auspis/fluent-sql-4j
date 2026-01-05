@@ -1,16 +1,16 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.IndexDefinition;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class StandardSqlTableDefinitionPsStrategy implements TableDefinitionPsStrategy {
 

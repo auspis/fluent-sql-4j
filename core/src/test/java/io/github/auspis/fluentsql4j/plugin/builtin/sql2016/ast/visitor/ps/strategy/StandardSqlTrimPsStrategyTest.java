@@ -5,14 +5,14 @@ import static io.github.auspis.fluentsql4j.ast.core.expression.function.string.T
 import static io.github.auspis.fluentsql4j.ast.core.expression.function.string.Trim.trimLeading;
 import static io.github.auspis.fluentsql4j.ast.core.expression.function.string.Trim.trimTrailing;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.TrimPsStrategy;
-import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlTrimPsStrategy;
+import org.junit.jupiter.api.Test;
 
 class StandardSqlTrimPsStrategyTest {
 

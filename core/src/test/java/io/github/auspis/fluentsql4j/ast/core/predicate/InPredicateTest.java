@@ -1,13 +1,12 @@
 package io.github.auspis.fluentsql4j.ast.core.predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.github.auspis.fluentsql4j.ast.core.expression.ValueExpression;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import io.github.auspis.fluentsql4j.ast.core.expression.ValueExpression;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.auspis.fluentsql4j.ast.core.predicate.In;
-import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 
 class InPredicateTest {
 

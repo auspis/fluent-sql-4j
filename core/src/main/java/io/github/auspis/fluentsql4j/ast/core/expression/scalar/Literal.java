@@ -1,9 +1,9 @@
 package io.github.auspis.fluentsql4j.ast.core.expression.scalar;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record Literal<R>(R value) implements ScalarExpression {
 

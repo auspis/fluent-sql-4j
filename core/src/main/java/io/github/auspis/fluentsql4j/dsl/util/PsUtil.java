@@ -1,9 +1,9 @@
 package io.github.auspis.fluentsql4j.dsl.util;
 
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 
 public class PsUtil {
     private PsUtil() {}

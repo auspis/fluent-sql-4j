@@ -1,16 +1,13 @@
 package io.github.auspis.fluentsql4j.ast.core.expression.scalar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ArithmeticExpression;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.NullScalarExpression;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ArithmeticExpression.UnaryArithmeticExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class ArithmeticExpressionTest {
 

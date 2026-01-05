@@ -1,24 +1,24 @@
 package io.github.auspis.fluentsql4j.dsl.table;
 
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
+import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.DataType;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.IndexDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.ReferencesItem;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.statement.CreateTableStatement;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.util.PsUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
-import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.DataType;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.IndexDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.ReferencesItem;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.statement.CreateTableStatement;
-import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
-import io.github.auspis.fluentsql4j.dsl.util.PsUtil;
 
 public class CreateTableBuilder {
 

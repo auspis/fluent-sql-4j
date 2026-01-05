@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.function.json.JsonValue;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.json.OnEmptyBehavior;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
@@ -12,9 +13,8 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.OverClause;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.WindowFunction;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
-import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.ComponentTest;
+import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

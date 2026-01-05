@@ -1,6 +1,7 @@
 package integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
@@ -11,8 +12,8 @@ import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
-import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.IntegrationTest;
+import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
+import io.github.auspis.fluentsql4j.test.util.annotation.IntegrationTest;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.junit.jupiter.api.AfterEach;

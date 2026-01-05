@@ -1,8 +1,8 @@
 package io.github.auspis.fluentsql4j.dsl.clause;
 
-import java.util.function.Function;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
+import java.util.function.Function;
 
 /**
  * Interface for builders that support WHERE clause construction.

@@ -1,7 +1,5 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.TableExpression;
 import io.github.auspis.fluentsql4j.ast.dml.statement.DeleteStatement;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
@@ -9,6 +7,8 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.DeleteStatementPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StandardSqlDeleteStatementPsStrategy implements DeleteStatementPsStrategy {
     @Override
@@ -25,8 +25,7 @@ public class StandardSqlDeleteStatementPsStrategy implements DeleteStatementPsSt
         Where where = stmt.where();
         if (where != null
                 && where.condition() != null
-                && !(where.condition()
-                        instanceof io.github.auspis.fluentsql4j.ast.core.predicate.NullPredicate)) {
+                && !(where.condition() instanceof io.github.auspis.fluentsql4j.ast.core.predicate.NullPredicate)) {
             PreparedStatementSpec whereDto = where.accept(renderer, ctx);
             sql.append(" WHERE ").append(whereDto.sql());
             params.addAll(whereDto.parameters());

@@ -16,7 +16,7 @@
 #
 # Per impostare i secrets direttamente su GitHub (richiede gh CLI autenticato e permessi repo:admin): 
 # grep -qxF "allow-loopback-pinentry" ~/.gnupg/gpg-agent.conf || echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf && gpgconf --kill gpg-agent && sleep 1
-# ./data/scripts/generate-gpg-secrets.sh --email ci@t-lab.lan --repo massimiliano/fluent-sql-4j --set-secrets --length 4096 2>&1 | tee /tmp/gpg-generate.log
+# ./data/scripts/generate-gpg-secrets.sh --email ci@t-lab.lan --repo auspis/fluent-sql-4j --set-secrets --length 4096 2>&1 | tee /tmp/gpg-generate.log
 
 
 set -euo pipefail

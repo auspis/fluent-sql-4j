@@ -94,8 +94,8 @@ class DeleteDSLComponentTest {
 1. **Aggiungi import**:
 
    ```java
-   import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
-   import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
+   import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
+   import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
    ```
 2. **Sostituisci 5 fields con 2**:
 

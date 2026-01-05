@@ -10,7 +10,7 @@ This guide covers the development workflow, testing strategies, code coverage, a
   - [Basic Commands](#basic-commands)
   - [Selective Test Execution](#selective-test-execution)
   - [Development Workflow](#development-workflow)
-  - [CI/CD Pipeline](#cicd-pipeline)
+  - [CI/CD Pipeline](#ci-cd-pipeline)
   - [Writing Tests](#writing-tests)
   - [Test Annotations](#test-annotations)
 - [Code Coverage](#code-coverage)
@@ -28,7 +28,7 @@ This guide covers the development workflow, testing strategies, code coverage, a
 
 This project uses a structured approach to test execution with three distinct test categories organized within the `core` module.
 
-### Test Categories (Test Pyramid)
+### Test Categories
 
 The project uses a structured test pyramid with four main categories:
 
@@ -45,8 +45,8 @@ All tests are consolidated within the `core` module with the following organizat
 
 ```
 core/src/test/java/
-├── io/github/massimiliano/fluentsql4j/                    # Unit tests (~200)
-├── io/github/massimiliano/fluentsql4j/dsl/*ComponentTest  # Component tests (~50)
+├── io/github/auspis/fluentsql4j/                    # Unit tests (~200)
+├── io/github/auspis/fluentsql4j/dsl/*ComponentTest  # Component tests (~50)
 ├── integration/                           # Integration tests (~20)
 └── e2e/system/                            # E2E tests (~3)
 ```
@@ -102,7 +102,7 @@ core/src/test/java/
 ./mvnw verify -pl core -Dgroups=e2e
 ```
 
-### CI/CD Pipeline
+### CI CD Pipeline
 
 The GitHub Actions pipeline executes tests in stages:
 
@@ -186,7 +186,7 @@ class AstToPreparedStatementSpecVisitorE2E {
 
 ### Test Annotations
 
-Custom test annotations are located in `io.github.massimiliano.fluentsql4j.test.util.annotation`:
+Custom test annotations are located in `io.github.auspis.fluentsql4j.test.util.annotation`:
 
 - `@ComponentTest` - Marks component tests (tagged with `component`)
 - `@IntegrationTest` - Marks integration tests (tagged with `integration`)

@@ -1,9 +1,9 @@
 package io.github.auspis.fluentsql4j.ast.visitor;
 
-import java.util.Objects;
 import io.github.auspis.fluentsql4j.ast.core.statement.Statement;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import java.util.Objects;
 
 /**
  * Factory for creating {@link PreparedStatementSpec} instances from SQL statements.

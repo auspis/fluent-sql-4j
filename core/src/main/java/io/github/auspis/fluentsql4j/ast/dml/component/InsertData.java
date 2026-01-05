@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.ast.dml.component;
 
-import java.util.List;
-import java.util.stream.Stream;
 import io.github.auspis.fluentsql4j.ast.core.expression.Expression;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.SetExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitable;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
+import java.util.stream.Stream;
 
 public interface InsertData extends Visitable {
 
