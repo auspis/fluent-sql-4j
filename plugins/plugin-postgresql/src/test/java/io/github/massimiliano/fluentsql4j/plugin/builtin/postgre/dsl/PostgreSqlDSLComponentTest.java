@@ -3,9 +3,8 @@ package io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import io.github.massimiliano.fluentsql4j.dsl.DSL;
-import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.dsl.DSLRegistry;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.PostgreSqlDialectPlugin;
 import io.github.massimiliano.fluentsql4j.test.util.annotation.ComponentTest;
 import java.sql.Connection;

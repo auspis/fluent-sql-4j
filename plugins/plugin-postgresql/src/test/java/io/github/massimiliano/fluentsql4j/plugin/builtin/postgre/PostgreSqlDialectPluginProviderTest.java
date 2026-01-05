@@ -1,9 +1,8 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.postgre;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPlugin;
 import org.junit.jupiter.api.Test;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 
 class PostgreSqlDialectPluginProviderTest {
 
@@ -58,6 +57,6 @@ class PostgreSqlDialectPluginProviderTest {
         PostgreSqlDialectPluginProvider provider = new PostgreSqlDialectPluginProvider();
 
         // Verify it implements the interface
-        assertThat(provider).isInstanceOf(io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider.class);
+        assertThat(provider).isInstanceOf(io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider.class);
     }
 }

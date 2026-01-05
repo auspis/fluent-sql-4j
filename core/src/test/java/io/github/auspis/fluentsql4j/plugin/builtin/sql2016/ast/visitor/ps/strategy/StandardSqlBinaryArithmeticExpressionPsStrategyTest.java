@@ -1,0 +1,83 @@
+package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ArithmeticExpression;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ArithmeticExpression.BinaryArithmeticExpression;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlBinaryArithmeticExpressionPsStrategy;
+
+class StandardSqlBinaryArithmeticExpressionPsStrategyTest {
+
+    private StandardSqlBinaryArithmeticExpressionPsStrategy strategy;
+    private AstToPreparedStatementSpecVisitor specFactory;
+
+    @BeforeEach
+    void setUp() {
+        strategy = new StandardSqlBinaryArithmeticExpressionPsStrategy();
+        specFactory = new AstToPreparedStatementSpecVisitor();
+    }
+
+    @Test
+    void additionLiterals() {
+        BinaryArithmeticExpression expression = ArithmeticExpression.addition(Literal.of(5), Literal.of(23));
+        PreparedStatementSpec result = strategy.handle(expression, specFactory, new AstContext());
+        assertThat(result.sql()).isEqualTo("(? + ?)");
+        assertThat(result.parameters()).containsExactly(5, 23);
+    }
+
+    @Test
+    void subtractionLiterals() {
+        BinaryArithmeticExpression expression = ArithmeticExpression.subtraction(Literal.of(10), Literal.of(3));
+        PreparedStatementSpec result = strategy.handle(expression, specFactory, new AstContext());
+        assertThat(result.sql()).isEqualTo("(? - ?)");
+        assertThat(result.parameters()).containsExactly(10, 3);
+    }
+
+    @Test
+    void multiplicationLiterals() {
+        BinaryArithmeticExpression expression = ArithmeticExpression.multiplication(Literal.of(4), Literal.of(5));
+        PreparedStatementSpec result = strategy.handle(expression, specFactory, new AstContext());
+        assertThat(result.sql()).isEqualTo("(? * ?)");
+        assertThat(result.parameters()).containsExactly(4, 5);
+    }
+
+    @Test
+    void divisionLiterals() {
+        BinaryArithmeticExpression expression = ArithmeticExpression.division(Literal.of(10), Literal.of(2));
+        PreparedStatementSpec result = strategy.handle(expression, specFactory, new AstContext());
+        assertThat(result.sql()).isEqualTo("(? / ?)");
+        assertThat(result.parameters()).containsExactly(10, 2);
+    }
+
+    @Test
+    void moduloLiterals() {
+        BinaryArithmeticExpression expression = ArithmeticExpression.modulo(Literal.of(10), Literal.of(3));
+        PreparedStatementSpec result = strategy.handle(expression, specFactory, new AstContext());
+        assertThat(result.sql()).isEqualTo("(? % ?)");
+        assertThat(result.parameters()).containsExactly(10, 3);
+    }
+
+    @Test
+    void columnReferenceAndLiteral() {
+        BinaryArithmeticExpression expression =
+                ArithmeticExpression.addition(ColumnReference.of("Customer", "score"), Literal.of(10));
+        PreparedStatementSpec result = strategy.handle(expression, specFactory, new AstContext());
+        assertThat(result.sql()).isEqualTo("(\"score\" + ?)");
+        assertThat(result.parameters()).containsExactly(10);
+    }
+
+    @Test
+    void twoColumnReferences() {
+        BinaryArithmeticExpression expression = ArithmeticExpression.multiplication(
+                ColumnReference.of("Order", "quantity"), ColumnReference.of("Product", "price"));
+        PreparedStatementSpec result = strategy.handle(expression, specFactory, new AstContext());
+        assertThat(result.sql()).isEqualTo("(\"quantity\" * \"price\")");
+        assertThat(result.parameters()).isEmpty();
+    }
+}

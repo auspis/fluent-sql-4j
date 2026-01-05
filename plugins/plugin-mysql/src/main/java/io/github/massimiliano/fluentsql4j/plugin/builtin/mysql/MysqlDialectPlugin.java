@@ -1,9 +1,9 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql;
 
-import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.dsl.DSL;
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlFetchPsStrategy;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlMergeStatementPsStrategy;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlCurrentDatePsStrategy;
@@ -117,7 +117,7 @@ public final class MysqlDialectPlugin {
     /**
      * The canonical name for the MySQL dialect.
      * <p>
-     * This name is used for plugin registration and lookup in the {@link io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginRegistry}.
+     * This name is used for plugin registration and lookup in the {@link io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry}.
      * The registry performs case-insensitive matching, so "MySQL", "mysql", and "MYSQL"
      * will all match this dialect.
      */

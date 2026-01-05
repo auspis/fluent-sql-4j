@@ -1,14 +1,13 @@
 package e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.massimiliano.fluentsql4j.dsl.DSL;
-import io.github.massimiliano.fluentsql4j.dsl.DSLRegistry;
-import io.github.massimiliano.fluentsql4j.dsl.util.ResultSetUtil;
-import io.github.massimiliano.fluentsql4j.dsl.util.ResultSetUtil.RowMapper;
-import io.github.massimiliano.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.dsl.DSLRegistry;
+import io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil;
+import io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil.RowMapper;
+import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.PostgreSqlDialectPlugin;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.dsl.PostgreSqlDSL;
 import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;

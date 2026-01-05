@@ -1,8 +1,8 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.util;
 
-import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.massimiliano.fluentsql4j.dsl.DSL;
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.MysqlDialectPlugin;
 
 /**
