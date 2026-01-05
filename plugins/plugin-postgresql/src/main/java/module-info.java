@@ -8,10 +8,10 @@ module io.github.massimiliano.fluentsql4j.plugin.postgresql {
     uses io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 
     provides io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider with
-            io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.PostgreSqlDialectPluginProvider;
+            io.github.auspis.fluentsql4j.plugin.builtin.postgre.PostgreSqlDialectPluginProvider;
 
     // Export plugin packages (optional, for advanced use)
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.postgre;
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.dsl;
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.ast.visitor.ps.strategy;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.postgre;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.postgre.dsl;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.postgre.ast.visitor.ps.strategy;
 }

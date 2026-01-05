@@ -8,12 +8,12 @@ module io.github.massimiliano.fluentsql4j.plugin.mysql {
     uses io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 
     provides io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider with
-            io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.MysqlDialectPluginProvider;
+            io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPluginProvider;
 
     // Export plugin packages (optional, for advanced use)
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.mysql;
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl;
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.select;
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.select.builders;
-    exports io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.mysql;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy;
 }
