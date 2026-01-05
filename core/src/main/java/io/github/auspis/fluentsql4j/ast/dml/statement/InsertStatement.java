@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.ast.dml.statement;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.TableExpression;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData.DefaultValues;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.ArrayList;
+import java.util.List;
 
 public record InsertStatement(TableExpression table, List<ColumnReference> columns, InsertData data)
         implements DataManipulationStatement {

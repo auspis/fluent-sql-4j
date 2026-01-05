@@ -1,4 +1,4 @@
-package io.github.massimiliano.fluentsql4j.test.helper;
+package io.github.auspis.fluentsql4j.test.helper;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

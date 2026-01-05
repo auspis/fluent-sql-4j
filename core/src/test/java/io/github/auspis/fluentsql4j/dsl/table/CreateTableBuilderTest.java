@@ -1,14 +1,14 @@
 package io.github.auspis.fluentsql4j.dsl.table;
 
-import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
+import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.auspis.fluentsql4j.dsl.table.CreateTableBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

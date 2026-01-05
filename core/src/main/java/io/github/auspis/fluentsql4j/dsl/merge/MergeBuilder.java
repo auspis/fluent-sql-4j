@@ -1,10 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl.merge;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.Expression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
@@ -15,17 +10,22 @@ import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
-import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction;
-import io.github.auspis.fluentsql4j.ast.dml.component.MergeUsing;
-import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData.InsertValues;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedDelete;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeUsing;
+import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MergeBuilder {
     private final PreparedStatementSpecFactory specFactory;

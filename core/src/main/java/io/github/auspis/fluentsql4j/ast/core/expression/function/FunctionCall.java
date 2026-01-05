@@ -39,11 +39,11 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
  *
  * <p><b>Implementation Categories</b>:
  * <ul>
- *   <li>String functions: {@code io.github.massimiliano.fluentsql4j.ast.core.expression.function.string.*}
- *   <li>Numeric functions: {@code io.github.massimiliano.fluentsql4j.ast.core.expression.function.number.*}
+ *   <li>String functions: {@code io.github.auspis.fluentsql4j.ast.core.expression.function.string.*}
+ *   <li>Numeric functions: {@code io.github.auspis.fluentsql4j.ast.core.expression.function.number.*}
  *   <li>Date/Time functions:
- *       {@code io.github.massimiliano.fluentsql4j.ast.core.expression.function.datetime.*}
- *   <li>JSON functions: {@code io.github.massimiliano.fluentsql4j.ast.core.expression.function.json.*}
+ *       {@code io.github.auspis.fluentsql4j.ast.core.expression.function.datetime.*}
+ *   <li>JSON functions: {@code io.github.auspis.fluentsql4j.ast.core.expression.function.json.*}
  * </ul>
  *
  * @see ScalarExpression

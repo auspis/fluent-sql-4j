@@ -1,14 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl.update;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
@@ -22,6 +13,15 @@ import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
 import io.github.auspis.fluentsql4j.dsl.clause.SupportsWhere;
 import io.github.auspis.fluentsql4j.dsl.util.LiteralUtil;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
     private UpdateStatement.UpdateStatementBuilder statementBuilder = UpdateStatement.builder();

@@ -1,6 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl;
 
-import java.util.Objects;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.delete.DeleteBuilder;
 import io.github.auspis.fluentsql4j.dsl.insert.InsertBuilder;
@@ -9,6 +8,7 @@ import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
 import io.github.auspis.fluentsql4j.dsl.select.SelectProjectionBuilder;
 import io.github.auspis.fluentsql4j.dsl.table.CreateTableBuilder;
 import io.github.auspis.fluentsql4j.dsl.update.UpdateBuilder;
+import java.util.Objects;
 
 /**
  * Base DSL class for building SQL queries in a type-safe, fluent manner.

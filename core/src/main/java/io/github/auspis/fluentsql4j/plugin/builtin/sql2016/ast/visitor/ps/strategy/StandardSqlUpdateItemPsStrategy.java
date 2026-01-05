@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.UpdateItemPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StandardSqlUpdateItemPsStrategy implements UpdateItemPsStrategy {
 

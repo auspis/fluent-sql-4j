@@ -1,10 +1,10 @@
 package io.github.auspis.fluentsql4j.ast.core.expression.function.number;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
-import io.github.auspis.fluentsql4j.ast.core.expression.function.number.Mod;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import org.junit.jupiter.api.Test;
 
 class ModTest {
 

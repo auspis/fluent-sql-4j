@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.dsl.table;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.DataType;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.DataType;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class ColumnBuilder {
     private final CreateTableBuilder tableBuilder;

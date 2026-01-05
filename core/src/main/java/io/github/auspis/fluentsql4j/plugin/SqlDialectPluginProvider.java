@@ -7,7 +7,7 @@ package io.github.auspis.fluentsql4j.plugin;
  * Each provider creates and returns a {@link SqlDialectPlugin} instance.
  * <p>
  * To make your plugin discoverable, create a provider file:
- * {@code META-INF/services/io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider}
+ * {@code META-INF/services/io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider}
  * containing the fully qualified name of your provider implementation.
  * <p>
  * <b>Example implementation:</b>

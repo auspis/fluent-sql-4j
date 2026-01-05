@@ -3,9 +3,6 @@ package io.github.auspis.fluentsql4j.ast.core.predicate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import io.github.auspis.fluentsql4j.ast.core.predicate.AndOr;
-import io.github.auspis.fluentsql4j.ast.core.predicate.NullPredicate;
-import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 
 class NullPredicateTest {
 

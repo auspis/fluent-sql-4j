@@ -1,11 +1,12 @@
 package io.github.auspis.fluentsql4j.dsl.clause;
 
-import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
+import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
 import static org.mockito.Mockito.verify;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.function.json.BehaviorKind;
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

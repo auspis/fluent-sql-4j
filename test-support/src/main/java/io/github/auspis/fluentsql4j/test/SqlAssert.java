@@ -1,6 +1,6 @@
-package io.github.massimiliano.fluentsql4j.test;
+package io.github.auspis.fluentsql4j.test;
 
-import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import org.assertj.core.api.AbstractAssert;
 
 /**

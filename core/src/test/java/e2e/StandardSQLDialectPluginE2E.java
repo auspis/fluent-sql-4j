@@ -4,6 +4,7 @@ import static io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDia
 import static io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
@@ -12,8 +13,8 @@ import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.E2ETest;
+import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
+import io.github.auspis.fluentsql4j.test.util.annotation.E2ETest;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;

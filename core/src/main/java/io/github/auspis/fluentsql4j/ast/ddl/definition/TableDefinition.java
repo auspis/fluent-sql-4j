@@ -1,6 +1,5 @@
 package io.github.auspis.fluentsql4j.ast.ddl.definition;
 
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.TableExpression;
 import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
@@ -8,6 +7,7 @@ import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.Uniq
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitable;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
 
 public record TableDefinition(
         TableExpression table,
