@@ -546,21 +546,5 @@
         </plugins>
       </build>
     </profile>
-
-    <profile>
-      <id>release-core-skip-javadoc</id>
-      <activation>
-        <property>
-          <name>performRelease</name>
-          <value>true</value>
-        </property>
-        <file>
-          <exists>src/main/java/io/github/massimiliano/fluentsql4j/dsl</exists>
-        </file>
-      </activation>
-      <properties>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-      </properties>
-    </profile>
   </profiles>
 </project>
