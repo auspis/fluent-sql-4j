@@ -1,16 +1,15 @@
 package integration.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.window.OverClause;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.window.WindowFunction;
-import io.github.massimiliano.fluentsql4j.ast.dql.clause.Select;
-import io.github.massimiliano.fluentsql4j.ast.dql.clause.Sorting;
-import io.github.massimiliano.fluentsql4j.ast.dql.projection.ScalarExpressionProjection;
-import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.massimiliano.fluentsql4j.dsl.select.SelectBuilder;
-import io.github.massimiliano.fluentsql4j.plugin.util.StandardSqlUtil;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.window.OverClause;
+import io.github.auspis.fluentsql4j.ast.core.expression.window.WindowFunction;
+import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
+import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
+import io.github.auspis.fluentsql4j.ast.dql.projection.ScalarExpressionProjection;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
+import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
 import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
 import io.github.massimiliano.fluentsql4j.test.util.annotation.IntegrationTest;
 import java.sql.Connection;
@@ -55,7 +54,7 @@ class WindowFunctionsIntegrationTest {
         PreparedStatement ps =
                 new SelectBuilder(specFactory, select).from("employees").build(connection);
 
-        List<List<Object>> rows = io.github.massimiliano.fluentsql4j.dsl.util.ResultSetUtil.list(
+        List<List<Object>> rows = io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil.list(
                 ps, rs -> List.of(rs.getString("name"), rs.getInt("row_num")));
 
         assertThat(rows)
@@ -79,7 +78,7 @@ class WindowFunctionsIntegrationTest {
         PreparedStatement ps =
                 new SelectBuilder(specFactory, select).from("employees").build(connection);
 
-        List<List<Object>> rows = io.github.massimiliano.fluentsql4j.dsl.util.ResultSetUtil.list(
+        List<List<Object>> rows = io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil.list(
                 ps, rs -> List.of(rs.getString("department"), rs.getString("name"), rs.getInt("dept_row_num")));
 
         assertThat(rows)

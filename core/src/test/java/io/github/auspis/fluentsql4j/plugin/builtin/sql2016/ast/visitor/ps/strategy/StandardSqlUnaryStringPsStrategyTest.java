@@ -1,0 +1,81 @@
+package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
+
+import static io.github.auspis.fluentsql4j.ast.core.expression.function.string.UnaryString.lower;
+import static io.github.auspis.fluentsql4j.ast.core.expression.function.string.UnaryString.upper;
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.UnaryStringPsStrategy;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUnaryStringPsStrategy;
+
+class StandardSqlUnaryStringPsStrategyTest {
+
+    private final UnaryStringPsStrategy strategy = new StandardSqlUnaryStringPsStrategy();
+    private final AstToPreparedStatementSpecVisitor specFactory =
+            AstToPreparedStatementSpecVisitor.builder().build();
+    private final AstContext ctx = new AstContext();
+
+    @Test
+    void lowerWithLiteral() {
+        var lowerCall = lower(Literal.of("HELLO WORLD"));
+
+        PreparedStatementSpec result = strategy.handle(lowerCall, specFactory, ctx);
+
+        assertThat(result.sql()).isEqualTo("LOWER(?)");
+        assertThat(result.parameters()).containsExactly("HELLO WORLD");
+    }
+
+    @Test
+    void lowerWithColumn() {
+        var lowerCall = lower(ColumnReference.of("users", "name"));
+
+        PreparedStatementSpec result = strategy.handle(lowerCall, specFactory, ctx);
+
+        assertThat(result.sql()).isEqualTo("LOWER(\"name\")");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void upperWithLiteral() {
+        var upperCall = upper(Literal.of("hello world"));
+
+        PreparedStatementSpec result = strategy.handle(upperCall, specFactory, ctx);
+
+        assertThat(result.sql()).isEqualTo("UPPER(?)");
+        assertThat(result.parameters()).containsExactly("hello world");
+    }
+
+    @Test
+    void upperWithColumn() {
+        var upperCall = upper(ColumnReference.of("products", "description"));
+
+        PreparedStatementSpec result = strategy.handle(upperCall, specFactory, ctx);
+
+        assertThat(result.sql()).isEqualTo("UPPER(\"description\")");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void lowerWithEmptyString() {
+        var lowerCall = lower(Literal.of(""));
+
+        PreparedStatementSpec result = strategy.handle(lowerCall, specFactory, ctx);
+
+        assertThat(result.sql()).isEqualTo("LOWER(?)");
+        assertThat(result.parameters()).containsExactly("");
+    }
+
+    @Test
+    void upperWithSpecialCharacters() {
+        var upperCall = upper(Literal.of("test@email.com"));
+
+        PreparedStatementSpec result = strategy.handle(upperCall, specFactory, ctx);
+
+        assertThat(result.sql()).isEqualTo("UPPER(?)");
+        assertThat(result.parameters()).containsExactly("test@email.com");
+    }
+}

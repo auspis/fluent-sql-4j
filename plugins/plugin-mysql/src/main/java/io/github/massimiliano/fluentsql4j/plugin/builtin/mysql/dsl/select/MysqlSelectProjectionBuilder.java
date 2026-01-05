@@ -1,11 +1,11 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.select;
 
-import io.github.massimiliano.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
-import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.massimiliano.fluentsql4j.dsl.select.SelectProjectionBuilder;
+import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.select.SelectProjectionBuilder;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.select.builders.MysqlCoalesceBuilder;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.select.builders.MysqlConcatBuilder;

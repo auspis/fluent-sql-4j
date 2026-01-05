@@ -1,17 +1,16 @@
 package integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.massimiliano.fluentsql4j.ast.core.predicate.Comparison;
-import io.github.massimiliano.fluentsql4j.ast.dql.clause.From;
-import io.github.massimiliano.fluentsql4j.ast.dql.clause.Select;
-import io.github.massimiliano.fluentsql4j.ast.dql.clause.Where;
-import io.github.massimiliano.fluentsql4j.ast.dql.statement.SelectStatement;
-import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
+import io.github.auspis.fluentsql4j.ast.dql.clause.From;
+import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
+import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
+import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
 import io.github.massimiliano.fluentsql4j.test.util.annotation.IntegrationTest;
 import java.sql.Connection;

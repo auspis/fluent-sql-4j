@@ -1,11 +1,11 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.select.builders;
 
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.massimiliano.fluentsql4j.ast.core.predicate.Comparison;
-import io.github.massimiliano.fluentsql4j.ast.core.predicate.IsNotNull;
-import io.github.massimiliano.fluentsql4j.ast.core.predicate.IsNull;
-import io.github.massimiliano.fluentsql4j.ast.core.predicate.Predicate;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
+import io.github.auspis.fluentsql4j.ast.core.predicate.IsNotNull;
+import io.github.auspis.fluentsql4j.ast.core.predicate.IsNull;
+import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 
