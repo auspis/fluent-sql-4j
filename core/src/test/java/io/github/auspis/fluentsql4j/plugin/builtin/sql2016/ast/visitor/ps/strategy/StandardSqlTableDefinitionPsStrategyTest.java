@@ -1,16 +1,15 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
 import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.DataType.SimpleDataType;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
-import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlTableDefinitionPsStrategy;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class StandardSqlTableDefinitionPsStrategyTest {
 

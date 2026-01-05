@@ -1,7 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl.select;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.DenseRank;
@@ -13,6 +11,8 @@ import io.github.auspis.fluentsql4j.ast.core.expression.window.Rank;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.RowNumber;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.WindowFunction;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fluent builder for window functions in SELECT projections.

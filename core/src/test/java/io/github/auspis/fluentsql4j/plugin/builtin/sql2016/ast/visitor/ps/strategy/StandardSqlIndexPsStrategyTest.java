@@ -1,14 +1,14 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.ddl.definition.IndexDefinition;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.IndexDefinitionPsStrategy;
-import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlIndexDefinitionPsStrategy;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class StandardSqlIndexPsStrategyTest {
 

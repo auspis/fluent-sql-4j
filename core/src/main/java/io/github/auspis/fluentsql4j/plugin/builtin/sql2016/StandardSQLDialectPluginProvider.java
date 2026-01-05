@@ -8,14 +8,14 @@ import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
  * <p>
  * This provider enables automatic discovery of the {@link StandardSQLDialectPlugin}
  * through Java's {@link java.util.ServiceLoader} mechanism. It is registered in
- * {@code META-INF/services/io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider}.
+ * {@code META-INF/services/io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider}.
  * <p>
  * <b>ServiceLoader Registration:</b>
  * <p>
  * To enable automatic discovery, this provider class is listed in the service provider
  * configuration file at:
  * <pre>
- * META-INF/services/io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider
+ * META-INF/services/io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider
  * </pre>
  * <p>
  * <b>Usage:</b>

@@ -1,10 +1,9 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
-import io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPlugin;
-import io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPluginProvider;
+import org.junit.jupiter.api.Test;
 
 class MysqlDialectPluginProviderTest {
 

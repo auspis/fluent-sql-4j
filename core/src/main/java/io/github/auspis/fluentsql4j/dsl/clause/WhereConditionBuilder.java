@@ -1,8 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl.clause;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import io.github.auspis.fluentsql4j.ast.core.expression.ValueExpression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
@@ -15,6 +12,9 @@ import io.github.auspis.fluentsql4j.ast.core.predicate.IsNull;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Like;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 
 /**
  * Generic builder for WHERE conditions that can work with any builder type.

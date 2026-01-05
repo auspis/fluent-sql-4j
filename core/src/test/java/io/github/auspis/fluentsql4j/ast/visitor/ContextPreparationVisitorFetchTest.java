@@ -1,13 +1,12 @@
 package io.github.auspis.fluentsql4j.ast.visitor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.dql.clause.Fetch;
 import io.github.auspis.fluentsql4j.ast.dql.clause.From;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
-import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
-import io.github.auspis.fluentsql4j.ast.visitor.ContextPreparationVisitor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ContextPreparationVisitorFetchTest {
 

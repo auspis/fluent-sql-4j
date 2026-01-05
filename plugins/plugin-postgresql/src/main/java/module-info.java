@@ -1,5 +1,5 @@
-module io.github.massimiliano.fluentsql4j.plugin.postgresql {
-    requires transitive io.github.massimiliano.fluentsql4j.spi;
+module io.github.auspis.fluentsql4j.plugin.postgresql {
+    requires transitive io.github.auspis.fluentsql4j.spi;
     requires java.sql;
     requires static lombok;
 

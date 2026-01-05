@@ -1,11 +1,11 @@
 package io.github.auspis.fluentsql4j.dsl.select;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.dql.clause.OrderBy;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fluent builder for ORDER BY clauses with support for both single-table and multi-table contexts.

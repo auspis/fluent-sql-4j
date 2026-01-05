@@ -3,10 +3,10 @@ package io.github.auspis.fluentsql4j.plugin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
-import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
+import org.junit.jupiter.api.Test;
 
 class SqlDialectPluginTest {
 

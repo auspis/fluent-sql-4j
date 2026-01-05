@@ -1,10 +1,11 @@
 package io.github.auspis.fluentsql4j.plugin.builtin;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginTest {
 

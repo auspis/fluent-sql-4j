@@ -1,4 +1,4 @@
-package io.github.massimiliano.fluentsql4j.test.util;
+package io.github.auspis.fluentsql4j.test.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

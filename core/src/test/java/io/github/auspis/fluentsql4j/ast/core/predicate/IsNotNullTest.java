@@ -1,16 +1,15 @@
 package io.github.auspis.fluentsql4j.ast.core.predicate;
 
-import static io.github.massimiliano.fluentsql4j.test.SqlAssert.assertThatSql;
+import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.auspis.fluentsql4j.ast.core.predicate.IsNotNull;
-import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.massimiliano.fluentsql4j.test.helper.SqlCaptureHelper;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

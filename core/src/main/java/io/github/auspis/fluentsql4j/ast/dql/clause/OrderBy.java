@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.ast.dql.clause;
 
+import io.github.auspis.fluentsql4j.ast.core.clause.Clause;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-import io.github.auspis.fluentsql4j.ast.core.clause.Clause;
-import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
-import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 
 public record OrderBy(List<Sorting> sortings) implements Clause {
 

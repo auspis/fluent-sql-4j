@@ -1,4 +1,4 @@
-package io.github.massimiliano.fluentsql4j.test.util.annotation;
+package io.github.auspis.fluentsql4j.test.util.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

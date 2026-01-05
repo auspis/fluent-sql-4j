@@ -1,6 +1,7 @@
 package e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.DSLRegistry;
@@ -10,8 +11,8 @@ import io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil.RowMapper;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
-import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.E2ETest;
+import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
+import io.github.auspis.fluentsql4j.test.util.annotation.E2ETest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
