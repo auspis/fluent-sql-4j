@@ -1,14 +1,14 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.dsl;
 
-import io.github.massimiliano.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
-import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.massimiliano.fluentsql4j.dsl.DSL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.DSL;
 
 /**
  * PostgreSQL-specific DSL extension providing access to PostgreSQL custom functions.
