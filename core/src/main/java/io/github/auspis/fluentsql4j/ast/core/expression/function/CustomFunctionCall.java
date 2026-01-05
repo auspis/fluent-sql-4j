@@ -1,10 +1,10 @@
 package io.github.auspis.fluentsql4j.ast.core.expression.function;
 
-import java.util.List;
-import java.util.Map;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a custom/dialect-specific SQL function call.

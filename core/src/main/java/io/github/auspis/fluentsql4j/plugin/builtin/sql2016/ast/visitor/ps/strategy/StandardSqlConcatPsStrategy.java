@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.string.Concat;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.ConcatPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class StandardSqlConcatPsStrategy implements ConcatPsStrategy {
 

@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.ast.dml.statement;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeUsing;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;

@@ -1,14 +1,15 @@
 package io.github.auspis.fluentsql4j.plugin.builtin;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.util.List;
-import java.util.ServiceLoader;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import java.util.List;
+import java.util.ServiceLoader;
+import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginServiceLoaderTest {
 

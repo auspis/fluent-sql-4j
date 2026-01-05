@@ -115,7 +115,7 @@ ls -l test-support/target/test-support-*.jar
 ls -l plugins/plugin-mysql/target/plugin-mysql-*.jar plugins/plugin-postgresql/target/plugin-postgresql-*.jar
 
 # After 'install' verify local repository coordinates
-ls -l ~/.m2/repository/io/github/massimiliano/fluentsql4j/api/* ~/.m2/repository/io/github/massimiliano/fluentsql4j/spi/*
+ls -l ~/.m2/repository/io/github/auspis/fluentsql4j/api/* ~/.m2/repository/io/github/auspis/fluentsql4j/spi/*
 
 # Verify packaging=pom modules produce a POM and no JAR
 ls -l plugins/target/plugins-*.pom

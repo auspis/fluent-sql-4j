@@ -1,9 +1,9 @@
 package io.github.auspis.fluentsql4j.ast.dql.clause;
 
-import java.util.Objects;
 import io.github.auspis.fluentsql4j.ast.core.clause.Clause;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.Objects;
 
 public record Fetch(Integer offset, Integer rows) implements Clause {
 

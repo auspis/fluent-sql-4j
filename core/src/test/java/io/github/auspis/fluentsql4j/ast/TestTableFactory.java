@@ -1,7 +1,7 @@
 package io.github.auspis.fluentsql4j.ast;
 
-import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
 
 public class TestTableFactory {
 

@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
-import io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPlugin;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.ComponentTest;
+import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

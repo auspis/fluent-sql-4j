@@ -1,8 +1,7 @@
 package io.github.auspis.fluentsql4j.ast.visitor.ps;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+
 import io.github.auspis.fluentsql4j.ast.core.expression.Expression;
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.datetime.CurrentDate;
@@ -39,10 +38,10 @@ import io.github.auspis.fluentsql4j.ast.core.predicate.IsNull;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Like;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Not;
 import io.github.auspis.fluentsql4j.ast.core.predicate.NullPredicate;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ReferencesItem;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition.ColumnDefinitionBuilder;
 import io.github.auspis.fluentsql4j.ast.ddl.statement.CreateTableStatement;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData.InsertValues;
@@ -61,8 +60,8 @@ import io.github.auspis.fluentsql4j.ast.dql.source.FromSubquery;
 import io.github.auspis.fluentsql4j.ast.dql.source.join.OnJoin;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
-import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class AstToPreparedStatementSpecVisitorTest {
     // TODO: remove User class

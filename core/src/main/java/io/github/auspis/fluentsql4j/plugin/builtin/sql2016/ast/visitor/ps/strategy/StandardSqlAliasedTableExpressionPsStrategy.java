@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.set.AliasedTableExpression;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.AliasedTableExpressionPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Standard SQL implementation for rendering {@link AliasedTableExpression}.

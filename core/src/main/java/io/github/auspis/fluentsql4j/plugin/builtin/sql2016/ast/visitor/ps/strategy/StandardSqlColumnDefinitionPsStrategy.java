@@ -1,14 +1,14 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.ColumnDefinitionPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StandardSqlColumnDefinitionPsStrategy implements ColumnDefinitionPsStrategy {
 

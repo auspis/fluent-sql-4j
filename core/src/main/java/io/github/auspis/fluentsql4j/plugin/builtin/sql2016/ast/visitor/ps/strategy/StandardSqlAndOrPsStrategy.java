@@ -1,7 +1,5 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.predicate.AndOr;
 import io.github.auspis.fluentsql4j.ast.core.predicate.LogicalOperator;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
@@ -9,6 +7,8 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.AndOrPsStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StandardSqlAndOrPsStrategy implements AndOrPsStrategy {
     @Override

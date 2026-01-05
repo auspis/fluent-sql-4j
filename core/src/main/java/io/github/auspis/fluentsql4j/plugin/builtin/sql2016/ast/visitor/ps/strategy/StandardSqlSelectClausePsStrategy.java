@@ -1,14 +1,14 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
 import io.github.auspis.fluentsql4j.ast.dql.projection.Projection;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.SelectClausePsStrategy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class StandardSqlSelectClausePsStrategy implements SelectClausePsStrategy {
     @Override

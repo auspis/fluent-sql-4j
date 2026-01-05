@@ -1,10 +1,11 @@
 package integration.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.DSLRegistry;
-import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.IntegrationTest;
+import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
+import io.github.auspis.fluentsql4j.test.util.annotation.IntegrationTest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

@@ -1,6 +1,5 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import java.util.List;
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCallImpl;
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.CountDistinct;
@@ -9,6 +8,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.AggregateCallPsStrategy;
+import java.util.List;
 
 public class StandardSqlAggregateCallPsStrategy implements AggregateCallPsStrategy {
     @Override

@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil;
@@ -14,8 +15,8 @@ import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
-import io.github.massimiliano.fluentsql4j.test.util.TestDatabaseUtil;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.IntegrationTest;
+import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
+import io.github.auspis.fluentsql4j.test.util.annotation.IntegrationTest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

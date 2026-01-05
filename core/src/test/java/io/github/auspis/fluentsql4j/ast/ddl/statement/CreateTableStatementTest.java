@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.ast.ddl.statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ColumnDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.DataType;
-import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.NotNullConstraintDefinition;
 import io.github.auspis.fluentsql4j.ast.ddl.definition.ConstraintDefinition.PrimaryKeyDefinition;
-import io.github.auspis.fluentsql4j.ast.ddl.statement.CreateTableStatement;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.DataType;
+import io.github.auspis.fluentsql4j.ast.ddl.definition.TableDefinition;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;

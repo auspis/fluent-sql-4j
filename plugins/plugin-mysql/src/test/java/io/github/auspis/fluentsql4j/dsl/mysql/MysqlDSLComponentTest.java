@@ -3,11 +3,12 @@ package io.github.auspis.fluentsql4j.dsl.mysql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.DSLRegistry;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
-import io.github.massimiliano.fluentsql4j.test.util.annotation.ComponentTest;
+import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

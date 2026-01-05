@@ -1,12 +1,12 @@
 package io.github.auspis.fluentsql4j.ast.core.expression.function.string;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.FunctionCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 public record Concat(String separator, List<ScalarExpression> stringExpressions) implements FunctionCall {
 
