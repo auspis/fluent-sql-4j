@@ -1,7 +1,7 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql;
 
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPlugin;
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 
 /**
  * Service provider for the MySQL dialect plugin.

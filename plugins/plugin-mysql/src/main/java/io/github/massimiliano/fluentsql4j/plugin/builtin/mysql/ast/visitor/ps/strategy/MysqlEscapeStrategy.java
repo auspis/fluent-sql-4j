@@ -1,6 +1,6 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.strategy.EscapeStrategy;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.EscapeStrategy;
 
 public class MysqlEscapeStrategy implements EscapeStrategy {
 

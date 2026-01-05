@@ -7,5 +7,5 @@ module io.github.massimiliano.fluentsql4j.spi {
     requires java.sql;
 
     // ServiceLoader support for plugin discovery
-    uses io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
+    uses io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 }

@@ -5,9 +5,9 @@ module io.github.massimiliano.fluentsql4j.plugin.mysql {
 
     // Provide MySQL dialect plugin implementation
     // Allow this module to call ServiceLoader for SqlDialectPluginProvider in tests
-    uses io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
+    uses io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 
-    provides io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider with
+    provides io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider with
             io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.MysqlDialectPluginProvider;
 
     // Export plugin packages (optional, for advanced use)

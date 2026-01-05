@@ -1,17 +1,16 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import io.github.massimiliano.fluentsql4j.ast.core.expression.function.json.BehaviorKind;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.function.json.JsonQuery;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.function.json.OnEmptyBehavior;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.function.json.WrapperBehavior;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import org.junit.jupiter.api.Test;
+import io.github.auspis.fluentsql4j.ast.core.expression.function.json.BehaviorKind;
+import io.github.auspis.fluentsql4j.ast.core.expression.function.json.JsonQuery;
+import io.github.auspis.fluentsql4j.ast.core.expression.function.json.OnEmptyBehavior;
+import io.github.auspis.fluentsql4j.ast.core.expression.function.json.WrapperBehavior;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 
 class MysqlJsonQueryPsStrategyTest {
 

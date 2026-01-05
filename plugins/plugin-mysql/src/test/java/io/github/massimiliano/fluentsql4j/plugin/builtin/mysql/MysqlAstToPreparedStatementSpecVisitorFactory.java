@@ -1,8 +1,8 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql;
 
-import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 
 /**
  * Test utility factory for creating MySQL AstToPreparedStatementSpecVisitor instances.

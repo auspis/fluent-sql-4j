@@ -2,22 +2,21 @@ package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.s
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.Literal;
-import io.github.massimiliano.fluentsql4j.ast.core.identifier.TableIdentifier;
-import io.github.massimiliano.fluentsql4j.ast.core.predicate.Comparison;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.InsertData;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedUpdate;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.MergeUsing;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.UpdateItem;
-import io.github.massimiliano.fluentsql4j.ast.dml.statement.MergeStatement;
-import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
+import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
+import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeUsing;
+import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedUpdate;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 
 class MySqlMergeStatementPsStrategyTest {
 

@@ -1,14 +1,14 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.ast.visitor.ps.strategy;
 
-import io.github.massimiliano.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
-import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
-import io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCustomFunctionCallPsStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCustomFunctionCallPsStrategy;
 
 /**
  * PostgreSQL-aware rendering for custom function calls.
