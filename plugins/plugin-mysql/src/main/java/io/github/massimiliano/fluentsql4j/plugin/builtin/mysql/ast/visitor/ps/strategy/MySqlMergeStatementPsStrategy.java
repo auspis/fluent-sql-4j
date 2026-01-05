@@ -1,17 +1,17 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
-import io.github.massimiliano.fluentsql4j.ast.core.expression.scalar.ColumnReference;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.InsertData;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedUpdate;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
-import io.github.massimiliano.fluentsql4j.ast.dml.component.UpdateItem;
-import io.github.massimiliano.fluentsql4j.ast.dml.statement.MergeStatement;
-import io.github.massimiliano.fluentsql4j.ast.visitor.AstContext;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 import java.util.ArrayList;
 import java.util.List;
+import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
+import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedUpdate;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
+import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
+import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.MergeStatementPsStrategy;
 
 /**
  * MySQL-specific PreparedStatement strategy for MERGE statements.
@@ -114,11 +114,11 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         return new PreparedStatementSpec(sql, params);
     }
 
-    private String getSourceAlias(io.github.massimiliano.fluentsql4j.ast.core.expression.set.TableExpression source) {
-        if (source instanceof io.github.massimiliano.fluentsql4j.ast.core.identifier.TableIdentifier tableId) {
+    private String getSourceAlias(io.github.auspis.fluentsql4j.ast.core.expression.set.TableExpression source) {
+        if (source instanceof io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier tableId) {
             return tableId.getTableReference();
         } else if (source
-                instanceof io.github.massimiliano.fluentsql4j.ast.core.expression.set.AliasedTableExpression aliased) {
+                instanceof io.github.auspis.fluentsql4j.ast.core.expression.set.AliasedTableExpression aliased) {
             return aliased.getTableReference();
         }
         return "src"; // fallback
