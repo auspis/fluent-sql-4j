@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.github.massimiliano.fluentsql4j</groupId>
+  <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>fluentsql4j-parent</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
@@ -9,7 +9,7 @@
   <!-- Project metadata required for publishing on Maven Central -->
   <name>fluent-sql-4j</name>
   <description>Java DSL for SQL</description>
-  <url>https://github.com/massimiliano/fluent-sql-4j</url>
+  <url>https://github.com/auspis/fluent-sql-4j</url>
 
   <licenses>
     <license>
@@ -21,8 +21,8 @@
 
   <developers>
     <developer>
-      <id>massimiliano</id>
-      <name>Massi</name>
+      <id>auspis</id>
+      <name>Auspis</name>
     </developer>
   </developers>
 
@@ -35,9 +35,9 @@
   </modules>
 
   <scm>
-    <connection>scm:git:git://github.com/massimiliano/fluent-sql-4j.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:massimiliano/fluent-sql-4j.git</developerConnection>
-    <url>https://github.com/massimiliano/fluent-sql-4j</url>
+    <connection>scm:git:git://github.com/auspis/fluent-sql-4j.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:auspis/fluent-sql-4j.git</developerConnection>
+    <url>https://github.com/auspis/fluent-sql-4j</url>
   </scm>
 
   <!-- Distribution settings for Sonatype Central Publishing Portal -->
@@ -90,33 +90,33 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.github.massimiliano.fluentsql4j</groupId>
+        <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>core</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>io.github.massimiliano.fluentsql4j</groupId>
+        <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>api</artifactId>
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>io.github.massimiliano.fluentsql4j</groupId>
+        <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>spi</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.massimiliano.fluentsql4j</groupId>
+        <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>test-support</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>io.github.massimiliano.fluentsql4j</groupId>
+        <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>plugin-mysql</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.massimiliano.fluentsql4j</groupId>
+        <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>plugin-postgresql</artifactId>
         <version>${project.version}</version>
       </dependency>
