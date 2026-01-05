@@ -1,12 +1,12 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.postgre;
 
-import io.github.massimiliano.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.massimiliano.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.massimiliano.fluentsql4j.dsl.DSL;
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlEscapeStrategy;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.ast.visitor.ps.strategy.PostgreSqlCustomFunctionCallPsStrategy;
 import io.github.massimiliano.fluentsql4j.plugin.builtin.postgre.dsl.PostgreSqlDSL;
-import io.github.massimiliano.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlEscapeStrategy;
 
 /**
  * Built-in plugin for the PostgreSQL dialect.
@@ -69,7 +69,7 @@ public final class PostgreSqlDialectPlugin {
     /**
      * The canonical name for the PostgreSQL dialect.
      * <p>
-     * This name is used for plugin registration and lookup in the {@link io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginRegistry}.
+     * This name is used for plugin registration and lookup in the {@link io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry}.
      * The registry performs case-insensitive matching, so "PostgreSQL", "postgresql", and "POSTGRESQL"
      * will all match this dialect.
      */

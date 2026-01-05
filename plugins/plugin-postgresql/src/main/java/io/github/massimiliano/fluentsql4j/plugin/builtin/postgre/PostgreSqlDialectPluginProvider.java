@@ -1,7 +1,7 @@
 package io.github.massimiliano.fluentsql4j.plugin.builtin.postgre;
 
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPlugin;
-import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 
 /**
  * Service provider for the PostgreSQL dialect plugin.
@@ -12,7 +12,7 @@ import io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginProvider;
  * <p>
  * <b>Service Loading Process:</b>
  * <ol>
- *   <li>The {@link io.github.massimiliano.fluentsql4j.plugin.SqlDialectPluginRegistry} uses
+ *   <li>The {@link io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry} uses
  *       {@link java.util.ServiceLoader} to discover all available providers</li>
  *   <li>For each provider found, the registry calls {@link #get()}</li>
  *   <li>The returned plugin is registered and made available for use</li>
