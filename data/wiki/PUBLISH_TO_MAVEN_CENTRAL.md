@@ -89,10 +89,11 @@ The release publishes these modules and attached artifacts:
 - `api`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `spi`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `test-support`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
+- `core`: main JAR, `-sources.jar`, `-javadoc.jar` (generated with Javadoc warnings due to Lombok-generated classes), module POM, and GPG signature (`.asc`).
 - `plugin-mysql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `plugin-postgresql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 
-Note: `core` is built locally but has `<maven.deploy.skip>true</maven.deploy.skip>` and is not published.
+Note: `core` is built and published but does not skip deployment. The Javadoc generation for `core` uses `doclint=none` and `failOnError=false` to handle Lombok-generated inner classes that cannot be resolved by Javadoc, resulting in warnings but a valid Javadoc JAR.
 
 **Why `packaging = pom` modules publish only a POM**
 
