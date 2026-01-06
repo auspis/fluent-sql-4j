@@ -2,6 +2,9 @@
 
 A type-safe SQL builder for Java with multi-dialect support through a plugin system. Build SQL statements programmatically using a fluent DSL with compile-time validation.
 
+[![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/auspis/fluent-sql-4j/actions)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/auspis/fluent-sql-4j/blob/main/LICENSE)
+
 ## Features
 
 - ✅ Type-safe SQL building with compile-time validation
