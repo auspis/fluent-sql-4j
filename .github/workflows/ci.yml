@@ -33,7 +33,7 @@ jobs:
 
     # Run all tests: unit + H2 integration + E2E (as per README)
     - name: Run all tests (unit + H2 integration + E2E)
-      run: ./mvnw verify
+      run: ./mvnw verify jacoco:report
 
     # Upload coverage to Codecov
     - name: Upload coverage to Codecov
