@@ -61,6 +61,7 @@
     <maven.versions.plugin.version>2.20.1</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
     <maven.jacoco.plugin.version>0.8.14</maven.jacoco.plugin.version>
+    <maven.sonar.plugin.version>4.0.0.4121</maven.sonar.plugin.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>auspis</sonar.organization>
     <sonar.projectKey>fluent-sql-4j</sonar.projectKey>
@@ -246,6 +247,11 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>${maven.sonar.plugin.version}</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
