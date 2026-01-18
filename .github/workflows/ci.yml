@@ -41,9 +41,9 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         files: ./api/target/site/jacoco/jacoco.xml,./core/target/site/jacoco/jacoco.xml,./spi/target/site/jacoco/jacoco.xml,./test-support/target/site/jacoco/jacoco.xml,./plugins/plugin-mysql/target/site/jacoco/jacoco.xml,./plugins/plugin-postgresql/target/site/jacoco/jacoco.xml
-        flags: unittests
+        flags: unittests, integrationtests, e2etests
         name: codecov-umbrella
-        fail_ci_if_error: true
+        fail_ci_if_error: false
 
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
