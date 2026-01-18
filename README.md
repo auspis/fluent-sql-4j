@@ -2,8 +2,8 @@
 
 A type-safe SQL builder for Java with multi-dialect support through a plugin system. Build SQL statements programmatically using a fluent DSL with compile-time validation.
 
-[![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg?branch=badges)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3ACI+branch%3Abadges)
-[![Release](https://github.com/auspis/fluent-sql-4j/actions/workflows/release.yml/badge.svg?branch=badges)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3A"Release+to+Maven+Central"+branch%3Abadges)
+[![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3ACI)
+[![Release](https://github.com/auspis/fluent-sql-4j/actions/workflows/release.yml/badge.svg)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3A"Release+to+Maven+Central")
 [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j)
 [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.auspis.fluentsql4j/api)](https://central.sonatype.com/artifact/io.github.auspis.fluentsql4j/api)
