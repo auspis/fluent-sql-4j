@@ -97,12 +97,12 @@
       <dependency>
         <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>core</artifactId>
-        <version>1.0.1</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>api</artifactId>
-        <version>1.0.1</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.github.auspis.fluentsql4j</groupId>
