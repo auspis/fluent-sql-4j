@@ -4,7 +4,6 @@ A type-safe SQL builder for Java with multi-dialect support through a plugin sys
 
 [![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg?branch=badges)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3ACI+branch%3Abadges)
 [![Release](https://github.com/auspis/fluent-sql-4j/actions/workflows/release.yml/badge.svg?branch=badges)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3A"Release+to+Maven+Central"+branch%3Abadges)
-[![Coverage](https://img.shields.io/codecov/c/github/auspis/fluent-sql-4j?branch=badges)](https://app.codecov.io/gh/auspis/fluent-sql-4j/tree/badges)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=alert_status&branch=badges)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j&branch=badges)
 [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=reliability_rating&branch=badges)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j&branch=badges)
 [![Security](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=security_rating&branch=badges)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j&branch=badges)
