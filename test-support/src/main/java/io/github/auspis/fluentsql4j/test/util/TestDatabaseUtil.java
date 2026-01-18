@@ -9,7 +9,9 @@ import java.util.UUID;
 /**
  * Utility class for creating and managing test database connections and tables in integration tests.
  */
+@SuppressWarnings("java:S2115")
 public final class TestDatabaseUtil {
+    private static final String PASSWORD = System.getProperty("fluentsql4j.test.database.password", "");
 
     private TestDatabaseUtil() {
         // Utility class - prevent instantiation
@@ -26,7 +28,7 @@ public final class TestDatabaseUtil {
         String uniqueDbName = "testdb_" + UUID.randomUUID().toString().replace("-", "");
         String jdbcUrl =
                 "jdbc:h2:mem:" + uniqueDbName + ";MODE=REGULAR;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
-        return DriverManager.getConnection(jdbcUrl, "sa", "");
+        return DriverManager.getConnection(jdbcUrl, "sa", PASSWORD);
     }
 
     /**
@@ -42,7 +44,7 @@ public final class TestDatabaseUtil {
         String uniqueDbName = "testdb_json_" + UUID.randomUUID().toString().replace("-", "");
         String jdbcUrl =
                 "jdbc:h2:mem:" + uniqueDbName + ";MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH";
-        return DriverManager.getConnection(jdbcUrl, "sa", "");
+        return DriverManager.getConnection(jdbcUrl, "sa", PASSWORD);
     }
 
     public static void dropUsersTable(Connection connection) throws SQLException {
