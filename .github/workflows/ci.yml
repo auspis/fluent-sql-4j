@@ -49,7 +49,7 @@ jobs:
     - name: SonarCloud Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
-      run: ./mvnw sonar:sonar
+      run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
