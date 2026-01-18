@@ -2,7 +2,16 @@
 
 A type-safe SQL builder for Java with multi-dialect support through a plugin system. Build SQL statements programmatically using a fluent DSL with compile-time validation.
 
-[![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/auspis/fluent-sql-4j/actions)
+[![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg?branch=badges)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3ACI+branch%3Abadges)
+[![Release](https://github.com/auspis/fluent-sql-4j/actions/workflows/release.yml/badge.svg?branch=badges)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3A"Release+to+Maven+Central"+branch%3Abadges)
+[![Coverage](https://img.shields.io/codecov/c/github/auspis/fluent-sql-4j?branch=badges)](https://app.codecov.io/gh/auspis/fluent-sql-4j/tree/badges)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=alert_status&branch=badges)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j&branch=badges)
+[![Reliability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=reliability_rating&branch=badges)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j&branch=badges)
+[![Security](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=security_rating&branch=badges)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j&branch=badges)
+[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=sqale_rating&branch=badges)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j&branch=badges)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.auspis.fluentsql4j/api)](https://central.sonatype.com/artifact/io.github.auspis.fluentsql4j/api)
+[![Javadoc](https://javadoc.io/badge2/io.github.auspis.fluentsql4j/api/javadoc.svg)](https://javadoc.io/doc/io.github.auspis.fluentsql4j/api)
+[![Code Style](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg?branch=badges&label=spotless)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3ACI+branch%3Abadges)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/auspis/fluent-sql-4j/blob/main/LICENSE)
 
 ## Features
@@ -165,4 +174,3 @@ To run all tests including integration and E2E tests:
 - **[DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md)**: Comprehensive examples for all DSL operations (SELECT, INSERT, UPDATE, DELETE, MERGE, CREATE TABLE)
 - **[Developer Guide](data/wiki/DEVELOPER_GUIDE.md)**: Testing strategies, code coverage, formatting guidelines
 - **[Plugin Development Guide](data/wiki/PLUGIN_DEVELOPMENT.md)**: How to create custom dialect plugins
-
