@@ -11,6 +11,14 @@ import java.util.UUID;
  */
 @SuppressWarnings("java:S2115")
 public final class TestDatabaseUtil {
+
+    /**
+     * Database password used for test database connections.
+     * <p>
+     * The value is read from the {@code fluentsql4j.test.database.password} system property.
+     * If the property is not set, it defaults to an empty string, which is suitable for H2
+     * in-memory databases that typically do not require a password.
+     */
     private static final String PASSWORD = System.getProperty("fluentsql4j.test.database.password", "");
 
     private TestDatabaseUtil() {
