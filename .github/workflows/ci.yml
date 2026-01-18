@@ -45,6 +45,12 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: false
 
+    # SonarCloud analysis
+    - name: SonarCloud Scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
+      run: ./mvnw sonar:sonar
+
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
       if: always()
