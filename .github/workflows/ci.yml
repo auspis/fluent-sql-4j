@@ -49,7 +49,7 @@ jobs:
           ./plugins/plugin-postgresql/target/site/jacoco/jacoco.xml
         flags: unittests
         name: codecov-umbrella
-        fail_ci_if_error: false
+        fail_ci_if_error: true
 
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
