@@ -35,6 +35,16 @@ jobs:
     - name: Run all tests (unit + H2 integration + E2E)
       run: ./mvnw verify
 
+    # Upload coverage to Codecov
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./core/target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
       if: always()
