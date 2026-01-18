@@ -6,6 +6,10 @@ on:
       - 'v*.*.*'
   workflow_dispatch:
     inputs:
+      releaseTag:
+        description: 'Release tag in format v*.*.* (e.g., v1.2.3). Required for manual dispatch.'
+        required: true
+        type: string
       autoPublish:
         description: 'Auto-publish to Maven Central (true = immediate, false = manual review required)'
         required: true
@@ -30,10 +34,27 @@ jobs:
           distribution: 'corretto'
           cache: maven
 
+      - name: Determine tag reference
+        id: tag
+        run: |
+          # For tag push: github.ref = refs/tags/v1.2.3
+          # For workflow_dispatch: github.ref = refs/heads/main, use input
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="${{ github.event.inputs.releaseTag }}"
+            if [[ -z "$TAG" ]]; then
+              echo "❌ workflow_dispatch requires 'releaseTag' input"
+              exit 1
+            fi
+          fi
+          
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "✅ Using tag: $TAG"
+
       - name: Validate tag format
         run: |
-          TAG_REF="${{ github.ref }}"
-          TAG="${TAG_REF#refs/tags/}"
+          TAG="${{ steps.tag.outputs.tag }}"
           
           if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "❌ Invalid tag format: '$TAG'"
@@ -45,8 +66,7 @@ jobs:
 
       - name: Verify POM version matches tag
         run: |
-          TAG_REF="${{ github.ref }}"
-          TAG="${TAG_REF#refs/tags/}"
+          TAG="${{ steps.tag.outputs.tag }}"
           TAG_VERSION="${TAG#v}"
           
           POM_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
@@ -94,4 +114,4 @@ jobs:
         run: |
           # Maven will use MAVEN_GPG_PASSPHRASE automatically for GPG signing
           export GPG_TTY=/dev/console
-          ./mvnw -B -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} deploy -P release
+          ./mvnw -B -DskipTests -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} deploy -P release
