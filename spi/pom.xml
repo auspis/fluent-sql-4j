@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.github.auspis.fluentsql4j</groupId>
     <artifactId>fluentsql4j-parent</artifactId>
-    <version>1.0</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>spi</artifactId>
   <name>fluent-sql-4j SPI</name>
