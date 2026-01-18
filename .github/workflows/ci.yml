@@ -44,15 +44,15 @@ jobs:
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: surefire-reports
         path: |
-          fluentsql4j/target/surefire-reports/
+          **/target/surefire-reports/
     - name: Upload Failsafe reports
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: failsafe-reports
         path: |
-          fluentsql4j/target/failsafe-reports/
+          **/target/failsafe-reports/
