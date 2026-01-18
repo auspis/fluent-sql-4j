@@ -16,14 +16,62 @@ on:
           - 'false'
 
 jobs:
-  build-and-publish:
+  # Pre-release validation: ensure tag format and version consistency
+  validate-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          cache: maven
+
+      - name: Validate tag format
+        run: |
+          TAG_REF="${{ github.ref }}"
+          TAG="${TAG_REF#refs/tags/}"
+          
+          if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid tag format: '$TAG'"
+            echo "   Expected: v*.*.* (e.g., v1.2.3)"
+            exit 1
+          fi
+          
+          echo "✅ Tag format valid: $TAG"
+
+      - name: Verify POM version matches tag
+        run: |
+          TAG_REF="${{ github.ref }}"
+          TAG="${TAG_REF#refs/tags/}"
+          TAG_VERSION="${TAG#v}"
+          
+          POM_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+          
+          if [[ "$POM_VERSION" != "$TAG_VERSION" ]]; then
+            echo "❌ Version mismatch!"
+            echo "   Tag version:    $TAG_VERSION"
+            echo "   POM version:    $POM_VERSION"
+            echo ""
+            echo "   Fix: Update pom.xml to match tag or create correct tag"
+            exit 1
+          fi
+          
+          echo "✅ Versions match: $TAG_VERSION"
+
+  # Build, sign, and deploy to Maven Central (only after validation passes)
+  build-and-publish:
+    needs: validate-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - name: Set up JDK and configure Maven + GPG
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
           java-version: '21'
@@ -33,6 +81,10 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Run full test suite (unit + integration + E2E)
+        run: ./mvnw clean verify
+
       - name: Build and deploy to Maven Central Portal
         env:
           GPG_TTY: /dev/console
@@ -42,4 +94,4 @@ jobs:
         run: |
           # Maven will use MAVEN_GPG_PASSPHRASE automatically for GPG signing
           export GPG_TTY=/dev/console
-          mvn -B -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} clean deploy -P release
+          ./mvnw -B -DautoPublish=${{ github.event.inputs.autoPublish || 'false' }} deploy -P release

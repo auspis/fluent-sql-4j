@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>fluentsql4j-parent</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>pom</packaging>
 
   <!-- Project metadata required for publishing on Maven Central -->
@@ -97,12 +97,12 @@
       <dependency>
         <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>core</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.auspis.fluentsql4j</groupId>
         <artifactId>api</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.auspis.fluentsql4j</groupId>
