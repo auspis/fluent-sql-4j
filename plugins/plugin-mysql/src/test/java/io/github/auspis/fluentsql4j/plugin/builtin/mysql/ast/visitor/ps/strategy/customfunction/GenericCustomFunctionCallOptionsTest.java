@@ -20,4 +20,11 @@ class GenericCustomFunctionCallOptionsTest {
         String sql = strategy.renderOptions(Map.of());
         assertThat(sql).isEmpty();
     }
+
+    @Test
+    void escapesQuotesInStringValues() {
+        CustomFunctionCallOptions strategy = new GenericCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("OPTION1", "', DROP TABLE users--"));
+        assertThat(sql).isEqualTo(" OPTION1 ''', DROP TABLE users--'");
+    }
 }

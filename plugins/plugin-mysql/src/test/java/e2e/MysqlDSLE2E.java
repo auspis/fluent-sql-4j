@@ -666,4 +666,51 @@ class MysqlDSLE2E {
             assertThat(count).isEqualTo(10);
         }
     }
+
+    @Test
+    void parameterBindingPreventsSqlInjection() throws SQLException {
+        // Insert a user with single quotes in name via raw SQL (mimics PreparedStatement binding)
+        String maliciousPayload = "O'Reilly'); DROP TABLE users; --";
+        try (var stmt = connection.createStatement()) {
+            stmt.execute(String.format(
+                    "INSERT INTO users VALUES (99, '%s', 'oreilly@example.com', 30, true, '1990-01-01', '2023-01-01', NULL, NULL)",
+                    maliciousPayload.replace("'", "''")));
+        }
+
+        // Verify retrieval by id: name should be exactly the payload (no double-escaping)
+        try (PreparedStatement ps = dsl.select()
+                        .column("name")
+                        .from("users")
+                        .where()
+                        .column("id")
+                        .eq(99)
+                        .build(connection);
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            String retrievedName = rs.getString("name");
+            assertThat(retrievedName).isEqualTo(maliciousPayload);
+        }
+
+        // Verify select filtered by name with single quote (parameter binding)
+        try (PreparedStatement ps = dsl.select()
+                        .column("id")
+                        .column("name")
+                        .from("users")
+                        .where()
+                        .column("name")
+                        .eq(maliciousPayload)
+                        .build(connection);
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("id")).isEqualTo(99);
+            assertThat(rs.getString("name")).isEqualTo(maliciousPayload);
+        }
+
+        // Verify table integrity: count should be 11 (10 fixture + 1 inserted)
+        try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) as cnt FROM users");
+                var rs = ps.executeQuery()) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt("cnt")).isEqualTo(11);
+        }
+    }
 }
