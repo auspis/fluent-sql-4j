@@ -10,6 +10,7 @@ import io.github.auspis.fluentsql4j.ast.dml.component.InsertData.InsertValues;
 import io.github.auspis.fluentsql4j.ast.dml.statement.InsertStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.dsl.util.LiteralUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -66,10 +67,7 @@ public class InsertBuilder {
     }
 
     private InsertBuilder setValue(String columnName, Object value) {
-        if (columnName == null || columnName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        columns.add(ColumnReference.of(table.name(), columnName));
+        columns.add(ColumnReferenceUtil.createWithTableReference(table.name(), columnName));
 
         List<Expression> expressions = getOrCreateExpressionList();
         expressions.add(value == null ? Literal.ofNull() : LiteralUtil.createLiteral(value));
