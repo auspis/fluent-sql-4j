@@ -64,4 +64,33 @@ class StandardSqlWhenMatchedUpdatePsStrategyTest {
         assertThat(result.sql()).isEqualTo("WHEN MATCHED THEN UPDATE SET \"col1\" = ?, \"col2\" = ?, \"col3\" = ?");
         assertThat(result.parameters()).containsExactly("value1", 100, true);
     }
+
+    @Test
+    void withJoinOnContext() {
+        AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        List<UpdateItem> updateItems = List.of(UpdateItem.of("name", ColumnReference.of("src", "name")));
+        WhenMatchedUpdate action = new WhenMatchedUpdate(null, updateItems);
+
+        PreparedStatementSpec result = strategy.handle(action, visitor, onCtx);
+
+        assertThat(result.sql()).isEqualTo("WHEN MATCHED THEN UPDATE SET \"name\" = \"src\".\"name\"");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void withConditionAndColumnReferences() {
+        AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        Comparison condition = Comparison.gt(ColumnReference.of("tgt", "price"), ColumnReference.of("src", "price"));
+        List<UpdateItem> updateItems = List.of(
+                UpdateItem.of("price", ColumnReference.of("src", "price")),
+                UpdateItem.of("updated_at", Literal.of("2024-01-24")));
+        WhenMatchedUpdate action = new WhenMatchedUpdate(condition, updateItems);
+
+        PreparedStatementSpec result = strategy.handle(action, visitor, onCtx);
+
+        assertThat(result.sql())
+                .isEqualTo(
+                        "WHEN MATCHED AND \"tgt\".\"price\" > \"src\".\"price\" THEN UPDATE SET \"price\" = \"src\".\"price\", \"updated_at\" = ?");
+        assertThat(result.parameters()).containsExactly("2024-01-24");
+    }
 }
