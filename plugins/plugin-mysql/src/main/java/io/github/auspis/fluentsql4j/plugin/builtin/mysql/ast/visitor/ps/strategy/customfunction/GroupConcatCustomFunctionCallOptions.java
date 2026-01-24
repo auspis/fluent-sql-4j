@@ -1,5 +1,6 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction;
 
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.util.MysqlStringUtil;
 import java.util.Map;
 
 /**
@@ -38,8 +39,9 @@ public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallO
     }
 
     private void appendValue(StringBuilder sb, Object value) {
-        if (value instanceof String) {
-            sb.append('\'').append(value).append('\'');
+        if (value instanceof String s) {
+            String escaped = MysqlStringUtil.escape(s);
+            sb.append('\'').append(escaped).append('\'');
         } else {
             sb.append(value);
         }
