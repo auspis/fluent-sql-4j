@@ -7,8 +7,10 @@ package io.github.auspis.fluentsql4j.ast.visitor.ps.strategy;
 public interface StringLiteralEscapeStrategy {
     /**
      * Escapes a string value for safe inclusion in SQL.
+     * Implementations should handle null input appropriately (typically by returning an empty string
+     * or throwing an exception).
      *
-     * @param value the string value to escape
+     * @param value the string value to escape (may be null)
      * @return the escaped string value
      */
     String escape(String value);

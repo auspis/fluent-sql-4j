@@ -40,4 +40,11 @@ class StandardSqlStringLiteralEscapeStrategyTest {
         String result = strategy.escape("Hello World");
         assertThat(result).isEqualTo("Hello World");
     }
+
+    @Test
+    void handlesNullInput() {
+        StandardSqlStringLiteralEscapeStrategy strategy = new StandardSqlStringLiteralEscapeStrategy();
+        String result = strategy.escape(null);
+        assertThat(result).isEmpty();
+    }
 }

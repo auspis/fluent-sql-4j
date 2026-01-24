@@ -40,4 +40,11 @@ class MysqlStringLiteralEscapeStrategyTest {
         String result = strategy.escape("Hello World");
         assertThat(result).isEqualTo("Hello World");
     }
+
+    @Test
+    void handlesNullInput() {
+        MysqlStringLiteralEscapeStrategy strategy = new MysqlStringLiteralEscapeStrategy();
+        String result = strategy.escape(null);
+        assertThat(result).isEmpty();
+    }
 }

@@ -10,6 +10,9 @@ public class StandardSqlStringLiteralEscapeStrategy implements StringLiteralEsca
 
     @Override
     public String escape(String value) {
+        if (value == null) {
+            return "";
+        }
         return value.replace("'", "''");
     }
 }
