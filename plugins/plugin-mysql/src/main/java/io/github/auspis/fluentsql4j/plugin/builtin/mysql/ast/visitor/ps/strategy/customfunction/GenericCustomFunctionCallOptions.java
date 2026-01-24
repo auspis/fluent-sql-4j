@@ -1,33 +1,30 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction;
 
-import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.util.MysqlStringUtil;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Generic options rendering strategy for MySQL custom functions.
- * Renders all options with proper string quoting, no special ordering.
+ * Renders all options with proper parameter binding for security.
  */
 public class GenericCustomFunctionCallOptions implements CustomFunctionCallOptions {
 
     @Override
-    public String renderOptions(Map<String, Object> options) {
+    public PreparedStatementSpec renderOptions(Map<String, Object> options) {
         if (options == null || options.isEmpty()) {
-            return "";
+            return new PreparedStatementSpec("", List.of());
         }
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Object> entry : options.entrySet()) {
-            sb.append(" ").append(entry.getKey()).append(" ");
-            appendValue(sb, entry.getValue());
-        }
-        return sb.toString();
-    }
 
-    private void appendValue(StringBuilder sb, Object value) {
-        if (value instanceof String s) {
-            String escaped = MysqlStringUtil.escape(s);
-            sb.append('\'').append(escaped).append('\'');
-        } else {
-            sb.append(value);
+        StringBuilder sql = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+
+        for (Map.Entry<String, Object> entry : options.entrySet()) {
+            sql.append(" ").append(entry.getKey()).append(" ?");
+            params.add(entry.getValue());
         }
+
+        return new PreparedStatementSpec(sql.toString(), params);
     }
 }
