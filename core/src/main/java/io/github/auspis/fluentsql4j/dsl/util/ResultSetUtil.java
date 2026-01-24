@@ -44,60 +44,14 @@ public final class ResultSetUtil {
      * @return a lazily-driven Stream of mapped rows; closing the stream does not close the ResultSet
      */
     public static <T> Stream<T> stream(ResultSet rs, RowMapper<T> mapper) {
-        if (rs == null) {
-            throw new IllegalArgumentException("ResultSet must not be null");
-        }
-        if (mapper == null) {
-            throw new IllegalArgumentException("RowMapper must not be null");
-        }
+        ResultSet notNullRs = requireNonNull(rs, "ResultSet must not be null");
+        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
 
-        final AtomicBoolean closed = new AtomicBoolean(false);
-
-        Spliterator<T> spliterator =
-                new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL) {
-                    @Override
-                    public boolean tryAdvance(Consumer<? super T> action) {
-                        try {
-                            boolean hasNext = rs.next();
-                            if (!hasNext) {
-                                // reached end: close the ResultSet once
-                                if (closed.compareAndSet(false, true)) {
-                                    try {
-                                        rs.close();
-                                    } catch (SQLException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                                return false;
-                            }
-                            action.accept(mapper.map(rs));
-                            return true;
-                        } catch (SQLException e) {
-                            // on error, attempt to close ResultSet and propagate
-                            if (closed.compareAndSet(false, true)) {
-                                try {
-                                    rs.close();
-                                } catch (SQLException ex) {
-                                    e.addSuppressed(ex);
-                                }
-                            }
-                            throw new RuntimeException(e);
-                        }
-                    }
-                };
-
-        Stream<T> stream = StreamSupport.stream(spliterator, false);
-
-        // Ensure that if the stream is closed prematurely (try-with-resources) the ResultSet is closed too.
-        return stream.onClose(() -> {
-            if (closed.compareAndSet(false, true)) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        return streamInternal(
+                notNullRs,
+                notNullMapper,
+                () -> closeResultSetSafely(notNullRs),
+                e -> closeResultSetSuppressed(notNullRs, e));
     }
 
     /**
@@ -114,15 +68,11 @@ public final class ResultSetUtil {
      * @throws RuntimeException in case of SQL errors while reading the ResultSet
      */
     public static <T> List<T> list(ResultSet rs, RowMapper<T> mapper) {
-        if (rs == null) {
-            throw new IllegalArgumentException("ResultSet must not be null");
-        }
-        if (mapper == null) {
-            throw new IllegalArgumentException("RowMapper must not be null");
-        }
+        ResultSet notNullRs = requireNonNull(rs, "ResultSet must not be null");
+        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
         // Delegate to toStream which guarantees the ResultSet will be closed
         // either when the stream is fully consumed or when the stream is closed.
-        try (Stream<T> stream = stream(rs, mapper)) {
+        try (Stream<T> stream = stream(notNullRs, notNullMapper)) {
             return stream.toList();
         }
     }
@@ -145,100 +95,26 @@ public final class ResultSetUtil {
      * @throws RuntimeException in case of SQL errors while executing or iterating the results
      */
     public static <T> Stream<T> stream(PreparedStatement ps, RowMapper<T> mapper) {
-        if (ps == null) {
-            throw new IllegalArgumentException("PreparedStatement must not be null");
-        }
-        if (mapper == null) {
-            throw new IllegalArgumentException("RowMapper must not be null");
-        }
+        PreparedStatement notNullPs = requireNonNull(ps, "PreparedStatement must not be null");
+        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
 
         final ResultSet rs;
         try {
-            rs = ps.executeQuery();
+            rs = notNullPs.executeQuery();
         } catch (SQLException e) {
-            e.printStackTrace();
-            // on execute failure, attempt to close the PreparedStatement and propagate
             try {
-                ps.close();
+                notNullPs.close();
             } catch (SQLException ex) {
                 e.addSuppressed(ex);
             }
             throw new RuntimeException(e);
         }
 
-        final java.util.concurrent.atomic.AtomicBoolean closed = new AtomicBoolean(false);
-
-        Spliterator<T> spliterator =
-                new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL) {
-                    @Override
-                    public boolean tryAdvance(Consumer<? super T> action) {
-                        try {
-                            boolean hasNext = rs.next();
-                            if (!hasNext) {
-                                // reached end: close ResultSet and PreparedStatement once
-                                if (closed.compareAndSet(false, true)) {
-                                    try {
-                                        rs.close();
-                                    } catch (SQLException e) {
-                                        // try to close ps even if rs.close fails
-                                        try {
-                                            ps.close();
-                                        } catch (SQLException ex) {
-                                            e.addSuppressed(ex);
-                                        }
-                                        throw new RuntimeException(e);
-                                    }
-                                    try {
-                                        ps.close();
-                                    } catch (SQLException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                                return false;
-                            }
-                            action.accept(mapper.map(rs));
-                            return true;
-                        } catch (SQLException e) {
-                            // on error, attempt to close both resources and propagate
-                            if (closed.compareAndSet(false, true)) {
-                                try {
-                                    rs.close();
-                                } catch (SQLException ex) {
-                                    e.addSuppressed(ex);
-                                }
-                                try {
-                                    ps.close();
-                                } catch (SQLException ex) {
-                                    e.addSuppressed(ex);
-                                }
-                            }
-                            throw new RuntimeException(e);
-                        }
-                    }
-                };
-
-        Stream<T> stream = StreamSupport.stream(spliterator, false);
-
-        // Ensure that if the stream is closed prematurely the ResultSet AND PreparedStatement are closed too.
-        return stream.onClose(() -> {
-            if (closed.compareAndSet(false, true)) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    try {
-                        ps.close();
-                    } catch (SQLException ex) {
-                        e.addSuppressed(ex);
-                    }
-                    throw new RuntimeException(e);
-                }
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        return streamInternal(
+                rs,
+                notNullMapper,
+                () -> closeResourcesSafely(rs, notNullPs),
+                e -> closeResourcesSuppressed(rs, notNullPs, e));
     }
 
     /**
@@ -255,15 +131,119 @@ public final class ResultSetUtil {
      * @throws RuntimeException in case of SQL errors while executing or reading the results
      */
     public static <T> List<T> list(PreparedStatement ps, RowMapper<T> mapper) {
-        if (ps == null) {
-            throw new IllegalArgumentException("PreparedStatement must not be null");
-        }
-        if (mapper == null) {
-            throw new IllegalArgumentException("RowMapper must not be null");
-        }
+        PreparedStatement notNullPs = requireNonNull(ps, "PreparedStatement must not be null");
+        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
 
-        try (Stream<T> stream = stream(ps, mapper)) {
+        try (Stream<T> stream = stream(notNullPs, notNullMapper)) {
             return stream.toList();
         }
+    }
+
+    private static <T> Stream<T> streamInternal(
+            ResultSet rs, RowMapper<T> mapper, Runnable closeSafely, Consumer<SQLException> closeSuppressed) {
+        final AtomicBoolean closed = new AtomicBoolean(false);
+
+        Spliterator<T> spliterator =
+                new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.NONNULL) {
+                    @Override
+                    public boolean tryAdvance(Consumer<? super T> action) {
+                        try {
+                            boolean hasNext = rs.next();
+                            if (!hasNext) {
+                                closeOnce(closed, closeSafely);
+                                return false;
+                            }
+                            action.accept(mapper.map(rs));
+                            return true;
+                        } catch (SQLException e) {
+                            closeOnce(closed, () -> closeSuppressed.accept(e));
+                            throw new RuntimeException(e);
+                        }
+                    }
+                };
+
+        Stream<T> stream = StreamSupport.stream(spliterator, false);
+        return stream.onClose(() -> closeOnce(closed, closeSafely));
+    }
+
+    /**
+     * Close a single ResultSet with proper exception handling.
+     * If close fails, wraps the SQLException in a RuntimeException.
+     */
+    private static void closeResultSetSafely(ResultSet rs) {
+        try {
+            rs.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Close a single ResultSet with exception suppression.
+     * If close fails, adds the SQLException as a suppressed exception to the provided original exception.
+     */
+    private static void closeResultSetSuppressed(ResultSet rs, SQLException originalException) {
+        try {
+            rs.close();
+        } catch (SQLException ex) {
+            originalException.addSuppressed(ex);
+        }
+    }
+
+    /**
+     * Close both ResultSet and PreparedStatement with proper exception handling.
+     * Closes ResultSet first, then PreparedStatement. If either fails, exceptions are suppressed
+     * and the original exception is propagated.
+     */
+    private static void closeResourcesSafely(ResultSet rs, PreparedStatement ps) {
+        try {
+            rs.close();
+        } catch (SQLException e) {
+            try {
+                ps.close();
+            } catch (SQLException ex) {
+                e.addSuppressed(ex);
+            }
+            throw new RuntimeException(e);
+        }
+        try {
+            ps.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Close both ResultSet and PreparedStatement with exception suppression.
+     * If either fails, exceptions are added as suppressed to the original exception.
+     */
+    private static void closeResourcesSuppressed(ResultSet rs, PreparedStatement ps, SQLException originalException) {
+        try {
+            rs.close();
+        } catch (SQLException ex) {
+            originalException.addSuppressed(ex);
+        }
+        try {
+            ps.close();
+        } catch (SQLException ex) {
+            originalException.addSuppressed(ex);
+        }
+    }
+
+    /**
+     * Execute a close action exactly once using an atomic gate-keeper.
+     * Prevents duplicate close attempts when multiple paths (error/end/onClose) converge.
+     */
+    private static void closeOnce(AtomicBoolean closed, Runnable closeAction) {
+        if (closed.compareAndSet(false, true)) {
+            closeAction.run();
+        }
+    }
+
+    private static <T> T requireNonNull(T value, String message) {
+        if (value == null) {
+            throw new IllegalArgumentException(message);
+        }
+        return value;
     }
 }
