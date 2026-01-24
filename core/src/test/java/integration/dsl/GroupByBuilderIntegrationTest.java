@@ -126,7 +126,7 @@ class GroupByBuilderIntegrationTest {
                         .fetch(1)
                         .build(connection))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("GROUP BY column must not contain dot notation");
+                .hasMessageContaining("Column name must not contain dot notation: 'customers.country'");
     }
 
     @Test
@@ -140,6 +140,6 @@ class GroupByBuilderIntegrationTest {
                         .fetch(1)
                         .build(connection))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("GROUP BY alias must not contain dot notation");
+                .hasMessageContaining("Table reference must not contain dot: 'c.invalid'");
     }
 }

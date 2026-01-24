@@ -1045,7 +1045,7 @@ class HavingConditionBuilderTest {
                         .column(null, "total")
                         .gt(1000))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -1058,7 +1058,7 @@ class HavingConditionBuilderTest {
                         .column("", "total")
                         .gt(1000))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -1071,7 +1071,7 @@ class HavingConditionBuilderTest {
                         .column("o.x", "total")
                         .gt(1000))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias must not contain dot");
+                .hasMessageContaining("Table reference must not contain dot");
     }
 
     @Test
@@ -1126,7 +1126,7 @@ class HavingConditionBuilderTest {
                         .column("orders.total")
                         .gt(1000))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Dot notation not supported");
+                .hasMessageContaining("Column name must not contain dot notation");
     }
 
     // Column-to-column comparisons (new feature)
@@ -1306,7 +1306,7 @@ class HavingConditionBuilderTest {
                         .gt()
                         .column(null, "quota"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -1321,7 +1321,7 @@ class HavingConditionBuilderTest {
                         .eq()
                         .column("", "expected_count"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -1336,7 +1336,7 @@ class HavingConditionBuilderTest {
                         .ne()
                         .column("b.x", "market_price"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias must not contain dot");
+                .hasMessageContaining("Table reference must not contain dot");
     }
 
     @Test
@@ -1351,7 +1351,7 @@ class HavingConditionBuilderTest {
                         .lte()
                         .column("t", null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column cannot be null or empty");
+                .hasMessageContaining("Column name cannot be null or empty");
     }
 
     @Test
@@ -1366,7 +1366,7 @@ class HavingConditionBuilderTest {
                         .gte()
                         .column("l", ""))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column cannot be null or empty");
+                .hasMessageContaining("Column name cannot be null or empty");
     }
 
     @Test
@@ -1381,6 +1381,6 @@ class HavingConditionBuilderTest {
                         .lt()
                         .column("p", "table.projected_revenue"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column must not contain dot");
+                .hasMessageContaining("Column name must not contain dot");
     }
 }

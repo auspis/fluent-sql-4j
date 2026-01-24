@@ -241,7 +241,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().asc(null, "customer_id"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -251,7 +251,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().asc("  ", "customer_id"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -261,7 +261,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().asc("o.x", "customer_id"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY alias must not contain dot notation");
+                .hasMessageContaining("Table reference must not contain dot: 'o.x'");
     }
 
     @Test
@@ -271,7 +271,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().asc("o", null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column cannot be null or empty");
+                .hasMessageContaining("Column name cannot be null or empty");
     }
 
     @Test
@@ -281,7 +281,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().asc("o", "  "))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column cannot be null or empty");
+                .hasMessageContaining("Column name cannot be null or empty");
     }
 
     @Test
@@ -291,8 +291,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().asc("o", "x.customer_id"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column must not contain dot notation")
-                .hasMessageContaining("Use asc(alias, column) with separate parameters");
+                .hasMessageContaining("Column name must not contain dot");
     }
 
     @Test
@@ -302,7 +301,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().desc(null, "customer_id"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -312,7 +311,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().desc("o.x", "customer_id"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY alias must not contain dot notation");
+                .hasMessageContaining("Table reference must not contain dot: 'o.x'");
     }
 
     @Test
@@ -322,8 +321,7 @@ class SelectBuilderOrderByTest {
 
         assertThatThrownBy(() -> builder.orderBy().desc("o", "x.status"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column must not contain dot notation")
-                .hasMessageContaining("Use desc(alias, column) with separate parameters");
+                .hasMessageContaining("Column name must not contain dot");
     }
 
     @Test
