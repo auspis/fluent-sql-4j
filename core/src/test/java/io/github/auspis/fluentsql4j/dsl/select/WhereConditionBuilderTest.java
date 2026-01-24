@@ -863,7 +863,7 @@ class WhereConditionBuilderTest {
                         .column(null, "age")
                         .gt(18))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -875,7 +875,7 @@ class WhereConditionBuilderTest {
                         .column("", "age")
                         .gt(18))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -887,7 +887,7 @@ class WhereConditionBuilderTest {
                         .column("u.x", "age")
                         .gt(18))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias must not contain dot");
+                .hasMessageContaining("Table reference must not contain dot");
     }
 
     @Test
@@ -934,7 +934,7 @@ class WhereConditionBuilderTest {
                         .column("users.age")
                         .gt(18))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Dot notation not supported");
+                .hasMessageContaining("Column name must not contain dot notation");
     }
 
     // Column-to-column comparisons (new feature)
@@ -1096,7 +1096,7 @@ class WhereConditionBuilderTest {
                         .gt()
                         .column(null, "age"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -1109,7 +1109,7 @@ class WhereConditionBuilderTest {
                         .eq()
                         .column("", "age"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias cannot be null or empty");
+                .hasMessageContaining("Table reference cannot be null or empty");
     }
 
     @Test
@@ -1122,7 +1122,7 @@ class WhereConditionBuilderTest {
                         .ne()
                         .column("u.x", "age"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Alias must not contain dot");
+                .hasMessageContaining("Table reference must not contain dot");
     }
 
     @Test
@@ -1135,7 +1135,7 @@ class WhereConditionBuilderTest {
                         .lte()
                         .column("e", null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column cannot be null or empty");
+                .hasMessageContaining("Column name cannot be null or empty");
     }
 
     @Test
@@ -1148,7 +1148,7 @@ class WhereConditionBuilderTest {
                         .gte()
                         .column("e", ""))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column cannot be null or empty");
+                .hasMessageContaining("Column name cannot be null or empty");
     }
 
     @Test
@@ -1161,6 +1161,6 @@ class WhereConditionBuilderTest {
                         .lt()
                         .column("e", "table.age"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column must not contain dot");
+                .hasMessageContaining("Column name must not contain dot");
     }
 }

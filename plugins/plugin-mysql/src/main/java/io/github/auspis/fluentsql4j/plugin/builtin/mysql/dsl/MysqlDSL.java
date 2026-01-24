@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl;
 
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.PredicateExpression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +118,7 @@ public class MysqlDSL extends DSL {
             case ScalarExpression se -> se;
             case Predicate predicate -> /* Wrap predicate as an expression for use in functions like IF() */
                 new PredicateExpression(predicate);
-            case String str -> ColumnReference.of("", str);
+            case String str -> ColumnReferenceUtil.createWithTableReference("", str);
             case Number n -> Literal.of(n);
             case Boolean b -> Literal.of(b);
             case null, default -> /* Fallback: treat as string literal */ Literal.of(String.valueOf(value));

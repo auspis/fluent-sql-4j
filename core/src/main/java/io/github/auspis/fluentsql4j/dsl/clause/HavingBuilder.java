@@ -2,6 +2,7 @@ package io.github.auspis.fluentsql4j.dsl.clause;
 
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 
 /**
  * Builder for HAVING clause that supports column conditions.
@@ -43,14 +44,9 @@ public class HavingBuilder {
      * @throws IllegalArgumentException if column is null, empty, or contains dot notation
      */
     public HavingConditionBuilder column(String column) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException(
-                    "Dot notation not supported. Use column(alias, column) for qualified references");
-        }
-        return new HavingConditionBuilder(parent, column, combinator);
+        ColumnReference colRef =
+                ColumnReferenceUtil.createValidatedWithTrustedTable(parent.getTableReference(), column);
+        return new HavingConditionBuilder(parent, colRef, combinator);
     }
 
     /**
@@ -73,20 +69,7 @@ public class HavingBuilder {
      * @throws IllegalArgumentException if alias or column is null, empty, or contains dot notation
      */
     public HavingConditionBuilder column(String alias, String column) {
-        if (alias == null || alias.trim().isEmpty()) {
-            throw new IllegalArgumentException("Alias cannot be null or empty");
-        }
-        if (alias.contains(".")) {
-            throw new IllegalArgumentException("Alias must not contain dot: '" + alias + "'");
-        }
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException(
-                    "Column name must not contain dot. Use column(alias, column) with separate parameters");
-        }
-        ColumnReference colRef = ColumnReference.of(alias, column);
+        ColumnReference colRef = ColumnReferenceUtil.createValidated(alias, column);
         return new HavingConditionBuilder(parent, colRef, combinator);
     }
 }
