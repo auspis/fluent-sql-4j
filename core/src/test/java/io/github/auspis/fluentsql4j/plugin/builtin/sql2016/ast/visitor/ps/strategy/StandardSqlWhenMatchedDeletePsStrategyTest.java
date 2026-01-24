@@ -56,4 +56,17 @@ class StandardSqlWhenMatchedDeletePsStrategyTest {
         assertThat(result.sql()).isEqualTo("WHEN MATCHED AND \"status\" = ? THEN DELETE");
         assertThat(result.parameters()).containsExactly("inactive");
     }
+
+    @Test
+    void withJoinOnContext() {
+        AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        Comparison condition =
+                Comparison.lt(ColumnReference.of("tgt", "quantity"), ColumnReference.of("src", "min_qty"));
+        WhenMatchedDelete action = new WhenMatchedDelete(condition);
+
+        PreparedStatementSpec result = strategy.handle(action, visitor, onCtx);
+
+        assertThat(result.sql()).isEqualTo("WHEN MATCHED AND \"tgt\".\"quantity\" < \"src\".\"min_qty\" THEN DELETE");
+        assertThat(result.parameters()).isEmpty();
+    }
 }
