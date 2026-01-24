@@ -21,4 +21,25 @@ class GenericCustomFunctionCallOptionsTest {
         String sql = strategy.renderOptions(Map.of());
         assertThat(sql).isEmpty();
     }
+
+    @Test
+    void escapesSingleQuotesInStringValues() {
+        CustomFunctionCallOptions strategy = new GenericCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("OPTION", "it's a test"));
+        assertThat(sql).isEqualTo(" OPTION 'it''s a test'");
+    }
+
+    @Test
+    void preventsSqlInjectionWithSingleQuotes() {
+        CustomFunctionCallOptions strategy = new GenericCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("OPTION", "', DROP TABLE users--"));
+        assertThat(sql).isEqualTo(" OPTION ''', DROP TABLE users--'");
+    }
+
+    @Test
+    void escapesMultipleSingleQuotes() {
+        CustomFunctionCallOptions strategy = new GenericCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("OPTION", "it's John's book"));
+        assertThat(sql).isEqualTo(" OPTION 'it''s John''s book'");
+    }
 }

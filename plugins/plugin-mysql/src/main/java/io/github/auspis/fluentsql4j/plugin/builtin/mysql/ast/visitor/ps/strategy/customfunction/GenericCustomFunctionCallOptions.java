@@ -22,8 +22,9 @@ public class GenericCustomFunctionCallOptions implements CustomFunctionCallOptio
     }
 
     private void appendValue(StringBuilder sb, Object value) {
-        if (value instanceof String) {
-            sb.append('\'').append(value).append('\'');
+        if (value instanceof String stringValue) {
+            String escaped = stringValue.replace("'", "''");
+            sb.append('\'').append(escaped).append('\'');
         } else {
             sb.append(value);
         }
