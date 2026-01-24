@@ -316,20 +316,7 @@ public class HavingConditionBuilder {
          * Compare with a column from another table.
          */
         public SelectBuilder column(String alias, String column) {
-            if (alias == null || alias.trim().isEmpty()) {
-                throw new IllegalArgumentException("Alias cannot be null or empty");
-            }
-            if (alias.contains(".")) {
-                throw new IllegalArgumentException("Alias must not contain dot");
-            }
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column cannot be null or empty");
-            }
-            if (column.contains(".")) {
-                throw new IllegalArgumentException("Column must not contain dot");
-            }
-
-            ColumnReference rightColumn = ColumnReference.of(alias, column);
+            ColumnReference rightColumn = ColumnReferenceUtil.createValidated(alias, column);
             Predicate condition =
                     switch (operator) {
                         case EQUALS -> Comparison.eq(parent.getColumnRef(), rightColumn);

@@ -10,6 +10,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.MergeStatementPsStrategy;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +76,8 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
             // Fallback: build column references from source
             List<String> selectExprs = new ArrayList<>();
             for (var col : insertAction.columns()) {
-                ColumnReference sourceCol = ColumnReference.of(sourceAlias, col.column());
+                ColumnReference sourceCol =
+                        ColumnReferenceUtil.createValidatedWithTrustedTable(sourceAlias, col.column());
                 PreparedStatementSpec colDto = sourceCol.accept(astToPsSpecVisitor, selectCtx);
                 selectExprs.add(colDto.sql());
             }

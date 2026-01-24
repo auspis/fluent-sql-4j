@@ -6,6 +6,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.select.SelectProjectionBuilder;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders.MysqlCoalesceBuilder;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders.MysqlConcatBuilder;
@@ -113,8 +114,7 @@ public class MysqlSelectProjectionBuilder extends SelectProjectionBuilder<MysqlS
         Objects.requireNonNull(column, "Column must not be null");
         Objects.requireNonNull(format, "Format must not be null");
 
-        ColumnReference columnRef =
-                table != null && !table.isEmpty() ? ColumnReference.of(table, column) : ColumnReference.of("", column);
+        ColumnReference columnRef = ColumnReferenceUtil.createWithTableReference(table, column);
 
         Literal<String> formatLiteral = Literal.of(format);
 
@@ -158,8 +158,7 @@ public class MysqlSelectProjectionBuilder extends SelectProjectionBuilder<MysqlS
         Objects.requireNonNull(column, "Column must not be null");
         Objects.requireNonNull(defaultValue, "Default value must not be null");
 
-        ColumnReference columnRef =
-                table != null && !table.isEmpty() ? ColumnReference.of(table, column) : ColumnReference.of("", column);
+        ColumnReference columnRef = ColumnReferenceUtil.createWithTableReference(table, column);
 
         Literal<String> defaultLiteral = Literal.of(defaultValue);
 
