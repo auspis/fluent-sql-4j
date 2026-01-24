@@ -6,6 +6,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,11 +155,11 @@ public class PostgreSqlDSL extends DSL {
         private boolean distinct = false;
 
         StringAggBuilder(String column) {
-            this.column = ColumnReference.of("", column);
+            this.column = ColumnReferenceUtil.createWithTableReference("", column);
         }
 
         StringAggBuilder(String table, String column) {
-            this.column = ColumnReference.of(table, column);
+            this.column = ColumnReferenceUtil.createWithTableReference(table, column);
         }
 
         /**
@@ -219,7 +220,7 @@ public class PostgreSqlDSL extends DSL {
         private boolean distinct = false;
 
         ArrayAggBuilder(String column) {
-            this.column = ColumnReference.of("", column);
+            this.column = ColumnReferenceUtil.createWithTableReference("", column);
         }
 
         public ArrayAggBuilder orderBy(String orderBy) {
@@ -251,7 +252,7 @@ public class PostgreSqlDSL extends DSL {
         private String orderBy;
 
         JsonbAggBuilder(String column) {
-            this.column = ColumnReference.of("", column);
+            this.column = ColumnReferenceUtil.createWithTableReference("", column);
         }
 
         public JsonbAggBuilder orderBy(String orderBy) {

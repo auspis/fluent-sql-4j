@@ -12,6 +12,9 @@ import java.util.UUID;
 @SuppressWarnings("java:S2115")
 public final class TestDatabaseUtil {
 
+    private static final String BIRTHDATE_1990 = "1990-01-01";
+    private static final String BIRTHDATE_1995 = "1995-01-01";
+    private static final String CREATED_AT_2023 = "2023-01-01";
     /**
      * Database password used for test database connections.
      * <p>
@@ -182,10 +185,11 @@ public final class TestDatabaseUtil {
         String sql = "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), CAST(? AS JSON))";
         try (var pstmt = connection.prepareStatement(sql)) {
             // Users without JSON data
-            insertUser(pstmt, 1, "John Doe", "john@example.com", 30, true, "1990-01-01", "2023-01-01", null, null);
-            insertUser(pstmt, 2, "Jane Smith", "jane@example.com", 25, true, "1995-01-01", "2023-01-01", null, null);
-            insertUser(pstmt, 3, "Bob", "bob@example.com", 15, false, "2005-01-01", "2023-01-01", null, null);
-            insertUser(pstmt, 4, "Alice", "alice@example.com", 35, true, "1990-01-01", "2023-01-01", null, null);
+            insertUser(pstmt, 1, "John Doe", "john@example.com", 30, true, BIRTHDATE_1990, CREATED_AT_2023, null, null);
+            insertUser(
+                    pstmt, 2, "Jane Smith", "jane@example.com", 25, true, BIRTHDATE_1995, CREATED_AT_2023, null, null);
+            insertUser(pstmt, 3, "Bob", "bob@example.com", 15, false, "2005-01-01", CREATED_AT_2023, null, null);
+            insertUser(pstmt, 4, "Alice", "alice@example.com", 35, true, BIRTHDATE_1990, CREATED_AT_2023, null, null);
             insertUser(pstmt, 5, "Charlie", "charlie@example.com", 30, true, "1991-01-01", "2023-01-02", null, null);
             insertUser(pstmt, 6, "Diana", "diana@example.com", 25, false, "1996-01-01", "2023-01-03", null, null);
             insertUser(pstmt, 7, "Eve", "eve@example.com", 40, true, "1985-01-01", "2023-01-04", null, null);
@@ -220,7 +224,7 @@ public final class TestDatabaseUtil {
                     "henry@example.com",
                     30,
                     true,
-                    "1995-01-01",
+                    BIRTHDATE_1995,
                     "2023-01-07",
                     "{\"street\":\"Corso Vittorio 78\",\"city\":\"Turin\",\"zip\":\"10100\",\"country\":\"Italy\"}",
                     "[\"sms\",\"push\",\"phone\"]");
@@ -346,11 +350,12 @@ public final class TestDatabaseUtil {
                     "john.newemail@example.com",
                     31,
                     true,
-                    "1990-01-01",
-                    "2023-01-01",
+                    BIRTHDATE_1990,
+                    CREATED_AT_2023,
                     null,
                     null);
-            insertUser(pstmt, 2, "Jane Smith", "jane@example.com", 25, true, "1995-01-01", "2023-01-01", null, null);
+            insertUser(
+                    pstmt, 2, "Jane Smith", "jane@example.com", 25, true, BIRTHDATE_1995, CREATED_AT_2023, null, null);
             insertUser(pstmt, 11, "New User", "newuser@example.com", 28, true, "2000-01-01", "2023-01-08", null, null);
         }
     }

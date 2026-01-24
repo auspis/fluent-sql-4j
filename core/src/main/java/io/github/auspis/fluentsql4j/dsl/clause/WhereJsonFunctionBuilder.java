@@ -11,6 +11,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
 import io.github.auspis.fluentsql4j.ast.core.predicate.IsNotNull;
 import io.github.auspis.fluentsql4j.ast.core.predicate.IsNull;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 
 /**
  * Fluent builder for JSON functions in WHERE conditions.
@@ -58,7 +59,7 @@ public class WhereJsonFunctionBuilder<T extends SupportsWhere<T>> {
         this.parent = parent;
         // Use parent's table reference if table is null or empty
         String tableRef = (table == null || table.isEmpty()) ? parent.getTableReference() : table;
-        this.jsonDocument = ColumnReference.of(tableRef, column);
+        this.jsonDocument = ColumnReferenceUtil.createWithTableReference(tableRef, column);
         this.path = path;
         this.functionType = functionType;
         this.combinator = combinator;

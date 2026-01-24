@@ -1,13 +1,13 @@
 package io.github.auspis.fluentsql4j.dsl.select;
 
 import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCall;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
 import io.github.auspis.fluentsql4j.ast.dql.projection.AggregateCallProjection;
 import io.github.auspis.fluentsql4j.ast.dql.projection.Projection;
 import io.github.auspis.fluentsql4j.ast.dql.projection.ScalarExpressionProjection;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
 
     public SELF column(String table, String column) {
         finalizePendingProjection();
-        pendingProjection = new ScalarExpressionProjection(ColumnReference.of(table, column));
+        pendingProjection = new ScalarExpressionProjection(ColumnReferenceUtil.createWithTableReference(table, column));
         return self();
     }
 
@@ -55,7 +55,8 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
 
     public SELF sum(String table, String column) {
         finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.sum(ColumnReference.of(table, column)));
+        pendingProjection = new AggregateCallProjection(
+                AggregateCall.sum(ColumnReferenceUtil.createWithTableReference(table, column)));
         return self();
     }
 
@@ -65,7 +66,8 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
 
     public SELF avg(String table, String column) {
         finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.avg(ColumnReference.of(table, column)));
+        pendingProjection = new AggregateCallProjection(
+                AggregateCall.avg(ColumnReferenceUtil.createWithTableReference(table, column)));
         return self();
     }
 
@@ -75,7 +77,8 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
 
     public SELF count(String table, String column) {
         finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.count(ColumnReference.of(table, column)));
+        pendingProjection = new AggregateCallProjection(
+                AggregateCall.count(ColumnReferenceUtil.createWithTableReference(table, column)));
         return self();
     }
 
@@ -91,7 +94,8 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
 
     public SELF countDistinct(String table, String column) {
         finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.countDistinct(ColumnReference.of(table, column)));
+        pendingProjection = new AggregateCallProjection(
+                AggregateCall.countDistinct(ColumnReferenceUtil.createWithTableReference(table, column)));
         return self();
     }
 
@@ -101,7 +105,8 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
 
     public SELF max(String table, String column) {
         finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.max(ColumnReference.of(table, column)));
+        pendingProjection = new AggregateCallProjection(
+                AggregateCall.max(ColumnReferenceUtil.createWithTableReference(table, column)));
         return self();
     }
 
@@ -111,7 +116,8 @@ public class SelectProjectionBuilder<SELF extends SelectProjectionBuilder<SELF>>
 
     public SELF min(String table, String column) {
         finalizePendingProjection();
-        pendingProjection = new AggregateCallProjection(AggregateCall.min(ColumnReference.of(table, column)));
+        pendingProjection = new AggregateCallProjection(
+                AggregateCall.min(ColumnReferenceUtil.createWithTableReference(table, column)));
         return self();
     }
 
