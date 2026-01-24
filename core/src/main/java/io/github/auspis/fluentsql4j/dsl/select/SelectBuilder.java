@@ -27,6 +27,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.dsl.clause.HavingBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
 import io.github.auspis.fluentsql4j.dsl.clause.SupportsWhere;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.dsl.util.PsUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -161,53 +162,62 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
 
     private void updateSelectClauseWithTable(TableIdentifier table) {
         Select currentSelect = getCurrentStatement().getSelect();
-        if (currentSelect != null && !currentSelect.projections().isEmpty()) {
-            List<Projection> updatedProjections = new ArrayList<>();
-
-            for (var projection : currentSelect.projections()) {
-                if (projection instanceof ScalarExpressionProjection scalarProj
-                        && scalarProj.expression() instanceof ColumnReference colRef) {
-                    boolean hasTable = colRef.table() != null && !colRef.table().isEmpty();
-                    boolean retargetToCurrent = !hasTable || colRef.table().equals(table.name());
-                    if ("*".equals(colRef.column()) || !retargetToCurrent) {
-                        updatedProjections.add(scalarProj);
-                    } else {
-                        ColumnReference updatedCol = ColumnReference.of(table.getTableReference(), colRef.column());
-                        // Preserve the alias if present
-                        if (scalarProj.as() != null && !scalarProj.as().name().isEmpty()) {
-                            updatedProjections.add(new ScalarExpressionProjection(updatedCol, scalarProj.as()));
-                        } else {
-                            updatedProjections.add(new ScalarExpressionProjection(updatedCol));
-                        }
-                    }
-                } else if (projection instanceof AggregateCallProjection aggProj) {
-                    // Update aggregate call projections with table reference
-                    AggregateCall aggCall = (AggregateCall) aggProj.expression();
-                    AggregateCall updatedAggCall = updateAggregateCallWithTable(aggCall, table);
-                    if (aggProj.as() != null && !aggProj.as().name().isEmpty()) {
-                        updatedProjections.add(new AggregateCallProjection(updatedAggCall, aggProj.as()));
-                    } else {
-                        updatedProjections.add(new AggregateCallProjection(updatedAggCall));
-                    }
-                } else {
-                    updatedProjections.add(projection);
-                }
-            }
-
-            if (!updatedProjections.isEmpty()) {
-                statementBuilder = statementBuilder.select(Select.of(updatedProjections.toArray(new Projection[0])));
-            }
+        if (currentSelect == null || currentSelect.projections().isEmpty()) {
+            return;
         }
+
+        List<Projection> updatedProjections = new ArrayList<>();
+        for (var projection : currentSelect.projections()) {
+            Projection updated =
+                    switch (projection) {
+                        case ScalarExpressionProjection scalarProj -> updateScalarProjection(scalarProj, table);
+                        case AggregateCallProjection aggProj -> updateAggregateProjection(aggProj, table);
+                        default -> projection;
+                    };
+            updatedProjections.add(updated);
+        }
+
+        if (!updatedProjections.isEmpty()) {
+            statementBuilder = statementBuilder.select(Select.of(updatedProjections.toArray(new Projection[0])));
+        }
+    }
+
+    private Projection updateScalarProjection(ScalarExpressionProjection scalarProj, TableIdentifier table) {
+        if (!(scalarProj.expression() instanceof ColumnReference colRef)) {
+            return scalarProj;
+        }
+
+        if (ColumnReferenceUtil.isWildcard(colRef) || !ColumnReferenceUtil.shouldRetarget(colRef, table.name())) {
+            return scalarProj;
+        }
+
+        ColumnReference updatedCol =
+                ColumnReferenceUtil.retargetIfApplicable(colRef, table.name(), table.getTableReference());
+
+        // Preserve the alias if present
+        if (scalarProj.as() != null && !scalarProj.as().name().isEmpty()) {
+            return new ScalarExpressionProjection(updatedCol, scalarProj.as());
+        }
+        return new ScalarExpressionProjection(updatedCol);
+    }
+
+    private Projection updateAggregateProjection(AggregateCallProjection aggProj, TableIdentifier table) {
+        AggregateCall aggCall = (AggregateCall) aggProj.expression();
+        AggregateCall updatedAggCall = updateAggregateCallWithTable(aggCall, table);
+
+        // Preserve the alias if present
+        if (aggProj.as() != null && !aggProj.as().name().isEmpty()) {
+            return new AggregateCallProjection(updatedAggCall, aggProj.as());
+        }
+        return new AggregateCallProjection(updatedAggCall);
     }
 
     private AggregateCall updateAggregateCallWithTable(AggregateCall aggCall, TableIdentifier table) {
         return switch (aggCall) {
             case AggregateCallImpl impl -> {
                 if (impl.expression() instanceof ColumnReference colRef) {
-                    boolean hasTable = colRef.table() != null && !colRef.table().isEmpty();
-                    boolean retargetToCurrent = !hasTable || colRef.table().equals(table.name());
                     ColumnReference targetCol =
-                            retargetToCurrent ? ColumnReference.of(table.getTableReference(), colRef.column()) : colRef;
+                            ColumnReferenceUtil.retargetIfApplicable(colRef, table.name(), table.getTableReference());
                     yield switch (impl.operator()) {
                         case MAX -> AggregateCall.max(targetCol);
                         case MIN -> AggregateCall.min(targetCol);
@@ -220,10 +230,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
             }
             case CountDistinct cd -> {
                 if (cd.expression() instanceof ColumnReference colRef) {
-                    boolean hasTable = colRef.table() != null && !colRef.table().isEmpty();
-                    boolean retargetToCurrent = !hasTable || colRef.table().equals(table.name());
                     ColumnReference targetCol =
-                            retargetToCurrent ? ColumnReference.of(table.getTableReference(), colRef.column()) : colRef;
+                            ColumnReferenceUtil.retargetIfApplicable(colRef, table.name(), table.getTableReference());
                     yield AggregateCall.countDistinct(targetCol);
                 }
                 yield cd;
