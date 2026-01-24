@@ -11,6 +11,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.window.Rank;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.RowNumber;
 import io.github.auspis.fluentsql4j.ast.core.expression.window.WindowFunction;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,10 +92,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
             String column,
             int offset) {
         this(projectionBuilder, defaultTableReference, functionType);
-        this.lagLeadExpression = toDefaultColumnReference(
-                column,
-                "LAG/LEAD column cannot be null or empty",
-                "LAG/LEAD column must not contain dot notation. Use lag(table, column, offset) or lead(table, column, offset) with separate parameters");
+        this.lagLeadExpression = toDefaultColumnReference(column);
         this.lagLeadOffset = offset;
     }
 
@@ -109,13 +107,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
             String column,
             int offset) {
         this(projectionBuilder, defaultTableReference, functionType);
-        this.lagLeadExpression = toQualifiedColumnReference(
-                table,
-                column,
-                "LAG/LEAD table cannot be null or empty",
-                "LAG/LEAD column cannot be null or empty",
-                "LAG/LEAD table must not contain dot notation: '",
-                "LAG/LEAD column must not contain dot notation: '");
+        this.lagLeadExpression = toQualifiedColumnReference(table, column);
         this.lagLeadOffset = offset;
     }
 
@@ -126,11 +118,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> partitionBy(String column) {
-        partitionByColumns.add(
-                toDefaultColumnReference(
-                        column,
-                        "PARTITION BY column cannot be null or empty",
-                        "PARTITION BY column must not contain dot notation. Use partitionBy(table, column) with separate parameters"));
+        partitionByColumns.add(toDefaultColumnReference(column));
         return this;
     }
 
@@ -142,14 +130,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> partitionBy(String table, String column) {
-        partitionByColumns.add(
-                toQualifiedColumnReference(
-                        table,
-                        column,
-                        "PARTITION BY table cannot be null or empty",
-                        "PARTITION BY column cannot be null or empty",
-                        "PARTITION BY table must not contain dot notation: '",
-                        "PARTITION BY column must not contain dot notation. Use partitionBy(table, column) with separate parameters: '"));
+        partitionByColumns.add(toQualifiedColumnReference(table, column));
         return this;
     }
 
@@ -160,10 +141,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByAsc(String column) {
-        ColumnReference columnRef = toDefaultColumnReference(
-                column,
-                "ORDER BY column cannot be null or empty",
-                "ORDER BY column must not contain dot notation. Use orderByAsc(table, column) with separate parameters");
+        ColumnReference columnRef = toDefaultColumnReference(column);
         orderByList.add(Sorting.asc(columnRef));
         return this;
     }
@@ -175,10 +153,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByDesc(String column) {
-        ColumnReference columnRef = toDefaultColumnReference(
-                column,
-                "ORDER BY column cannot be null or empty",
-                "ORDER BY column must not contain dot notation. Use orderByDesc(table, column) with separate parameters");
+        ColumnReference columnRef = toDefaultColumnReference(column);
         orderByList.add(Sorting.desc(columnRef));
         return this;
     }
@@ -191,13 +166,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByAsc(String table, String column) {
-        ColumnReference columnRef = toQualifiedColumnReference(
-                table,
-                column,
-                "ORDER BY table cannot be null or empty",
-                "ORDER BY column cannot be null or empty",
-                "ORDER BY table must not contain dot notation: '",
-                "ORDER BY column must not contain dot notation. Use orderByAsc(table, column) with separate parameters: '");
+        ColumnReference columnRef = toQualifiedColumnReference(table, column);
         orderByList.add(Sorting.asc(columnRef));
         return this;
     }
@@ -210,13 +179,7 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
      * @return this builder for chaining
      */
     public WindowFunctionBuilder<PARENT> orderByDesc(String table, String column) {
-        ColumnReference columnRef = toQualifiedColumnReference(
-                table,
-                column,
-                "ORDER BY table cannot be null or empty",
-                "ORDER BY column cannot be null or empty",
-                "ORDER BY table must not contain dot notation: '",
-                "ORDER BY column must not contain dot notation. Use orderByDesc(table, column) with separate parameters: '");
+        ColumnReference columnRef = toQualifiedColumnReference(table, column);
         orderByList.add(Sorting.desc(columnRef));
         return this;
     }
@@ -322,37 +285,16 @@ public class WindowFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT
     }
 
     /**
-     * Parses a column reference, handling both "table.column" and "column" formats.
+     * Creates a column reference with the default table reference.
      */
-    private ColumnReference toDefaultColumnReference(String column, String nullOrEmptyMessage, String dotMessage) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException(nullOrEmptyMessage);
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException(dotMessage + ": '" + column + "'");
-        }
-        return ColumnReference.of(defaultTableReference, column);
+    private ColumnReference toDefaultColumnReference(String column) {
+        return ColumnReferenceUtil.createValidatedWithTrustedTable(defaultTableReference, column);
     }
 
-    private ColumnReference toQualifiedColumnReference(
-            String table,
-            String column,
-            String tableNullOrEmptyMessage,
-            String columnNullOrEmptyMessage,
-            String tableDotMessagePrefix,
-            String columnDotMessagePrefix) {
-        if (table == null || table.trim().isEmpty()) {
-            throw new IllegalArgumentException(tableNullOrEmptyMessage);
-        }
-        if (table.contains(".")) {
-            throw new IllegalArgumentException(tableDotMessagePrefix + table + "'");
-        }
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException(columnNullOrEmptyMessage);
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException(columnDotMessagePrefix + column + "'");
-        }
-        return ColumnReference.of(table, column);
+    /**
+     * Creates a validated column reference with explicit table reference.
+     */
+    private ColumnReference toQualifiedColumnReference(String table, String column) {
+        return ColumnReferenceUtil.createValidated(table, column);
     }
 }
