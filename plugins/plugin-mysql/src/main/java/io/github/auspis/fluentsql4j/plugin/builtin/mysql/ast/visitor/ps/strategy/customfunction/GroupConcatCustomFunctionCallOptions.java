@@ -1,5 +1,7 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction;
 
+import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.StringLiteralEscapeStrategy;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MysqlStringLiteralEscapeStrategy;
 import java.util.Map;
 
 /**
@@ -10,6 +12,16 @@ public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallO
 
     private static final String OPTION_ORDER_BY = "ORDER BY";
     private static final String OPTION_SEPARATOR = "SEPARATOR";
+
+    private final StringLiteralEscapeStrategy escapeStrategy;
+
+    public GroupConcatCustomFunctionCallOptions() {
+        this(new MysqlStringLiteralEscapeStrategy());
+    }
+
+    public GroupConcatCustomFunctionCallOptions(StringLiteralEscapeStrategy escapeStrategy) {
+        this.escapeStrategy = escapeStrategy;
+    }
 
     @Override
     public String renderOptions(Map<String, Object> options) {
@@ -39,7 +51,7 @@ public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallO
 
     private void appendValue(StringBuilder sb, Object value) {
         if (value instanceof String stringValue) {
-            String escaped = stringValue.replace("'", "''");
+            String escaped = escapeStrategy.escape(stringValue);
             sb.append('\'').append(escaped).append('\'');
         } else {
             sb.append(value);
