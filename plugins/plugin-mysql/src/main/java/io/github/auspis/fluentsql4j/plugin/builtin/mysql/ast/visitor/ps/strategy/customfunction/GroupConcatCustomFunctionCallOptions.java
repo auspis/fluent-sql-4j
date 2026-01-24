@@ -39,7 +39,7 @@ public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallO
 
     private void appendValue(StringBuilder sb, Object value) {
         if (value instanceof String) {
-            String escaped = value.toString().replace("'", "''");
+            String escaped = ((String) value).replace("'", "''");
             sb.append('\'').append(escaped).append('\'');
         } else {
             sb.append(value);
