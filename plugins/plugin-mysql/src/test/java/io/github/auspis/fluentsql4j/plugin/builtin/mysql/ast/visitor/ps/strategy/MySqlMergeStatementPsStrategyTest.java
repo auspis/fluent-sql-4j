@@ -8,6 +8,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
+import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedDelete;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenMatchedUpdate;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeUsing;
@@ -126,5 +127,27 @@ class MySqlMergeStatementPsStrategyTest {
         assertThatThrownBy(() -> strategy.handle(stmt, specFactory, new AstContext()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("MySQL MERGE requires a WHEN NOT MATCHED THEN INSERT clause");
+    }
+
+    @Test
+    void mergeWithWhenMatchedDelete_throwsUnsupportedOperationException() {
+        MergeStatement stmt = MergeStatement.builder()
+                .targetTable(new TableIdentifier("users"))
+                .using(new MergeUsing(new TableIdentifier("users_updates", "src")))
+                .onCondition(Comparison.eq(ColumnReference.of("users", "id"), ColumnReference.of("src", "id")))
+                .actions(List.of(
+                        new WhenMatchedDelete(null),
+                        new WhenNotMatchedInsert(
+                                List.of(ColumnReference.of("", "id"), ColumnReference.of("", "name")),
+                                InsertData.InsertValues.of(ColumnReference.of("src", "id"), Literal.of("John")))))
+                .build();
+
+        AstToPreparedStatementSpecVisitor specFactory = AstToPreparedStatementSpecVisitor.builder()
+                .escapeStrategy(new MysqlEscapeStrategy())
+                .build();
+        MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
+        assertThatThrownBy(() -> strategy.handle(stmt, specFactory, new AstContext()))
+                .isInstanceOf(UnsupportedOperationException.class)
+                .hasMessageContaining("MySQL does not support WHEN MATCHED THEN DELETE");
     }
 }
