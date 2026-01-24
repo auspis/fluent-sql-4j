@@ -44,6 +44,36 @@ class StandardSqlSelectStatementPsStrategyTest {
     }
 
     @Test
+    void fullQueryWithWhereGroupHavingOrderFetch() {
+        SelectStatement statement = SelectStatement.builder()
+                .select(Select.of(
+                        new ScalarExpressionProjection(ColumnReference.of("p", "category")),
+                        new AggregateCallProjection(new CountStar())))
+                .from(From.fromTable("products", "p"))
+                .where(Where.andOf(
+                        Comparison.gt(ColumnReference.of("p", "price"), Literal.of(100)),
+                        Comparison.eq(ColumnReference.of("p", "available"), Literal.of(true))))
+                .groupBy(GroupBy.of(ColumnReference.of("p", "category")))
+                .having(Having.of(Comparison.gt(new CountStar(), Literal.of(5))))
+                .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("p", "category"))))
+                .fetch(new io.github.auspis.fluentsql4j.ast.dql.clause.Fetch(10, 3))
+                .build();
+
+        PreparedStatementSpec spec = strategy.handle(statement, astToPsSpecVisitor, ctx);
+        assertThat(spec.sql()).isEqualTo("""
+            SELECT \"category\", COUNT(*) \
+            FROM \"products\" AS p \
+            WHERE (\"price\" > ?) \
+            AND (\"available\" = ?) \
+            GROUP BY \"category\" \
+            HAVING COUNT(*) > ? \
+            ORDER BY \"category\" ASC \
+            OFFSET 10 ROWS FETCH NEXT 3 ROWS ONLY\
+            """);
+        assertThat(spec.parameters()).containsExactly(100, true, 5);
+    }
+
+    @Test
     void alias() {
         SelectStatement statement = SelectStatement.builder()
                 .select(Select.of(
