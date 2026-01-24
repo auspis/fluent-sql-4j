@@ -1,6 +1,7 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
 
-import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
+import io.github.auspis.fluentsql4j.ast.core.expression.Expression;
+import io.github.auspis.fluentsql4j.ast.dml.component.InsertData.InsertValues;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
@@ -38,9 +39,9 @@ public class StandardSqlWhenNotMatchedInsertPsStrategy implements WhenNotMatched
 
         // For INSERT VALUES in MERGE, we need to render the expressions directly
         // since they can be column references from the source table
-        if (item.insertData() instanceof InsertData.InsertValues insertValues) {
+        if (item.insertData() instanceof InsertValues(List<Expression> valueExpressions)) {
             List<String> valueClauses = new ArrayList<>();
-            for (var expr : insertValues.valueExpressions()) {
+            for (var expr : valueExpressions) {
                 PreparedStatementSpec exprDto = expr.accept(visitor, ctx);
                 valueClauses.add(exprDto.sql());
                 allParameters.addAll(exprDto.parameters());

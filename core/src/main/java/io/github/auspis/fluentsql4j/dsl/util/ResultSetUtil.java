@@ -18,6 +18,10 @@ import java.util.stream.StreamSupport;
  */
 public final class ResultSetUtil {
 
+    private static final String PREPARED_STATEMENT_MUST_NOT_BE_NULL = "PreparedStatement must not be null";
+    private static final String ROW_MAPPER_MUST_NOT_BE_NULL = "RowMapper must not be null";
+    private static final String RESULT_SET_MUST_NOT_BE_NULL = "ResultSet must not be null";
+
     private ResultSetUtil() {
         // utility class
     }
@@ -44,8 +48,8 @@ public final class ResultSetUtil {
      * @return a lazily-driven Stream of mapped rows; closing the stream does not close the ResultSet
      */
     public static <T> Stream<T> stream(ResultSet rs, RowMapper<T> mapper) {
-        ResultSet notNullRs = requireNonNull(rs, "ResultSet must not be null");
-        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
+        ResultSet notNullRs = requireNonNull(rs, RESULT_SET_MUST_NOT_BE_NULL);
+        RowMapper<T> notNullMapper = requireNonNull(mapper, ROW_MAPPER_MUST_NOT_BE_NULL);
 
         return streamInternal(
                 notNullRs,
@@ -68,8 +72,8 @@ public final class ResultSetUtil {
      * @throws RuntimeException in case of SQL errors while reading the ResultSet
      */
     public static <T> List<T> list(ResultSet rs, RowMapper<T> mapper) {
-        ResultSet notNullRs = requireNonNull(rs, "ResultSet must not be null");
-        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
+        ResultSet notNullRs = requireNonNull(rs, RESULT_SET_MUST_NOT_BE_NULL);
+        RowMapper<T> notNullMapper = requireNonNull(mapper, ROW_MAPPER_MUST_NOT_BE_NULL);
         // Delegate to toStream which guarantees the ResultSet will be closed
         // either when the stream is fully consumed or when the stream is closed.
         try (Stream<T> stream = stream(notNullRs, notNullMapper)) {
@@ -95,8 +99,8 @@ public final class ResultSetUtil {
      * @throws RuntimeException in case of SQL errors while executing or iterating the results
      */
     public static <T> Stream<T> stream(PreparedStatement ps, RowMapper<T> mapper) {
-        PreparedStatement notNullPs = requireNonNull(ps, "PreparedStatement must not be null");
-        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
+        PreparedStatement notNullPs = requireNonNull(ps, PREPARED_STATEMENT_MUST_NOT_BE_NULL);
+        RowMapper<T> notNullMapper = requireNonNull(mapper, ROW_MAPPER_MUST_NOT_BE_NULL);
 
         final ResultSet rs;
         try {
@@ -131,8 +135,8 @@ public final class ResultSetUtil {
      * @throws RuntimeException in case of SQL errors while executing or reading the results
      */
     public static <T> List<T> list(PreparedStatement ps, RowMapper<T> mapper) {
-        PreparedStatement notNullPs = requireNonNull(ps, "PreparedStatement must not be null");
-        RowMapper<T> notNullMapper = requireNonNull(mapper, "RowMapper must not be null");
+        PreparedStatement notNullPs = requireNonNull(ps, PREPARED_STATEMENT_MUST_NOT_BE_NULL);
+        RowMapper<T> notNullMapper = requireNonNull(mapper, ROW_MAPPER_MUST_NOT_BE_NULL);
 
         try (Stream<T> stream = stream(notNullPs, notNullMapper)) {
             return stream.toList();
