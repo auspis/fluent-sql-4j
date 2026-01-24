@@ -84,7 +84,7 @@ The project is organized as a multi-module Maven project with two main artifacts
     <dependency>
       <groupId>io.github.auspis.fluentsql4j</groupId>
       <artifactId>api</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
     </dependency>
     ```
 - **[`spi/`](spi/)**: **Service Provider Interface for plugin developers**
@@ -96,7 +96,7 @@ The project is organized as a multi-module Maven project with two main artifacts
     <dependency>
       <groupId>io.github.auspis.fluentsql4j</groupId>
       <artifactId>spi</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
     </dependency>
     ```
 
@@ -118,13 +118,13 @@ The project is organized as a multi-module Maven project with two main artifacts
 <dependency>
   <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>api</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 <!-- Add dialect plugins as needed -->
 <dependency>
   <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>plugin-mysql</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 
@@ -134,7 +134,7 @@ The project is organized as a multi-module Maven project with two main artifacts
 <dependency>
   <groupId>io.github.auspis.fluentsql4j</groupId>
   <artifactId>spi</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 
