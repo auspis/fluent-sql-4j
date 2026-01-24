@@ -21,6 +21,7 @@ import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -82,37 +83,8 @@ public class MergeBuilder {
 
     public MergeBuilder on(
             String leftTableReference, String leftColumn, String rightTableReference, String rightColumn) {
-        if (leftTableReference == null || leftTableReference.trim().isEmpty()) {
-            throw new IllegalArgumentException("Left table reference cannot be null or empty");
-        }
-        if (leftTableReference.contains(".")) {
-            throw new IllegalArgumentException(
-                    "Left table reference must not contain dot: '" + leftTableReference + "'");
-        }
-        if (leftColumn == null || leftColumn.trim().isEmpty()) {
-            throw new IllegalArgumentException("Left column cannot be null or empty");
-        }
-        if (leftColumn.contains(".")) {
-            throw new IllegalArgumentException(
-                    "Left column must not contain dot. Use on(table, column, table, column) with separate parameters");
-        }
-        if (rightTableReference == null || rightTableReference.trim().isEmpty()) {
-            throw new IllegalArgumentException("Right table reference cannot be null or empty");
-        }
-        if (rightTableReference.contains(".")) {
-            throw new IllegalArgumentException(
-                    "Right table reference must not contain dot: '" + rightTableReference + "'");
-        }
-        if (rightColumn == null || rightColumn.trim().isEmpty()) {
-            throw new IllegalArgumentException("Right column cannot be null or empty");
-        }
-        if (rightColumn.contains(".")) {
-            throw new IllegalArgumentException(
-                    "Right column must not contain dot. Use on(table, column, table, column) with separate parameters");
-        }
-
-        ColumnReference targetColRef = ColumnReference.of(leftTableReference, leftColumn);
-        ColumnReference sourceColRef = ColumnReference.of(rightTableReference, rightColumn);
+        ColumnReference targetColRef = ColumnReferenceUtil.createValidated(leftTableReference, leftColumn);
+        ColumnReference sourceColRef = ColumnReferenceUtil.createValidated(rightTableReference, rightColumn);
         onCondition = Comparison.eq(targetColRef, sourceColRef);
         return this;
     }
@@ -246,46 +218,36 @@ public class MergeBuilder {
             this.condition = condition;
         }
 
-        private ColumnReference validateAndCreateColumnReference(String column) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            if (column.contains(".")) {
-                throw new IllegalArgumentException("Column name must not contain dot notation: '" + column + "'");
-            }
-            return ColumnReference.of("", column);
-        }
-
         public WhenMatchedUpdateBuilder set(String column, String value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
         public WhenMatchedUpdateBuilder set(String column, Number value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
         public WhenMatchedUpdateBuilder set(String column, Boolean value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             ScalarExpression expr = value == null ? Literal.ofNull() : Literal.of(value);
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
         public WhenMatchedUpdateBuilder set(String column, ColumnReference value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             ScalarExpression expr = value == null ? Literal.ofNull() : value;
             updateItems.add(new UpdateItem(colRef, expr));
             return this;
         }
 
         public WhenMatchedUpdateBuilder set(String column, Expression value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             if (value != null && !(value instanceof ScalarExpression)) {
                 throw new IllegalArgumentException("Value must be a ScalarExpression");
             }
@@ -360,18 +322,8 @@ public class MergeBuilder {
             this.condition = condition;
         }
 
-        private ColumnReference validateAndCreateColumnReference(String column) {
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column name cannot be null or empty");
-            }
-            if (column.contains(".")) {
-                throw new IllegalArgumentException("Column name must not contain dot notation: '" + column + "'");
-            }
-            return ColumnReference.of("", column);
-        }
-
         public WhenNotMatchedInsertBuilder set(String column, String value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             columns.add(colRef);
             values.add(expr);
@@ -379,7 +331,7 @@ public class MergeBuilder {
         }
 
         public WhenNotMatchedInsertBuilder set(String column, Number value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             columns.add(colRef);
             values.add(expr);
@@ -387,7 +339,7 @@ public class MergeBuilder {
         }
 
         public WhenNotMatchedInsertBuilder set(String column, Boolean value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             Expression expr = value == null ? Literal.ofNull() : Literal.of(value);
             columns.add(colRef);
             values.add(expr);
@@ -395,7 +347,7 @@ public class MergeBuilder {
         }
 
         public WhenNotMatchedInsertBuilder set(String column, ColumnReference value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             Expression expr = value == null ? Literal.ofNull() : value;
             columns.add(colRef);
             values.add(expr);
@@ -403,7 +355,7 @@ public class MergeBuilder {
         }
 
         public WhenNotMatchedInsertBuilder set(String column, Expression value) {
-            ColumnReference colRef = validateAndCreateColumnReference(column);
+            ColumnReference colRef = ColumnReferenceUtil.createValidated(column);
             Expression expr = value == null ? Literal.ofNull() : value;
             columns.add(colRef);
             values.add(expr);
