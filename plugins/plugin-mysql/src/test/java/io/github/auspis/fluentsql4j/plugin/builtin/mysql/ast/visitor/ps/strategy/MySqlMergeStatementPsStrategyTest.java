@@ -146,7 +146,8 @@ class MySqlMergeStatementPsStrategyTest {
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .build();
         MySqlMergeStatementPsStrategy strategy = new MySqlMergeStatementPsStrategy();
-        assertThatThrownBy(() -> strategy.handle(stmt, specFactory, new AstContext()))
+        AstContext ctx = new AstContext();
+        assertThatThrownBy(() -> strategy.handle(stmt, specFactory, ctx))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessageContaining("MySQL does not support WHEN MATCHED THEN DELETE");
     }

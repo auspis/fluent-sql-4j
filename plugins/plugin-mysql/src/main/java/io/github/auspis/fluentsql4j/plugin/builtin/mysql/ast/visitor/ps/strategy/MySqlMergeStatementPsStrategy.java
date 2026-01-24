@@ -40,7 +40,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
 
-        buildInsertIntoClause(sql, insertAction, stmt, astToPsSpecVisitor);
+        buildInsertIntoClause(sql, stmt, astToPsSpecVisitor);
         buildSelectAndFromClauses(sql, params, insertAction, stmt, astToPsSpecVisitor, ctx);
         buildActionClauses(sql, params, stmt, astToPsSpecVisitor, ctx);
 
@@ -57,10 +57,7 @@ public class MySqlMergeStatementPsStrategy implements MergeStatementPsStrategy {
     }
 
     private void buildInsertIntoClause(
-            StringBuilder sql,
-            WhenNotMatchedInsert insertAction,
-            MergeStatement stmt,
-            AstToPreparedStatementSpecVisitor astToPsSpecVisitor) {
+            StringBuilder sql, MergeStatement stmt, AstToPreparedStatementSpecVisitor astToPsSpecVisitor) {
         sql.append("INSERT INTO ")
                 .append(astToPsSpecVisitor
                         .getEscapeStrategy()

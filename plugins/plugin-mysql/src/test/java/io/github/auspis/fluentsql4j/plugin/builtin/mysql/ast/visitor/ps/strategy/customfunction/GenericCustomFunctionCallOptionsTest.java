@@ -11,8 +11,7 @@ class GenericCustomFunctionCallOptionsTest {
     void rendersOptionsWithQuoting() {
         CustomFunctionCallOptions strategy = new GenericCustomFunctionCallOptions();
         String sql = strategy.renderOptions(Map.of("OPTION1", "value1", "OPTION2", 42));
-        assertThat(sql).contains(" OPTION1 'value1'");
-        assertThat(sql).contains(" OPTION2 42");
+        assertThat(sql).contains(" OPTION1 'value1'").contains(" OPTION2 42");
     }
 
     @Test
