@@ -12,6 +12,7 @@ import io.github.auspis.fluentsql4j.ast.core.predicate.IsNull;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Like;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -282,7 +283,7 @@ public class HavingConditionBuilder {
         if (columnRef != null) {
             return columnRef; // Use explicit column reference (multi-table context)
         }
-        return ColumnReference.of(parent.getTableReference(), column);
+        return ColumnReferenceUtil.createWithTableReference(parent.getTableReference(), column);
     }
 
     private ScalarSubquery toScalarSubquery(SelectBuilder subquery) {
