@@ -3,6 +3,8 @@ package io.github.auspis.fluentsql4j.dsl.select;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.dql.clause.OrderBy;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +57,7 @@ public class OrderByBuilder {
                     + column
                     + "'");
         }
-        sortings.add(Sorting.asc(ColumnReference.of(parent.getTableReference(), column)));
+        sortings.add(Sorting.asc(ColumnReferenceUtil.createWithTableReference(parent.getTableReference(), column)));
         return this;
     }
 
@@ -106,7 +108,7 @@ public class OrderByBuilder {
                     + column
                     + "'");
         }
-        sortings.add(Sorting.desc(ColumnReference.of(parent.getTableReference(), column)));
+        sortings.add(Sorting.desc(ColumnReferenceUtil.createWithTableReference(parent.getTableReference(), column)));
         return this;
     }
 

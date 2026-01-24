@@ -3,6 +3,8 @@ package io.github.auspis.fluentsql4j.dsl.select;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.dql.clause.GroupBy;
 import io.github.auspis.fluentsql4j.dsl.clause.HavingBuilder;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +56,7 @@ public class GroupByBuilder {
                     + column
                     + "'");
         }
-        columns.add(ColumnReference.of(parent.getTableReference(), column));
+        columns.add(ColumnReferenceUtil.createWithTableReference(parent.getTableReference(), column));
         return this;
     }
 

@@ -91,4 +91,49 @@ class ColumnReferenceUtilTest {
                 .isInstanceOf(InvocationTargetException.class)
                 .hasCauseInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void createWithTableReferenceAndValidColumn() {
+        ColumnReference result = ColumnReferenceUtil.createWithTableReference("users", "name");
+
+        assertThat(result.table()).isEqualTo("users");
+        assertThat(result.column()).isEqualTo("name");
+    }
+
+    @Test
+    void createWithNullTableReference() {
+        ColumnReference result = ColumnReferenceUtil.createWithTableReference(null, "name");
+
+        assertThat(result.table()).isEmpty();
+        assertThat(result.column()).isEqualTo("name");
+    }
+
+    @Test
+    void createWithEmptyTableReference() {
+        ColumnReference result = ColumnReferenceUtil.createWithTableReference("", "name");
+
+        assertThat(result.table()).isEmpty();
+        assertThat(result.column()).isEqualTo("name");
+    }
+
+    @Test
+    void createWithTableReferenceThrowsOnNullColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createWithTableReference("users", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createWithTableReferenceThrowsOnEmptyColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createWithTableReference("users", ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createWithTableReferenceThrowsOnWhitespaceColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createWithTableReference("users", "   "))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
 }
