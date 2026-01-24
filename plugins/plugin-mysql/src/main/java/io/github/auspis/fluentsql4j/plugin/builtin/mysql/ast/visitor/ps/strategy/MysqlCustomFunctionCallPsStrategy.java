@@ -44,8 +44,10 @@ public class MysqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsSt
         result.append(functionCall.functionName()).append("(").append(args);
 
         // Delegate options rendering to function-specific strategy
-        String optionsSql = selectOptionsStrategy(functionCall.functionName()).renderOptions(functionCall.options());
-        result.append(optionsSql);
+        PreparedStatementSpec optionsSpec =
+                selectOptionsStrategy(functionCall.functionName()).renderOptions(functionCall.options());
+        result.append(optionsSpec.sql());
+        allParams.addAll(optionsSpec.parameters());
 
         result.append(")");
         return new PreparedStatementSpec(result.toString(), allParams);
