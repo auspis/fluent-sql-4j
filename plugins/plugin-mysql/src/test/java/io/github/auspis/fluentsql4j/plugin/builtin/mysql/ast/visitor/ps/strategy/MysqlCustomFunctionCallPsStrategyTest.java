@@ -39,8 +39,8 @@ class MysqlCustomFunctionCallPsStrategyTest {
         CustomFunctionCall function = new CustomFunctionCall(
                 "GROUP_CONCAT", List.of(ColumnReference.of("", "name")), Map.of("SEPARATOR", ", "));
         PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
-        assertThat(dto.sql()).isEqualTo("GROUP_CONCAT(\"name\" SEPARATOR ', ')");
-        assertThat(dto.parameters()).isEmpty();
+        assertThat(dto.sql()).isEqualTo("GROUP_CONCAT(\"name\" SEPARATOR ?)");
+        assertThat(dto.parameters()).containsExactly(", ");
     }
 
     @Test
@@ -50,8 +50,8 @@ class MysqlCustomFunctionCallPsStrategyTest {
                 List.of(ColumnReference.of("", "name"), Literal.of("ORDER BY"), ColumnReference.of("", "id")),
                 Map.of("SEPARATOR", ";"));
         PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
-        assertThat(dto.sql()).isEqualTo("GROUP_CONCAT(\"name\", ?, \"id\" SEPARATOR ';')");
-        assertThat(dto.parameters()).containsExactly("ORDER BY");
+        assertThat(dto.sql()).isEqualTo("GROUP_CONCAT(\"name\", ?, \"id\" SEPARATOR ?)");
+        assertThat(dto.parameters()).containsExactly("ORDER BY", ";");
     }
 
     @Test
@@ -59,12 +59,12 @@ class MysqlCustomFunctionCallPsStrategyTest {
         CustomFunctionCall function = new CustomFunctionCall(
                 "CUSTOM_FUNC", List.of(ColumnReference.of("", "col1")), Map.of("OPTION1", "value1", "OPTION2", 42));
         PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
-        // Note: Map iteration order is not guaranteed, so we check that both options are present
+        // Note: Map iteration order is not guaranteed, so we check that both options are present with ? placeholders
         String sql = dto.sql();
         assertThat(sql).startsWith("CUSTOM_FUNC(\"col1\" ");
-        assertThat(sql).contains("OPTION1 'value1'");
-        assertThat(sql).contains("OPTION2 42");
+        assertThat(sql).contains("OPTION1 ?");
+        assertThat(sql).contains("OPTION2 ?");
         assertThat(sql).endsWith(")");
-        assertThat(dto.parameters()).isEmpty();
+        assertThat(dto.parameters()).containsExactlyInAnyOrder("value1", 42);
     }
 }
