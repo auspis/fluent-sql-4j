@@ -1,6 +1,5 @@
 package io.github.auspis.fluentsql4j.dsl.select;
 
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.dql.clause.OrderBy;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
@@ -72,22 +71,7 @@ public class OrderByBuilder {
      * @throws IllegalArgumentException if alias or column is null, empty, or contains dot notation
      */
     public OrderByBuilder asc(String alias, String column) {
-        if (alias == null || alias.trim().isEmpty()) {
-            throw new IllegalArgumentException("ORDER BY alias cannot be null or empty");
-        }
-        if (alias.contains(".")) {
-            throw new IllegalArgumentException("ORDER BY alias must not contain dot notation: '" + alias + "'");
-        }
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("ORDER BY column cannot be null or empty");
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException("ORDER BY column must not contain dot notation. "
-                    + "Use asc(alias, column) with separate parameters: '"
-                    + column
-                    + "'");
-        }
-        sortings.add(Sorting.asc(ColumnReference.of(alias, column)));
+        sortings.add(Sorting.asc(ColumnReferenceUtil.createValidated(alias, column)));
         return this;
     }
 
@@ -123,22 +107,7 @@ public class OrderByBuilder {
      * @throws IllegalArgumentException if alias or column is null, empty, or contains dot notation
      */
     public OrderByBuilder desc(String alias, String column) {
-        if (alias == null || alias.trim().isEmpty()) {
-            throw new IllegalArgumentException("ORDER BY alias cannot be null or empty");
-        }
-        if (alias.contains(".")) {
-            throw new IllegalArgumentException("ORDER BY alias must not contain dot notation: '" + alias + "'");
-        }
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("ORDER BY column cannot be null or empty");
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException("ORDER BY column must not contain dot notation. "
-                    + "Use desc(alias, column) with separate parameters: '"
-                    + column
-                    + "'");
-        }
-        sortings.add(Sorting.desc(ColumnReference.of(alias, column)));
+        sortings.add(Sorting.desc(ColumnReferenceUtil.createValidated(alias, column)));
         return this;
     }
 

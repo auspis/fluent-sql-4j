@@ -47,7 +47,8 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         this.specFactory = specFactory;
         if (columns != null && columns.length > 0) {
             statementBuilder = statementBuilder.select(Select.of(java.util.Arrays.stream(columns)
-                    .map(column -> new ScalarExpressionProjection(ColumnReference.of("", column)))
+                    .map(column ->
+                            new ScalarExpressionProjection(ColumnReferenceUtil.createWithTableReference("", column)))
                     .toArray(ScalarExpressionProjection[]::new)));
         }
     }

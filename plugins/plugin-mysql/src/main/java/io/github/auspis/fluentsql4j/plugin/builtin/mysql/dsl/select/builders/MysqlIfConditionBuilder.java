@@ -6,6 +6,7 @@ import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
 import io.github.auspis.fluentsql4j.ast.core.predicate.IsNotNull;
 import io.github.auspis.fluentsql4j.ast.core.predicate.IsNull;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 
@@ -23,7 +24,7 @@ public class MysqlIfConditionBuilder {
         this.parent = parent;
         this.dsl = dsl;
         java.util.Objects.requireNonNull(column, "Column must not be null");
-        this.column = table != null ? ColumnReference.of(table, column) : ColumnReference.of("", column);
+        this.column = ColumnReferenceUtil.createWithTableReference(table, column);
     }
 
     /**

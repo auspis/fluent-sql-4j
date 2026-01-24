@@ -2,6 +2,7 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders;
 
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public class MysqlGroupConcatBuilder {
 
     public MysqlGroupConcatBuilder(MysqlSelectProjectionBuilder parent, String table, String column) {
         this.parent = parent;
-        this.column = ColumnReference.of(table, column);
+        this.column = ColumnReferenceUtil.createWithTableReference(table, column);
     }
 
     /**

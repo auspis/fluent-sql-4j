@@ -318,24 +318,7 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
          * Compare with a column from another table.
          */
         public R column(String alias, String column) {
-            if (alias == null || alias.trim().isEmpty()) {
-                throw new IllegalArgumentException("Alias cannot be null or empty");
-            }
-            if (column == null || column.trim().isEmpty()) {
-                throw new IllegalArgumentException("Column cannot be null or empty");
-            }
-
-            String trimmedAlias = alias.trim();
-            String trimmedColumn = column.trim();
-
-            if (trimmedAlias.contains(".")) {
-                throw new IllegalArgumentException("Alias must not contain dot");
-            }
-            if (trimmedColumn.contains(".")) {
-                throw new IllegalArgumentException("Column must not contain dot");
-            }
-
-            ColumnReference rightColumn = ColumnReference.of(trimmedAlias, trimmedColumn);
+            ColumnReference rightColumn = ColumnReferenceUtil.createValidated(alias, column);
             Predicate condition =
                     switch (operator) {
                         case EQUALS -> Comparison.eq(parent.getColumnRef(), rightColumn);
