@@ -27,7 +27,7 @@ public record Literal<R>(R value) implements ScalarExpression {
         return new Literal<>(value);
     }
 
-    public static Literal<?> ofNull() {
+    public static Literal<Object> ofNull() {
         return new Literal<>(null);
     }
 
