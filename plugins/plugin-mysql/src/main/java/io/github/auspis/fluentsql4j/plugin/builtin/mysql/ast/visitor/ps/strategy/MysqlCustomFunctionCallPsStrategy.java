@@ -5,6 +5,9 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction.CustomFunctionCallOptions;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction.GenericCustomFunctionCallOptions;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction.GroupConcatCustomFunctionCallOptions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,41 +43,18 @@ public class MysqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsSt
         StringBuilder result = new StringBuilder();
         result.append(functionCall.functionName()).append("(").append(args);
 
-        // Handle function options (e.g., SEPARATOR for GROUP_CONCAT)
-        if (!functionCall.options().isEmpty()) {
-            // For MySQL, ORDER BY should come before SEPARATOR
-            if (functionCall.options().containsKey("ORDER BY")) {
-                result.append(" ORDER BY ");
-                Object orderByValue = functionCall.options().get("ORDER BY");
-                if (orderByValue instanceof String) {
-                    result.append("'").append(orderByValue).append("'");
-                } else {
-                    result.append(orderByValue);
-                }
-            }
-            if (functionCall.options().containsKey("SEPARATOR")) {
-                result.append(" SEPARATOR ");
-                Object separatorValue = functionCall.options().get("SEPARATOR");
-                if (separatorValue instanceof String) {
-                    result.append("'").append(separatorValue).append("'");
-                } else {
-                    result.append(separatorValue);
-                }
-            }
-            // Handle any other options
-            functionCall.options().forEach((key, value) -> {
-                if (!"ORDER BY".equals(key) && !"SEPARATOR".equals(key)) {
-                    result.append(" ").append(key).append(" ");
-                    if (value instanceof String) {
-                        result.append("'").append(value).append("'");
-                    } else {
-                        result.append(value);
-                    }
-                }
-            });
-        }
+        // Delegate options rendering to function-specific strategy
+        String optionsSql = selectOptionsStrategy(functionCall.functionName()).renderOptions(functionCall.options());
+        result.append(optionsSql);
 
         result.append(")");
         return new PreparedStatementSpec(result.toString(), allParams);
+    }
+
+    private CustomFunctionCallOptions selectOptionsStrategy(String functionName) {
+        if (functionName != null && functionName.equalsIgnoreCase("GROUP_CONCAT")) {
+            return new GroupConcatCustomFunctionCallOptions();
+        }
+        return new GenericCustomFunctionCallOptions();
     }
 }
