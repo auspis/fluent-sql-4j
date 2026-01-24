@@ -28,4 +28,25 @@ class GroupConcatCustomFunctionCallOptionsTest {
         String sql = strategy.renderOptions(Map.of("SEPARATOR", 1));
         assertThat(sql).isEqualTo(" SEPARATOR 1");
     }
+
+    @Test
+    void escapesSingleQuotesInStringValues() {
+        CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("SEPARATOR", "it's a test"));
+        assertThat(sql).isEqualTo(" SEPARATOR 'it''s a test'");
+    }
+
+    @Test
+    void preventsSqlInjectionWithSingleQuotes() {
+        CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("SEPARATOR", "', DROP TABLE users--"));
+        assertThat(sql).isEqualTo(" SEPARATOR ''', DROP TABLE users--'");
+    }
+
+    @Test
+    void escapesMultipleSingleQuotes() {
+        CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("SEPARATOR", "it's John's book"));
+        assertThat(sql).isEqualTo(" SEPARATOR 'it''s John''s book'");
+    }
 }
