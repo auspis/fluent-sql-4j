@@ -27,4 +27,11 @@ class GroupConcatCustomFunctionCallOptionsTest {
         String sql = strategy.renderOptions(Map.of("SEPARATOR", 1));
         assertThat(sql).isEqualTo(" SEPARATOR 1");
     }
+
+    @Test
+    void escapesQuotesInStringValues() {
+        CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
+        String sql = strategy.renderOptions(Map.of("SEPARATOR", "', DROP TABLE users--"));
+        assertThat(sql).isEqualTo(" SEPARATOR ''', DROP TABLE users--'");
+    }
 }
