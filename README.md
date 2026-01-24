@@ -7,7 +7,6 @@ A type-safe SQL builder for Java with multi-dialect support through a plugin sys
 [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j)
 [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.auspis.fluentsql4j/api)](https://central.sonatype.com/artifact/io.github.auspis.fluentsql4j/api)
-[![Javadoc](https://javadoc.io/badge2/io.github.auspis.fluentsql4j/api/javadoc.svg)](https://javadoc.io/doc/io.github.auspis.fluentsql4j/api)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/auspis/fluent-sql-4j/blob/main/LICENSE)
 
 ## Features
