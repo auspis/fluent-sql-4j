@@ -8,6 +8,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.function.json.OnEmptyBeh
 import io.github.auspis.fluentsql4j.ast.core.expression.function.json.WrapperBehavior;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 
 /**
  * Fluent builder for JSON functions in SELECT projections.
@@ -50,7 +51,7 @@ public class JsonFunctionBuilder<PARENT extends SelectProjectionBuilder<PARENT>>
 
     JsonFunctionBuilder(PARENT parent, String table, String column, String path, JsonFunctionType functionType) {
         this.parent = parent;
-        this.jsonDocument = ColumnReference.of(table, column);
+        this.jsonDocument = ColumnReferenceUtil.createWithTableReference(table, column);
         this.path = path;
         this.functionType = functionType;
     }

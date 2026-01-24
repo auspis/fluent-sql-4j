@@ -47,16 +47,7 @@ public class GroupByBuilder {
      * @throws IllegalArgumentException if column is null, empty, or contains dot notation
      */
     public GroupByBuilder column(String column) {
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("GROUP BY column cannot be null or empty");
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException("GROUP BY column must not contain dot notation. "
-                    + "Use column(alias, column) for qualified references: '"
-                    + column
-                    + "'");
-        }
-        columns.add(ColumnReferenceUtil.createWithTableReference(parent.getTableReference(), column));
+        columns.add(ColumnReferenceUtil.createValidatedWithTrustedTable(parent.getTableReference(), column));
         return this;
     }
 
@@ -71,22 +62,7 @@ public class GroupByBuilder {
      * @throws IllegalArgumentException if alias or column is null, empty, or contains dot notation
      */
     public GroupByBuilder column(String alias, String column) {
-        if (alias == null || alias.trim().isEmpty()) {
-            throw new IllegalArgumentException("GROUP BY alias cannot be null or empty");
-        }
-        if (alias.contains(".")) {
-            throw new IllegalArgumentException("GROUP BY alias must not contain dot notation: '" + alias + "'");
-        }
-        if (column == null || column.trim().isEmpty()) {
-            throw new IllegalArgumentException("GROUP BY column cannot be null or empty");
-        }
-        if (column.contains(".")) {
-            throw new IllegalArgumentException("GROUP BY column must not contain dot notation. "
-                    + "Use column(alias, column) with separate parameters: '"
-                    + column
-                    + "'");
-        }
-        columns.add(ColumnReference.of(alias, column));
+        columns.add(ColumnReferenceUtil.createValidated(alias, column));
         return this;
     }
 

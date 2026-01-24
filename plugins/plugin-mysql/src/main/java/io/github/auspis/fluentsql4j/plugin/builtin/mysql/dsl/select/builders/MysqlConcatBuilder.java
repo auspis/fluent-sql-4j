@@ -1,9 +1,9 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders;
 
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
-import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
+import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +46,14 @@ public class MysqlConcatBuilder {
      */
     public MysqlConcatBuilder column(String column) {
         Objects.requireNonNull(column, "Column must not be null");
-        expressions.add(ColumnReference.of("", column));
+        expressions.add(ColumnReferenceUtil.createWithTableReference("", column));
         return this;
     }
 
     public MysqlConcatBuilder column(String table, String column) {
         Objects.requireNonNull(table, "Table must not be null");
         Objects.requireNonNull(column, "Column must not be null");
-        expressions.add(ColumnReference.of(table, column));
+        expressions.add(ColumnReferenceUtil.createWithTableReference(table, column));
         return this;
     }
 
