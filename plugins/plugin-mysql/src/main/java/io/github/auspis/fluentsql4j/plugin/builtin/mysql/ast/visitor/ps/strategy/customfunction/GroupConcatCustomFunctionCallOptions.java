@@ -1,11 +1,13 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction;
 
-import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.util.MysqlStringUtil;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Options rendering for MySQL GROUP_CONCAT function.
- * Enforces ORDER BY before SEPARATOR, then renders other options.
+ * Enforces ORDER BY before SEPARATOR, then renders other options using parameter binding.
  */
 public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallOptions {
 
@@ -13,37 +15,41 @@ public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallO
     private static final String OPTION_SEPARATOR = "SEPARATOR";
 
     @Override
-    public String renderOptions(Map<String, Object> options) {
+    public PreparedStatementSpec renderOptions(Map<String, Object> options) {
         if (options == null || options.isEmpty()) {
-            return "";
+            return new PreparedStatementSpec("", List.of());
         }
-        StringBuilder sb = new StringBuilder();
+
+        StringBuilder sql = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+
         if (options.containsKey(OPTION_ORDER_BY)) {
-            appendOption(sb, OPTION_ORDER_BY, options.get(OPTION_ORDER_BY));
+            sql.append(" ").append(OPTION_ORDER_BY).append(" ");
+            appendValue(sql, options.get(OPTION_ORDER_BY), params);
         }
+
         if (options.containsKey(OPTION_SEPARATOR)) {
-            appendOption(sb, OPTION_SEPARATOR, options.get(OPTION_SEPARATOR));
+            sql.append(" ").append(OPTION_SEPARATOR).append(" ?");
+            params.add(options.get(OPTION_SEPARATOR));
         }
+
         for (Map.Entry<String, Object> entry : options.entrySet()) {
             String key = entry.getKey();
             if (!OPTION_ORDER_BY.equals(key) && !OPTION_SEPARATOR.equals(key)) {
-                appendOption(sb, key, entry.getValue());
+                sql.append(" ").append(key).append(" ?");
+                params.add(entry.getValue());
             }
         }
-        return sb.toString();
+
+        return new PreparedStatementSpec(sql.toString(), params);
     }
 
-    private void appendOption(StringBuilder sb, String key, Object value) {
-        sb.append(" ").append(key).append(" ");
-        appendValue(sb, value);
-    }
-
-    private void appendValue(StringBuilder sb, Object value) {
-        if (value instanceof String s) {
-            String escaped = MysqlStringUtil.escape(s);
-            sb.append('\'').append(escaped).append('\'');
+    private void appendValue(StringBuilder sql, Object value, List<Object> params) {
+        if (value == null) {
+            sql.append("NULL");
         } else {
-            sb.append(value);
+            sql.append("?");
+            params.add(value);
         }
     }
 }
