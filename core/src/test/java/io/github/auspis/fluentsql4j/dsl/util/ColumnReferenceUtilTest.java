@@ -136,4 +136,106 @@ class ColumnReferenceUtilTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
+
+    // Tests for createValidated(String table, String column)
+    @Test
+    void createValidatedWithValidTableAndColumn() {
+        ColumnReference result = ColumnReferenceUtil.createValidated("users", "name");
+
+        assertThat(result.table()).isEqualTo("users");
+        assertThat(result.column()).isEqualTo("name");
+    }
+
+    @Test
+    void createValidatedThrowsOnNullTable() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated(null, "name"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Table reference cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedThrowsOnEmptyTable() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("", "name"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Table reference cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedThrowsOnWhitespaceTable() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("   ", "name"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Table reference cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedThrowsOnTableWithDot() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("schema.users", "name"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Table reference must not contain dot: 'schema.users'");
+    }
+
+    @Test
+    void createValidatedThrowsOnNullColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("users", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedThrowsOnEmptyColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("users", ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedThrowsOnWhitespaceColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("users", "   "))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedThrowsOnColumnWithDot() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("users", "table.name"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Column name must not contain dot");
+    }
+
+    // Tests for createValidated(String column) - column only
+    @Test
+    void createValidatedColumnOnlyWithValidColumn() {
+        ColumnReference result = ColumnReferenceUtil.createValidated("name");
+
+        assertThat(result.table()).isEmpty();
+        assertThat(result.column()).isEqualTo("name");
+    }
+
+    @Test
+    void createValidatedColumnOnlyThrowsOnNullColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated((String) null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedColumnOnlyThrowsOnEmptyColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedColumnOnlyThrowsOnWhitespaceColumn() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("   "))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name cannot be null or empty");
+    }
+
+    @Test
+    void createValidatedColumnOnlyThrowsOnColumnWithDot() {
+        assertThatThrownBy(() -> ColumnReferenceUtil.createValidated("table.name"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Column name must not contain dot notation: 'table.name'");
+    }
 }

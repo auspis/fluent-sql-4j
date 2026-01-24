@@ -249,7 +249,7 @@ class SelectBuilderJoinTest {
                         .innerJoin("orders")
                         .on("users", "", "orders", "user_id"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Left column cannot be null or empty");
+                .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
@@ -259,7 +259,7 @@ class SelectBuilderJoinTest {
                         .innerJoin("orders")
                         .on("users", "id", "orders", ""))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Right column cannot be null or empty");
+                .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
