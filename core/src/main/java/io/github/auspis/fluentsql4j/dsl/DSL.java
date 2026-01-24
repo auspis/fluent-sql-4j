@@ -67,7 +67,7 @@ public class DSL {
         return new CreateTableBuilder(specFactory, tableName);
     }
 
-    public SelectProjectionBuilder<?> select() {
+    public <SELF extends SelectProjectionBuilder<SELF>> SelectProjectionBuilder<SELF> select() {
         return new SelectProjectionBuilder<>(specFactory);
     }
 
