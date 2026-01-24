@@ -208,7 +208,7 @@ class SelectDSLComponentTest {
                         .partitionBy("employees.department")
                         .as("rank")
                         .from("employees"))
-                .withMessageContaining("PARTITION BY column must not contain dot notation");
+                .withMessageContaining("Column name must not contain dot notation");
     }
 
     @Test
@@ -242,7 +242,7 @@ class SelectDSLComponentTest {
                         .orderByAsc("employees.salary")
                         .as("rank")
                         .from("employees"))
-                .withMessageContaining("ORDER BY column must not contain dot notation");
+                .withMessageContaining("Column name must not contain dot notation");
     }
 
     @Test

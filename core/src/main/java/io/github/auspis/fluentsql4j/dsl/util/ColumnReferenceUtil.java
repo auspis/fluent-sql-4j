@@ -153,4 +153,29 @@ public final class ColumnReferenceUtil {
         }
         return ColumnReference.of("", column);
     }
+
+    /**
+     * Create a ColumnReference with a pre-validated table reference and validated column name.
+     *
+     * <p>This method validates only the column name (null, empty, dot notation).
+     * The table reference is assumed to be already validated (e.g., from a trusted source
+     * like a builder's defaultTableReference field).
+     *
+     * <p>Use this when you have a trusted table reference (alias or name) and need to
+     * validate only the column name.
+     *
+     * @param trustedTableReference the table reference (assumed validated, not null)
+     * @param column the column name to validate
+     * @return a new ColumnReference with the table reference and validated column name
+     * @throws IllegalArgumentException if column validation fails
+     */
+    public static ColumnReference createValidatedWithTrustedTable(String trustedTableReference, String column) {
+        if (column == null || column.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column name cannot be null or empty");
+        }
+        if (column.contains(".")) {
+            throw new IllegalArgumentException("Column name must not contain dot notation: '" + column + "'");
+        }
+        return ColumnReference.of(trustedTableReference, column);
+    }
 }
