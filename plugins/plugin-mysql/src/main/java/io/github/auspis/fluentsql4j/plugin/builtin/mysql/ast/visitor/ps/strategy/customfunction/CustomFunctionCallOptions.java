@@ -1,15 +1,17 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction;
 
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import java.util.Map;
 
 /**
  * Strategy interface to render function options fragment for MySQL custom functions.
- * Implementations return the SQL fragment to append inside the function call,
- * starting with a leading space when options are present.
+ * Implementations return a PreparedStatementSpec containing the SQL fragment and bound parameters.
+ * Uses parameter binding (?) instead of inline literals for security.
  */
 public interface CustomFunctionCallOptions {
     /**
-     * Renders the options fragment. Returns an empty string when no options.
+     * Renders the options fragment with parameter binding.
+     * Returns a PreparedStatementSpec with empty SQL when no options are present.
      */
-    String renderOptions(Map<String, Object> options);
+    PreparedStatementSpec renderOptions(Map<String, Object> options);
 }
