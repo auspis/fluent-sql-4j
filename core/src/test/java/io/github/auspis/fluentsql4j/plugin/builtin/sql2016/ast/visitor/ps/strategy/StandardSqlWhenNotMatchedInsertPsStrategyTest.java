@@ -34,7 +34,7 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
 
         PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
-        assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED THEN INSERT ?, ?");
+        assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED THEN INSERT VALUES (?, ?)");
         assertThat(result.parameters()).containsExactly("New Name", 100);
     }
 
@@ -46,7 +46,7 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
 
         PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
-        assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED THEN INSERT (\"name\", \"amount\") ?, ?");
+        assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED THEN INSERT (\"name\", \"amount\") VALUES (?, ?)");
         assertThat(result.parameters()).containsExactly("Item", 250);
     }
 
@@ -58,7 +58,7 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
 
         PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
-        assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED AND \"priority\" > ? THEN INSERT ?");
+        assertThat(result.sql()).isEqualTo("WHEN NOT MATCHED AND \"priority\" > ? THEN INSERT VALUES (?)");
         assertThat(result.parameters()).containsExactly(5, "High Priority");
     }
 
@@ -73,7 +73,38 @@ class StandardSqlWhenNotMatchedInsertPsStrategyTest {
         PreparedStatementSpec result = strategy.handle(action, visitor, ctx);
 
         assertThat(result.sql())
-                .isEqualTo("WHEN NOT MATCHED AND \"type\" = ? THEN INSERT (\"id\", \"name\", \"value\") ?, ?, ?");
+                .isEqualTo(
+                        "WHEN NOT MATCHED AND \"type\" = ? THEN INSERT (\"id\", \"name\", \"value\") VALUES (?, ?, ?)");
         assertThat(result.parameters()).containsExactly("new", 999, "Test", 42.5);
+    }
+
+    @Test
+    void withJoinOnContext() {
+        AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        List<ColumnReference> columns = List.of(ColumnReference.of("", "id"), ColumnReference.of("", "name"));
+        InsertValues insertData = InsertValues.of(ColumnReference.of("src", "id"), ColumnReference.of("src", "name"));
+        WhenNotMatchedInsert action = new WhenNotMatchedInsert(null, columns, insertData);
+
+        PreparedStatementSpec result = strategy.handle(action, visitor, onCtx);
+
+        assertThat(result.sql())
+                .isEqualTo("WHEN NOT MATCHED THEN INSERT (\"id\", \"name\") VALUES (\"src\".\"id\", \"src\".\"name\")");
+        assertThat(result.parameters()).isEmpty();
+    }
+
+    @Test
+    void withConditionAndColumnReferencesFromSource() {
+        AstContext onCtx = new AstContext(AstContext.Feature.JOIN_ON);
+        Comparison condition = Comparison.eq(ColumnReference.of("source", "status"), Literal.of("active"));
+        List<ColumnReference> columns = List.of(ColumnReference.of("", "id"), ColumnReference.of("", "status"));
+        InsertValues insertData = InsertValues.of(ColumnReference.of("src", "id"), ColumnReference.of("src", "status"));
+        WhenNotMatchedInsert action = new WhenNotMatchedInsert(condition, columns, insertData);
+
+        PreparedStatementSpec result = strategy.handle(action, visitor, onCtx);
+
+        assertThat(result.sql())
+                .isEqualTo(
+                        "WHEN NOT MATCHED AND \"source\".\"status\" = ? THEN INSERT (\"id\", \"status\") VALUES (\"src\".\"id\", \"src\".\"status\")");
+        assertThat(result.parameters()).containsExactly("active");
     }
 }
