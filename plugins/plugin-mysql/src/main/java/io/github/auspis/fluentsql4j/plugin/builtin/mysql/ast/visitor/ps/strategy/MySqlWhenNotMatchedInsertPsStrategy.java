@@ -1,5 +1,6 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy;
 
+import io.github.auspis.fluentsql4j.ast.core.expression.Expression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.dml.component.InsertData;
 import io.github.auspis.fluentsql4j.ast.dml.component.MergeAction.WhenNotMatchedInsert;
@@ -45,9 +46,9 @@ public class MySqlWhenNotMatchedInsertPsStrategy implements WhenNotMatchedInsert
         List<String> selectExprs = new ArrayList<>();
         AstContext selectCtx = new AstContext(AstContext.Feature.JOIN_ON);
 
-        if (item.insertData() instanceof InsertData.InsertValues insertValues) {
+        if (item.insertData() instanceof InsertData.InsertValues(List<Expression> valueExpressions)) {
             // Render value expressions directly (can be column references or literals)
-            for (var expr : insertValues.valueExpressions()) {
+            for (var expr : valueExpressions) {
                 PreparedStatementSpec exprDto = expr.accept(visitor, selectCtx);
                 selectExprs.add(exprDto.sql());
                 params.addAll(exprDto.parameters());
