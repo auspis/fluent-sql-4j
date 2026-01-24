@@ -153,13 +153,16 @@ class TestDatabaseUtilTest {
 
         TestDatabaseUtil.insertSampleUsers(connection);
 
-        try (var stmt = connection.createStatement();
-                var rs = stmt.executeQuery("SELECT id, name, email, age FROM users WHERE id = 1")) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("id")).isEqualTo(1);
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getString("email")).isEqualTo("john@example.com");
-            assertThat(rs.getInt("age")).isEqualTo(30);
+        String sql = "SELECT id, name, email, age FROM users WHERE id = ?";
+        try (var pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, 1);
+            try (var rs = pstmt.executeQuery()) {
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getInt("id")).isEqualTo(1);
+                assertThat(rs.getString("name")).isEqualTo("John Doe");
+                assertThat(rs.getString("email")).isEqualTo("john@example.com");
+                assertThat(rs.getInt("age")).isEqualTo(30);
+            }
         }
 
         TestDatabaseUtil.closeConnection(connection);
@@ -172,13 +175,16 @@ class TestDatabaseUtilTest {
 
         TestDatabaseUtil.insertSampleUsers(connection);
 
-        try (var stmt = connection.createStatement();
-                var rs = stmt.executeQuery("SELECT id, name, address FROM users WHERE id = 8")) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("id")).isEqualTo(8);
-            assertThat(rs.getString("name")).isEqualTo("Frank");
-            assertThat(rs.getString("address")).isNotNull();
-            assertThat(rs.getString("address")).contains("Via Roma 123");
+        String sql = "SELECT id, name, address FROM users WHERE id = ?";
+        try (var pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, 8);
+            try (var rs = pstmt.executeQuery()) {
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getInt("id")).isEqualTo(8);
+                assertThat(rs.getString("name")).isEqualTo("Frank");
+                assertThat(rs.getString("address")).isNotNull();
+                assertThat(rs.getString("address")).contains("Via Roma 123");
+            }
         }
 
         TestDatabaseUtil.closeConnection(connection);
@@ -207,13 +213,16 @@ class TestDatabaseUtilTest {
 
         TestDatabaseUtil.insertSampleProducts(connection);
 
-        try (var stmt = connection.createStatement();
-                var rs = stmt.executeQuery("SELECT id, name, metadata FROM products WHERE id = 3")) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("id")).isEqualTo(3);
-            assertThat(rs.getString("name")).isEqualTo("Laptop");
-            assertThat(rs.getString("metadata")).isNotNull();
-            assertThat(rs.getString("metadata")).contains("electronics");
+        String sql = "SELECT id, name, metadata FROM products WHERE id = ?";
+        try (var pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, 3);
+            try (var rs = pstmt.executeQuery()) {
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getInt("id")).isEqualTo(3);
+                assertThat(rs.getString("name")).isEqualTo("Laptop");
+                assertThat(rs.getString("metadata")).isNotNull();
+                assertThat(rs.getString("metadata")).contains("electronics");
+            }
         }
 
         TestDatabaseUtil.closeConnection(connection);
@@ -297,13 +306,16 @@ class TestDatabaseUtilTest {
             assertThat(rs.getInt(1)).isEqualTo(3);
         }
 
-        try (var stmt = connection.createStatement();
-                var rs = stmt.executeQuery("SELECT id, name, email, age FROM users_updates WHERE id = 1")) {
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getInt("id")).isEqualTo(1);
-            assertThat(rs.getString("name")).isEqualTo("John Doe");
-            assertThat(rs.getString("email")).isEqualTo("john.newemail@example.com");
-            assertThat(rs.getInt("age")).isEqualTo(31);
+        String sql = "SELECT id, name, email, age FROM users_updates WHERE id = ?";
+        try (var pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, 1);
+            try (var rs = pstmt.executeQuery()) {
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getInt("id")).isEqualTo(1);
+                assertThat(rs.getString("name")).isEqualTo("John Doe");
+                assertThat(rs.getString("email")).isEqualTo("john.newemail@example.com");
+                assertThat(rs.getInt("age")).isEqualTo(31);
+            }
         }
 
         TestDatabaseUtil.closeConnection(connection);
