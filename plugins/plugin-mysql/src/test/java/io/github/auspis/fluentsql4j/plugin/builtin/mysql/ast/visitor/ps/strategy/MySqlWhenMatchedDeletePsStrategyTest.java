@@ -18,7 +18,8 @@ class MySqlWhenMatchedDeletePsStrategyTest {
                 .build();
         MySqlWhenMatchedDeletePsStrategy strategy = new MySqlWhenMatchedDeletePsStrategy();
 
-        assertThatThrownBy(() -> strategy.handle(item, visitor, new AstContext()))
+        AstContext ctx = new AstContext();
+        assertThatThrownBy(() -> strategy.handle(item, visitor, ctx))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessageContaining("MySQL does not support WHEN MATCHED THEN DELETE")
                 .hasMessageContaining("INSERT...ON DUPLICATE KEY UPDATE");

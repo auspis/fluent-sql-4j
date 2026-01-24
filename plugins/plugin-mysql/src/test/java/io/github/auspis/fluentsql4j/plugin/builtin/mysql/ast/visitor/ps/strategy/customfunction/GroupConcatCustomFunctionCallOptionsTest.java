@@ -18,8 +18,7 @@ class GroupConcatCustomFunctionCallOptionsTest {
     void rendersOtherOptionsAfterReserved() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
         String sql = strategy.renderOptions(Map.of("SEPARATOR", ";", "ORDER BY", "id", "OPTION1", 42));
-        assertThat(sql).startsWith(" ORDER BY 'id' SEPARATOR ';'");
-        assertThat(sql).contains(" OPTION1 42");
+        assertThat(sql).startsWith(" ORDER BY 'id' SEPARATOR ';'").contains(" OPTION1 42");
     }
 
     @Test
