@@ -2,36 +2,48 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strateg
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class GroupConcatCustomFunctionCallOptionsTest {
 
     @Test
-    void rendersOrderByThenSeparator() {
+    void rendersOrderByThenSeparatorWithParameterBinding() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        String sql = strategy.renderOptions(Map.of("SEPARATOR", ", ", "ORDER BY", "name"));
-        assertThat(sql).isEqualTo(" ORDER BY 'name' SEPARATOR ', '");
+        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", ", ", "ORDER BY", "name"));
+
+        assertThat(spec.sql()).startsWith(" ORDER BY ?").contains(" SEPARATOR ?");
+        assertThat(spec.parameters()).containsExactly("name", ", ");
     }
 
     @Test
     void rendersOtherOptionsAfterReserved() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        String sql = strategy.renderOptions(Map.of("SEPARATOR", ";", "ORDER BY", "id", "OPTION1", 42));
-        assertThat(sql).startsWith(" ORDER BY 'id' SEPARATOR ';'").contains(" OPTION1 42");
+        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", ";", "ORDER BY", "id", "OPTION1", 42));
+
+        assertThat(spec.sql())
+                .startsWith(" ORDER BY ?")
+                .contains(" SEPARATOR ?")
+                .contains(" OPTION1 ?");
+        assertThat(spec.parameters()).containsExactly("id", ";", 42);
     }
 
     @Test
-    void quotesStringValuesAndLeavesNonStringAsIs() {
+    void quotesNonStringValuesViaParameterBinding() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        String sql = strategy.renderOptions(Map.of("SEPARATOR", 1));
-        assertThat(sql).isEqualTo(" SEPARATOR 1");
+        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", 1));
+
+        assertThat(spec.sql()).isEqualTo(" SEPARATOR ?");
+        assertThat(spec.parameters()).containsExactly(1);
     }
 
     @Test
-    void escapesQuotesInStringValues() {
+    void escapesStringValuesViaParameterBinding() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        String sql = strategy.renderOptions(Map.of("SEPARATOR", "', DROP TABLE users--"));
-        assertThat(sql).isEqualTo(" SEPARATOR ''', DROP TABLE users--'");
+        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", "', DROP TABLE users--"));
+
+        assertThat(spec.sql()).isEqualTo(" SEPARATOR ?");
+        assertThat(spec.parameters()).containsExactly("', DROP TABLE users--");
     }
 }
