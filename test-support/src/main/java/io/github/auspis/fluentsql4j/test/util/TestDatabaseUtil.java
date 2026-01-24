@@ -178,40 +178,77 @@ public final class TestDatabaseUtil {
      * @throws SQLException if insert fails
      */
     public static void insertSampleUsers(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
+        // Use CAST for PostgreSQL compatibility; H2 also supports CAST
+        String sql = "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), CAST(? AS JSON))";
+        try (var pstmt = connection.prepareStatement(sql)) {
             // Users without JSON data
-            stmt.execute(
-                    "INSERT INTO users VALUES (1, 'John Doe', 'john@example.com', 30, true, '1990-01-01', '2023-01-01', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users VALUES (2, 'Jane Smith', 'jane@example.com', 25, true, '1995-01-01', '2023-01-01', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users VALUES (3, 'Bob', 'bob@example.com', 15, false, '2005-01-01', '2023-01-01', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users VALUES (4, 'Alice', 'alice@example.com', 35, true, '1990-01-01', '2023-01-01', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users VALUES (5, 'Charlie', 'charlie@example.com', 30, true, '1991-01-01', '2023-01-02', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users VALUES (6, 'Diana', 'diana@example.com', 25, false, '1996-01-01', '2023-01-03', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users VALUES (7, 'Eve', 'eve@example.com', 40, true, '1985-01-01', '2023-01-04', NULL, NULL)");
+            insertUser(pstmt, 1, "John Doe", "john@example.com", 30, true, "1990-01-01", "2023-01-01", null, null);
+            insertUser(pstmt, 2, "Jane Smith", "jane@example.com", 25, true, "1995-01-01", "2023-01-01", null, null);
+            insertUser(pstmt, 3, "Bob", "bob@example.com", 15, false, "2005-01-01", "2023-01-01", null, null);
+            insertUser(pstmt, 4, "Alice", "alice@example.com", 35, true, "1990-01-01", "2023-01-01", null, null);
+            insertUser(pstmt, 5, "Charlie", "charlie@example.com", 30, true, "1991-01-01", "2023-01-02", null, null);
+            insertUser(pstmt, 6, "Diana", "diana@example.com", 25, false, "1996-01-01", "2023-01-03", null, null);
+            insertUser(pstmt, 7, "Eve", "eve@example.com", 40, true, "1985-01-01", "2023-01-04", null, null);
 
             // Users with JSON data prepopulated
-            stmt.execute("""
-                    INSERT INTO users VALUES (8, 'Frank', 'frank@example.com', 35, true, '1990-02-01', '2023-01-05', \
-                    '{"street":"Via Roma 123","city":"Milan","zip":"20100","country":"Italy"}', \
-                    '["email","sms"]')
-                    """);
-            stmt.execute("""
-                    INSERT INTO users VALUES (9, 'Grace', 'grace@example.com', 28, false, '1997-01-01', '2023-01-06', \
-                    '{"street":"Via Torino 45","city":"Rome","zip":"00100","country":"Italy"}', \
-                    '["email","push"]')
-                    """);
-            stmt.execute("""
-                    INSERT INTO users VALUES (10, 'Henry', 'henry@example.com', 30, true, '1995-01-01', '2023-01-07', \
-                    '{"street":"Corso Vittorio 78","city":"Turin","zip":"10100","country":"Italy"}', \
-                    '["sms","push","phone"]')
-                    """);
+            insertUser(
+                    pstmt,
+                    8,
+                    "Frank",
+                    "frank@example.com",
+                    35,
+                    true,
+                    "1990-02-01",
+                    "2023-01-05",
+                    "{\"street\":\"Via Roma 123\",\"city\":\"Milan\",\"zip\":\"20100\",\"country\":\"Italy\"}",
+                    "[\"email\",\"sms\"]");
+            insertUser(
+                    pstmt,
+                    9,
+                    "Grace",
+                    "grace@example.com",
+                    28,
+                    false,
+                    "1997-01-01",
+                    "2023-01-06",
+                    "{\"street\":\"Via Torino 45\",\"city\":\"Rome\",\"zip\":\"00100\",\"country\":\"Italy\"}",
+                    "[\"email\",\"push\"]");
+            insertUser(
+                    pstmt,
+                    10,
+                    "Henry",
+                    "henry@example.com",
+                    30,
+                    true,
+                    "1995-01-01",
+                    "2023-01-07",
+                    "{\"street\":\"Corso Vittorio 78\",\"city\":\"Turin\",\"zip\":\"10100\",\"country\":\"Italy\"}",
+                    "[\"sms\",\"push\",\"phone\"]");
         }
+    }
+
+    private static void insertUser(
+            java.sql.PreparedStatement pstmt,
+            int id,
+            String name,
+            String email,
+            int age,
+            boolean active,
+            String birthdate,
+            String createdAt,
+            String address,
+            String preferences)
+            throws SQLException {
+        pstmt.setInt(1, id);
+        pstmt.setString(2, name);
+        pstmt.setString(3, email);
+        pstmt.setInt(4, age);
+        pstmt.setBoolean(5, active);
+        pstmt.setDate(6, java.sql.Date.valueOf(java.time.LocalDate.parse(birthdate)));
+        pstmt.setDate(7, java.sql.Date.valueOf(java.time.LocalDate.parse(createdAt)));
+        pstmt.setString(8, address);
+        pstmt.setString(9, preferences);
+        pstmt.executeUpdate();
     }
 
     /**
@@ -222,34 +259,64 @@ public final class TestDatabaseUtil {
      * @throws SQLException if insert fails
      */
     public static void insertSampleProducts(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
+        String sql = "INSERT INTO products VALUES (?, ?, ?, ?, ?)";
+        try (var pstmt = connection.prepareStatement(sql)) {
             // Products without JSON metadata
-            stmt.execute("INSERT INTO products VALUES (1, 'Widget', 19.99, 100, NULL)");
-            stmt.execute("INSERT INTO products VALUES (2, 'Gadget', 29.99, 50, NULL)");
+            insertProduct(pstmt, 1, "Widget", 19.99, 100, null);
+            insertProduct(pstmt, 2, "Gadget", 29.99, 50, null);
 
             // Products with JSON metadata prepopulated
-            stmt.execute("""
-                    INSERT INTO products VALUES (3, 'Laptop', 999.99, 10, \
-                    '{"tags":["electronics","computers"],"featured":true,"warranty":24}')
-                    """);
-            stmt.execute("""
-                    INSERT INTO products VALUES (4, 'Mouse', 15.99, 200, \
-                    '{"tags":["electronics","accessories"],"featured":false,"color":"black"}')
-                    """);
-            stmt.execute("""
-                    INSERT INTO products VALUES (5, 'Keyboard', 49.99, 75, \
-                    '{"tags":["electronics","accessories"],"featured":true,"backlit":true}')
-                    """);
+            insertProduct(
+                    pstmt,
+                    3,
+                    "Laptop",
+                    999.99,
+                    10,
+                    "{\"tags\":[\"electronics\",\"computers\"],\"featured\":true,\"warranty\":24}");
+            insertProduct(
+                    pstmt,
+                    4,
+                    "Mouse",
+                    15.99,
+                    200,
+                    "{\"tags\":[\"electronics\",\"accessories\"],\"featured\":false,\"color\":\"black\"}");
+            insertProduct(
+                    pstmt,
+                    5,
+                    "Keyboard",
+                    49.99,
+                    75,
+                    "{\"tags\":[\"electronics\",\"accessories\"],\"featured\":true,\"backlit\":true}");
         }
     }
 
+    private static void insertProduct(
+            java.sql.PreparedStatement pstmt, int id, String name, double price, int quantity, String metadata)
+            throws SQLException {
+        pstmt.setInt(1, id);
+        pstmt.setString(2, name);
+        pstmt.setDouble(3, price);
+        pstmt.setInt(4, quantity);
+        pstmt.setString(5, metadata);
+        pstmt.executeUpdate();
+    }
+
     public static void insertSampleOrders(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("INSERT INTO orders VALUES (1, 1, 10.99)");
-            stmt.execute("INSERT INTO orders VALUES (2, 1, 29.99)");
-            stmt.execute("INSERT INTO orders VALUES (3, 4, 39.99)");
-            stmt.execute("INSERT INTO orders VALUES (4, 5, 49.99)");
+        String sql = "INSERT INTO orders VALUES (?, ?, ?)";
+        try (var pstmt = connection.prepareStatement(sql)) {
+            insertOrder(pstmt, 1, 1, 10.99);
+            insertOrder(pstmt, 2, 1, 29.99);
+            insertOrder(pstmt, 3, 4, 39.99);
+            insertOrder(pstmt, 4, 5, 49.99);
         }
+    }
+
+    private static void insertOrder(java.sql.PreparedStatement pstmt, int id, int userId, double total)
+            throws SQLException {
+        pstmt.setInt(1, id);
+        pstmt.setInt(2, userId);
+        pstmt.setDouble(3, total);
+        pstmt.executeUpdate();
     }
 
     public static void createUsersUpdatesTableWithRecords(Connection connection) throws SQLException {
@@ -268,13 +335,23 @@ public final class TestDatabaseUtil {
                         preferences JSON
                     )
                     """);
-            // Source has: updated John Doe (age changed), new user (id=11), Jane Smith unchanged
-            stmt.execute(
-                    "INSERT INTO users_updates VALUES (1, 'John Doe', 'john.newemail@example.com', 31, true, '1990-01-01', '2023-01-01', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users_updates VALUES (2, 'Jane Smith', 'jane@example.com', 25, true, '1995-01-01', '2023-01-01', NULL, NULL)");
-            stmt.execute(
-                    "INSERT INTO users_updates VALUES (11, 'New User', 'newuser@example.com', 28, true, '2000-01-01', '2023-01-08', NULL, NULL)");
+        }
+        // Insert data using PreparedStatement
+        String sql = "INSERT INTO users_updates VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), CAST(? AS JSON))";
+        try (var pstmt = connection.prepareStatement(sql)) {
+            insertUser(
+                    pstmt,
+                    1,
+                    "John Doe",
+                    "john.newemail@example.com",
+                    31,
+                    true,
+                    "1990-01-01",
+                    "2023-01-01",
+                    null,
+                    null);
+            insertUser(pstmt, 2, "Jane Smith", "jane@example.com", 25, true, "1995-01-01", "2023-01-01", null, null);
+            insertUser(pstmt, 11, "New User", "newuser@example.com", 28, true, "2000-01-01", "2023-01-08", null, null);
         }
     }
 
