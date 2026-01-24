@@ -69,6 +69,7 @@ public class MysqlDSL extends DSL {
      *
      * @return a MySQL-specific SELECT projection builder for fluent query construction
      */
+    @SuppressWarnings("unchecked")
     @Override
     public MysqlSelectProjectionBuilder select() {
         return new MysqlSelectProjectionBuilder(specFactory, this);
