@@ -84,7 +84,7 @@
     <dep.testcontainer-core.version>2.0.3</dep.testcontainer-core.version>
     <dep.testcontainer.version>1.21.4</dep.testcontainer.version>
     <dep.junit-jupiter.version>6.0.1</dep.junit-jupiter.version>
-    <dep.assertj-core.version>3.27.6</dep.assertj-core.version>
+    <dep.assertj-core.version>3.27.7</dep.assertj-core.version>
     <dep.mockito-core.version>5.21.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.18.3</dep.byte-buddy.version>
 
