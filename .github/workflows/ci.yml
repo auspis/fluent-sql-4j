@@ -44,14 +44,14 @@ jobs:
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: surefire-reports
         path: |
           **/target/surefire-reports/
     - name: Upload Failsafe reports
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: failsafe-reports
         path: |
