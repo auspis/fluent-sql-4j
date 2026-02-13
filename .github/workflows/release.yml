@@ -31,6 +31,8 @@ jobs:
   # Pre-release validation: ensure tag format and version consistency
   validate-release:
     runs-on: ${{ github.event.inputs.architecture == 'arm64' && 'ubuntu-24.04-arm64' || 'ubuntu-latest' }}
+    permissions:
+      contents: read
     steps:
       - name: Display build architecture
         run: |
@@ -101,6 +103,8 @@ jobs:
   build-and-publish:
     needs: validate-release
     runs-on: ${{ github.event.inputs.architecture == 'arm64' && 'ubuntu-24.04-arm64' || 'ubuntu-latest' }}
+    permissions:
+      contents: read
     steps:
       - name: Display build architecture
         run: |

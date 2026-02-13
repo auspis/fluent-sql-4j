@@ -17,6 +17,9 @@ jobs:
           - runner: ubuntu-24.04-arm64
             arch: arm64
     runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      actions: write  # Required for uploading artifacts
 
     steps:
     - name: Display build architecture
