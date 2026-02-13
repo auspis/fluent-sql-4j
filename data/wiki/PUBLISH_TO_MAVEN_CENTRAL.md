@@ -2,6 +2,15 @@
 
 As of June 30, 2025, OSSRH (Sonatype Open Source Repository Hosting) has reached end-of-life. This project now publishes via the **Central Publishing Portal** (https://central.sonatype.com/).
 
+## ARM64 Architecture Support
+
+This project supports building and publishing on both x64 (Intel/AMD) and ARM64 architectures. The release workflow can run on either architecture to ensure compatibility and optimal performance.
+
+**Note**: Java artifacts are platform-independent (bytecode is the same regardless of build architecture). The architecture selection primarily affects:
+- Build and test performance (ARM64 may be faster on ARM-based CI runners)
+- Integration test execution (ensures compatibility on both architectures)
+- Native dependencies in Testcontainers (database containers)
+
 ## Setup
 
 ### 1. Generate a Central Portal User Token
@@ -25,7 +34,7 @@ Set these secrets in *Settings → Secrets and variables → Actions*:
 
 By default, the release workflow uploads and validates artifacts without automatically publishing them. This allows for review before they go public to Maven Central.
 
-**Option 1: Push a tag (automatic trigger, manual review)**
+**Option 1: Push a tag (automatic trigger, manual review, default x64 architecture)**
 
 ```bash
 git tag v1.0.0
@@ -33,7 +42,7 @@ git push origin v1.0.0
 ```
 
 The GitHub Actions workflow will automatically:
-1. Build the release artifacts
+1. Build the release artifacts on x64 architecture (default)
 2. Sign them with GPG
 3. Upload to Central Publishing Portal
 4. Validate the bundle
@@ -41,23 +50,43 @@ The GitHub Actions workflow will automatically:
 6. You review at https://central.sonatype.com/publishing/deployments
 7. You click "Publish" to make them live on Maven Central
 
-**Option 2: Manual workflow dispatch (manual review)**
+**Option 2: Manual workflow dispatch (manual review, choose architecture)**
 
-Go to GitHub → Actions → "Release to Maven Central" → "Run workflow" → Set `autoPublish = false` → "Run workflow"
+Go to GitHub → Actions → "Release to Maven Central" → "Run workflow":
+- Set `releaseTag` (e.g., v1.0.0)
+- Set `autoPublish = false`
+- Set `architecture = x64` or `arm64` (default: x64)
+- Click "Run workflow"
 
-This gives you the same result as pushing a tag: artifacts are uploaded and validated, waiting for manual publishing.
+This gives you control over:
+- Which architecture to build on (x64 or arm64)
+- Manual review before publishing (autoPublish = false)
 
 ### Auto-Publishing to Maven Central
 
-**Option 3: Auto-publish via workflow dispatch**
+**Option 3: Auto-publish via workflow dispatch (choose architecture)**
 
-Go to GitHub → Actions → "Release to Maven Central" → "Run workflow" → Set `autoPublish = true` → "Run workflow"
+Go to GitHub → Actions → "Release to Maven Central" → "Run workflow":
+- Set `releaseTag` (e.g., v1.0.0)
+- Set `autoPublish = true`
+- Set `architecture = x64` or `arm64` (default: x64)
+- Click "Run workflow"
 
 This will:
-1. Build and upload artifacts
+1. Build and upload artifacts on the selected architecture
 2. Validate the bundle
 3. Automatically publish to Maven Central (no manual review)
 4. Artifacts appear on Maven Central after ~10 minutes
+
+### Architecture Selection Guide
+
+- **x64 (Intel/AMD)**: Default, widely compatible, standard GitHub-hosted runners
+- **arm64 (ARM64)**: Use if you want to build on ARM architecture for:
+  - Performance benefits on ARM-based CI infrastructure
+  - Testing ARM compatibility
+  - Verifying builds work correctly on ARM processors
+
+**Important**: Java artifacts are platform-independent, so the choice of build architecture doesn't affect the published artifacts themselves. Both architectures produce identical bytecode.
 
 ---
 
@@ -68,15 +97,21 @@ The workflow is configured with two trigger modes:
 1. **Tag push** (`git push` with a tag matching `v*.*.*`):
    - Automatic trigger (no manual action needed)
    - Uses `autoPublish = false` (default)
+   - Uses `x64` architecture (default)
    - Artifacts are uploaded and validated, waiting for manual publishing
 2. **Manual dispatch** (GitHub Actions UI):
    - Manual trigger via "Run workflow" button
    - User chooses `autoPublish = true` or `false`
-   - Control over manual vs. automatic publishing
+   - User chooses `architecture = x64` or `arm64`
+   - Control over manual vs. automatic publishing and build architecture
 
 The Maven command parameter `-DautoPublish` controls the Central Publishing Plugin behavior:
 - `false`: Artifacts uploaded and validated; you publish manually via https://central.sonatype.com/publishing/deployments (conservative, recommended)
 - `true`: Artifacts uploaded, validated, and automatically published (immediate release)
+
+The workflow `architecture` parameter controls which GitHub runner is used:
+- `x64`: Uses standard `ubuntu-latest` runners (Intel/AMD 64-bit)
+- `arm64`: Uses `ubuntu-24.04-arm64` runners (ARM64 architecture)
 
 ---
 

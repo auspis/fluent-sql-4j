@@ -19,6 +19,7 @@ A type-safe SQL builder for Java with multi-dialect support through a plugin sys
 - ✅ Complex queries: JOINs, subqueries, window functions, aggregates
 - ✅ DDL operations: CREATE TABLE, ALTER, DROP
 - ✅ DML operations: SELECT, INSERT, UPDATE, DELETE, MERGE
+- ✅ Multi-architecture support: Builds and tests on both x64 and ARM64
 
 ## Quick Start
 

@@ -8,9 +8,23 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm64]
+        include:
+          - runner: ubuntu-latest
+            arch: x64
+          - runner: ubuntu-24.04-arm64
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
 
     steps:
+    - name: Display build architecture
+      run: |
+        echo "🏗️ Building on architecture: ${{ matrix.arch }}"
+        echo "🖥️ Runner: ${{ runner.os }} (${{ runner.arch }})"
+        uname -m
+    
     - name: Checkout code
       uses: actions/checkout@v6
 
@@ -35,8 +49,9 @@ jobs:
     - name: Run all tests (unit + H2 integration + E2E)
       run: ./mvnw verify jacoco:report
 
-    # SonarCloud analysis
+    # SonarCloud analysis (only run on x64 to avoid duplicate scans)
     - name: SonarCloud Scan
+      if: matrix.arch == 'x64'
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
       run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
@@ -46,13 +61,13 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: surefire-reports
+        name: surefire-reports-${{ matrix.arch }}
         path: |
           **/target/surefire-reports/
     - name: Upload Failsafe reports
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: failsafe-reports
+        name: failsafe-reports-${{ matrix.arch }}
         path: |
           **/target/failsafe-reports/

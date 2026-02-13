@@ -18,12 +18,27 @@ on:
         options:
           - 'true'
           - 'false'
+      architecture:
+        description: 'Build architecture (x64 = Intel/AMD, arm64 = ARM64)'
+        required: false
+        default: 'x64'
+        type: choice
+        options:
+          - 'x64'
+          - 'arm64'
 
 jobs:
   # Pre-release validation: ensure tag format and version consistency
   validate-release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.inputs.architecture == 'arm64' && 'ubuntu-24.04-arm64' || 'ubuntu-latest' }}
     steps:
+      - name: Display build architecture
+        run: |
+          ARCH="${{ github.event.inputs.architecture || 'x64' }}"
+          echo "🏗️ Building on architecture: $ARCH"
+          echo "🖥️ Runner: ${{ runner.os }} (${{ runner.arch }})"
+          uname -m
+      
       - name: Checkout code
         uses: actions/checkout@v6
 
@@ -85,8 +100,15 @@ jobs:
   # Build, sign, and deploy to Maven Central (only after validation passes)
   build-and-publish:
     needs: validate-release
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.inputs.architecture == 'arm64' && 'ubuntu-24.04-arm64' || 'ubuntu-latest' }}
     steps:
+      - name: Display build architecture
+        run: |
+          ARCH="${{ github.event.inputs.architecture || 'x64' }}"
+          echo "🏗️ Building on architecture: $ARCH"
+          echo "🖥️ Runner: ${{ runner.os }} (${{ runner.arch }})"
+          uname -m
+      
       - name: Checkout code
         uses: actions/checkout@v6
 
