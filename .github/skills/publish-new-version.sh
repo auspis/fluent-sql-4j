@@ -31,14 +31,28 @@ parse_version() {
   echo "$version"
 }
 
-# Extract current version from root pom.xml
+# Extract current version from root pom.xml using Maven's help:evaluate
 get_current_version() {
   local root_pom="$1"
   if [[ ! -f "$root_pom" ]]; then
     echo "ERROR: Root pom.xml not found at $root_pom" >&2
     exit 1
   fi
-  grep -m1 "<version>" "$root_pom" | sed -E 's/.*<version>([0-9]+\.[0-9]+\.[0-9]+)<\/version>.*/\1/'
+
+  if [[ ! -x "./mvnw" ]]; then
+    echo "ERROR: Maven wrapper (./mvnw) not found or not executable in workspace root" >&2
+    exit 1
+  fi
+
+  local version
+  version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout 2>/dev/null || true)
+
+  if [[ -z "$version" ]]; then
+    echo "ERROR: Unable to determine project.version from Maven" >&2
+    exit 1
+  fi
+
+  echo "$version"
 }
 
 # Compute next version based on bump type or custom override
