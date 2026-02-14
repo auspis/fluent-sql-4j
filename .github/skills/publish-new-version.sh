@@ -189,8 +189,8 @@ main() {
   echo "Please review the changes now (e.g. git status, git diff)."
   read -p "Proceed with git add/commit/tag/push? (y/N): " proceed
   if ! [[ "$proceed" =~ ^[Yy][Ee]?$ ]]; then
-    echo "Cancelled by user. Restoring pom.xml changes..."
-    restore_pom_files "$pom_files"
+    echo "Cancelled by user. Version changes preserved."
+    echo "You can commit them manually or run 'git restore -- \$(find . -name pom.xml)' to revert."
     exit 0
   fi
 
