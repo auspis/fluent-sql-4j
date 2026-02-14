@@ -22,7 +22,7 @@ echo
 
 read -p "Do you want to proceed? (y/N): " -n 1 -r
 echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+if [[ ! $REPLY =~ ^[Yy]([Ee][Ss])?$ ]]; then
     echo "Operation cancelled."
     exit 0
 fi
