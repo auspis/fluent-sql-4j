@@ -159,7 +159,7 @@ main() {
 
   # Confirm
   read -p "Proceed to update all pom.xml files to version $new_version? (y/N): " confirm
-  if ! [[ "$confirm" =~ ^[Yy][Ee]?$ ]]; then
+  if ! [[ "$confirm" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     echo "Aborted by user."
     exit 0
   fi
@@ -188,7 +188,7 @@ main() {
   echo ""
   echo "Please review the changes now (e.g. git status, git diff)."
   read -p "Proceed with git add/commit/tag/push? (y/N): " proceed
-  if ! [[ "$proceed" =~ ^[Yy][Ee]?$ ]]; then
+  if ! [[ "$proceed" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     echo "Cancelled by user. Version changes preserved."
     echo "You can commit them manually or run 'git restore -- \$(find . -name pom.xml)' to revert."
     exit 0
