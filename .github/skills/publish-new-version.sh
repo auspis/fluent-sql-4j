@@ -103,7 +103,7 @@ get_current_branch() {
 
 # Validate Maven project
 validate_maven() {
-  ./mvnw validate -q 2>/dev/null
+  ./mvnw validate -q
 }
 
 restore_pom_files() {
