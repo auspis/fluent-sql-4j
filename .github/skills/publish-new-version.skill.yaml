@@ -2,7 +2,7 @@
 
 name: "publish-new-version"
 description: |
-  Bumps all pom.xml versions in the repository (root and modules) according to SemVer (major, minor, patch, or custom), validates version consistency, and suggests next steps (commit, tag, push). Warns if not on main/master. English only.
+  Bumps all pom.xml versions in the repository (root and modules) according to SemVer (major, minor, patch, or custom), validates version consistency, and suggests next steps (commit, tag, push). Warns if not on main. English only.
 author: auspis
 version: 0.1.0
 entrypoint: publish-new-version.sh
