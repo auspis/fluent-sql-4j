@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Skill: Publish New Version
 # Updates all pom.xml files with a new version (SemVer), validates with Maven,
