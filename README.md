@@ -100,7 +100,7 @@ The project is organized as a multi-module Maven project with two main artifacts
     </dependency>
     ```
 
-### Internal Modules (Not Published)
+### Internal Modules
 
 - **[`core/`](core/)**: Internal implementation (AST, DSL builders, plugin system)
   - Not intended for direct use - access via `api` or `spi`
