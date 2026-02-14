@@ -78,7 +78,7 @@ compute_next_version() {
 update_pom_version() {
   local pom_file="$1"
   local new_version="$2"
-  sed -i.bak "s/<version>[0-9]\+\.[0-9]\+\.[0-9]\+<\/version>/<version>$new_version<\/version>/" "$pom_file"
+  sed -E -i.bak "s/<version>[0-9]+\.[0-9]+\.[0-9]+<\/version>/<version>${new_version}<\/version>/" "$pom_file"
   rm -f "$pom_file.bak"
 }
 
