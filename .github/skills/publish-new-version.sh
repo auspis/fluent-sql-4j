@@ -94,10 +94,34 @@ validate_maven() {
 
 restore_pom_files() {
   local pom_list="$1"
-  if git restore -q -- $pom_list 2>/dev/null; then
+
+  if [[ -z "$pom_list" ]]; then
+    echo -e "${YELLOW}No pom.xml files to restore.${NC}"
     return 0
   fi
-  git checkout -- $pom_list
+
+  local restore_failed=0
+
+  while IFS= read -r pom; do
+    # Skip empty lines
+    if [[ -z "$pom" ]]; then
+      continue
+    fi
+
+    if git restore -q -- "$pom" 2>/dev/null; then
+      echo -e "${GREEN}Restored ${pom} using git restore.${NC}"
+    else
+      echo -e "${YELLOW}git restore failed for ${pom}, falling back to git checkout...${NC}"
+      if git checkout -- "$pom"; then
+        echo -e "${GREEN}Restored ${pom} using git checkout.${NC}"
+      else
+        echo -e "${RED}Failed to restore ${pom}.${NC}" >&2
+        restore_failed=1
+      fi
+    fi
+  done <<< "$pom_list"
+
+  return "$restore_failed"
 }
 
 run_git_steps() {
