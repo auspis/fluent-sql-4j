@@ -35,7 +35,7 @@ jobs:
     - name: Run all tests (unit + H2 integration + E2E)
       run: ./mvnw verify jacoco:report
 
-    # SonarCloud analysis
+    # SonarCloud analysis (requires SonarCloud Automatic Analysis disabled)
     - name: SonarCloud Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
@@ -44,14 +44,14 @@ jobs:
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: surefire-reports
         path: |
           **/target/surefire-reports/
     - name: Upload Failsafe reports
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: failsafe-reports
         path: |
