@@ -2,7 +2,7 @@
 
 name: publish-new-version
 description: Automates Maven multi-module version bumping following SemVer (major, minor, patch, or custom). Updates all pom.xml files, validates with Maven, and guides through git commit/tag/push workflow. Use when releasing a new version, bumping version numbers, preparing Maven releases, or publishing to Maven Central.
-license: MIT
+license: Apache-2.0
 compatibility: Requires Maven wrapper (./mvnw), git, bash, and a multi-module Maven project with pom.xml files
 metadata:
   author: auspis
@@ -92,7 +92,7 @@ You can cancel at any step to perform manual operations.
 ## Safety Features
 
 - ⚠️ **Branch warning**: Alerts if you're not on `main` or `master`
-- ✅ **Maven validation**: Ensures project compiles after version changes
+- ✅ **Maven validation**: Runs `./mvnw validate` to check project structure and POM consistency after version changes
 - 🔄 **Automatic rollback**: Restores pom.xml files if validation fails using `git restore`
 - 🛑 **User confirmation**: Requires explicit approval before git operations
 - 📋 **Review step**: Allows manual inspection before committing
