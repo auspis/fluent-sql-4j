@@ -301,6 +301,10 @@
               <includes>
                 <include>**/*.md</include>
               </includes>
+              <excludes>
+                <exclude>**/.github/skills/**/*.md</exclude>
+                <exclude>**/.github/agents/**/*.md</exclude>
+              </excludes>
               <flexmark/>
             </markdown>
           </configuration>
