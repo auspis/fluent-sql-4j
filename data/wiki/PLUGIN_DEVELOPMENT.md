@@ -190,7 +190,7 @@ public class PostgreSqlCustomFunctionCallPsStrategy implements CustomFunctionCal
     public PreparedStatementSpec handle(
             CustomFunctionCall functionCall, AstToPreparedStatementSpecVisitor astToPsSpecVisitor, AstContext ctx) {
         return switch (functionCall.functionName()) {
-            case "STRING_AGG" -> renderStringAgg(functionCall, astToPsSpecVisitor, ctx);
+            case FUN_STRING_AGG -> renderStringAgg(functionCall, astToPsSpecVisitor, ctx);
             default -> renderGeneric(functionCall, astToPsSpecVisitor, ctx);
         };
     }
