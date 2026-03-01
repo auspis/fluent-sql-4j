@@ -7,6 +7,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionC
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.data.FunctionCallNames;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -48,15 +49,21 @@ class CustomFunctionCallTest {
 
     @Test
     void createsWithOptions() {
-        Map<String, Object> options = Map.of("ORDER_BY", "id", "SEPARATOR", ",", "DISTINCT", true);
+        Map<String, Object> options = Map.of(
+                FunctionCallNames.Options.ORDER_BY,
+                "id",
+                FunctionCallNames.Options.SEPARATOR,
+                ",",
+                FunctionCallNames.Options.DISTINCT,
+                true);
 
         CustomFunctionCall call =
                 new CustomFunctionCall("GROUP_CONCAT", List.of(ColumnReference.of("t", "name")), options);
 
         assertThat(call.options()).hasSize(3);
-        assertThat(call.options().get("ORDER_BY")).isEqualTo("id");
-        assertThat(call.options().get("SEPARATOR")).isEqualTo(",");
-        assertThat(call.options().get("DISTINCT")).isEqualTo(true);
+        assertThat(call.options().get(FunctionCallNames.Options.ORDER_BY)).isEqualTo("id");
+        assertThat(call.options().get(FunctionCallNames.Options.SEPARATOR)).isEqualTo(",");
+        assertThat(call.options().get(FunctionCallNames.Options.DISTINCT)).isEqualTo(true);
     }
 
     @Test

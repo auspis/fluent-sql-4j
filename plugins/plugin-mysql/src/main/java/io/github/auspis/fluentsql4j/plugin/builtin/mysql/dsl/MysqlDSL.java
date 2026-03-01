@@ -8,6 +8,7 @@ import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +105,9 @@ public class MysqlDSL extends DSL {
         java.util.Objects.requireNonNull(separator, "Separator must not be null");
 
         return new CustomFunctionCall(
-                "GROUP_CONCAT", List.of(toScalarExpression(column)), Map.of("SEPARATOR", separator));
+                MysqlFunctionCallNames.GROUP_CONCAT,
+                List.of(toScalarExpression(column)),
+                Map.of(MysqlFunctionCallNames.Options.SEPARATOR, separator));
     }
 
     /**

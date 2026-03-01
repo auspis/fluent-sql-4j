@@ -17,6 +17,7 @@ module io.github.auspis.fluentsql4j.core {
     exports io.github.auspis.fluentsql4j.plugin;
     exports io.github.auspis.fluentsql4j.plugin.util;
     exports io.github.auspis.fluentsql4j.plugin.builtin.sql2016;
+    exports io.github.auspis.fluentsql4j.plugin.builtin.sql2016.data;
     exports io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
     exports io.github.auspis.fluentsql4j.ast.visitor;
     exports io.github.auspis.fluentsql4j.ast.visitor.ps;

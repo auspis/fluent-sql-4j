@@ -75,11 +75,27 @@ public class InsertBuilder {
         return this;
     }
 
+    /**
+     * Builds and returns a PreparedStatement with bound parameters.
+     * <p>
+     * <strong>Note:</strong> The caller is responsible for closing the returned PreparedStatement.
+     * Consider using try-with-resources:
+     * <pre>
+     * try (PreparedStatement ps = builder.build(connection)) {
+     *     // use ps
+     * }
+     * </pre>
+     *
+     * @param connection the database connection
+     * @return a PreparedStatement ready for execution
+     * @throws SQLException if a database error occurs
+     */
     public PreparedStatement build(Connection connection) throws SQLException {
         validateState();
         InsertStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);
 
+        //noinspection resource
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {
             ps.setObject(i + 1, result.parameters().get(i));

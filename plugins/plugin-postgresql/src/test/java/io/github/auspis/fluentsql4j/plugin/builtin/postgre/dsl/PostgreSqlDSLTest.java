@@ -8,6 +8,8 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.PostgreSqlAstToPreparedStatementSpecVisitorFactory;
+import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames;
+import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames.Options;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +30,9 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("STRING_AGG");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.STRING_AGG);
         assertThat(call.arguments()).hasSize(1);
-        assertThat(call.options()).containsEntry("SEPARATOR", ",");
+        assertThat(call.options()).containsEntry(Options.SEPARATOR, ",");
     }
 
     @Test
@@ -38,7 +40,7 @@ class PostgreSqlDSLTest {
         ScalarExpression expr = dsl.stringAgg("name").separator(", ").build();
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.options()).containsEntry("SEPARATOR", ", ");
+        assertThat(call.options()).containsEntry(Options.SEPARATOR, ", ");
     }
 
     @Test
@@ -46,7 +48,7 @@ class PostgreSqlDSLTest {
         ScalarExpression expr = dsl.stringAgg("name").orderBy("name").build();
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.options()).containsEntry("ORDER_BY", "name");
+        assertThat(call.options()).containsEntry(Options.ORDER_BY, "name");
     }
 
     @Test
@@ -54,7 +56,7 @@ class PostgreSqlDSLTest {
         ScalarExpression expr = dsl.stringAgg("name").distinct().build();
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.options()).containsEntry("DISTINCT", true);
+        assertThat(call.options()).containsEntry(Options.DISTINCT, true);
     }
 
     @Test
@@ -66,11 +68,11 @@ class PostgreSqlDSLTest {
                 .build();
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("STRING_AGG");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.STRING_AGG);
         assertThat(call.options())
-                .containsEntry("DISTINCT", true)
-                .containsEntry("ORDER_BY", "email DESC")
-                .containsEntry("SEPARATOR", " | ");
+                .containsEntry(Options.DISTINCT, true)
+                .containsEntry(Options.ORDER_BY, "email DESC")
+                .containsEntry(Options.SEPARATOR, " | ");
     }
 
     @Test
@@ -91,7 +93,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("ARRAY_AGG");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.ARRAY_AGG);
         assertThat(call.arguments()).hasSize(1);
     }
 
@@ -100,7 +102,7 @@ class PostgreSqlDSLTest {
         ScalarExpression expr = dsl.arrayAgg("tags").orderBy("tags").build();
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.options()).containsEntry("ORDER_BY", "tags");
+        assertThat(call.options()).containsEntry(Options.ORDER_BY, "tags");
     }
 
     @Test
@@ -108,7 +110,7 @@ class PostgreSqlDSLTest {
         ScalarExpression expr = dsl.arrayAgg("category").distinct().build();
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.options()).containsEntry("DISTINCT", true);
+        assertThat(call.options()).containsEntry(Options.DISTINCT, true);
     }
 
     // JSONB_AGG Tests
@@ -119,7 +121,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("JSONB_AGG");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.JSONB_AGG);
     }
 
     @Test
@@ -127,7 +129,7 @@ class PostgreSqlDSLTest {
         ScalarExpression expr = dsl.jsonbAgg("item").orderBy("created_at").build();
 
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.options()).containsEntry("ORDER_BY", "created_at");
+        assertThat(call.options()).containsEntry(Options.ORDER_BY, "created_at");
     }
 
     // TO_CHAR Tests
@@ -138,7 +140,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("TO_CHAR");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.TO_CHAR);
         assertThat(call.arguments()).hasSize(2);
     }
 
@@ -161,7 +163,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("DATE_TRUNC");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.DATE_TRUNC);
         assertThat(call.arguments()).hasSize(2);
     }
 
@@ -183,7 +185,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("AGE");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.AGE);
         assertThat(call.arguments()).hasSize(1);
     }
 
@@ -219,7 +221,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("COALESCE");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.COALESCE);
         assertThat(call.arguments()).hasSize(2);
     }
 
@@ -247,7 +249,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo("NULLIF");
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.NULLIF);
         assertThat(call.arguments()).hasSize(2);
     }
 }

@@ -9,6 +9,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,9 @@ class MysqlCustomFunctionCallPsStrategyTest {
     @Test
     void groupConcatWithSeparator() {
         CustomFunctionCall function = new CustomFunctionCall(
-                "GROUP_CONCAT", List.of(ColumnReference.of("", "name")), Map.of("SEPARATOR", ", "));
+                MysqlFunctionCallNames.GROUP_CONCAT,
+                List.of(ColumnReference.of("", "name")),
+                Map.of(MysqlFunctionCallNames.Options.SEPARATOR, ", "));
         PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("GROUP_CONCAT(\"name\" SEPARATOR ?)");
         assertThat(dto.parameters()).containsExactly(", ");
@@ -46,9 +49,9 @@ class MysqlCustomFunctionCallPsStrategyTest {
     @Test
     void groupConcatWithParametersAndSeparator() {
         CustomFunctionCall function = new CustomFunctionCall(
-                "GROUP_CONCAT",
+                MysqlFunctionCallNames.GROUP_CONCAT,
                 List.of(ColumnReference.of("", "name"), Literal.of("ORDER BY"), ColumnReference.of("", "id")),
-                Map.of("SEPARATOR", ";"));
+                Map.of(MysqlFunctionCallNames.Options.SEPARATOR, ";"));
         PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());
         assertThat(dto.sql()).isEqualTo("GROUP_CONCAT(\"name\", ?, \"id\" SEPARATOR ?)");
         assertThat(dto.parameters()).containsExactly("ORDER BY", ";");

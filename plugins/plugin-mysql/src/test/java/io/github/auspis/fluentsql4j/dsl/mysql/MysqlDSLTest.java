@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +31,9 @@ class MysqlDSLTest {
 
         assertThat(result).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) result;
-        assertThat(call.functionName()).isEqualTo("GROUP_CONCAT");
+        assertThat(call.functionName()).isEqualTo(MysqlFunctionCallNames.GROUP_CONCAT);
         assertThat(call.arguments()).hasSize(1);
-        assertThat(call.options()).containsEntry("SEPARATOR", ", ");
+        assertThat(call.options()).containsEntry(MysqlFunctionCallNames.Options.SEPARATOR, ", ");
     }
 
     @Test
