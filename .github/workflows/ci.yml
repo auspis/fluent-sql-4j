@@ -42,6 +42,7 @@ jobs:
       run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
         -Dsonar.projectKey=fluent-sql-4j \
         -Dsonar.organization=auspis \
+        -Dsonar.pullrequest.key=${{ github.event.number }} \
         -Dsonar.pullrequest.branch=${GITHUB_HEAD_REF} \
         -Dsonar.pullrequest.base=${GITHUB_BASE_REF}
 
