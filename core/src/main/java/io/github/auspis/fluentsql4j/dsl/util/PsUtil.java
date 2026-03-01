@@ -26,7 +26,7 @@ public class PsUtil {
      */
     public static PreparedStatement preparedStatement(PreparedStatementSpec spec, Connection connection)
             throws SQLException {
-        // NOSONAR S2095 - Caller is responsible for closing the PreparedStatement
+        @SuppressWarnings("java:S2095")
         PreparedStatement ps = connection.prepareStatement(spec.sql());
         for (int i = 0; i < spec.parameters().size(); i++) {
             ps.setObject(i + 1, spec.parameters().get(i));

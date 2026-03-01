@@ -114,7 +114,7 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
         DeleteStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);
 
-        // NOSONAR S2095 - Caller is responsible for closing the PreparedStatement
+        @SuppressWarnings("java:S2095")
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {
             ps.setObject(i + 1, result.parameters().get(i));
