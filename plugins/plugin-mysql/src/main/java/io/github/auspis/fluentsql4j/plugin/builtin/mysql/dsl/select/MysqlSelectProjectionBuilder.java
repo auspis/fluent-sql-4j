@@ -7,6 +7,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.select.SelectProjectionBuilder;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders.MysqlCoalesceBuilder;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders.MysqlConcatBuilder;
@@ -119,7 +120,7 @@ public class MysqlSelectProjectionBuilder extends SelectProjectionBuilder<MysqlS
         Literal<String> formatLiteral = Literal.of(format);
 
         CustomFunctionCall dateFormatCall =
-                new CustomFunctionCall("DATE_FORMAT", List.of(columnRef, formatLiteral), Map.of());
+                new CustomFunctionCall(MysqlFunctionCallNames.DATE_FORMAT, List.of(columnRef, formatLiteral), Map.of());
 
         return expression(dateFormatCall);
     }
@@ -162,7 +163,8 @@ public class MysqlSelectProjectionBuilder extends SelectProjectionBuilder<MysqlS
 
         Literal<String> defaultLiteral = Literal.of(defaultValue);
 
-        CustomFunctionCall ifnullCall = new CustomFunctionCall("IFNULL", List.of(columnRef, defaultLiteral), Map.of());
+        CustomFunctionCall ifnullCall =
+                new CustomFunctionCall(MysqlFunctionCallNames.IFNULL, List.of(columnRef, defaultLiteral), Map.of());
 
         return expression(ifnullCall);
     }
@@ -181,7 +183,7 @@ public class MysqlSelectProjectionBuilder extends SelectProjectionBuilder<MysqlS
         Objects.requireNonNull(defaultExpression, "Default expression must not be null");
 
         CustomFunctionCall ifnullCall =
-                new CustomFunctionCall("IFNULL", List.of(expression, defaultExpression), Map.of());
+                new CustomFunctionCall(MysqlFunctionCallNames.IFNULL, List.of(expression, defaultExpression), Map.of());
 
         return expression(ifnullCall);
     }

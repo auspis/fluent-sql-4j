@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.builders;
 import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.HashMap;
 import java.util.List;
@@ -56,9 +57,10 @@ public class MysqlGroupConcatBuilder {
      */
     public MysqlSelectProjectionBuilder as(String alias) {
         Map<String, Object> options = new HashMap<>();
-        options.put("SEPARATOR", separator);
+        options.put(MysqlFunctionCallNames.Options.SEPARATOR, separator);
 
-        CustomFunctionCall functionCall = new CustomFunctionCall("GROUP_CONCAT", List.of(column), options);
+        CustomFunctionCall functionCall =
+                new CustomFunctionCall(MysqlFunctionCallNames.GROUP_CONCAT, List.of(column), options);
 
         return parent.expression(functionCall, alias);
     }

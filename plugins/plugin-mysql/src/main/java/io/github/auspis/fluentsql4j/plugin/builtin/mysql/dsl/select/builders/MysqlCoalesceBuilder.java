@@ -4,6 +4,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionC
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +101,8 @@ public class MysqlCoalesceBuilder {
             throw new IllegalStateException("COALESCE requires at least two expressions");
         }
 
-        CustomFunctionCall coalesceCall = new CustomFunctionCall("COALESCE", expressions, Map.of());
+        CustomFunctionCall coalesceCall =
+                new CustomFunctionCall(MysqlFunctionCallNames.COALESCE, expressions, Map.of());
         return parent.expression(coalesceCall).as(alias);
     }
 }

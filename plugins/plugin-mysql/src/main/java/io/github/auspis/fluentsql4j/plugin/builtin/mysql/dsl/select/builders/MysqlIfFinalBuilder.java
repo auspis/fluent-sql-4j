@@ -5,6 +5,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.PredicateExpression;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.List;
@@ -41,8 +42,8 @@ public class MysqlIfFinalBuilder {
         // Wrap the Predicate in PredicateExpression to use it as ScalarExpression
         PredicateExpression predicateExpr = new PredicateExpression(condition);
 
-        CustomFunctionCall ifExpression =
-                new CustomFunctionCall("IF", List.of(predicateExpr, trueValue, falseValue), Map.of());
+        CustomFunctionCall ifExpression = new CustomFunctionCall(
+                MysqlFunctionCallNames.IF, List.of(predicateExpr, trueValue, falseValue), Map.of());
 
         return new MysqlIfProjectionAliasBuilder(parent, ifExpression);
     }

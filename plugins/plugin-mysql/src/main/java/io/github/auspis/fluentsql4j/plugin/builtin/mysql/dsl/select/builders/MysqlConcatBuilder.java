@@ -4,6 +4,7 @@ import io.github.auspis.fluentsql4j.ast.core.expression.function.CustomFunctionC
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.select.MysqlSelectProjectionBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class MysqlConcatBuilder {
             throw new IllegalStateException("CONCAT requires at least one expression");
         }
 
-        CustomFunctionCall concatCall = new CustomFunctionCall("CONCAT", expressions, Map.of());
+        CustomFunctionCall concatCall = new CustomFunctionCall(MysqlFunctionCallNames.CONCAT, expressions, Map.of());
         return parent.expression(concatCall).as(alias);
     }
 }

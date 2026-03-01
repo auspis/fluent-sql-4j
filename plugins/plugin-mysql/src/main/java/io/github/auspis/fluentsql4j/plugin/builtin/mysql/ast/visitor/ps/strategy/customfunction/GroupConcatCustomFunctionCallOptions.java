@@ -1,6 +1,7 @@
 package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction;
 
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +12,6 @@ import java.util.Map;
  */
 public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallOptions {
 
-    private static final String OPTION_ORDER_BY = "ORDER BY";
-    private static final String OPTION_SEPARATOR = "SEPARATOR";
-
     @Override
     public PreparedStatementSpec renderOptions(Map<String, Object> options) {
         if (options == null || options.isEmpty()) {
@@ -23,19 +21,20 @@ public class GroupConcatCustomFunctionCallOptions implements CustomFunctionCallO
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
 
-        if (options.containsKey(OPTION_ORDER_BY)) {
-            sql.append(" ").append(OPTION_ORDER_BY).append(" ");
-            appendValue(sql, options.get(OPTION_ORDER_BY), params);
+        if (options.containsKey(MysqlFunctionCallNames.Options.ORDER_BY)) {
+            sql.append(" ORDER BY ");
+            appendValue(sql, options.get(MysqlFunctionCallNames.Options.ORDER_BY), params);
         }
 
-        if (options.containsKey(OPTION_SEPARATOR)) {
-            sql.append(" ").append(OPTION_SEPARATOR).append(" ?");
-            params.add(options.get(OPTION_SEPARATOR));
+        if (options.containsKey(MysqlFunctionCallNames.Options.SEPARATOR)) {
+            sql.append(" ").append(MysqlFunctionCallNames.Options.SEPARATOR).append(" ?");
+            params.add(options.get(MysqlFunctionCallNames.Options.SEPARATOR));
         }
 
         for (Map.Entry<String, Object> entry : options.entrySet()) {
             String key = entry.getKey();
-            if (!OPTION_ORDER_BY.equals(key) && !OPTION_SEPARATOR.equals(key)) {
+            if (!MysqlFunctionCallNames.Options.ORDER_BY.equals(key)
+                    && !MysqlFunctionCallNames.Options.SEPARATOR.equals(key)) {
                 sql.append(" ").append(key).append(" ?");
                 params.add(entry.getValue());
             }

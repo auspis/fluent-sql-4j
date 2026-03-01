@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strateg
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,8 @@ class GroupConcatCustomFunctionCallOptionsTest {
     @Test
     void rendersOrderByThenSeparatorWithParameterBinding() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", ", ", "ORDER BY", "name"));
+        PreparedStatementSpec spec = strategy.renderOptions(Map.of(
+                MysqlFunctionCallNames.Options.SEPARATOR, ", ", MysqlFunctionCallNames.Options.ORDER_BY, "name"));
 
         assertThat(spec.sql()).startsWith(" ORDER BY ?").contains(" SEPARATOR ?");
         assertThat(spec.parameters()).containsExactly("name", ", ");
@@ -20,7 +22,13 @@ class GroupConcatCustomFunctionCallOptionsTest {
     @Test
     void rendersOtherOptionsAfterReserved() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", ";", "ORDER BY", "id", "OPTION1", 42));
+        PreparedStatementSpec spec = strategy.renderOptions(Map.of(
+                MysqlFunctionCallNames.Options.SEPARATOR,
+                ";",
+                MysqlFunctionCallNames.Options.ORDER_BY,
+                "id",
+                "OPTION1",
+                42));
 
         assertThat(spec.sql())
                 .startsWith(" ORDER BY ?")
@@ -32,7 +40,7 @@ class GroupConcatCustomFunctionCallOptionsTest {
     @Test
     void quotesNonStringValuesViaParameterBinding() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", 1));
+        PreparedStatementSpec spec = strategy.renderOptions(Map.of(MysqlFunctionCallNames.Options.SEPARATOR, 1));
 
         assertThat(spec.sql()).isEqualTo(" SEPARATOR ?");
         assertThat(spec.parameters()).containsExactly(1);
@@ -41,7 +49,8 @@ class GroupConcatCustomFunctionCallOptionsTest {
     @Test
     void escapesStringValuesViaParameterBinding() {
         CustomFunctionCallOptions strategy = new GroupConcatCustomFunctionCallOptions();
-        PreparedStatementSpec spec = strategy.renderOptions(Map.of("SEPARATOR", "', DROP TABLE users--"));
+        PreparedStatementSpec spec =
+                strategy.renderOptions(Map.of(MysqlFunctionCallNames.Options.SEPARATOR, "', DROP TABLE users--"));
 
         assertThat(spec.sql()).isEqualTo(" SEPARATOR ?");
         assertThat(spec.parameters()).containsExactly("', DROP TABLE users--");
