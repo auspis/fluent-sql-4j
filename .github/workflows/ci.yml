@@ -39,12 +39,7 @@ jobs:
     - name: SonarCloud Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
-      run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-        -Dsonar.projectKey=fluent-sql-4j \
-        -Dsonar.organization=auspis \
-        -Dsonar.pullrequest.key=${{ github.event.number }} \
-        -Dsonar.pullrequest.branch=${GITHUB_HEAD_REF} \
-        -Dsonar.pullrequest.base=${GITHUB_BASE_REF}
+      run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
