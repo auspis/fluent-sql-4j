@@ -2,6 +2,7 @@ module io.github.auspis.fluentsql4j.plugin.mysql {
     requires transitive io.github.auspis.fluentsql4j.spi;
     requires java.sql;
     requires static lombok;
+    requires io.github.auspis.fluentsql4j.core;
 
     // Provide MySQL dialect plugin implementation
     // Allow this module to call ServiceLoader for SqlDialectPluginProvider in tests

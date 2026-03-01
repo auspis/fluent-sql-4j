@@ -10,6 +10,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVis
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlCustomFunctionCallPsStrategy;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.data.FunctionCallNames;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class StandardSqlCustomFunctionCallPsStrategyTest {
     @Test
     void multipleArguments() {
         CustomFunctionCall function = new CustomFunctionCall(
-                "CONCAT",
+                FunctionCallNames.CONCAT,
                 List.of(ColumnReference.of("", "first_name"), Literal.of(" "), ColumnReference.of("", "last_name")),
                 Map.of());
         PreparedStatementSpec dto = strategy.handle(function, specFactory, new AstContext());

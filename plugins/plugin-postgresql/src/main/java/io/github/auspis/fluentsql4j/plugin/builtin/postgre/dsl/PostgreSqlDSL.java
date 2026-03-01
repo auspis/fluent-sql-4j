@@ -7,6 +7,8 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
+import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames;
+import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames.Options;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +87,8 @@ public class PostgreSqlDSL extends DSL {
      * @return a CustomFunctionCall representing TO_CHAR
      */
     public ScalarExpression toChar(ScalarExpression expression, String format) {
-        return new CustomFunctionCall("TO_CHAR", List.of(expression, Literal.of(format)), Map.of());
+        return new CustomFunctionCall(
+                PostgreSqlFunctionCallNames.TO_CHAR, List.of(expression, Literal.of(format)), Map.of());
     }
 
     /**
@@ -98,7 +101,8 @@ public class PostgreSqlDSL extends DSL {
      * @return a CustomFunctionCall representing DATE_TRUNC
      */
     public ScalarExpression dateTrunc(String field, ScalarExpression expression) {
-        return new CustomFunctionCall("DATE_TRUNC", List.of(Literal.of(field), expression), Map.of());
+        return new CustomFunctionCall(
+                PostgreSqlFunctionCallNames.DATE_TRUNC, List.of(Literal.of(field), expression), Map.of());
     }
 
     /**
@@ -114,7 +118,7 @@ public class PostgreSqlDSL extends DSL {
         if (expressions.length == 0 || expressions.length > 2) {
             throw new IllegalArgumentException("AGE requires 1 or 2 arguments");
         }
-        return new CustomFunctionCall("AGE", List.of(expressions), Map.of());
+        return new CustomFunctionCall(PostgreSqlFunctionCallNames.AGE, List.of(expressions), Map.of());
     }
 
     /**
@@ -129,7 +133,7 @@ public class PostgreSqlDSL extends DSL {
         if (expressions.length < 2) {
             throw new IllegalArgumentException("COALESCE requires at least 2 arguments");
         }
-        return new CustomFunctionCall("COALESCE", List.of(expressions), Map.of());
+        return new CustomFunctionCall(PostgreSqlFunctionCallNames.COALESCE, List.of(expressions), Map.of());
     }
 
     /**
@@ -142,7 +146,7 @@ public class PostgreSqlDSL extends DSL {
      * @return a CustomFunctionCall representing NULLIF
      */
     public ScalarExpression nullIf(ScalarExpression expr1, ScalarExpression expr2) {
-        return new CustomFunctionCall("NULLIF", List.of(expr1, expr2), Map.of());
+        return new CustomFunctionCall(PostgreSqlFunctionCallNames.NULLIF, List.of(expr1, expr2), Map.of());
     }
 
     /**
@@ -202,12 +206,12 @@ public class PostgreSqlDSL extends DSL {
         public ScalarExpression build() {
             Map<String, Object> options = new HashMap<>();
             if (orderBy != null) {
-                options.put("ORDER_BY", orderBy);
+                options.put(Options.ORDER_BY, orderBy);
             }
-            options.put("SEPARATOR", separator);
-            options.put("DISTINCT", distinct);
+            options.put(Options.SEPARATOR, separator);
+            options.put(Options.DISTINCT, distinct);
 
-            return new CustomFunctionCall("STRING_AGG", List.of(column), options);
+            return new CustomFunctionCall(PostgreSqlFunctionCallNames.STRING_AGG, List.of(column), options);
         }
     }
 
@@ -236,11 +240,11 @@ public class PostgreSqlDSL extends DSL {
         public ScalarExpression build() {
             Map<String, Object> options = new HashMap<>();
             if (orderBy != null) {
-                options.put("ORDER_BY", orderBy);
+                options.put(Options.ORDER_BY, orderBy);
             }
-            options.put("DISTINCT", distinct);
+            options.put(Options.DISTINCT, distinct);
 
-            return new CustomFunctionCall("ARRAY_AGG", List.of(column), options);
+            return new CustomFunctionCall(PostgreSqlFunctionCallNames.ARRAY_AGG, List.of(column), options);
         }
     }
 
@@ -263,10 +267,10 @@ public class PostgreSqlDSL extends DSL {
         public ScalarExpression build() {
             Map<String, Object> options = new HashMap<>();
             if (orderBy != null) {
-                options.put("ORDER_BY", orderBy);
+                options.put(Options.ORDER_BY, orderBy);
             }
 
-            return new CustomFunctionCall("JSONB_AGG", List.of(column), options);
+            return new CustomFunctionCall(PostgreSqlFunctionCallNames.JSONB_AGG, List.of(column), options);
         }
     }
 }
