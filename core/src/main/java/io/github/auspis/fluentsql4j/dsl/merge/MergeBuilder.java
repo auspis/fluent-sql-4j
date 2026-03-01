@@ -191,7 +191,7 @@ public class MergeBuilder {
         MergeStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);
 
-        //noinspection resource
+        // NOSONAR S2095 - Caller is responsible for closing the PreparedStatement
         PreparedStatement ps = connection.prepareStatement(result.sql());
         for (int i = 0; i < result.parameters().size(); i++) {
             ps.setObject(i + 1, result.parameters().get(i));
