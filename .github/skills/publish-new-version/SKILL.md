@@ -5,8 +5,9 @@ description: Automates Maven multi-module version bumping following SemVer (majo
 license: Apache-2.0
 compatibility: Requires Maven wrapper (./mvnw), git, bash, and a multi-module Maven project with pom.xml files
 metadata:
-  author: auspis
-  version: 0.1.0
+author: auspis
+version: 0.1.0
+
 ---
 
 # Publish New Version
@@ -61,12 +62,12 @@ This ensures accurate version detection even in complex multi-module setups.
 
 Choose from four bump types following Semantic Versioning:
 
-|    Type    |             Description             | Example (from 1.2.3) |
+|    Type    | Description                         | Example (from 1.2.3) |
 |:----------:|:------------------------------------|:--------------------:|
-| **minor**  | Default. Adds new features          | 1.3.0                |
-| **major**  | Breaking changes, major release     | 2.0.0                |
-| **patch**  | Bug fixes, patches                  | 1.2.4                |
-| **custom** | Specify exact version (e.g., 2.5.0) | 2.5.0                |
+| **minor**  | Default. Adds new features          |        1.3.0         |
+| **major**  | Breaking changes, major release     |        2.0.0         |
+| **patch**  | Bug fixes, patches                  |        1.2.4         |
+| **custom** | Specify exact version (e.g., 2.5.0) |        2.5.0         |
 
 ### 3. Update Process
 

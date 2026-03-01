@@ -3,6 +3,7 @@
 name: skill-creator
 description: Guides you through creating Agent Skills following the official specification. Conducts an interactive interview to gather all requirements, validates them, previews the complete skill structure, and generates all skill files in .github/skills/. Use when you want to create a new Agent Skill for this repository.
 tools: ["read", "edit", "search"]
+
 ---
 
 # Agent Skill Creator
