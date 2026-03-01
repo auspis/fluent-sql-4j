@@ -8,6 +8,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.CustomFunctionCallPs
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction.CustomFunctionCallOptions;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction.GenericCustomFunctionCallOptions;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.customfunction.GroupConcatCustomFunctionCallOptions;
+import io.github.auspis.fluentsql4j.plugin.builtin.mysql.data.MysqlFunctionCallNames;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class MysqlCustomFunctionCallPsStrategy implements CustomFunctionCallPsSt
     }
 
     private CustomFunctionCallOptions selectOptionsStrategy(String functionName) {
-        if (functionName != null && functionName.equalsIgnoreCase("GROUP_CONCAT")) {
+        if (functionName != null && functionName.equalsIgnoreCase(MysqlFunctionCallNames.GROUP_CONCAT)) {
             return new GroupConcatCustomFunctionCallOptions();
         }
         return new GenericCustomFunctionCallOptions();

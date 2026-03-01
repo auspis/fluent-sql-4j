@@ -10,7 +10,6 @@ import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ScalarExpression;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.PostgreSqlAstToPreparedStatementSpecVisitorFactory;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames.Options;
-import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.data.FunctionCallNames;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -141,7 +140,7 @@ class PostgreSqlDSLTest {
 
         assertThat(expr).isInstanceOf(CustomFunctionCall.class);
         CustomFunctionCall call = (CustomFunctionCall) expr;
-        assertThat(call.functionName()).isEqualTo(FunctionCallNames.FUN_TO_CHAR);
+        assertThat(call.functionName()).isEqualTo(PostgreSqlFunctionCallNames.TO_CHAR);
         assertThat(call.arguments()).hasSize(2);
     }
 

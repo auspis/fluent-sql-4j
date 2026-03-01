@@ -9,7 +9,6 @@ import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.data.PostgreSqlFunctionCallNames.Options;
-import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.data.FunctionCallNames;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +87,8 @@ public class PostgreSqlDSL extends DSL {
      * @return a CustomFunctionCall representing TO_CHAR
      */
     public ScalarExpression toChar(ScalarExpression expression, String format) {
-        return new CustomFunctionCall(FunctionCallNames.FUN_TO_CHAR, List.of(expression, Literal.of(format)), Map.of());
+        return new CustomFunctionCall(
+                PostgreSqlFunctionCallNames.TO_CHAR, List.of(expression, Literal.of(format)), Map.of());
     }
 
     /**
@@ -211,7 +211,7 @@ public class PostgreSqlDSL extends DSL {
             options.put(Options.SEPARATOR, separator);
             options.put(Options.DISTINCT, distinct);
 
-            return new CustomFunctionCall("STRING_AGG", List.of(column), options);
+            return new CustomFunctionCall(PostgreSqlFunctionCallNames.STRING_AGG, List.of(column), options);
         }
     }
 

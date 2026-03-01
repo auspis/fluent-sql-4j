@@ -10,13 +10,8 @@ public class PostgreSqlFunctionCallNames extends FunctionCallNames {
     public static final String JSONB_AGG = "JSONB_AGG";
     public static final String DATE_TRUNC = "DATE_TRUNC";
     public static final String AGE = "AGE";
-    public static final String COALESCE = "COALESCE";
-    public static final String NULLIF = "NULLIF";
+    public static final String TO_CHAR = "TO_CHAR";
 
     @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-    public static class Options {
-        public static final String DISTINCT = "DISTINCT";
-        public static final String SEPARATOR = "SEPARATOR";
-        public static final String ORDER_BY = "ORDER_BY";
-    }
+    public static class Options extends FunctionCallNames.Options {}
 }

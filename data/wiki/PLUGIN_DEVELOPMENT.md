@@ -204,11 +204,11 @@ public class PostgreSqlCustomFunctionCallPsStrategy implements CustomFunctionCal
 
         StringBuilder sql = new StringBuilder("STRING_AGG(").append(expr.sql());
 
-        String separator = (String) call.options().get("SEPARATOR");
+        String separator = (String) call.options().get(FunctionCallNames.Options.SEPARATOR);
         sql.append(", '").append(separator).append("'");
 
-        if (call.options().containsKey("ORDER_BY")) {
-            sql.append(" ORDER BY ").append(call.options().get("ORDER_BY"));
+        if (call.options().containsKey(FunctionCallNames.Options.ORDER_BY)) {
+            sql.append(" ORDER BY ").append(call.options().get(FunctionCallNames.Options.ORDER_BY));
         }
 
         sql.append(")");
@@ -279,12 +279,12 @@ public class PostgreSqlDSL extends DSL {
         public ScalarExpression build() {
             Map<String, Object> options = new HashMap<>();
             if (orderBy != null) {
-                options.put("ORDER_BY", orderBy);
+                options.put(FunctionCallNames.Options.ORDER_BY, orderBy);
             }
-            options.put("SEPARATOR", separator);
+            options.put(FunctionCallNames.Options.SEPARATOR, separator);
             
             return new CustomFunctionCall(
-                "STRING_AGG",
+                PostgreSqlFunctionCallNames.STRING_AGG,
                 List.of(ColumnReference.of("", column)),
                 options
             );
@@ -428,13 +428,13 @@ public class BadRenderStrategy implements CustomFunctionCallPsStrategy {
 ```java
 // ✅ GOOD: Immutable options
 Map<String, Object> options = Map.of(
-    "ORDER_BY", orderBy,
-    "SEPARATOR", separator
+    FunctionCallNames.Options.ORDER_BY, orderBy,
+    FunctionCallNames.Options.SEPARATOR, separator
 );
 
 // ❌ BAD: Mutable options
 Map<String, Object> options = new HashMap<>();
-options.put("ORDER_BY", orderBy); // Can be modified externally
+options.put(FunctionCallNames.Options.ORDER_BY, orderBy); // Can be modified externally
 ```
 
 ### Error Handling
@@ -541,9 +541,9 @@ Test individual components in isolation:
 @Test
 void shouldRenderStringAggWithSeparator() {
     CustomFunctionCall call = new CustomFunctionCall(
-        "STRING_AGG",
+        PostgreSqlFunctionCallNames.STRING_AGG,
         List.of(ColumnReference.of("employees", "name")),
-        Map.of("SEPARATOR", ", ")
+        Map.of(FunctionCallNames.Options.SEPARATOR, ", ")
     );
 
     AstToPreparedStatementSpecVisitor visitor = AstToPreparedStatementSpecVisitor.builder()
