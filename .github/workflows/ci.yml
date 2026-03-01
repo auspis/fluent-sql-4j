@@ -35,7 +35,7 @@ jobs:
     - name: Run all tests (unit + H2 integration + E2E)
       run: ./mvnw verify jacoco:report
 
-    # SonarCloud analysis
+    # SonarCloud analysis (requires SonarCloud Automatic Analysis disabled)
     - name: SonarCloud Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
