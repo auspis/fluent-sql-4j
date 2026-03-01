@@ -1,13 +1,12 @@
 ---
-
 name: publish-new-version
 description: Automates Maven multi-module version bumping following SemVer (major, minor, patch, or custom). Updates all pom.xml files, validates with Maven, and guides through git commit/tag/push workflow. Use when releasing a new version, bumping version numbers, preparing Maven releases, or publishing to Maven Central.
 license: Apache-2.0
 compatibility: Requires Maven wrapper (./mvnw), git, bash, and a multi-module Maven project with pom.xml files
 metadata:
-author: auspis
-version: 0.1.0
---------------
+  author: auspis
+  version: 0.1.0
+---
 
 # Publish New Version
 
