@@ -7,7 +7,7 @@ compatibility: Requires Maven wrapper (./mvnw), git, bash, and a multi-module Ma
 metadata:
 author: auspis
 version: 0.1.0
---------------
+---
 
 # Publish New Version
 
