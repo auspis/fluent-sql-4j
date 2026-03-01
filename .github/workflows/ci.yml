@@ -35,27 +35,11 @@ jobs:
     - name: Run all tests (unit + H2 integration + E2E)
       run: ./mvnw verify jacoco:report
 
-    # SonarCloud analysis for Pull Requests
-    - name: SonarCloud Scan (PR)
-      if: github.event_name == 'pull_request'
+    # SonarCloud analysis
+    - name: SonarCloud Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
-      run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-        -Dsonar.projectKey=auspis_fluent-sql-4j \
-        -Dsonar.organization=auspis \
-        -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
-        -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-        -Dsonar.pullrequest.base=${{ github.base_ref }}
-
-    # SonarCloud analysis for branches (push)
-    - name: SonarCloud Scan (Branch)
-      if: github.event_name == 'push'
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_QUBE }}
-      run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-        -Dsonar.projectKey=auspis_fluent-sql-4j \
-        -Dsonar.organization=auspis \
-        -Dsonar.branch.name=${{ github.ref_name }}
+      run: ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
     # Upload Surefire and Failsafe reports for debugging
     - name: Upload Surefire reports
