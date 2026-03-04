@@ -35,6 +35,10 @@ jobs:
     - name: Run all tests (unit + H2 integration + E2E)
       run: ./mvnw verify jacoco:report
 
+    # Verify SPI discovery works on classpath (dual-mode support: JPMS + classpath)
+    - name: Verify SPI discovery on classpath
+      run: ./mvnw test -Pclasspath-strict -am -pl core -Dsurefire.failIfNoSpecifiedTests=false
+
     # SonarCloud analysis (requires SonarCloud Automatic Analysis disabled)
     - name: SonarCloud Scan
       env:

@@ -84,6 +84,9 @@ core/src/test/java/
 
 # Run integration + e2e (skip unit + component)
 ./mvnw verify -pl core -Dgroups=integration,e2e
+
+# Verify SPI discovery on classpath (strict test, disables module-path)
+./mvnw test -Pclasspath-strict -pl core -Dsurefire.failIfNoSpecifiedTests=false
 ```
 
 ### Development Workflow
