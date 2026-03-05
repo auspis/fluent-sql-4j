@@ -163,10 +163,19 @@ Create the ServiceLoader configuration file:
 io.github.auspis.fluentsql4j.plugin.builtin.postgresql.PostgreSqlDialectPluginProvider
 ```
 
-**CRITICAL**: The file path and name must be exact:
+**CRITICAL**: File path and content must be exact:
 - Directory: `META-INF/services/`
-- Filename: `io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider` (interface FQN)
-- Content: Fully qualified class name of your provider implementation
+- Filename: `io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider` (SPI interface FQN)
+- Content: Fully qualified class name of your provider implementation (one per line)
+
+This descriptor enables automatic discovery when your plugin JAR is on the **classpath** (default, Spring Boot, standard enterprise deployments).
+
+**Requirements Summary**:
+- ✅ Steps 3a **and** 3b are **required** for universal compatibility
+- ✅ JPMS (module-path): uses `module-info.java` `provides` directive
+- ✅ Classpath (Spring/enterprise): uses `META-INF/services` descriptor
+- ⚠️ Both must declare the **same provider class**
+- 🛡️ No double-loading risk (Java spec prevents it)
 
 ### Step 4: Create Custom Rendering Strategy
 

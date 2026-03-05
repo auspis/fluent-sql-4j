@@ -105,6 +105,9 @@ jobs:
       - name: Run full test suite (unit + integration + E2E)
         run: ./mvnw clean verify
 
+      - name: Verify SPI discovery on classpath (dual-mode validation)
+        run: ./mvnw test -Pclasspath-strict -am -pl core -Dsurefire.failIfNoSpecifiedTests=false
+
       - name: Build and deploy to Maven Central Portal
         env:
           GPG_TTY: /dev/console
