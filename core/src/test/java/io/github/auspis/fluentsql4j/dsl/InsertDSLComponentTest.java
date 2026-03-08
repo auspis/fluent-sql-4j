@@ -1,6 +1,7 @@
 package io.github.auspis.fluentsql4j.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,7 @@ class InsertDSLComponentTest {
         ps = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
         when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+        when(connection.prepareStatement(sqlCaptor.capture(), anyInt())).thenReturn(ps);
     }
 
     @Test

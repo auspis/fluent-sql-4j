@@ -4,6 +4,7 @@ import static io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDia
 import static io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin.DIALECT_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -138,6 +139,7 @@ class StandardSQLDialectPluginIntegrationTest {
         PreparedStatement mockPs = mock(PreparedStatement.class);
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
         when(mockConnection.prepareStatement(sqlCaptor.capture())).thenReturn(mockPs);
+        when(mockConnection.prepareStatement(sqlCaptor.capture(), anyInt())).thenReturn(mockPs);
 
         PreparedStatementSpecFactory specFactory =
                 registry.getSpecFactory("StandardSQL", "2008").orElseThrow();
