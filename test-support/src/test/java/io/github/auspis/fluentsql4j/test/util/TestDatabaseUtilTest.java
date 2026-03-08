@@ -363,12 +363,9 @@ class TestDatabaseUtilTest {
         TestDatabaseUtil.dropUsersTable(connection);
 
         // Try to query the dropped table - should fail
-        assertThatThrownBy(() -> {
-                    try (var stmt = connection.createStatement()) {
-                        stmt.executeQuery("SELECT * FROM users");
-                    }
-                })
-                .isInstanceOf(SQLException.class);
+        try (var stmt = connection.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM users")).isInstanceOf(SQLException.class);
+        }
 
         TestDatabaseUtil.closeConnection(connection);
     }
@@ -390,12 +387,10 @@ class TestDatabaseUtilTest {
         TestDatabaseUtil.dropOrdersTable(connection);
 
         // Try to query the dropped table - should fail
-        assertThatThrownBy(() -> {
-                    try (var stmt = connection.createStatement()) {
-                        stmt.executeQuery("SELECT * FROM orders");
-                    }
-                })
-                .isInstanceOf(SQLException.class);
+        try (var stmt = connection.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM orders")).isInstanceOf(SQLException.class);
+        }
+        ;
 
         TestDatabaseUtil.closeConnection(connection);
     }
@@ -408,12 +403,11 @@ class TestDatabaseUtilTest {
         TestDatabaseUtil.dropUsersUpdatesTable(connection);
 
         // Try to query the dropped table - should fail
-        assertThatThrownBy(() -> {
-                    try (var stmt = connection.createStatement()) {
-                        stmt.executeQuery("SELECT * FROM users_updates");
-                    }
-                })
-                .isInstanceOf(SQLException.class);
+        try (var stmt = connection.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM users_updates"))
+                    .isInstanceOf(SQLException.class);
+        }
+        ;
 
         TestDatabaseUtil.closeConnection(connection);
     }
@@ -473,9 +467,9 @@ class TestDatabaseUtilTest {
         TestDatabaseUtil.createCartItemsTable(connection);
 
         try (var rs = connection.getMetaData().getColumns(null, null, "cart_items", null)) {
-            assertThat(rs.next()).isTrue().as("column id should exist");
+            assertThat(rs.next()).as("column id should exist").isTrue();
             assertThat(rs.getString("COLUMN_NAME")).isEqualToIgnoringCase("id");
-            assertThat(rs.next()).isTrue().as("column cart_id should exist");
+            assertThat(rs.next()).as("column cart_id should exist").isTrue();
             assertThat(rs.getString("COLUMN_NAME")).isEqualToIgnoringCase("cart_id");
         }
 
@@ -647,12 +641,11 @@ class TestDatabaseUtilTest {
         }
 
         // conn2 should not have access to conn1's data (different database)
-        assertThatThrownBy(() -> {
-                    try (var stmt = conn2.createStatement()) {
-                        stmt.executeQuery("SELECT COUNT(*) FROM users");
-                    }
-                })
-                .isInstanceOf(SQLException.class);
+        try (var stmt = conn2.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT COUNT(*) FROM users"))
+                    .isInstanceOf(SQLException.class);
+        }
+        ;
 
         TestDatabaseUtil.closeConnection(conn1);
         TestDatabaseUtil.closeConnection(conn2);
