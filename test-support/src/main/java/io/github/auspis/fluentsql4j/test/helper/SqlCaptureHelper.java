@@ -1,5 +1,6 @@
 package io.github.auspis.fluentsql4j.test.helper;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,6 +59,7 @@ public class SqlCaptureHelper {
         preparedStatement = mock(PreparedStatement.class);
         sqlCaptor = ArgumentCaptor.forClass(String.class);
         when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(preparedStatement);
+        when(connection.prepareStatement(sqlCaptor.capture(), anyInt())).thenReturn(preparedStatement);
     }
 
     public Connection getConnection() {
