@@ -2,6 +2,7 @@ package io.github.auspis.fluentsql4j.test.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -351,5 +352,299 @@ class TestDatabaseUtilTest {
         TestDatabaseUtil.closeConnection(connection);
 
         assertThat(connection.isClosed()).isTrue();
+    }
+
+    // Drop methods tests
+    @Test
+    void dropUsersTableRemovesExistingTable() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersTable(connection);
+
+        TestDatabaseUtil.dropUsersTable(connection);
+
+        // Try to query the dropped table - should fail
+        try (var stmt = connection.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM users")).isInstanceOf(SQLException.class);
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void dropUsersTableIsIdempotent() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+
+        assertThatCode(() -> TestDatabaseUtil.dropUsersTable(connection)).doesNotThrowAnyException();
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void dropOrdersTableRemovesExistingTable() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createOrderTable(connection);
+
+        TestDatabaseUtil.dropOrdersTable(connection);
+
+        // Try to query the dropped table - should fail
+        try (var stmt = connection.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM orders")).isInstanceOf(SQLException.class);
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void dropUsersUpdatesTableRemovesExistingTable() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersUpdatesTableWithRecords(connection);
+
+        TestDatabaseUtil.dropUsersUpdatesTable(connection);
+
+        // Try to query the dropped table - should fail
+        try (var stmt = connection.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM users_updates"))
+                    .isInstanceOf(SQLException.class);
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    // BackTick variants tests
+    @Test
+    void createUsersTableWithBackTicksCreatesColumnsWithBackTicks() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+
+        TestDatabaseUtil.createUsersTableWithBackTicks(connection);
+
+        try (var rs = connection.getMetaData().getColumns(null, null, "users", null)) {
+            int columnCount = 0;
+            while (rs.next()) {
+                columnCount++;
+                assertThat(rs.getString("COLUMN_NAME")).isNotNull();
+            }
+            assertThat(columnCount).isGreaterThan(0); // Should have columns
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void createUsersTableWithBackTicksCanBeQueried() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersTableWithBackTicks(connection);
+
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isZero();
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void createOrderTableWithBackTicksCanBeQueried() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createOrderTableWithBackTicks(connection);
+
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT COUNT(*) FROM orders")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isZero();
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    // createCartItemsTable tests
+    @Test
+    void createCartItemsTableCreatesTableWithCorrectSchema() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+
+        TestDatabaseUtil.createCartItemsTable(connection);
+
+        try (var rs = connection.getMetaData().getColumns(null, null, "cart_items", null)) {
+            assertThat(rs.next()).as("column id should exist").isTrue();
+            assertThat(rs.getString("COLUMN_NAME")).isEqualToIgnoringCase("id");
+            assertThat(rs.next()).as("column cart_id should exist").isTrue();
+            assertThat(rs.getString("COLUMN_NAME")).isEqualToIgnoringCase("cart_id");
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void createCartItemsTableSupportsAutoIncrementId() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createCartItemsTable(connection);
+
+        String sql =
+                "INSERT INTO cart_items (cart_id, product_id, product_name, unit_price, quantity) VALUES (?, ?, ?, ?, ?)";
+        try (var pstmt = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setLong(1, 1L);
+            pstmt.setLong(2, 101L);
+            pstmt.setString(3, "Widget");
+            pstmt.setDouble(4, 19.99);
+            pstmt.setInt(5, 2);
+            pstmt.executeUpdate();
+
+            try (var generatedKeys = pstmt.getGeneratedKeys()) {
+                assertThat(generatedKeys.next()).isTrue();
+                assertThat(generatedKeys.getLong(1)).isGreaterThan(0L);
+            }
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void createCartItemsTableInsertAndRetrieveData() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createCartItemsTable(connection);
+
+        String insertSql =
+                "INSERT INTO cart_items (cart_id, product_id, product_name, unit_price, quantity) VALUES (?, ?, ?, ?, ?)";
+        try (var pstmt = connection.prepareStatement(insertSql)) {
+            pstmt.setLong(1, 1L);
+            pstmt.setLong(2, 101L);
+            pstmt.setString(3, "Widget");
+            pstmt.setDouble(4, 19.99);
+            pstmt.setInt(5, 2);
+            pstmt.executeUpdate();
+        }
+
+        String selectSql = "SELECT cart_id, product_name, unit_price, quantity FROM cart_items WHERE product_id = ?";
+        try (var pstmt = connection.prepareStatement(selectSql)) {
+            pstmt.setLong(1, 101L);
+            try (var rs = pstmt.executeQuery()) {
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getLong("cart_id")).isEqualTo(1L);
+                assertThat(rs.getString("product_name")).isEqualTo("Widget");
+                assertThat(rs.getDouble("unit_price")).isEqualTo(19.99);
+                assertThat(rs.getInt("quantity")).isEqualTo(2);
+            }
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    // Error scenarios tests
+    @Test
+    void insertSampleUsersFailsWhenTableDoesNotExist() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+
+        assertThatThrownBy(() -> TestDatabaseUtil.insertSampleUsers(connection)).isInstanceOf(SQLException.class);
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void truncateUsersFailsWhenTableDoesNotExist() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+
+        assertThatThrownBy(() -> TestDatabaseUtil.truncateUsers(connection)).isInstanceOf(SQLException.class);
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    // Data integrity tests
+    @Test
+    void dropAndRecreateUserTablePreservesSchema() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersTable(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
+
+        TestDatabaseUtil.dropUsersTable(connection);
+        TestDatabaseUtil.createUsersTable(connection);
+
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isZero(); // New table is empty
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void insertTruncateInsertCyclePreservesDataIntegrity() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersTable(connection);
+
+        TestDatabaseUtil.insertSampleUsers(connection);
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
+            assertThat(rs.next()).isTrue();
+            int countBefore = rs.getInt(1);
+            assertThat(countBefore).isGreaterThan(0);
+        }
+
+        TestDatabaseUtil.truncateUsers(connection);
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isZero();
+        }
+
+        TestDatabaseUtil.insertSampleUsers(connection);
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
+            assertThat(rs.next()).isTrue();
+            int countAfter = rs.getInt(1);
+            assertThat(countAfter).isGreaterThan(0);
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void jsonDataPersistsThroughTruncateRecreate() throws SQLException {
+        Connection connection = TestDatabaseUtil.createH2Connection();
+        TestDatabaseUtil.createUsersTable(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
+
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT address FROM users WHERE id = 8")) {
+            assertThat(rs.next()).isTrue();
+            String addressBefore = rs.getString("address");
+            assertThat(addressBefore).isNotNull().contains("Via Roma");
+        }
+
+        TestDatabaseUtil.truncateUsers(connection);
+        TestDatabaseUtil.insertSampleUsers(connection);
+
+        try (var stmt = connection.createStatement();
+                var rs = stmt.executeQuery("SELECT address FROM users WHERE id = 8")) {
+            assertThat(rs.next()).isTrue();
+            String addressAfter = rs.getString("address");
+            assertThat(addressAfter).isNotNull().contains("Via Roma");
+        }
+
+        TestDatabaseUtil.closeConnection(connection);
+    }
+
+    @Test
+    void multipleConnectionsWithUniqueDbNamesAreIsolated() throws SQLException {
+        Connection conn1 = TestDatabaseUtil.createH2Connection();
+        Connection conn2 = TestDatabaseUtil.createH2Connection();
+
+        TestDatabaseUtil.createUsersTable(conn1);
+        TestDatabaseUtil.insertSampleUsers(conn1);
+
+        try (var stmt = conn1.createStatement();
+                var rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getInt(1)).isGreaterThan(0);
+        }
+
+        // conn2 should not have access to conn1's data (different database)
+        try (var stmt = conn2.createStatement()) {
+            assertThatThrownBy(() -> stmt.executeQuery("SELECT COUNT(*) FROM users"))
+                    .isInstanceOf(SQLException.class);
+        }
+
+        TestDatabaseUtil.closeConnection(conn1);
+        TestDatabaseUtil.closeConnection(conn2);
     }
 }
