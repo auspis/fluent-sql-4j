@@ -541,6 +541,35 @@ PreparedStatement ps = dsl.insertInto("users")
     .build(connection);
 ```
 
+### Retrieving Auto-Generated Keys
+
+The `build(connection)` method returns a `PreparedStatement` that is automatically configured to capture auto-generated keys (via `Statement.RETURN_GENERATED_KEYS`). This is useful when you need to retrieve the database-generated identifier (e.g., auto-increment ID) after inserting a new row.
+
+After executing the INSERT statement, use `ps.getGeneratedKeys()` to retrieve the generated keys as a `ResultSet`:
+
+```java
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
+try (PreparedStatement ps = dsl.insertInto("users")
+    .set("name", "Alice")
+    .set("email", "alice@example.com")
+    .build(connection)) {
+    
+    ps.executeUpdate();
+    
+    // Retrieve auto-generated keys
+    try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+            long userId = generatedKeys.getLong(1);  // Get the generated ID
+            System.out.println("New user ID: " + userId);
+        }
+    }
+}
+```
+
+Note: The number and type of generated keys depend on your database schema. For most single-column auto-increment primary keys, `getLong(1)` retrieves the ID. Check your JDBC driver documentation for specific behavior with databases that support multiple generated columns.
+
 ## UPDATE Statements
 
 ```java

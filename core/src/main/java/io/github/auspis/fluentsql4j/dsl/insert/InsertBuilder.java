@@ -79,16 +79,25 @@ public class InsertBuilder {
     /**
      * Builds and returns a PreparedStatement with bound parameters.
      * <p>
-     * <strong>Note:</strong> The caller is responsible for closing the returned PreparedStatement.
-     * Consider using try-with-resources:
+     * The returned PreparedStatement is configured to automatically return auto-generated keys
+     * (created with {@code Statement.RETURN_GENERATED_KEYS}), allowing you to retrieve
+     * database-generated identifiers after execution.
+     * <p>
+     * <strong>Important:</strong> The caller is responsible for closing the returned
+     * PreparedStatement. Use try-with-resources to ensure proper resource cleanup:
      * <pre>
      * try (PreparedStatement ps = builder.build(connection)) {
-     *     // use ps
+     *     ps.executeUpdate();
+     *     try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+     *         if (generatedKeys.next()) {
+     *             long id = generatedKeys.getLong(1);
+     *         }
+     *     }
      * }
      * </pre>
      *
      * @param connection the database connection
-     * @return a PreparedStatement ready for execution
+     * @return a PreparedStatement configured for auto-generated key retrieval
      * @throws SQLException if a database error occurs
      */
     public PreparedStatement build(Connection connection) throws SQLException {
