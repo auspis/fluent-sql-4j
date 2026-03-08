@@ -15,6 +15,7 @@ import io.github.auspis.fluentsql4j.dsl.util.LiteralUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class InsertBuilder {
         PreparedStatementSpec result = specFactory.create(statement);
 
         @SuppressWarnings("java:S2095")
-        PreparedStatement ps = connection.prepareStatement(result.sql());
+        PreparedStatement ps = connection.prepareStatement(result.sql(), Statement.RETURN_GENERATED_KEYS);
         for (int i = 0; i < result.parameters().size(); i++) {
             ps.setObject(i + 1, result.parameters().get(i));
         }
