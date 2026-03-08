@@ -390,7 +390,6 @@ class TestDatabaseUtilTest {
         try (var stmt = connection.createStatement()) {
             assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM orders")).isInstanceOf(SQLException.class);
         }
-        ;
 
         TestDatabaseUtil.closeConnection(connection);
     }
@@ -407,7 +406,6 @@ class TestDatabaseUtilTest {
             assertThatThrownBy(() -> stmt.executeQuery("SELECT * FROM users_updates"))
                     .isInstanceOf(SQLException.class);
         }
-        ;
 
         TestDatabaseUtil.closeConnection(connection);
     }
@@ -645,7 +643,6 @@ class TestDatabaseUtilTest {
             assertThatThrownBy(() -> stmt.executeQuery("SELECT COUNT(*) FROM users"))
                     .isInstanceOf(SQLException.class);
         }
-        ;
 
         TestDatabaseUtil.closeConnection(conn1);
         TestDatabaseUtil.closeConnection(conn2);
