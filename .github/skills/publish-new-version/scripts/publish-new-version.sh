@@ -150,7 +150,16 @@ run_git_steps() {
 }
 
 get_previous_release_tag() {
-  git tag -l 'v*' --sort=-version:refname | head -n 1
+  local described_tag
+
+  # Prefer the most recent reachable v* tag from HEAD
+  if described_tag=$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null); then
+    echo "$described_tag"
+    return 0
+  fi
+
+  # Fallback: highest v* tag that is merged into HEAD (if any)
+  git tag -l 'v*' --merged HEAD --sort=-version:refname | head -n 1
 }
 
 build_compare_url() {
