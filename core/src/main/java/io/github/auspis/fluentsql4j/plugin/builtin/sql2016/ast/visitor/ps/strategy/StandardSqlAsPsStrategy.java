@@ -10,7 +10,7 @@ import java.util.List;
 public class StandardSqlAsPsStrategy implements AsPsStrategy {
     @Override
     public PreparedStatementSpec handle(Alias as, Visitor<PreparedStatementSpec> renderer, AstContext ctx) {
-        String sql = "\"" + as.name() + "\"";
+        String sql = renderer.getEscapeStrategy().apply(as.name());
         return new PreparedStatementSpec(sql, List.of());
     }
 }

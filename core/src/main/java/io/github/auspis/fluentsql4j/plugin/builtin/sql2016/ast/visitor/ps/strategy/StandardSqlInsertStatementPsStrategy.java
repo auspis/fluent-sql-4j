@@ -10,6 +10,7 @@ import io.github.auspis.fluentsql4j.ast.dml.statement.InsertStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.EscapeStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.InsertStatementPsStrategy;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,20 +22,21 @@ public class StandardSqlInsertStatementPsStrategy implements InsertStatementPsSt
         // TableIdentifier name
         TableIdentifier table = (TableIdentifier) stmt.table();
         String tableName = table.name();
+        EscapeStrategy escape = renderer.getEscapeStrategy();
 
         InsertData data = stmt.data();
 
         if (data instanceof DefaultValues defaultValues) {
             // Handle DEFAULT VALUES case
             PreparedStatementSpec dataResult = defaultValues.accept(renderer, ctx);
-            String sql = "INSERT INTO \"" + tableName + "\" " + dataResult.sql();
+            String sql = "INSERT INTO " + escape.apply(tableName) + " " + dataResult.sql();
             return new PreparedStatementSpec(sql, dataResult.parameters());
         } else if (data instanceof InsertValues values) {
             // Handle explicit values case
             // Column names
             List<String> columns = stmt.columns().stream()
                     .map(ColumnReference::column)
-                    .map(name -> "\"" + name + "\"")
+                    .map(escape::apply)
                     .collect(Collectors.toList());
             String columnList = String.join(", ", columns);
 
@@ -51,7 +53,8 @@ public class StandardSqlInsertStatementPsStrategy implements InsertStatementPsSt
                     })
                     .collect(Collectors.joining(", "));
 
-            String sql = "INSERT INTO \"" + tableName + "\" (" + columnList + ") VALUES (" + placeholders + ")";
+            String sql =
+                    "INSERT INTO " + escape.apply(tableName) + " (" + columnList + ") VALUES (" + placeholders + ")";
             return new PreparedStatementSpec(sql, params);
         } else {
             throw new UnsupportedOperationException("Unsupported InsertData type: " + data.getClass());
