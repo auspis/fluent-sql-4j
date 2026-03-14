@@ -18,7 +18,7 @@ A type-safe SQL builder for Java with multi-dialect support through a plugin sys
 - ✅ PreparedStatement support with automatic parameter binding and SQL injection prevention
 - ✅ Complex queries: JOINs, subqueries, window functions, aggregates
 - ✅ DDL operations: CREATE TABLE, ALTER, DROP
-- ✅ DML operations: SELECT, INSERT, UPDATE, DELETE, MERGE
+- ✅ DML operations: SELECT, INSERT, UPDATE, DELETE, MERGE, TRUNCATE
 
 ## Quick Start
 
@@ -77,7 +77,7 @@ The project is organized as a multi-module Maven project with two main artifacts
 
 - **[`api/`](api/)**: **Public API for DSL users**
   - Use this dependency in your application to build SQL queries
-  - Provides DSL, builders (SELECT, INSERT, UPDATE, DELETE, MERGE, CREATE TABLE), and PreparedStatement support
+  - Provides DSL, builders (SELECT, INSERT, UPDATE, DELETE, MERGE, TRUNCATE, CREATE TABLE), and PreparedStatement support
   - Maven dependency:
 
     ```xml
@@ -166,7 +166,7 @@ To run all tests including integration and E2E tests:
 
 ## Documentation
 
-- **[DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md)**: Comprehensive examples for all DSL operations (SELECT, INSERT, UPDATE, DELETE, MERGE, CREATE TABLE)
+- **[DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md)**: Comprehensive examples for all DSL operations (SELECT, INSERT, UPDATE, DELETE, MERGE, TRUNCATE, CREATE TABLE)
 - **[Developer Guide](data/wiki/DEVELOPER_GUIDE.md)**: Testing strategies, code coverage, formatting guidelines
 - **[Plugin Development Guide](data/wiki/PLUGIN_DEVELOPMENT.md)**: How to create custom dialect plugins
 

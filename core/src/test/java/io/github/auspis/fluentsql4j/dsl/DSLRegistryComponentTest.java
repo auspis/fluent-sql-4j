@@ -139,6 +139,16 @@ class DSLRegistryComponentTest {
     }
 
     @Test
+    void truncateQuery_withStandardSQL_shouldGenerateCorrectSQL() throws SQLException {
+        DSL dsl = registry.dslFor(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
+                .orElseThrow();
+
+        dsl.truncateTable("users").build(connection);
+
+        assertThat(sqlCaptor.getValue()).isEqualTo("TRUNCATE TABLE \"users\"");
+    }
+
+    @Test
     void complexQuery_withJoinsAndAggregations_shouldWork() throws SQLException {
         DSL dsl = registry.dslFor(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
                 .orElseThrow();

@@ -7,7 +7,7 @@ For SQL, the AST acts as an essential intermediary representation of a query. It
 SQL statements are broadly categorized by their function, and the AST naturally groups these operations:
 
 * **Data Definition Language (DDL):** Statements that **define or modify the structure** of database objects (e.g., `CREATE`, `DROP`).
-* **Data Manipulation Language (DML):** Statements that **modify data** within the objects (e.g., `INSERT`, `UPDATE`, `DELETE`).
+* **Data Manipulation Language (DML):** Statements that **modify data** within the objects (e.g., `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`).
 * **Data Query Language (DQL):** Statements used for **retrieving data** (e.g., `SELECT`).
 * **Data Control Language (DCL):** Statements used to **control access rights** to the data and objects (e.g., `GRANT`, `REVOKE`).
 
@@ -19,12 +19,12 @@ The AST structure begins with a **Statement** node, classified by one of these f
 
 The SQL AST is built upon a hierarchical model where every query begins with a **Statement** node, corresponding to the categories defined above.
 
-| Category (Grouping) | Core Statement Nodes                                        | Purpose in the AST                                                                                                   |
-|:--------------------|:------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------|
-| **DQL**             | **`Select Statement`**.                                     | The primary node for data retrieval; it often forms the most complex subtrees due to the number of possible clauses. |
-| **DML**             | `Insert Statement`, `Update Statement`, `Delete Statement`. | Nodes representing operations that modify data within existing database objects.                                     |
-| **DDL**             | `Create Statement`, `Drop Statement`, `Alter Statement`.    | Nodes representing operations that define or modify the structure of database objects (schemas, tables, indexes).    |
-| **DCL**             | `Grant Statement`, `Revoke Statement`.                      | Nodes for managing access rights and permissions on database objects.                                                |
+| Category (Grouping) | Core Statement Nodes                                                              | Purpose in the AST                                                                                                   |
+|:--------------------|:----------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------|
+| **DQL**             | **`Select Statement`**.                                                           | The primary node for data retrieval; it often forms the most complex subtrees due to the number of possible clauses. |
+| **DML**             | `Insert Statement`, `Update Statement`, `Delete Statement`, `Truncate Statement`. | Nodes representing operations that modify data within existing database objects.                                     |
+| **DDL**             | `Create Statement`, `Drop Statement`, `Alter Statement`.                          | Nodes representing operations that define or modify the structure of database objects (schemas, tables, indexes).    |
+| **DCL**             | `Grant Statement`, `Revoke Statement`.                                            | Nodes for managing access rights and permissions on database objects.                                                |
 
 Below the statement level, the AST branches into the following functional units:
 
@@ -89,6 +89,7 @@ The base DSL provides:
 - **UPDATE Statements**: Conditional updates
 - **DELETE Statements**: Conditional deletes
 - **MERGE Statements**: Upsert operations (SQL:2008)
+- **TRUNCATE Statements**: Full-table data removal
 - **CREATE TABLE**: Table definitions with constraints
 - **Window Functions**: ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD
 - **JSON Functions**: JSON_EXISTS, JSON_VALUE, JSON_QUERY (SQL:2016)

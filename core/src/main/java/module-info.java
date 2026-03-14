@@ -12,6 +12,7 @@ module io.github.auspis.fluentsql4j.core {
     exports io.github.auspis.fluentsql4j.dsl.delete;
     exports io.github.auspis.fluentsql4j.dsl.merge;
     exports io.github.auspis.fluentsql4j.dsl.table;
+    exports io.github.auspis.fluentsql4j.dsl.truncate;
     exports io.github.auspis.fluentsql4j.dsl.clause;
     exports io.github.auspis.fluentsql4j.dsl.util;
     exports io.github.auspis.fluentsql4j.plugin;
