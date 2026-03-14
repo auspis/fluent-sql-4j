@@ -174,11 +174,18 @@ build_compare_url() {
   fi
 
   local owner_repo=""
-  if [[ "$remote_url" =~ ^git@github.com:(.+)\.git$ ]]; then
+  # Support common GitHub remote URL formats, with or without `.git`:
+  # - git@github.com:owner/repo[.git]
+  # - ssh://git@github.com/owner/repo[.git]
+  # - https://github.com/owner/repo[.git]
+  # - git://github.com/owner/repo[.git]
+  if [[ "$remote_url" =~ ^git@github.com:([^/]+/[^/]+)(\.git)?$ ]]; then
     owner_repo="${BASH_REMATCH[1]}"
-  elif [[ "$remote_url" =~ ^https://github.com/(.+)\.git$ ]]; then
+  elif [[ "$remote_url" =~ ^ssh://git@github.com/([^/]+/[^/]+)(\.git)?$ ]]; then
     owner_repo="${BASH_REMATCH[1]}"
-  elif [[ "$remote_url" =~ ^https://github.com/(.+)$ ]]; then
+  elif [[ "$remote_url" =~ ^https://github.com/([^/]+/[^/]+)(\.git)?$ ]]; then
+    owner_repo="${BASH_REMATCH[1]}"
+  elif [[ "$remote_url" =~ ^git://github.com/([^/]+/[^/]+)(\.git)?$ ]]; then
     owner_repo="${BASH_REMATCH[1]}"
   fi
 
