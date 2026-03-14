@@ -77,6 +77,7 @@ import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.dml.statement.DeleteStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.InsertStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
+import io.github.auspis.fluentsql4j.ast.dml.statement.TruncateStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.UpdateStatement;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Fetch;
 import io.github.auspis.fluentsql4j.ast.dql.clause.From;
@@ -176,6 +177,7 @@ import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.SubstringPsStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.TableDefinitionPsStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.TablePsStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.TrimPsStrategy;
+import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.TruncateStatementPsStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.UnaryArithmeticExpressionPsStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.UnaryNumericPsStrategy;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.strategy.UnaryStringPsStrategy;
@@ -268,6 +270,7 @@ import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strate
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlTableDefinitionPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlTablePsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlTrimPsStrategy;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlTruncateStatementPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUnaryArithmeticExpressionPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUnaryNumericPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlUnaryStringPsStrategy;
@@ -541,6 +544,9 @@ public class AstToPreparedStatementSpecVisitor implements Visitor<PreparedStatem
     private final MergeStatementPsStrategy mergeStatementStrategy = new StandardSqlMergeStatementPsStrategy();
 
     @Default
+    private final TruncateStatementPsStrategy truncateStatementStrategy = new StandardSqlTruncateStatementPsStrategy();
+
+    @Default
     private final MergeUsingPsStrategy mergeUsingStrategy = new StandardSqlMergeUsingPsStrategy();
 
     @Default
@@ -636,6 +642,11 @@ public class AstToPreparedStatementSpecVisitor implements Visitor<PreparedStatem
     @Override
     public PreparedStatementSpec visit(MergeStatement mergeStatement, AstContext ctx) {
         return mergeStatementStrategy.handle(mergeStatement, this, ctx);
+    }
+
+    @Override
+    public PreparedStatementSpec visit(TruncateStatement truncateStatement, AstContext ctx) {
+        return truncateStatementStrategy.handle(truncateStatement, this, ctx);
     }
 
     @Override

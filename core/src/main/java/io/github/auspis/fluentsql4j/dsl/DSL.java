@@ -7,6 +7,7 @@ import io.github.auspis.fluentsql4j.dsl.merge.MergeBuilder;
 import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
 import io.github.auspis.fluentsql4j.dsl.select.SelectProjectionBuilder;
 import io.github.auspis.fluentsql4j.dsl.table.CreateTableBuilder;
+import io.github.auspis.fluentsql4j.dsl.truncate.TruncateBuilder;
 import io.github.auspis.fluentsql4j.dsl.update.UpdateBuilder;
 import java.util.Objects;
 
@@ -65,6 +66,10 @@ public class DSL {
 
     public CreateTableBuilder createTable(String tableName) {
         return new CreateTableBuilder(specFactory, tableName);
+    }
+
+    public TruncateBuilder truncateTable(String tableName) {
+        return new TruncateBuilder(specFactory, tableName);
     }
 
     public <SELF extends SelectProjectionBuilder<SELF>> SelectProjectionBuilder<SELF> select() {

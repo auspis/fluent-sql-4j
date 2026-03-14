@@ -18,6 +18,7 @@ This guide provides comprehensive examples of using the JDSQL DSL to build SQL s
 - [INSERT Statements](#insert-statements)
 - [UPDATE Statements](#update-statements)
 - [DELETE Statements](#delete-statements)
+- [TRUNCATE Statements](#truncate-statements)
 - [MERGE Statements](#merge-statements)
 
 ## Getting Started
@@ -621,6 +622,24 @@ PreparedStatement ps = dsl.deleteFrom("users")
     .and().column("name").eq("Alice")
     .build(connection);
 ```
+
+## TRUNCATE Statements
+
+```java
+// Get a DSL instance
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+
+// TRUNCATE a table
+PreparedStatement ps = dsl.truncateTable("users")
+    .build(connection);
+
+// TRUNCATE another table
+PreparedStatement ps = dsl.truncateTable("orders")
+    .build(connection);
+```
+
+**Note:** `TRUNCATE` removes all rows from a table and does not support `WHERE` clauses. Table identifiers are rendered with the configured dialect escaping strategy (for example `"users"` in Standard SQL and `` `users` `` in MySQL).
 
 ## MERGE Statements
 
