@@ -21,7 +21,9 @@ This skill handles the entire version release process for Maven projects:
 3. **Updates all pom.xml files** recursively (root + all modules)
 4. **Validates** the updated project with `mvn validate`
 5. **Guides through git workflow**: commit, tag, push (with user confirmation)
-6. **Includes safety checks**: warns if not on main/master, allows rollback on validation failure
+6. **Generates release notes automatically**: English Markdown notes based on commits since previous tag
+7. **Publishes GitHub release conditionally**: auto-publishes with `gh` if installed and authenticated
+8. **Includes safety checks**: warns if not on main/master, allows rollback on validation failure
 
 ## When to Use This Skill
 
@@ -88,6 +90,25 @@ After successful validation, the skill prompts to:
 
 You can cancel at any step to perform manual operations.
 
+### 5. Automatic Release Notes
+
+Before the release commit/tag/push, the script automatically generates English Markdown release notes:
+
+- Uses commit range from previous `v*` tag to current release tag
+- Excludes merge commits
+- Excludes technical commit `Bump version to X.Y.Z`
+- Falls back to last 20 commits if no previous tag exists
+- Saves notes to `data/release-notes/RELEASE_NOTES_vX.Y.Z.md`
+- Includes the notes file in the same release commit (`git add .`)
+- Prints notes in terminal
+
+### 6. Optional GitHub Release Publish
+
+As a final step:
+
+- If `gh` is installed and authenticated, the script runs `gh release create`
+- If `gh` is missing or not authenticated, the script prints the exact manual command to run
+
 ## Safety Features
 
 - ⚠️ **Branch warning**: Alerts if you're not on `main` or `master`
@@ -95,6 +116,8 @@ You can cancel at any step to perform manual operations.
 - 🔄 **Automatic rollback**: Restores pom.xml files if validation fails using `git restore`
 - 🛑 **User confirmation**: Requires explicit approval before git operations
 - 📋 **Review step**: Allows manual inspection before committing
+- 🧾 **Release notes artifact**: Always generated and saved under `data/release-notes/`
+- 🐙 **Graceful GitHub publish fallback**: If `gh` is unavailable, user still gets a ready command
 
 ## Usage Example
 
@@ -129,6 +152,30 @@ Skill Output:
 > Please review the changes now (e.g. git status, git diff).
 > Proceed with git add/commit/tag/push? (y/N): y
 >
+> Generated release notes (English Markdown):
+>
+> # Release Notes - v1.3.0
+>
+> Release date: 2026-03-14
+>
+> ## Highlights
+>
+> - `a1b2c3d` - feat: add support for foo
+>
+> ## Included Commits
+>
+> - `a1b2c3d` - feat: add support for foo
+> - `d4e5f6g` - fix: correct bar rendering
+>
+> ## Full Changelog
+>
+> - https://github.com/auspis/fluent-sql-4j/compare/v1.2.3...v1.3.0
+>
+> Release notes saved to: data/release-notes/RELEASE_NOTES_v1.3.0.md
+>
+> Publishing GitHub release with gh...
+> GitHub release published for v1.3.0.
+>
 > Done, published version 1.3.0. Please verify the release on GitHub.
 ```
 
@@ -146,6 +193,13 @@ Restored ./core/pom.xml using git restore.
 
 All changes are automatically reverted to prevent broken state.
 
+If `gh` is not available or not authenticated:
+
+```
+GitHub CLI (gh) not found. You can publish manually with:
+  gh release create v1.3.0 --title "v1.3.0" --notes-file "data/release-notes/RELEASE_NOTES_v1.3.0.md"
+```
+
 ## Script Location
 
 The implementation is in [`scripts/publish-new-version.sh`](scripts/publish-new-version.sh).
@@ -154,8 +208,8 @@ The implementation is in [`scripts/publish-new-version.sh`](scripts/publish-new-
 
 After successful version publishing:
 
-1. **Verify GitHub Actions**: Check that the CI/CD pipeline runs successfully
-2. **Create GitHub Release**: Draft release notes on GitHub
+1. **Review committed notes**: Check `data/release-notes/RELEASE_NOTES_vX.Y.Z.md` in the release commit/tag
+2. **Confirm GitHub release**: If `gh` succeeded, verify the created release page
 3. **Deploy to Maven Central**: If configured, deploy artifacts (see repository docs)
 4. **Update documentation**: Changelog, README badges, etc.
 5. **Announce release**: Notify users, update release channels
@@ -173,6 +227,12 @@ After successful version publishing:
 
 **Problem**: Git push fails (authentication)
 - **Solution**: The skill doesn't handle git push failures automatically. Configure git credentials or SSH keys before running
+
+**Problem**: `gh` command not found
+- **Solution**: Install GitHub CLI or run the printed manual command from a machine where `gh` is available
+
+**Problem**: `gh` is installed but release publish failed
+- **Solution**: Run `gh auth login` and retry with the printed `gh release create ... --notes-file ...` command
 
 ## Related Documentation
 

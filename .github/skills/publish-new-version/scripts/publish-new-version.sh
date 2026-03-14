@@ -16,6 +16,8 @@ YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+RELEASE_NOTES_DIR="data/release-notes"
+
 # Find all pom.xml files recursively
 find_pom_files() {
   find . -name "pom.xml" -type f | sort
@@ -147,6 +149,143 @@ run_git_steps() {
   git push && git push --tags
 }
 
+get_previous_release_tag() {
+  local described_tag
+
+  # Prefer the most recent reachable v* tag from HEAD
+  if described_tag=$(git describe --tags --match 'v*' --abbrev=0 2>/dev/null); then
+    echo "$described_tag"
+    return 0
+  fi
+
+  # Fallback: highest v* tag that is merged into HEAD (if any)
+  git tag -l 'v*' --merged HEAD --sort=-version:refname | head -n 1
+}
+
+build_compare_url() {
+  local previous_tag="$1"
+  local new_tag="$2"
+  local remote_url
+  remote_url=$(git config --get remote.origin.url 2>/dev/null || true)
+
+  if [[ -z "$remote_url" || -z "$previous_tag" ]]; then
+    echo ""
+    return 0
+  fi
+
+  local owner_repo=""
+  # Support common GitHub remote URL formats, with or without `.git`:
+  # - git@github.com:owner/repo[.git]
+  # - ssh://git@github.com/owner/repo[.git]
+  # - https://github.com/owner/repo[.git]
+  # - git://github.com/owner/repo[.git]
+  if [[ "$remote_url" =~ ^git@github.com:([^/]+/[^/]+)(\.git)?$ ]]; then
+    owner_repo="${BASH_REMATCH[1]}"
+  elif [[ "$remote_url" =~ ^ssh://git@github.com/([^/]+/[^/]+)(\.git)?$ ]]; then
+    owner_repo="${BASH_REMATCH[1]}"
+  elif [[ "$remote_url" =~ ^https://github.com/([^/]+/[^/]+)(\.git)?$ ]]; then
+    owner_repo="${BASH_REMATCH[1]}"
+  elif [[ "$remote_url" =~ ^git://github.com/([^/]+/[^/]+)(\.git)?$ ]]; then
+    owner_repo="${BASH_REMATCH[1]}"
+  fi
+
+  if [[ -z "$owner_repo" ]]; then
+    echo ""
+    return 0
+  fi
+
+  echo "https://github.com/${owner_repo}/compare/${previous_tag}...${new_tag}"
+}
+
+generate_release_notes() {
+  local previous_tag="$1"
+  local new_version="$2"
+  local end_ref="${3:-HEAD}"
+  local new_tag="v${new_version}"
+
+  local commit_args=()
+  if [[ -n "$previous_tag" ]]; then
+    commit_args+=("${previous_tag}..${end_ref}")
+  else
+    commit_args+=("-n" "20" "${end_ref}")
+  fi
+
+  local release_date
+  release_date=$(date '+%Y-%m-%d')
+  local compare_url
+  compare_url=$(build_compare_url "$previous_tag" "$new_tag")
+
+  local commits
+  commits=$(git log --no-merges --pretty=format:'%h%x09%s' "${commit_args[@]}" | awk -F '\t' -v bump="Bump version to ${new_version}" '$2 != bump { printf("- `%s` - %s\n", $1, $2) }')
+
+  {
+    echo "# Release Notes - ${new_tag}"
+    echo ""
+    echo "Release date: ${release_date}"
+    echo ""
+    echo "## Highlights"
+    echo ""
+    if [[ -n "$commits" ]]; then
+      echo "$commits" | head -n 3
+    else
+      echo "- No functional changes found in this release window."
+    fi
+    echo ""
+    echo "## Included Commits"
+    echo ""
+    if [[ -n "$commits" ]]; then
+      echo "$commits"
+    else
+      echo "- No commits to display."
+    fi
+    echo ""
+    echo "## Full Changelog"
+    echo ""
+    if [[ -n "$compare_url" ]]; then
+      echo "- ${compare_url}"
+    else
+      echo "- GitHub compare URL not available (missing previous tag or unrecognized remote URL)."
+    fi
+  }
+}
+
+save_release_notes() {
+  local new_version="$1"
+  local content="$2"
+  mkdir -p "$RELEASE_NOTES_DIR"
+  local output_file="${RELEASE_NOTES_DIR}/RELEASE_NOTES_v${new_version}.md"
+  printf '%s\n' "$content" > "$output_file"
+  echo "$output_file"
+}
+
+publish_release_with_gh_if_available() {
+  local new_version="$1"
+  local notes_file="$2"
+  local tag="v${new_version}"
+
+  if ! command -v gh >/dev/null 2>&1; then
+    echo -e "${YELLOW}GitHub CLI (gh) not found. You can publish manually with:${NC}"
+    echo "  gh release create ${tag} --title \"${tag}\" --notes-file \"${notes_file}\""
+    return 0
+  fi
+
+  if ! gh auth status >/dev/null 2>&1; then
+    echo -e "${YELLOW}GitHub CLI is installed but not authenticated.${NC}"
+    echo "Run: gh auth login"
+    echo "Then publish with: gh release create ${tag} --title \"${tag}\" --notes-file \"${notes_file}\""
+    return 0
+  fi
+
+  echo ""
+  echo "Publishing GitHub release with gh..."
+  if gh release create "$tag" --title "$tag" --notes-file "$notes_file"; then
+    echo -e "${GREEN}GitHub release published for ${tag}.${NC}"
+  else
+    echo -e "${YELLOW}Failed to publish GitHub release automatically.${NC}"
+    echo "You can retry manually with: gh release create ${tag} --title \"${tag}\" --notes-file \"${notes_file}\""
+  fi
+}
+
 # Main logic
 main() {
   local root_pom="pom.xml"
@@ -182,6 +321,8 @@ main() {
 
   local new_version
   new_version=$(compute_next_version "$current_version" "$bump" "$custom")
+  local previous_tag
+  previous_tag=$(get_previous_release_tag)
 
   echo ""
   echo "New version will be: $new_version"
@@ -232,7 +373,22 @@ main() {
     exit 0
   fi
 
+  local release_notes
+  release_notes=$(generate_release_notes "$previous_tag" "$new_version" "HEAD")
+  local release_notes_file
+  release_notes_file=$(save_release_notes "$new_version" "$release_notes")
+
+  echo ""
+  echo "Generated release notes (English Markdown):"
+  echo ""
+  echo "$release_notes"
+  echo ""
+  echo "Release notes saved to: $release_notes_file"
+
   run_git_steps "$new_version"
+
+  publish_release_with_gh_if_available "$new_version" "$release_notes_file"
+
   echo ""
   echo "Done, published version $new_version. Please verify the release on GitHub: https://github.com/auspis/fluent-sql-4j/actions"
 }
