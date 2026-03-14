@@ -4,16 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class QueryUtilTest {
 
-    @Test
-    void countByColumnReturnsMatchingRows() throws SQLException {
-        Connection connection = TestDatabaseUtil.createH2Connection();
+    private Connection connection;
+
+    @BeforeEach
+    void setUp() throws SQLException {
+        connection = TestDatabaseUtil.createH2Connection();
         TestDatabaseUtil.createUsersTable(connection);
         TestDatabaseUtil.insertSampleUsers(connection);
+    }
 
+    @Test
+    void countByColumnReturnsMatchingRows() throws SQLException {
         long count = QueryUtil.countByColumn(connection, "users", "email", "john@example.com");
 
         assertThat(count).isEqualTo(1);
@@ -22,10 +28,6 @@ class QueryUtilTest {
 
     @Test
     void countByColumnInReturnsMatchingRows() throws SQLException {
-        Connection connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
-
         long count = QueryUtil.countByColumnIn(
                 connection, "users", "email", "john@example.com", "jane@example.com", "missing@example.com");
 
@@ -35,10 +37,6 @@ class QueryUtilTest {
 
     @Test
     void existsByColumnReturnsTrueWhenRowExists() throws SQLException {
-        Connection connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
-
         boolean exists = QueryUtil.existsByColumn(connection, "users", "email", "jane@example.com");
 
         assertThat(exists).isTrue();
@@ -47,10 +45,6 @@ class QueryUtilTest {
 
     @Test
     void getSingleValueByColumnReturnsValue() throws SQLException {
-        Connection connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
-
         var userId =
                 QueryUtil.getSingleValueByColumn(connection, "users", "id", "email", "jane@example.com", Integer.class);
 
@@ -60,10 +54,6 @@ class QueryUtilTest {
 
     @Test
     void getSingleValueByColumnConvertsNumericValue() throws SQLException {
-        Connection connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
-
         var userId =
                 QueryUtil.getSingleValueByColumn(connection, "users", "id", "email", "jane@example.com", Long.class);
 
@@ -73,10 +63,6 @@ class QueryUtilTest {
 
     @Test
     void getSingleValueByColumnReturnsEmptyWhenNoMatch() throws SQLException {
-        Connection connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
-
         var userId = QueryUtil.getSingleValueByColumn(
                 connection, "users", "id", "email", "missing@example.com", Integer.class);
 
