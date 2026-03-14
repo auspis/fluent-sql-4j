@@ -92,14 +92,15 @@ You can cancel at any step to perform manual operations.
 
 ### 5. Automatic Release Notes
 
-After successful push, the script automatically generates English Markdown release notes:
+Before the release commit/tag/push, the script automatically generates English Markdown release notes:
 
 - Uses commit range from previous `v*` tag to current release tag
 - Excludes merge commits
 - Excludes technical commit `Bump version to X.Y.Z`
 - Falls back to last 20 commits if no previous tag exists
-- Prints notes in terminal
 - Saves notes to `data/release-notes/RELEASE_NOTES_vX.Y.Z.md`
+- Includes the notes file in the same release commit (`git add .`)
+- Prints notes in terminal
 
 ### 6. Optional GitHub Release Publish
 
@@ -207,7 +208,7 @@ The implementation is in [`scripts/publish-new-version.sh`](scripts/publish-new-
 
 After successful version publishing:
 
-1. **Review generated notes**: Check `data/release-notes/RELEASE_NOTES_vX.Y.Z.md`
+1. **Review committed notes**: Check `data/release-notes/RELEASE_NOTES_vX.Y.Z.md` in the release commit/tag
 2. **Confirm GitHub release**: If `gh` succeeded, verify the created release page
 3. **Deploy to Maven Central**: If configured, deploy artifacts (see repository docs)
 4. **Update documentation**: Changelog, README badges, etc.

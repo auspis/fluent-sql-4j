@@ -200,13 +200,14 @@ build_compare_url() {
 generate_release_notes() {
   local previous_tag="$1"
   local new_version="$2"
+  local end_ref="${3:-HEAD}"
   local new_tag="v${new_version}"
 
   local commit_args=()
   if [[ -n "$previous_tag" ]]; then
-    commit_args+=("${previous_tag}..${new_tag}")
+    commit_args+=("${previous_tag}..${end_ref}")
   else
-    commit_args+=("-n" "20" "${new_tag}")
+    commit_args+=("-n" "20" "${end_ref}")
   fi
 
   local release_date
@@ -372,10 +373,8 @@ main() {
     exit 0
   fi
 
-  run_git_steps "$new_version"
-
   local release_notes
-  release_notes=$(generate_release_notes "$previous_tag" "$new_version")
+  release_notes=$(generate_release_notes "$previous_tag" "$new_version" "HEAD")
   local release_notes_file
   release_notes_file=$(save_release_notes "$new_version" "$release_notes")
 
@@ -385,6 +384,8 @@ main() {
   echo "$release_notes"
   echo ""
   echo "Release notes saved to: $release_notes_file"
+
+  run_git_steps "$new_version"
 
   publish_release_with_gh_if_available "$new_version" "$release_notes_file"
 
