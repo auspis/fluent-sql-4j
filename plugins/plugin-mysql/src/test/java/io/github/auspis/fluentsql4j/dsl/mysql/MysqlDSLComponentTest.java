@@ -102,4 +102,21 @@ class MysqlDSLComponentTest {
         assertThat(sqlCaptor.getValue()).contains("`email`");
         assertThat(sqlCaptor.getValue()).contains("`users`");
     }
+
+    @Test
+    void shouldRenderTruncateWithMySqlEscaping() throws SQLException {
+        DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+
+        MysqlDSL dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, "8.0.35", MysqlDSL.class)
+                .orElseThrow();
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+        when(connection.prepareStatement(sqlCaptor.capture())).thenReturn(ps);
+
+        dsl.truncateTable("users").build(connection);
+
+        assertThat(sqlCaptor.getValue()).isEqualTo("TRUNCATE TABLE `users`");
+    }
 }

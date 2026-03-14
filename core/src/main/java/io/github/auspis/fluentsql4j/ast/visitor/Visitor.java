@@ -77,6 +77,7 @@ import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.dml.statement.DeleteStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.InsertStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
+import io.github.auspis.fluentsql4j.ast.dml.statement.TruncateStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.UpdateStatement;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Fetch;
 import io.github.auspis.fluentsql4j.ast.dql.clause.From;
@@ -107,6 +108,8 @@ public interface Visitor<T> {
     T visit(DeleteStatement deleteStatement, AstContext ctx);
 
     T visit(MergeStatement mergeStatement, AstContext ctx);
+
+    T visit(TruncateStatement truncateStatement, AstContext ctx);
 
     T visit(CreateTableStatement createTableStatement, AstContext ctx);
 

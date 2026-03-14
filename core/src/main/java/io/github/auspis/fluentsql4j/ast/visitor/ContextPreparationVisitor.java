@@ -77,6 +77,7 @@ import io.github.auspis.fluentsql4j.ast.dml.component.UpdateItem;
 import io.github.auspis.fluentsql4j.ast.dml.statement.DeleteStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.InsertStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
+import io.github.auspis.fluentsql4j.ast.dml.statement.TruncateStatement;
 import io.github.auspis.fluentsql4j.ast.dml.statement.UpdateStatement;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Fetch;
 import io.github.auspis.fluentsql4j.ast.dql.clause.From;
@@ -324,6 +325,11 @@ public class ContextPreparationVisitor implements Visitor<AstContext> {
 
     @Override
     public AstContext visit(MergeStatement mergeStatement, AstContext ctx) {
+        return ctx;
+    }
+
+    @Override
+    public AstContext visit(TruncateStatement truncateStatement, AstContext ctx) {
         return ctx;
     }
 
