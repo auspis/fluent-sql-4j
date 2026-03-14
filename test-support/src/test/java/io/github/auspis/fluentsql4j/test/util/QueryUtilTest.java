@@ -1,7 +1,6 @@
 package io.github.auspis.fluentsql4j.test.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -82,18 +81,6 @@ class QueryUtilTest {
                 connection, "users", "id", "email", "missing@example.com", Integer.class);
 
         assertThat(userId).isEmpty();
-        TestDatabaseUtil.closeConnection(connection);
-    }
-
-    @Test
-    void countByColumnInWithoutValuesThrows() throws SQLException {
-        Connection connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-
-        assertThatThrownBy(() -> QueryUtil.countByColumnIn(connection, "users", "email"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least one value must be provided");
-
         TestDatabaseUtil.closeConnection(connection);
     }
 }

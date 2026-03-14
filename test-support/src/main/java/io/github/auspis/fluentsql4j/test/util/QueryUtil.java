@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
@@ -19,11 +18,7 @@ public final class QueryUtil {
 
     public static long countByColumn(Connection connection, String tableName, String columnName, Object value)
             throws SQLException {
-        requireConnection(connection);
-        String table = requireIdentifier(tableName, "tableName");
-        String column = requireIdentifier(columnName, "columnName");
-
-        String sql = "SELECT COUNT(*) FROM " + quoteIdentifier(table) + " WHERE " + quoteIdentifier(column) + " = ?";
+        String sql = select("COUNT(*)", tableName, columnName + " = ?");
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setObject(1, value);
             try (ResultSet rs = ps.executeQuery()) {
@@ -35,20 +30,12 @@ public final class QueryUtil {
 
     public static long countByColumnIn(Connection connection, String tableName, String columnName, Object... values)
             throws SQLException {
-        requireConnection(connection);
-        String table = requireIdentifier(tableName, "tableName");
-        String column = requireIdentifier(columnName, "columnName");
-        if (values == null || values.length == 0) {
-            throw new IllegalArgumentException("At least one value must be provided");
-        }
-
         StringJoiner placeholders = new StringJoiner(", ");
         for (int i = 0; i < values.length; i++) {
             placeholders.add("?");
         }
 
-        String sql = "SELECT COUNT(*) FROM " + quoteIdentifier(table) + " WHERE " + quoteIdentifier(column) + " IN ("
-                + placeholders + ")";
+        String sql = select("COUNT(*)", tableName, columnName + " IN (" + placeholders + ")");
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             for (int i = 0; i < values.length; i++) {
                 ps.setObject(i + 1, values[i]);
@@ -73,14 +60,7 @@ public final class QueryUtil {
             Object whereValue,
             Class<T> type)
             throws SQLException {
-        requireConnection(connection);
-        String table = requireIdentifier(tableName, "tableName");
-        String selected = requireIdentifier(selectedColumn, "selectedColumn");
-        String where = requireIdentifier(whereColumn, "whereColumn");
-        Objects.requireNonNull(type, "type must not be null");
-
-        String sql = "SELECT " + quoteIdentifier(selected) + " FROM " + quoteIdentifier(table) + " WHERE "
-                + quoteIdentifier(where) + " = ?";
+        String sql = select(selectedColumn, tableName, whereColumn + " = ?");
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setObject(1, whereValue);
@@ -127,18 +107,14 @@ public final class QueryUtil {
                 "Cannot cast value of type " + raw.getClass().getName() + " to " + type.getName());
     }
 
-    private static void requireConnection(Connection connection) {
-        Objects.requireNonNull(connection, "connection must not be null");
-    }
-
-    private static String requireIdentifier(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(fieldName + " must not be null or empty");
-        }
-        return value;
-    }
-
-    private static String quoteIdentifier(String identifier) {
-        return "\"" + identifier.replace("\"", "\"\"") + "\"";
+    private static String select(String projection, String table, String condition) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("SELECT ");
+        stringBuilder.append(projection);
+        stringBuilder.append(" FROM ");
+        stringBuilder.append(table);
+        stringBuilder.append(" WHERE ");
+        stringBuilder.append(condition);
+        return stringBuilder.toString();
     }
 }

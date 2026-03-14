@@ -37,6 +37,6 @@ public class TruncateBuilder {
     public PreparedStatement build(Connection connection) throws SQLException {
         TruncateStatement statement = TruncateStatement.builder().table(table).build();
         PreparedStatementSpec result = specFactory.create(statement);
-        return PsUtil.preparedStatement(connection, result);
+        return PsUtil.preparedStatement(result, connection);
     }
 }
