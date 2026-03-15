@@ -607,7 +607,7 @@ class AstToPreparedStatementSpecVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(new Fetch(0, 10))
+                .fetch(new Fetch(0L, 10L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -620,7 +620,7 @@ class AstToPreparedStatementSpecVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(new Fetch(10, 10))
+                .fetch(new Fetch(10L, 10L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -634,7 +634,7 @@ class AstToPreparedStatementSpecVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
                 .where(Where.of(Comparison.gt(ColumnReference.of("User", "id"), Literal.of(100))))
-                .fetch(new Fetch(5, 5))
+                .fetch(new Fetch(5L, 5L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -649,7 +649,7 @@ class AstToPreparedStatementSpecVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("User", "id"))))
-                .fetch(new Fetch(3, 3))
+                .fetch(new Fetch(3L, 3L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -664,7 +664,7 @@ class AstToPreparedStatementSpecVisitorTest {
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "email"))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .fetch(new Fetch(4, 2))
+                .fetch(new Fetch(4L, 2L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -790,7 +790,7 @@ class AstToPreparedStatementSpecVisitorTest {
                         new ScalarExpressionProjection(ColumnReference.of("t1", "id")),
                         new ScalarExpressionProjection(ColumnReference.of("t2", "name"))))
                 .from(From.of(join))
-                .fetch(new Fetch(0, 5))
+                .fetch(new Fetch(0L, 5L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(stmt, new AstContext());
@@ -930,7 +930,7 @@ class AstToPreparedStatementSpecVisitorTest {
                 .having(io.github.auspis.fluentsql4j.ast.dql.clause.Having.of(
                         Comparison.lt(AggregateCall.min(ColumnReference.of("User", "id")), Literal.of(100))))
                 .orderBy(OrderBy.of(Sorting.desc(ColumnReference.of("User", "email"))))
-                .fetch(new Fetch(0, 5))
+                .fetch(new Fetch(0L, 5L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -1031,7 +1031,7 @@ class AstToPreparedStatementSpecVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(new Fetch(0, 10))
+                .fetch(new Fetch(0L, 10L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -1044,7 +1044,7 @@ class AstToPreparedStatementSpecVisitorTest {
         SelectStatement selectStmt = SelectStatement.builder()
                 .select(Select.of(new ScalarExpressionProjection(ColumnReference.of("User", "id"))))
                 .from(From.of(new TableIdentifier("User")))
-                .fetch(new Fetch(225, 25))
+                .fetch(new Fetch(225L, 25L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());
@@ -1064,7 +1064,7 @@ class AstToPreparedStatementSpecVisitorTest {
                 .orderBy(OrderBy.of(
                         Sorting.asc(ColumnReference.of("User", "name")),
                         Sorting.desc(ColumnReference.of("User", "id"))))
-                .fetch(new Fetch(30, 15))
+                .fetch(new Fetch(30L, 15L))
                 .build();
         AstToPreparedStatementSpecVisitor specFactory = new AstToPreparedStatementSpecVisitor();
         PreparedStatementSpec result = specFactory.visit(selectStmt, new AstContext());

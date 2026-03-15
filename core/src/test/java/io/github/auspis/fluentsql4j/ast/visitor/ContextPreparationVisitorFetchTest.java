@@ -21,7 +21,7 @@ class ContextPreparationVisitorFetchTest {
     void fetchClauseDoesNotAddNewFeatures() {
         SelectStatement statement = SelectStatement.builder()
                 .from(From.fromTable("users"))
-                .fetch(Fetch.of(10))
+                .fetch(Fetch.of(10L))
                 .build();
 
         AstContext result = statement.accept(visitor, new AstContext());

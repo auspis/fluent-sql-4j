@@ -307,24 +307,24 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder> {
         return this;
     }
 
-    public SelectBuilder fetch(int rows) {
+    public SelectBuilder fetch(long rows) {
         if (rows <= 0) {
             throw new IllegalArgumentException("Fetch rows must be positive, got: " + rows);
         }
 
         return updateFetch(fetch -> {
-            int currentOffset = fetch != null ? fetch.offset() : 0;
+            long currentOffset = fetch != null ? fetch.offset() : 0L;
             return new Fetch(currentOffset, rows);
         });
     }
 
-    public SelectBuilder offset(int offset) {
+    public SelectBuilder offset(long offset) {
         if (offset < 0) {
             throw new IllegalArgumentException("Offset must be non-negative, got: " + offset);
         }
 
         return updateFetch(fetch -> {
-            Integer currentRows = fetch != null ? fetch.rows() : null;
+            Long currentRows = fetch != null ? fetch.rows() : null;
             return new Fetch(offset, currentRows);
         });
     }

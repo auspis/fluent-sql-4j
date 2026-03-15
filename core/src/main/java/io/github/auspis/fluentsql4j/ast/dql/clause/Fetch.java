@@ -5,20 +5,20 @@ import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.Visitor;
 import java.util.Objects;
 
-public record Fetch(Integer offset, Integer rows) implements Clause {
+public record Fetch(Long offset, Long rows) implements Clause {
 
     public Fetch {
         if (offset == null) {
-            offset = 0;
+            offset = 0L;
         }
     }
 
     public static Fetch nullObject() {
-        return new Fetch(0, null);
+        return new Fetch(0L, null);
     }
 
-    public static Fetch of(Integer rows) {
-        return new Fetch(0, rows);
+    public static Fetch of(Long rows) {
+        return new Fetch(0L, rows);
     }
 
     @Override

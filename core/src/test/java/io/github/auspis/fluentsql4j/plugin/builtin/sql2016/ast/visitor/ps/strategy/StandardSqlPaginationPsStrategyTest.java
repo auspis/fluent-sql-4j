@@ -17,7 +17,7 @@ class StandardSqlPaginationPsStrategyTest {
 
     @Test
     void handleLimitOnly() {
-        Fetch pagination = new Fetch(0, 10);
+        Fetch pagination = new Fetch(0L, 10L);
 
         PreparedStatementSpec result = strategy.handle(pagination, specFactory, ctx);
 
@@ -27,7 +27,7 @@ class StandardSqlPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage1() {
-        Fetch pagination = new Fetch(0, 5);
+        Fetch pagination = new Fetch(0L, 5L);
 
         PreparedStatementSpec result = strategy.handle(pagination, specFactory, ctx);
 
@@ -37,7 +37,7 @@ class StandardSqlPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage2() {
-        Fetch pagination = new Fetch(10, 10);
+        Fetch pagination = new Fetch(10L, 10L);
 
         PreparedStatementSpec result = strategy.handle(pagination, specFactory, ctx);
 
@@ -47,7 +47,7 @@ class StandardSqlPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetPage3() {
-        Fetch pagination = new Fetch(10, 5);
+        Fetch pagination = new Fetch(10L, 5L);
 
         PreparedStatementSpec result = strategy.handle(pagination, specFactory, ctx);
 
@@ -57,7 +57,7 @@ class StandardSqlPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetLargePage() {
-        Fetch pagination = new Fetch(80, 20);
+        Fetch pagination = new Fetch(80L, 20L);
 
         PreparedStatementSpec result = strategy.handle(pagination, specFactory, ctx);
 
@@ -67,7 +67,7 @@ class StandardSqlPaginationPsStrategyTest {
 
     @Test
     void handleLimitWithOffsetCalculation() {
-        Fetch pagination = new Fetch(45, 15);
+        Fetch pagination = new Fetch(45L, 15L);
 
         PreparedStatementSpec result = strategy.handle(pagination, specFactory, ctx);
 
