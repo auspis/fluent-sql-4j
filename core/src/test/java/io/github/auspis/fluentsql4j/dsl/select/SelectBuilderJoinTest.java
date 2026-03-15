@@ -237,37 +237,35 @@ class SelectBuilderJoinTest {
 
     @Test
     void joinWithoutFromThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").innerJoin("orders"))
+        SelectBuilder builder = new SelectBuilder(specFactory, "*");
+        assertThatThrownBy(() -> builder.innerJoin("orders"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified before adding a join");
     }
 
     @Test
     void joinWithEmptyLeftColumnThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .innerJoin("orders")
-                        .on("users", "", "orders", "user_id"))
+        JoinSpecBuilder joinSpec =
+                new SelectBuilder(specFactory, "*").from("users").innerJoin("orders");
+        assertThatThrownBy(() -> joinSpec.on("users", "", "orders", "user_id"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void joinWithEmptyRightColumnThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .innerJoin("orders")
-                        .on("users", "id", "orders", ""))
+        JoinSpecBuilder joinSpec =
+                new SelectBuilder(specFactory, "*").from("users").innerJoin("orders");
+        assertThatThrownBy(() -> joinSpec.on("users", "id", "orders", ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void joinWithEmptyAliasThrowsException() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .innerJoin("orders")
-                        .as(""))
+        JoinSpecBuilder joinSpec =
+                new SelectBuilder(specFactory, "*").from("users").innerJoin("orders");
+        assertThatThrownBy(() -> joinSpec.as(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty");
     }

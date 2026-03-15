@@ -56,7 +56,7 @@ class StandardSqlSelectStatementPsStrategyTest {
                 .groupBy(GroupBy.of(ColumnReference.of("p", "category")))
                 .having(Having.of(Comparison.gt(new CountStar(), Literal.of(5))))
                 .orderBy(OrderBy.of(Sorting.asc(ColumnReference.of("p", "category"))))
-                .fetch(new io.github.auspis.fluentsql4j.ast.dql.clause.Fetch(10, 3))
+                .fetch(new io.github.auspis.fluentsql4j.ast.dql.clause.Fetch(10L, 3L))
                 .build();
 
         PreparedStatementSpec spec = strategy.handle(statement, astToPsSpecVisitor, ctx);

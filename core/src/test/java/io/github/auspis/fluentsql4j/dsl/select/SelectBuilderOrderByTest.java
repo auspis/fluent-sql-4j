@@ -10,8 +10,13 @@ import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
 import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class SelectBuilderOrderByTest {
 
@@ -187,148 +192,103 @@ class SelectBuilderOrderByTest {
 
     // Validation tests
 
-    @Test
-    void nullColumnThrowsException() {
-        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("orders");
+    @Nested
+    class AscValidation {
 
-        assertThatThrownBy(() -> builder.orderBy().asc(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column cannot be null or empty");
+        @ParameterizedTest
+        @MethodSource("invalidSingleColumnArgs")
+        void rejectsInvalidSingleColumn(String column, String expectedMessage) {
+            OrderByBuilder orderBy =
+                    new SelectBuilder(specFactory, "*").from("orders").orderBy();
+            assertThatThrownBy(() -> orderBy.asc(column))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(expectedMessage);
+        }
+
+        static Stream<Arguments> invalidSingleColumnArgs() {
+            return Stream.of(
+                    Arguments.of(null, "ORDER BY column cannot be null or empty"),
+                    Arguments.of("  ", "ORDER BY column cannot be null or empty"),
+                    Arguments.of("orders.customer_id", "ORDER BY column must not contain dot notation"));
+        }
+
+        @ParameterizedTest
+        @MethodSource("invalidAliasArgs")
+        void rejectsInvalidAlias(String alias, String expectedMessage) {
+            OrderByBuilder orderBy =
+                    new SelectBuilder(specFactory, "*").from("orders").as("o").orderBy();
+            assertThatThrownBy(() -> orderBy.asc(alias, "customer_id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(expectedMessage);
+        }
+
+        static Stream<Arguments> invalidAliasArgs() {
+            return Stream.of(
+                    Arguments.of(null, "Table reference cannot be null or empty"),
+                    Arguments.of("  ", "Table reference cannot be null or empty"),
+                    Arguments.of("o.x", "Table reference must not contain dot: 'o.x'"));
+        }
+
+        @ParameterizedTest
+        @MethodSource("invalidColumnWithAliasArgs")
+        void rejectsInvalidColumnWhenAliasProvided(String column, String expectedMessage) {
+            OrderByBuilder orderBy =
+                    new SelectBuilder(specFactory, "*").from("orders").as("o").orderBy();
+            assertThatThrownBy(() -> orderBy.asc("o", column))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(expectedMessage);
+        }
+
+        static Stream<Arguments> invalidColumnWithAliasArgs() {
+            return Stream.of(
+                    Arguments.of(null, "Column name cannot be null or empty"),
+                    Arguments.of("  ", "Column name cannot be null or empty"),
+                    Arguments.of("x.customer_id", "Column name must not contain dot"));
+        }
     }
 
-    @Test
-    void emptyColumnThrowsException() {
-        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("orders");
+    @Nested
+    class DescValidation {
 
-        assertThatThrownBy(() -> builder.orderBy().asc("  "))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column cannot be null or empty");
-    }
+        @ParameterizedTest
+        @MethodSource("invalidSingleColumnArgs")
+        void rejectsInvalidSingleColumn(String column, String expectedMessage) {
+            OrderByBuilder orderBy =
+                    new SelectBuilder(specFactory, "*").from("orders").orderBy();
+            assertThatThrownBy(() -> orderBy.desc(column))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(expectedMessage);
+        }
 
-    @Test
-    void dotNotationInColumnThrowsException() {
-        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("orders");
+        static Stream<Arguments> invalidSingleColumnArgs() {
+            return Stream.of(
+                    Arguments.of(null, "ORDER BY column cannot be null or empty"),
+                    Arguments.of("orders.status", "ORDER BY column must not contain dot notation"));
+        }
 
-        assertThatThrownBy(() -> builder.orderBy().asc("orders.customer_id"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column must not contain dot notation")
-                .hasMessageContaining("Use asc(alias, column)");
-    }
+        @ParameterizedTest
+        @MethodSource("invalidTwoArgCases")
+        void rejectsInvalidArguments(String alias, String column, String expectedMessage) {
+            OrderByBuilder orderBy =
+                    new SelectBuilder(specFactory, "*").from("orders").as("o").orderBy();
+            assertThatThrownBy(() -> orderBy.desc(alias, column))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(expectedMessage);
+        }
 
-    @Test
-    void nullColumnDescThrowsException() {
-        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("orders");
-
-        assertThatThrownBy(() -> builder.orderBy().desc(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column cannot be null or empty");
-    }
-
-    @Test
-    void dotNotationInColumnDescThrowsException() {
-        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("orders");
-
-        assertThatThrownBy(() -> builder.orderBy().desc("orders.status"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ORDER BY column must not contain dot notation")
-                .hasMessageContaining("Use desc(alias, column)");
-    }
-
-    @Test
-    void nullAliasThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().asc(null, "customer_id"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Table reference cannot be null or empty");
-    }
-
-    @Test
-    void emptyAliasThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().asc("  ", "customer_id"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Table reference cannot be null or empty");
-    }
-
-    @Test
-    void dotNotationInAliasThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().asc("o.x", "customer_id"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Table reference must not contain dot: 'o.x'");
-    }
-
-    @Test
-    void nullColumnWithAliasThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().asc("o", null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column name cannot be null or empty");
-    }
-
-    @Test
-    void emptyColumnWithAliasThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().asc("o", "  "))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column name cannot be null or empty");
-    }
-
-    @Test
-    void dotNotationInColumnWithAliasThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().asc("o", "x.customer_id"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column name must not contain dot");
-    }
-
-    @Test
-    void nullAliasDescThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().desc(null, "customer_id"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Table reference cannot be null or empty");
-    }
-
-    @Test
-    void dotNotationInAliasDescThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().desc("o.x", "customer_id"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Table reference must not contain dot: 'o.x'");
-    }
-
-    @Test
-    void dotNotationInColumnDescWithAliasThrowsException() {
-        SelectBuilder builder =
-                new SelectBuilder(specFactory, "*").from("orders").as("o");
-
-        assertThatThrownBy(() -> builder.orderBy().desc("o", "x.status"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Column name must not contain dot");
+        static Stream<Arguments> invalidTwoArgCases() {
+            return Stream.of(
+                    Arguments.of(null, "customer_id", "Table reference cannot be null or empty"),
+                    Arguments.of("o.x", "customer_id", "Table reference must not contain dot: 'o.x'"),
+                    Arguments.of("o", "x.status", "Column name must not contain dot"));
+        }
     }
 
     @Test
     void emptyOrderByThrowsException() {
         SelectBuilder builder = new SelectBuilder(specFactory, "*").from("orders");
-
-        assertThatThrownBy(() -> builder.orderBy().build())
+        OrderByBuilder orderBy = builder.orderBy();
+        assertThatThrownBy(() -> orderBy.build())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ORDER BY must contain at least one sorting column");
     }

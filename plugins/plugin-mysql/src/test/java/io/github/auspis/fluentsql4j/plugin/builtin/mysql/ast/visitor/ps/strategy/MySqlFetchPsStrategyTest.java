@@ -16,7 +16,7 @@ class MySqlFetchPsStrategyTest {
     private AstToPreparedStatementSpecVisitor astToPsSpecVisitor;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         strategy = new MySqlFetchPsStrategy();
         astToPsSpecVisitor = MysqlAstToPreparedStatementSpecVisitorFactory.create();
     }
@@ -26,19 +26,19 @@ class MySqlFetchPsStrategyTest {
         Fetch pagination = Fetch.nullObject();
 
         PreparedStatementSpec result = strategy.handle(pagination, astToPsSpecVisitor, new AstContext());
-        assertThat(result.sql()).isEqualTo("");
+        assertThat(result.sql()).isEmpty();
         assertThat(result.parameters()).isEmpty();
     }
 
     @Test
     void ok() {
-        Fetch pagination = new Fetch(0, 10);
+        Fetch pagination = new Fetch(0L, 10L);
 
         PreparedStatementSpec result = strategy.handle(pagination, astToPsSpecVisitor, new AstContext());
         assertThat(result.sql()).isEqualTo("LIMIT 10 OFFSET 0");
         assertThat(result.parameters()).isEmpty();
 
-        pagination = new Fetch(16, 8);
+        pagination = new Fetch(16L, 8L);
         result = strategy.handle(pagination, astToPsSpecVisitor, new AstContext());
         assertThat(result.sql()).isEqualTo("LIMIT 8 OFFSET 16");
         assertThat(result.parameters()).isEmpty();
