@@ -5,13 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
+import io.github.auspis.fluentsql4j.ast.core.expression.aggregate.AggregateCall;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.ColumnReference;
 import io.github.auspis.fluentsql4j.ast.core.expression.scalar.Literal;
 import io.github.auspis.fluentsql4j.ast.core.predicate.AndOr;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Comparison;
 import io.github.auspis.fluentsql4j.ast.core.predicate.NullPredicate;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
+import io.github.auspis.fluentsql4j.ast.dql.clause.Having;
+import io.github.auspis.fluentsql4j.ast.dql.clause.Select;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
+import io.github.auspis.fluentsql4j.ast.dql.projection.AggregateCallProjection;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.clause.HavingBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.HavingConditionBuilder;
@@ -21,8 +25,13 @@ import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
 import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class SelectBuilderTest {
 
@@ -42,6 +51,15 @@ class SelectBuilderTest {
 
         assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
         assertThatSql(sqlCaptureHelper).isEqualTo("SELECT \"name\", \"email\" FROM \"users\"");
+    }
+
+    @Test
+    void nullSelectConstructorDefaultsToWildcardProjection() throws SQLException {
+        PreparedStatement result =
+                new SelectBuilder(specFactory, (Select) null).from("users").build(sqlCaptureHelper.getConnection());
+
+        assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
+        assertThatSql(sqlCaptureHelper).isEqualTo("SELECT * FROM \"users\"");
     }
 
     @Test
@@ -330,12 +348,21 @@ class SelectBuilderTest {
                 .hasMessage("FROM table must be specified");
     }
 
-    @Test
-    void invalidTableName() {
-        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
-        assertThatThrownBy(() -> selectBuilder.from(""))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("TableIdentifier name cannot be null or empty");
+    @Nested
+    class FromValidation {
+
+        @ParameterizedTest
+        @MethodSource("invalidTableNames")
+        void invalidTableName(String tableName) {
+            SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+            assertThatThrownBy(() -> selectBuilder.from(tableName))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("TableIdentifier name cannot be null or empty");
+        }
+
+        static Stream<Arguments> invalidTableNames() {
+            return Stream.of(Arguments.of((String) null), Arguments.of(""), Arguments.of("   "));
+        }
     }
 
     @Test
@@ -1402,5 +1429,106 @@ class SelectBuilderTest {
         assertThatThrownBy(() -> selectBuilder.fetch(0))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Fetch rows must be positive, got: 0");
+    }
+
+    @Test
+    void getTableReferenceBeforeFromReturnsEmptyString() {
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+
+        assertThat(selectBuilder.getTableReference()).isEmpty();
+    }
+
+    @Test
+    void invalidAliasNull() {
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> selectBuilder.as(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Alias cannot be null or empty");
+    }
+
+    @Test
+    void invalidAliasBlank() {
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> selectBuilder.as("   "))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Alias cannot be null or empty");
+    }
+
+    @Test
+    void hasValidHavingConditionReturnsTrueForValidComparison() {
+        Having havingWithComparison = Having.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        assertThat(SelectBuilder.hasValidHavingCondition(havingWithComparison)).isTrue();
+    }
+
+    @Test
+    void hasValidHavingConditionReturnsFalseForNullPredicate() {
+        Having havingWithNull = Having.of(new NullPredicate());
+
+        assertThat(SelectBuilder.hasValidHavingCondition(havingWithNull)).isFalse();
+    }
+
+    @Test
+    void combineHavingWithExistingCreatesAndCondition() {
+        Having existingHaving = Having.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Having result = SelectBuilder.combineHavingWithExisting(existingHaving, newCondition, LogicalCombinator.AND);
+
+        assertThat(result.condition()).isInstanceOf(AndOr.class);
+    }
+
+    @Test
+    void combineHavingWithExistingCreatesOrCondition() {
+        Having existingHaving = Having.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Having result = SelectBuilder.combineHavingWithExisting(existingHaving, newCondition, LogicalCombinator.OR);
+
+        assertThat(result.condition()).isInstanceOf(AndOr.class);
+    }
+
+    @Test
+    void combineHavingConditionsWithNullHavingCreatesNewCondition() {
+        Predicate condition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+
+        Having result = SelectBuilder.combineHavingConditions(null, condition, LogicalCombinator.AND);
+
+        assertThat(result.condition()).isEqualTo(condition);
+    }
+
+    @Test
+    void combineHavingConditionsWithValidHavingCreatesCombinedCondition() {
+        Having existingHaving = Having.of(Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John")));
+
+        Predicate newCondition = Comparison.gt(ColumnReference.of("users", "age"), Literal.of(25));
+
+        Having result = SelectBuilder.combineHavingConditions(existingHaving, newCondition, LogicalCombinator.OR);
+
+        assertThat(result.condition()).isInstanceOf(AndOr.class);
+    }
+
+    @Test
+    void combineHavingConditionsWithNullPredicateCreatesNewCondition() {
+        Having existingHaving = Having.of(new NullPredicate());
+
+        Predicate newCondition = Comparison.eq(ColumnReference.of("users", "name"), Literal.of("John"));
+
+        Having result = SelectBuilder.combineHavingConditions(existingHaving, newCondition, LogicalCombinator.AND);
+
+        assertThat(result.condition()).isEqualTo(newCondition);
+    }
+
+    @Test
+    void countStarProjectionIsNotRetargetedWithAlias() throws SQLException {
+        Select select = Select.of(new AggregateCallProjection(AggregateCall.countStar()));
+
+        PreparedStatement result =
+                new SelectBuilder(specFactory, select).from("users").as("u").build(sqlCaptureHelper.getConnection());
+
+        assertThat(result).isSameAs(sqlCaptureHelper.getPreparedStatement());
+        assertThatSql(sqlCaptureHelper).isEqualTo("SELECT COUNT(*) FROM \"users\" AS u");
     }
 }
