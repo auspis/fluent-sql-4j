@@ -13,7 +13,10 @@ import io.github.auspis.fluentsql4j.ast.core.predicate.NullPredicate;
 import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.clause.HavingBuilder;
+import io.github.auspis.fluentsql4j.dsl.clause.HavingConditionBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
+import io.github.auspis.fluentsql4j.dsl.clause.WhereBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
 import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.PreparedStatement;
@@ -321,48 +324,49 @@ class SelectBuilderTest {
 
     @Test
     void fromNotSpecified() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").build(sqlCaptureHelper.getConnection()))
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+        assertThatThrownBy(() -> selectBuilder.build(null))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FROM table must be specified");
     }
 
     @Test
     void invalidTableName() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from(""))
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+        assertThatThrownBy(() -> selectBuilder.from(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("TableIdentifier name cannot be null or empty");
     }
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .where()
-                        .column(""))
+        WhereBuilder<SelectBuilder> builder =
+                new SelectBuilder(specFactory, "*").from("users").where();
+        assertThatThrownBy(() -> builder.column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
 
     @Test
     void invalidAlias() {
-        assertThatThrownBy(
-                        () -> new SelectBuilder(specFactory, "*").from("users").as(""))
+        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> builder.as(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty");
     }
 
     @Test
     void invalidFetch() {
-        assertThatThrownBy(
-                        () -> new SelectBuilder(specFactory, "*").from("users").fetch(-1))
+        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> builder.fetch(-1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Fetch rows must be positive, got: -1");
     }
 
     @Test
     void invalidOffset() {
-        assertThatThrownBy(
-                        () -> new SelectBuilder(specFactory, "*").from("users").offset(-5))
+        SelectBuilder builder = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> builder.offset(-5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Offset must be non-negative, got: -5");
     }
@@ -524,7 +528,8 @@ class SelectBuilderTest {
 
     @Test
     void fromSubqueryNullSubquery() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from((SelectBuilder) null, "alias"))
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+        assertThatThrownBy(() -> selectBuilder.from((SelectBuilder) null, "alias"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Subquery cannot be null");
     }
@@ -532,7 +537,8 @@ class SelectBuilderTest {
     @Test
     void fromSubqueryNullAlias() {
         SelectBuilder subquery = new SelectBuilder(specFactory, "*").from("users");
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from(subquery, null))
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+        assertThatThrownBy(() -> selectBuilder.from(subquery, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty for subquery");
     }
@@ -540,7 +546,8 @@ class SelectBuilderTest {
     @Test
     void fromSubqueryEmptyAlias() {
         SelectBuilder subquery = new SelectBuilder(specFactory, "*").from("users");
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*").from(subquery, ""))
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+        assertThatThrownBy(() -> selectBuilder.from(subquery, ""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Alias cannot be null or empty for subquery");
     }
@@ -673,12 +680,12 @@ class SelectBuilderTest {
 
     @Test
     void invalidHavingColumn() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .groupBy()
-                        .column("age")
-                        .having()
-                        .column(""))
+        HavingBuilder havingBuilder = new SelectBuilder(specFactory, "*")
+                .from("users")
+                .groupBy()
+                .column("age")
+                .having();
+        assertThatThrownBy(() -> havingBuilder.column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }
@@ -862,14 +869,14 @@ class SelectBuilderTest {
 
     @Test
     void havingWithNullSubquery_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .groupBy()
-                        .column("age")
-                        .build()
-                        .having()
-                        .column("age")
-                        .eq((SelectBuilder) null))
+        HavingConditionBuilder builder = new SelectBuilder(specFactory, "*")
+                .from("users")
+                .groupBy()
+                .column("age")
+                .build()
+                .having()
+                .column("age");
+        assertThatThrownBy(() -> builder.eq((SelectBuilder) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Subquery cannot be null");
     }
@@ -990,28 +997,28 @@ class SelectBuilderTest {
 
     @Test
     void havingInOperatorEmptyValues_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .groupBy()
-                        .column("age")
-                        .build()
-                        .having()
-                        .column("age")
-                        .in(new String[0]))
+        HavingConditionBuilder builder = new SelectBuilder(specFactory, "*")
+                .from("users")
+                .groupBy()
+                .column("age")
+                .build()
+                .having()
+                .column("age");
+        assertThatThrownBy(() -> builder.in(new String[0]))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be provided for IN clause");
     }
 
     @Test
     void havingInOperatorNullValues_throwsException() {
-        assertThatThrownBy(() -> new SelectBuilder(specFactory, "*")
-                        .from("users")
-                        .groupBy()
-                        .column("age")
-                        .build()
-                        .having()
-                        .column("age")
-                        .in((String[]) null))
+        HavingConditionBuilder builder = new SelectBuilder(specFactory, "*")
+                .from("users")
+                .groupBy()
+                .column("age")
+                .build()
+                .having()
+                .column("age");
+        assertThatThrownBy(() -> builder.in((String[]) null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least one value must be provided for IN clause");
     }
@@ -1379,5 +1386,21 @@ class SelectBuilderTest {
         assertThatSql(sqlCaptureHelper).isEqualTo("""
                 SELECT "name", SUM("score") AS "total_score" FROM "users"\
                 """);
+    }
+
+    @Test
+    void asBeforeFromThrowsException() {
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*");
+        assertThatThrownBy(() -> selectBuilder.as("u"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Cannot set alias before specifying table with from()");
+    }
+
+    @Test
+    void fetchZeroThrowsException() {
+        SelectBuilder selectBuilder = new SelectBuilder(specFactory, "*").from("users");
+        assertThatThrownBy(() -> selectBuilder.fetch(0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Fetch rows must be positive, got: 0");
     }
 }

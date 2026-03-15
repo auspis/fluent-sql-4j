@@ -16,7 +16,7 @@ class MySqlFetchPsStrategyTest {
     private AstToPreparedStatementSpecVisitor astToPsSpecVisitor;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         strategy = new MySqlFetchPsStrategy();
         astToPsSpecVisitor = MysqlAstToPreparedStatementSpecVisitorFactory.create();
     }
@@ -26,7 +26,7 @@ class MySqlFetchPsStrategyTest {
         Fetch pagination = Fetch.nullObject();
 
         PreparedStatementSpec result = strategy.handle(pagination, astToPsSpecVisitor, new AstContext());
-        assertThat(result.sql()).isEqualTo("");
+        assertThat(result.sql()).isEmpty();
         assertThat(result.parameters()).isEmpty();
     }
 

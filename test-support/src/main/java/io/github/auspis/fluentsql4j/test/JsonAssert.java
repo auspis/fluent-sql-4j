@@ -21,6 +21,7 @@ import org.assertj.core.api.AbstractAssert;
  */
 public class JsonAssert extends AbstractAssert<JsonAssert, String> {
 
+    private static final String ACTUAL_STR = "actual";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private JsonAssert(String actual) {
@@ -50,7 +51,7 @@ public class JsonAssert extends AbstractAssert<JsonAssert, String> {
     public JsonAssert isEqualToJson(String expected) {
         isNotNull();
 
-        JsonNode actualNode = parseJson(actual, "actual");
+        JsonNode actualNode = parseJson(actual, ACTUAL_STR);
         JsonNode expectedNode = parseJson(expected, "expected");
 
         if (!actualNode.equals(expectedNode)) {
@@ -74,7 +75,7 @@ public class JsonAssert extends AbstractAssert<JsonAssert, String> {
     public JsonAssert containsAllJsonArrayValues(String... expectedValues) {
         isNotNull();
 
-        JsonNode actualNode = parseJson(actual, "actual");
+        JsonNode actualNode = parseJson(actual, ACTUAL_STR);
 
         if (!actualNode.isArray()) {
             failWithMessage("Expected JSON array but got: %s", actualNode.getNodeType());
@@ -109,7 +110,7 @@ public class JsonAssert extends AbstractAssert<JsonAssert, String> {
     public JsonAssert hasJsonProperty(String propertyName, String expectedValue) {
         isNotNull();
 
-        JsonNode actualNode = parseJson(actual, "actual");
+        JsonNode actualNode = parseJson(actual, ACTUAL_STR);
 
         if (!actualNode.isObject()) {
             failWithMessage("Expected JSON object but got: %s", actualNode.getNodeType());
