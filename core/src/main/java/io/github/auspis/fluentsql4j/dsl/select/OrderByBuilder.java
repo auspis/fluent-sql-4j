@@ -149,7 +149,7 @@ public class OrderByBuilder {
      *
      * @return the parent SelectBuilder
      */
-    public SelectBuilder fetch(int rows) {
+    public SelectBuilder fetch(long rows) {
         return build().fetch(rows);
     }
 
@@ -158,7 +158,7 @@ public class OrderByBuilder {
      *
      * @return the parent SelectBuilder
      */
-    public SelectBuilder offset(int offset) {
+    public SelectBuilder offset(long offset) {
         return build().offset(offset);
     }
 }
