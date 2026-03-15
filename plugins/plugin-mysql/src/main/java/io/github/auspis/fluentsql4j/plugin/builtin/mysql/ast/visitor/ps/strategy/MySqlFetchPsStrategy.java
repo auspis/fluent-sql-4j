@@ -16,9 +16,7 @@ public class MySqlFetchPsStrategy implements FetchPsStrategy {
         if (!clause.isActive()) {
             return new PreparedStatementSpec("", List.of());
         }
-        Long offset = clause.offset();
-        Long rows = clause.rows();
-        String sql = String.format("LIMIT %s OFFSET %s", rows, offset);
+        String sql = String.format("LIMIT %s OFFSET %s", clause.rows(), clause.offset());
         return new PreparedStatementSpec(sql, List.of());
     }
 }
