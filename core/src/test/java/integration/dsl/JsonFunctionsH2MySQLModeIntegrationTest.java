@@ -33,19 +33,19 @@ class JsonFunctionsH2MySQLModeIntegrationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2JsonConnection();
+        connection = TestDatabaseUtil.H2.createJsonConnection();
 
         // Use MySQL dialect DSL since we're testing MySQL-compatible JSON functions
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
         dsl = registry.dslFor("mysql", "8.0.0").orElseThrow();
 
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.H2.createUsersTable(connection);
+        TestDatabaseUtil.H2.insertSampleUsers(connection);
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        TestDatabaseUtil.closeConnection(connection);
+        TestDatabaseUtil.H2.closeConnection(connection);
     }
 
     @Test

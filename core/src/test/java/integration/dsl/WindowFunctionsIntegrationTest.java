@@ -30,14 +30,14 @@ class WindowFunctionsIntegrationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
+        connection = TestDatabaseUtil.H2.createConnection();
         specFactory = StandardSqlUtil.preparedStatementSpecFactory();
         prepareData();
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        TestDatabaseUtil.closeConnection(connection);
+        TestDatabaseUtil.H2.closeConnection(connection);
     }
 
     @Test

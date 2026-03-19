@@ -41,14 +41,14 @@ class StandardSQLDialectPluginE2E {
         registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Set up database for renderer functionality tests
-        connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
+        connection = TestDatabaseUtil.H2.createConnection();
+        TestDatabaseUtil.H2.createUsersTable(connection);
+        TestDatabaseUtil.H2.insertSampleUsers(connection);
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        TestDatabaseUtil.closeConnection(connection);
+        TestDatabaseUtil.H2.closeConnection(connection);
     }
 
     @Test

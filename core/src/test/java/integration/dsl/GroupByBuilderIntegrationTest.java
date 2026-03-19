@@ -27,11 +27,12 @@ class GroupByBuilderIntegrationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
+        connection = TestDatabaseUtil.H2.createConnection();
         dsl = StandardSqlUtil.dsl();
 
         // Create test tables
         try (var stmt = connection.createStatement()) {
+            // TODO: reuse TestDatabaseUtil to create tables and insert data
             stmt.execute("CREATE TABLE customers (id INT PRIMARY KEY, name VARCHAR(100), country VARCHAR(50))");
 
             // Insert test data

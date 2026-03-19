@@ -58,10 +58,10 @@ class PostgreSqlDSLE2E {
 
         connection = DriverManager.getConnection(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword());
 
-        TestDatabaseUtil.dropUsersTable(connection);
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.dropOrdersTable(connection);
-        TestDatabaseUtil.createOrderTable(connection);
+        TestDatabaseUtil.PostgreSQL.dropUsersTable(connection);
+        TestDatabaseUtil.PostgreSQL.createUsersTable(connection);
+        TestDatabaseUtil.PostgreSQL.dropOrdersTable(connection);
+        TestDatabaseUtil.PostgreSQL.createOrdersTable(connection);
 
         nameMapper = r -> r.getString("name");
     }
@@ -76,10 +76,10 @@ class PostgreSqlDSLE2E {
         dsl = (PostgreSqlDSL)
                 registry.dslFor(PostgreSqlDialectPlugin.DIALECT_NAME, PostgreSqlDialectPlugin.DIALECT_VERSION)
                         .orElseThrow();
-        TestDatabaseUtil.truncateUsers(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
-        TestDatabaseUtil.truncateOrders(connection);
-        TestDatabaseUtil.insertSampleOrders(connection);
+        TestDatabaseUtil.PostgreSQL.truncateUsers(connection);
+        TestDatabaseUtil.PostgreSQL.insertSampleUsers(connection);
+        TestDatabaseUtil.PostgreSQL.truncateOrders(connection);
+        TestDatabaseUtil.PostgreSQL.insertSampleOrders(connection);
     }
 
     @Test

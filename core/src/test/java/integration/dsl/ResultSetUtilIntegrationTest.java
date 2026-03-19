@@ -32,15 +32,15 @@ class ResultSetUtilIntegrationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
+        connection = TestDatabaseUtil.H2.createConnection();
         dsl = StandardSqlUtil.dsl();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.H2.createUsersTable(connection);
+        TestDatabaseUtil.H2.insertSampleUsers(connection);
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        TestDatabaseUtil.closeConnection(connection);
+        TestDatabaseUtil.H2.closeConnection(connection);
     }
 
     @Test

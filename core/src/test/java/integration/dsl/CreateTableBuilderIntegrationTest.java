@@ -29,7 +29,7 @@ class CreateTableBuilderIntegrationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
+        connection = TestDatabaseUtil.H2.createConnection();
         dsl = StandardSqlUtil.dsl();
     }
 

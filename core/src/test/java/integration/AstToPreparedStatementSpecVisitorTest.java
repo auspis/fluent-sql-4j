@@ -31,11 +31,11 @@ class AstToPreparedStatementSpecVisitorTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
+        connection = TestDatabaseUtil.H2.createConnection();
         specFactory = new AstToPreparedStatementSpecVisitor();
 
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.H2.createUsersTable(connection);
+        TestDatabaseUtil.H2.insertSampleUsers(connection);
     }
 
     @AfterEach
