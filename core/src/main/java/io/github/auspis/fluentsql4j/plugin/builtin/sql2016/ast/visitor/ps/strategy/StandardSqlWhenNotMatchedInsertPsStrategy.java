@@ -39,9 +39,10 @@ public class StandardSqlWhenNotMatchedInsertPsStrategy implements WhenNotMatched
 
         // For INSERT VALUES in MERGE, we need to render the expressions directly
         // since they can be column references from the source table
-        if (item.insertData() instanceof InsertValues(List<Expression> valueExpressions)) {
+        if (item.insertData() instanceof InsertValues insertValues) {
+            List<Expression> valueExpressions = insertValues.valueExpressions();
             List<String> valueClauses = new ArrayList<>();
-            for (var expr : valueExpressions) {
+            for (Expression expr : valueExpressions) {
                 PreparedStatementSpec exprDto = expr.accept(visitor, ctx);
                 valueClauses.add(exprDto.sql());
                 allParameters.addAll(exprDto.parameters());

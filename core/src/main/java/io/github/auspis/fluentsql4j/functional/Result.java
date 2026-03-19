@@ -36,7 +36,7 @@ public sealed interface Result<T> {
 
     default <U> Result<U> map(Function<T, U> mapper) {
         return switch (this) {
-            case Success<T>(T value) -> new Success<>(mapper.apply(value));
+            case Success<T> s -> new Success<>(mapper.apply(s.value()));
             case Failure<T> f -> new Failure<>(f.message());
         };
     }
@@ -69,8 +69,8 @@ public sealed interface Result<T> {
      */
     default <U> U fold(Function<T, U> onSuccess, Function<String, U> onFailure) {
         return switch (this) {
-            case Success<T>(T value) -> onSuccess.apply(value);
-            case Failure<T>(String message) -> onFailure.apply(message);
+            case Success<T> s -> onSuccess.apply(s.value());
+            case Failure<T> f -> onFailure.apply(f.message());
         };
     }
 
@@ -91,22 +91,22 @@ public sealed interface Result<T> {
      * @return this result unchanged
      */
     default Result<T> peek(Consumer<T> consumer) {
-        if (this instanceof Success<T>(T value)) {
-            consumer.accept(value);
+        if (this instanceof Success<T> s) {
+            consumer.accept(s.value());
         }
         return this;
     }
 
     default T orElseThrow() {
         return switch (this) {
-            case Success<T>(T value) -> value;
+            case Success<T> s -> s.value();
             case Failure<T> f -> throw f.toException();
         };
     }
 
     default T orElse(T defaultValue) {
         return switch (this) {
-            case Success<T>(T value) -> value;
+            case Success<T> s -> s.value();
             case Failure<T> ignored -> defaultValue;
         };
     }
@@ -128,7 +128,7 @@ public sealed interface Result<T> {
      */
     default T orElseGet(java.util.function.Supplier<T> supplier) {
         return switch (this) {
-            case Success<T>(T value) -> value;
+            case Success<T> s -> s.value();
             case Failure<T> ignored -> supplier.get();
         };
     }

@@ -118,6 +118,9 @@ public class MysqlDSL extends DSL {
      * @return the corresponding ScalarExpression
      */
     private ScalarExpression toScalarExpression(Object value) {
+        if (value == null) {
+            return Literal.of(String.valueOf(value));
+        }
         return switch (value) {
             case ScalarExpression se -> se;
             case Predicate predicate -> /* Wrap predicate as an expression for use in functions like IF() */
@@ -125,7 +128,7 @@ public class MysqlDSL extends DSL {
             case String str -> ColumnReferenceUtil.createWithTableReference("", str);
             case Number n -> Literal.of(n);
             case Boolean b -> Literal.of(b);
-            case null, default -> /* Fallback: treat as string literal */ Literal.of(String.valueOf(value));
+            default -> /* Fallback: treat as string literal */ Literal.of(String.valueOf(value));
         };
     }
 }
