@@ -553,8 +553,8 @@ public final class TestDatabaseUtil {
                         `active` BOOLEAN,
                         `birthdate` DATE,
                         `createdAt` TIMESTAMP NULL,
-                        `address` TEXT,
-                        `preferences` TEXT
+                        `address` JSON,
+                        `preferences` JSON
                     )
                     """);
         }
