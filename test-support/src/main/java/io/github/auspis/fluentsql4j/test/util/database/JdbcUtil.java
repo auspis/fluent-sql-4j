@@ -1,10 +1,10 @@
 package io.github.auspis.fluentsql4j.test.util.database;
 
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.CartItemRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.CustomerRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.OrderRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.ProductRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.UserRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.CartItemRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.CustomerRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.OrderRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.ProductRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

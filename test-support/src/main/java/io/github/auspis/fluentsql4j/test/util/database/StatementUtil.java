@@ -1,10 +1,10 @@
 package io.github.auspis.fluentsql4j.test.util.database;
 
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.CartItemRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.CustomerRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.OrderRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.ProductRecord;
-import io.github.auspis.fluentsql4j.test.util.database.TestDataUtil.UserRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.CartItemRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.CustomerRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.OrderRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.ProductRecord;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -79,7 +79,7 @@ final class StatementUtil {
 
     static void insertProducts(Connection connection) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement("INSERT INTO products VALUES (?, ?, ?, ?, ?)")) {
-            for (ProductRecord product : TestDataUtil.SAMPLE_PRODUCTS) {
+            for (ProductRecord product : DataUtil.SAMPLE_PRODUCTS) {
                 JdbcUtil.bind(ps, product);
             }
         }
@@ -87,7 +87,7 @@ final class StatementUtil {
 
     static void insertOrders(Connection connection) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement("INSERT INTO orders VALUES (?, ?, ?)")) {
-            for (OrderRecord order : TestDataUtil.SAMPLE_ORDERS) {
+            for (OrderRecord order : DataUtil.SAMPLE_ORDERS) {
                 JdbcUtil.bind(ps, order);
             }
         }
@@ -96,7 +96,7 @@ final class StatementUtil {
     static void insertCartItems(Connection connection) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO cart_items (cart_id, product_id, product_name, unit_price, quantity) VALUES (?, ?, ?, ?, ?)")) {
-            for (CartItemRecord item : TestDataUtil.SAMPLE_CART_ITEMS) {
+            for (CartItemRecord item : DataUtil.SAMPLE_CART_ITEMS) {
                 JdbcUtil.bind(ps, item);
             }
         }
@@ -104,7 +104,7 @@ final class StatementUtil {
 
     static void insertCustomers(Connection connection, String sql) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            for (CustomerRecord customer : TestDataUtil.SAMPLE_CUSTOMERS) {
+            for (CustomerRecord customer : DataUtil.SAMPLE_CUSTOMERS) {
                 JdbcUtil.bind(ps, customer);
             }
         }

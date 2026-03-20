@@ -2,7 +2,9 @@ package io.github.auspis.fluentsql4j.test.util.database;
 
 import java.util.List;
 
-final class TestDataUtil {
+final class DataUtil {
+
+    private static final String WIDGET = "Widget";
 
     protected static final String BIRTHDATE_1990 = "1990-01-01";
     protected static final String BIRTHDATE_1995 = "1995-01-01";
@@ -75,7 +77,7 @@ final class TestDataUtil {
             new UserRecord(11, "New User", "newuser@example.com", 28, true, "2000-01-01", "2023-01-08", null, null));
 
     protected static final List<ProductRecord> SAMPLE_PRODUCTS = List.of(
-            new ProductRecord(1, "Widget", 19.99, 100, null),
+            new ProductRecord(1, WIDGET, 19.99, 100, null),
             new ProductRecord(2, "Gadget", 29.99, 50, null),
             new ProductRecord(
                     3,
@@ -103,14 +105,14 @@ final class TestDataUtil {
             new OrderRecord(4, 5, 49.99));
 
     protected static final List<CartItemRecord> SAMPLE_CART_ITEMS = List.of(
-            new CartItemRecord(1L, 101L, "Widget", 19.99, 2),
+            new CartItemRecord(1L, 101L, WIDGET, 19.99, 2),
             new CartItemRecord(1L, 102L, "Gadget", 29.99, 1),
-            new CartItemRecord(2L, 101L, "Widget", 19.99, 3));
+            new CartItemRecord(2L, 101L, WIDGET, 19.99, 3));
 
     protected static final List<CustomerRecord> SAMPLE_CUSTOMERS = List.of(
             new CustomerRecord(1, "Alice", "USA"),
             new CustomerRecord(2, "Bob", "UK"),
             new CustomerRecord(3, "Charlie", "USA"));
 
-    private TestDataUtil() {}
+    private DataUtil() {}
 }

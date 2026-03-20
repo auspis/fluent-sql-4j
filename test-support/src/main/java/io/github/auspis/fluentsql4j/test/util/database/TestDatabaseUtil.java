@@ -92,7 +92,7 @@ public final class TestDatabaseUtil {
             StatementUtil.insertUsers(
                     connection,
                     "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), CAST(? AS JSON))",
-                    TestDataUtil.SAMPLE_USERS);
+                    DataUtil.SAMPLE_USERS);
         }
 
         // products
@@ -175,7 +175,7 @@ public final class TestDatabaseUtil {
             StatementUtil.insertUsers(
                     connection,
                     "INSERT INTO users_updates VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), CAST(? AS JSON))",
-                    TestDataUtil.SAMPLE_USERS_UPDATES);
+                    DataUtil.SAMPLE_USERS_UPDATES);
         }
 
         // cart_items
@@ -262,7 +262,7 @@ public final class TestDatabaseUtil {
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
             StatementUtil.insertUsers(
-                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", TestDataUtil.SAMPLE_USERS);
+                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", DataUtil.SAMPLE_USERS);
         }
 
         // products
@@ -345,7 +345,7 @@ public final class TestDatabaseUtil {
             StatementUtil.insertUsers(
                     connection,
                     "INSERT INTO users_updates VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    TestDataUtil.SAMPLE_USERS_UPDATES);
+                    DataUtil.SAMPLE_USERS_UPDATES);
         }
 
         // cart_items
@@ -408,7 +408,7 @@ public final class TestDatabaseUtil {
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
             StatementUtil.insertUsers(
-                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", TestDataUtil.SAMPLE_USERS);
+                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", DataUtil.SAMPLE_USERS);
         }
 
         // products
@@ -491,7 +491,7 @@ public final class TestDatabaseUtil {
             StatementUtil.insertUsers(
                     connection,
                     "INSERT INTO users_updates VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    TestDataUtil.SAMPLE_USERS_UPDATES);
+                    DataUtil.SAMPLE_USERS_UPDATES);
         }
 
         // cart_items
