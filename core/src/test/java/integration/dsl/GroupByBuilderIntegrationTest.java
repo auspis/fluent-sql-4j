@@ -29,24 +29,13 @@ class GroupByBuilderIntegrationTest {
     void setUp() throws SQLException {
         connection = TestDatabaseUtil.H2.createConnection();
         dsl = StandardSqlUtil.dsl();
-
-        // Create test tables
-        try (var stmt = connection.createStatement()) {
-            // TODO: reuse TestDatabaseUtil to create tables and insert data
-            stmt.execute("CREATE TABLE customers (id INT PRIMARY KEY, name VARCHAR(100), country VARCHAR(50))");
-
-            // Insert test data
-            stmt.execute("INSERT INTO customers VALUES (1, 'Alice', 'USA')");
-            stmt.execute("INSERT INTO customers VALUES (2, 'Bob', 'UK')");
-            stmt.execute("INSERT INTO customers VALUES (3, 'Charlie', 'USA')");
-        }
+        TestDatabaseUtil.H2.createCustomersTable(connection);
+        TestDatabaseUtil.H2.insertSampleCustomers(connection);
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        TestDatabaseUtil.H2.closeConnection(connection);
     }
 
     @Test

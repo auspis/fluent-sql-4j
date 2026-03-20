@@ -27,7 +27,7 @@ public class MySqlWhenNotMatchedInsertPsStrategy implements WhenNotMatchedInsert
         // MySQL: Build column list
         if (!item.columns().isEmpty()) {
             List<String> columns = new ArrayList<>();
-            for (var col : item.columns()) {
+            for (ColumnReference col : item.columns()) {
                 columns.add(visitor.getEscapeStrategy().apply(col.column()));
             }
             sql.append("(").append(String.join(", ", columns)).append(")");
@@ -48,7 +48,7 @@ public class MySqlWhenNotMatchedInsertPsStrategy implements WhenNotMatchedInsert
 
         if (item.insertData() instanceof InsertData.InsertValues(List<Expression> valueExpressions)) {
             // Render value expressions directly (can be column references or literals)
-            for (var expr : valueExpressions) {
+            for (Expression expr : valueExpressions) {
                 PreparedStatementSpec exprDto = expr.accept(visitor, selectCtx);
                 selectExprs.add(exprDto.sql());
                 params.addAll(exprDto.parameters());
@@ -56,7 +56,7 @@ public class MySqlWhenNotMatchedInsertPsStrategy implements WhenNotMatchedInsert
         } else {
             // Fallback: build column references from source
             String sourceAlias = "src"; // Default fallback
-            for (var col : item.columns()) {
+            for (ColumnReference col : item.columns()) {
                 ColumnReference sourceCol =
                         ColumnReferenceUtil.createValidatedWithTrustedTable(sourceAlias, col.column());
                 PreparedStatementSpec colDto = sourceCol.accept(visitor, selectCtx);

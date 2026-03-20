@@ -42,6 +42,8 @@ public final class TestDatabaseUtil {
 
     private record CartItemRecord(long cartId, long productId, String productName, double unitPrice, int quantity) {}
 
+    private record CustomerRecord(int id, String name, String country) {}
+
     // Shared date constants
 
     private static final String BIRTHDATE_1990 = "1990-01-01";
@@ -128,6 +130,11 @@ public final class TestDatabaseUtil {
             new CartItemRecord(1L, 102L, "Gadget", 29.99, 1),
             new CartItemRecord(2L, 101L, "Widget", 19.99, 3));
 
+    private static final List<CustomerRecord> SAMPLE_CUSTOMERS = List.of(
+            new CustomerRecord(1, "Alice", "USA"),
+            new CustomerRecord(2, "Bob", "UK"),
+            new CustomerRecord(3, "Charlie", "USA"));
+
     private TestDatabaseUtil() {}
 
     // Shared binding helpers
@@ -205,6 +212,21 @@ public final class TestDatabaseUtil {
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             for (CartItemRecord item : SAMPLE_CART_ITEMS) {
                 bindCartItem(pstmt, item);
+            }
+        }
+    }
+
+    private static void bindCustomer(PreparedStatement pstmt, CustomerRecord customer) throws SQLException {
+        pstmt.setInt(1, customer.id());
+        pstmt.setString(2, customer.name());
+        pstmt.setString(3, customer.country());
+        pstmt.executeUpdate();
+    }
+
+    private static void insertCustomers(Connection connection, String sql) throws SQLException {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            for (CustomerRecord customer : SAMPLE_CUSTOMERS) {
+                bindCustomer(pstmt, customer);
             }
         }
     }
@@ -406,13 +428,35 @@ public final class TestDatabaseUtil {
                     connection,
                     "INSERT INTO cart_items (cart_id, product_id, product_name, unit_price, quantity) VALUES (?, ?, ?, ?, ?)");
         }
+
+        // customers
+
+        public static void createCustomersTable(Connection connection) throws SQLException {
+            executeSql(connection, """
+                    CREATE TABLE customers (
+                        "id" INTEGER PRIMARY KEY,
+                        "name" VARCHAR(100) NOT NULL,
+                        "country" VARCHAR(50) NOT NULL
+                    )
+                    """);
+        }
+
+        public static void dropCustomersTable(Connection connection) throws SQLException {
+            executeSql(connection, "DROP TABLE IF EXISTS customers");
+        }
+
+        public static void truncateCustomers(Connection connection) throws SQLException {
+            executeSql(connection, "TRUNCATE TABLE customers");
+        }
+
+        public static void insertSampleCustomers(Connection connection) throws SQLException {
+            insertCustomers(connection, "INSERT INTO customers VALUES (?, ?, ?)");
+        }
     }
 
     // =====================================================================
     // MySQL
     // =====================================================================
-
-    /** MySQL dialect-specific test database operations. */
     public static final class MySQL {
 
         private MySQL() {}
