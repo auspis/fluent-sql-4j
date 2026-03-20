@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.test.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,14 +17,14 @@ class QueryUtilTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
+        connection = TestDatabaseUtil.H2.createConnection();
+        TestDatabaseUtil.H2.createUsersTable(connection);
+        TestDatabaseUtil.H2.insertSampleUsers(connection);
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        TestDatabaseUtil.closeConnection(connection);
+        TestDatabaseUtil.H2.closeConnection(connection);
     }
 
     @Test

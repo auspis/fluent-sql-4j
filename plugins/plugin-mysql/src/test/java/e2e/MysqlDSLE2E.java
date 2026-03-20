@@ -11,8 +11,8 @@ import io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil.RowMapper;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
-import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
 import io.github.auspis.fluentsql4j.test.util.annotation.E2ETest;
+import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -58,10 +58,10 @@ class MysqlDSLE2E {
 
         connection = DriverManager.getConnection(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
 
-        TestDatabaseUtil.dropUsersTable(connection);
-        TestDatabaseUtil.createUsersTableWithBackTicks(connection);
-        TestDatabaseUtil.dropOrdersTable(connection);
-        TestDatabaseUtil.createOrderTableWithBackTicks(connection);
+        TestDatabaseUtil.MySQL.dropUsersTable(connection);
+        TestDatabaseUtil.MySQL.createUsersTable(connection);
+        TestDatabaseUtil.MySQL.dropOrdersTable(connection);
+        TestDatabaseUtil.MySQL.createOrdersTable(connection);
 
         nameMapper = r -> r.getString("name");
     }
@@ -74,10 +74,10 @@ class MysqlDSLE2E {
     @BeforeEach
     void setUp() throws SQLException {
         dsl = registry.dslFor(MysqlDialectPlugin.DIALECT_NAME, MysqlDSL.class).orElseThrow();
-        TestDatabaseUtil.truncateUsers(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
-        TestDatabaseUtil.truncateOrders(connection);
-        TestDatabaseUtil.insertSampleOrders(connection);
+        TestDatabaseUtil.MySQL.truncateUsers(connection);
+        TestDatabaseUtil.MySQL.insertSampleUsers(connection);
+        TestDatabaseUtil.MySQL.truncateOrders(connection);
+        TestDatabaseUtil.MySQL.insertSampleOrders(connection);
     }
 
     @Test
@@ -143,7 +143,8 @@ class MysqlDSLE2E {
 
     @Test
     void mergeStatementWithRealDatabase() throws SQLException {
-        TestDatabaseUtil.createUsersUpdatesTableWithRecords(connection);
+        TestDatabaseUtil.MySQL.createUsersUpdatesTable(connection);
+        TestDatabaseUtil.MySQL.insertSampleUsersUpdates(connection);
         // Build and execute MERGE statement using DSL
         try (var ps = dsl.mergeInto("users")
                 .as("tgt")
