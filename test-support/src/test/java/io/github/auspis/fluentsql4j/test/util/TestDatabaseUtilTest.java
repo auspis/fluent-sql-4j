@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class TestDatabaseUtilTest {
 
     @Test
     void h2_createJsonConnectionReturnsValidConnection() throws SQLException {
-        Connection connection = TestDatabaseUtil.H2.createJsonConnection();
+        Connection connection = TestDatabaseUtil.H2.createMySQLConnection();
 
         assertThat(connection).isNotNull();
         assertThat(connection.isClosed()).isFalse();

@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.test.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.auspis.fluentsql4j.test.util.annotation.E2ETest;
+import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

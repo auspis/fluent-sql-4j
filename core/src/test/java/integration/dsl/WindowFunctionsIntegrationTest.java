@@ -11,8 +11,8 @@ import io.github.auspis.fluentsql4j.ast.dql.projection.ScalarExpressionProjectio
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.select.SelectBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
 import io.github.auspis.fluentsql4j.test.util.annotation.IntegrationTest;
+import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
