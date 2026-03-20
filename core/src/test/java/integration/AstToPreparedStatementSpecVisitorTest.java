@@ -12,8 +12,8 @@ import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.AstContext;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
-import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
 import io.github.auspis.fluentsql4j.test.util.annotation.IntegrationTest;
+import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.junit.jupiter.api.AfterEach;
@@ -31,11 +31,11 @@ class AstToPreparedStatementSpecVisitorTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
+        connection = TestDatabaseUtil.H2.createConnection();
         specFactory = new AstToPreparedStatementSpecVisitor();
 
-        TestDatabaseUtil.createUsersTable(connection);
-        TestDatabaseUtil.insertSampleUsers(connection);
+        TestDatabaseUtil.H2.createUsersTable(connection);
+        TestDatabaseUtil.H2.insertSampleUsers(connection);
     }
 
     @AfterEach

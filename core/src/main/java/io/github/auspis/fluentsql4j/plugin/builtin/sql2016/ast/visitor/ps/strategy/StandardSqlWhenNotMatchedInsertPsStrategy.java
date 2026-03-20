@@ -41,7 +41,7 @@ public class StandardSqlWhenNotMatchedInsertPsStrategy implements WhenNotMatched
         // since they can be column references from the source table
         if (item.insertData() instanceof InsertValues(List<Expression> valueExpressions)) {
             List<String> valueClauses = new ArrayList<>();
-            for (var expr : valueExpressions) {
+            for (Expression expr : valueExpressions) {
                 PreparedStatementSpec exprDto = expr.accept(visitor, ctx);
                 valueClauses.add(exprDto.sql());
                 allParameters.addAll(exprDto.parameters());

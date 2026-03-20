@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.dsl.select.GroupByBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
-import io.github.auspis.fluentsql4j.test.util.TestDatabaseUtil;
 import io.github.auspis.fluentsql4j.test.util.annotation.IntegrationTest;
+import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,25 +28,15 @@ class GroupByBuilderIntegrationTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        connection = TestDatabaseUtil.createH2Connection();
+        connection = TestDatabaseUtil.H2.createConnection();
         dsl = StandardSqlUtil.dsl();
-
-        // Create test tables
-        try (var stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE customers (id INT PRIMARY KEY, name VARCHAR(100), country VARCHAR(50))");
-
-            // Insert test data
-            stmt.execute("INSERT INTO customers VALUES (1, 'Alice', 'USA')");
-            stmt.execute("INSERT INTO customers VALUES (2, 'Bob', 'UK')");
-            stmt.execute("INSERT INTO customers VALUES (3, 'Charlie', 'USA')");
-        }
+        TestDatabaseUtil.H2.createCustomersTable(connection);
+        TestDatabaseUtil.H2.insertSampleCustomers(connection);
     }
 
     @AfterEach
     void tearDown() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        TestDatabaseUtil.H2.closeConnection(connection);
     }
 
     @Test
@@ -118,27 +109,18 @@ class GroupByBuilderIntegrationTest {
 
     @Test
     void rejectsDotNotationInColumn() {
-        assertThatThrownBy(() -> dsl.select()
-                        .column("country")
-                        .from("customers")
-                        .groupBy()
-                        .column("customers.country")
-                        .fetch(1)
-                        .build(connection))
+        GroupByBuilder groupByBuilder =
+                dsl.select().column("country").from("customers").groupBy();
+        assertThatThrownBy(() -> groupByBuilder.column("customers.country"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Column name must not contain dot notation: 'customers.country'");
     }
 
     @Test
     void rejectsDotNotationInAlias() {
-        assertThatThrownBy(() -> dsl.select()
-                        .column("country")
-                        .from("customers")
-                        .as("c")
-                        .groupBy()
-                        .column("c.invalid", "country")
-                        .fetch(1)
-                        .build(connection))
+        GroupByBuilder groupByBuilder =
+                dsl.select().column("country").from("customers").as("c").groupBy();
+        assertThatThrownBy(() -> groupByBuilder.column("c.invalid", "country"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Table reference must not contain dot: 'c.invalid'");
     }
