@@ -140,7 +140,7 @@ public final class TestDatabaseUtil {
     // Shared binding helpers
 
     private static void bindUser(PreparedStatement pstmt, UserRecord user) throws SQLException {
-        pstmt.setInt(1, user.id());
+        pstmt.setLong(1, user.id());
         pstmt.setString(2, user.name());
         pstmt.setString(3, user.email());
         pstmt.setInt(4, user.age());
@@ -154,7 +154,7 @@ public final class TestDatabaseUtil {
     }
 
     private static void bindProduct(PreparedStatement pstmt, ProductRecord product) throws SQLException {
-        pstmt.setInt(1, product.id());
+        pstmt.setLong(1, product.id());
         pstmt.setString(2, product.name());
         pstmt.setDouble(3, product.price());
         pstmt.setInt(4, product.quantity());
@@ -163,8 +163,8 @@ public final class TestDatabaseUtil {
     }
 
     private static void bindOrder(PreparedStatement pstmt, OrderRecord order) throws SQLException {
-        pstmt.setInt(1, order.id());
-        pstmt.setInt(2, order.userId());
+        pstmt.setLong(1, order.id());
+        pstmt.setLong(2, order.userId());
         pstmt.setDouble(3, order.total());
         pstmt.executeUpdate();
     }
