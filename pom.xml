@@ -275,6 +275,40 @@
           <artifactId>spotless-maven-plugin</artifactId>
           <version>${maven.spotless.plugin.version}</version>
           <configuration>
+            <lintSuppressions>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/functional/Result.java</path>
+                <step>palantir-java-format</step>
+              </lintSuppression>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/functional/Result.java</path>
+                <step>removeUnusedImports</step>
+              </lintSuppression>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/plugin/builtin/sql2016/ast/visitor/ps/strategy/StandardSqlWhenNotMatchedInsertPsStrategy.java</path>
+                <step>palantir-java-format</step>
+              </lintSuppression>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/plugin/builtin/sql2016/ast/visitor/ps/strategy/StandardSqlWhenNotMatchedInsertPsStrategy.java</path>
+                <step>removeUnusedImports</step>
+              </lintSuppression>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/plugin/builtin/mysql/dsl/MysqlDSL.java</path>
+                <step>palantir-java-format</step>
+              </lintSuppression>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/plugin/builtin/mysql/dsl/MysqlDSL.java</path>
+                <step>removeUnusedImports</step>
+              </lintSuppression>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/plugin/builtin/mysql/ast/visitor/ps/strategy/MySqlWhenNotMatchedInsertPsStrategy.java</path>
+                <step>palantir-java-format</step>
+              </lintSuppression>
+              <lintSuppression>
+                <path>src/main/java/io/github/auspis/fluentsql4j/plugin/builtin/mysql/ast/visitor/ps/strategy/MySqlWhenNotMatchedInsertPsStrategy.java</path>
+                <step>removeUnusedImports</step>
+              </lintSuppression>
+            </lintSuppressions>
             <java>
               <palantirJavaFormat/>
               <encoding>${project.build.sourceEncoding}</encoding>
