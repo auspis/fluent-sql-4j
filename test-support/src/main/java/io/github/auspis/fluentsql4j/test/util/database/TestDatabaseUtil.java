@@ -423,8 +423,7 @@ public final class TestDatabaseUtil {
         }
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
-            List<UserRecord> records = DataUtil.SAMPLE_USERS;
-            insertUsers(connection, records);
+            insertUsers(connection, DataUtil.SAMPLE_USERS);
         }
 
         public static void insertUser(Connection connection, UserRecord user) throws SQLException {
