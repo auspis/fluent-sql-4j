@@ -2,7 +2,7 @@ package io.github.auspis.fluentsql4j.test.util.database;
 
 import java.util.List;
 
-final class DataUtil {
+public final class DataUtil {
 
     private static final String WIDGET = "Widget";
 
@@ -10,7 +10,7 @@ final class DataUtil {
     protected static final String BIRTHDATE_1995 = "1995-01-01";
     protected static final String CREATED_AT_2023 = "2023-01-01";
 
-    protected record UserRecord(
+    public record UserRecord(
             long id,
             String name,
             String email,
@@ -21,13 +21,13 @@ final class DataUtil {
             String address,
             String preferences) {}
 
-    protected record ProductRecord(int id, String name, double price, int quantity, String metadata) {}
+    public record ProductRecord(int id, String name, double price, int quantity, String metadata) {}
 
-    protected record OrderRecord(int id, int userId, double total) {}
+    public record OrderRecord(int id, int userId, double total) {}
 
-    protected record CartItemRecord(long cartId, long productId, String productName, double unitPrice, int quantity) {}
+    public record CartItemRecord(long cartId, long productId, String productName, double unitPrice, int quantity) {}
 
-    protected record CustomerRecord(int id, String name, String country) {}
+    public record CustomerRecord(int id, String name, String country) {}
 
     // Shared data lists
 

@@ -5,8 +5,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +20,6 @@ import java.util.UUID;
  * Adding a record to a shared list makes it available for all dialects automatically.
  */
 public final class TestDatabaseUtil {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-
     private TestDatabaseUtil() {}
 
     public static final class H2 {
@@ -97,30 +93,8 @@ public final class TestDatabaseUtil {
             insertUsers(connection, DataUtil.SAMPLE_USERS);
         }
 
-        public static void insertUser(
-                Connection connection,
-                long id,
-                String name,
-                String email,
-                int age,
-                boolean active,
-                LocalDate birthdate,
-                LocalDate createdAt,
-                String address,
-                String preferences)
-                throws SQLException {
-            insertUsers(
-                    connection,
-                    List.of(new UserRecord(
-                            id,
-                            name,
-                            email,
-                            age,
-                            active,
-                            birthdate.format(DATE_FORMATTER),
-                            createdAt.format(DATE_FORMATTER),
-                            address,
-                            preferences)));
+        public static void insertUser(Connection connection, UserRecord user) throws SQLException {
+            insertUsers(connection, List.of(user));
         }
 
         private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
@@ -299,30 +273,8 @@ public final class TestDatabaseUtil {
             insertUsers(connection, DataUtil.SAMPLE_USERS);
         }
 
-        public static void insertUser(
-                Connection connection,
-                long id,
-                String name,
-                String email,
-                int age,
-                boolean active,
-                LocalDate birthdate,
-                LocalDate createdAt,
-                String address,
-                String preferences)
-                throws SQLException {
-            insertUsers(
-                    connection,
-                    List.of(new UserRecord(
-                            id,
-                            name,
-                            email,
-                            age,
-                            active,
-                            birthdate.format(DATE_FORMATTER),
-                            createdAt.format(DATE_FORMATTER),
-                            address,
-                            preferences)));
+        public static void insertUser(Connection connection, UserRecord user) throws SQLException {
+            insertUsers(connection, List.of(user));
         }
 
         private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
@@ -475,30 +427,8 @@ public final class TestDatabaseUtil {
             insertUsers(connection, records);
         }
 
-        public static void insertUser(
-                Connection connection,
-                long id,
-                String name,
-                String email,
-                int age,
-                boolean active,
-                LocalDate birthdate,
-                LocalDate createdAt,
-                String address,
-                String preferences)
-                throws SQLException {
-            insertUsers(
-                    connection,
-                    List.of(new UserRecord(
-                            id,
-                            name,
-                            email,
-                            age,
-                            active,
-                            birthdate.format(DATE_FORMATTER),
-                            createdAt.format(DATE_FORMATTER),
-                            address,
-                            preferences)));
+        public static void insertUser(Connection connection, UserRecord user) throws SQLException {
+            insertUsers(connection, List.of(user));
         }
 
         private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {

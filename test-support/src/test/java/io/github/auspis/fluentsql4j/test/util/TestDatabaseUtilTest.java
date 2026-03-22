@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class TestDatabaseUtilTest {
@@ -132,20 +134,21 @@ class TestDatabaseUtilTest {
 
         TestDatabaseUtil.H2.insertUser(
                 connection,
-                99L,
-                "Single User",
-                "single.user@example.com",
-                42,
-                true,
-                LocalDate.of(1982, 3, 14),
-                LocalDate.of(2024, 1, 2),
-                "{\"street\":\"Test Street\"}",
-                "{\"theme\":\"dark\"}");
+                new UserRecord(
+                        99L,
+                        "Single User",
+                        "single.user@example.com",
+                        42,
+                        true,
+                        "1982-03-14",
+                        "2024-01-02",
+                        "{\"street\":\"Test Street\"}",
+                        "{\"theme\":\"dark\"}"));
 
-        try (java.sql.PreparedStatement pstmt =
+        try (PreparedStatement ps =
                 connection.prepareStatement("SELECT id, name, email, age, active FROM users WHERE id = ?")) {
-            pstmt.setLong(1, 99L);
-            try (java.sql.ResultSet rs = pstmt.executeQuery()) {
+            ps.setLong(1, 99L);
+            try (ResultSet rs = ps.executeQuery()) {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getLong("id")).isEqualTo(99L);
                 assertThat(rs.getString("name")).isEqualTo("Single User");

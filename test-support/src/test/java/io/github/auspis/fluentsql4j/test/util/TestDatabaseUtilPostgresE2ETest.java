@@ -3,12 +3,12 @@ package io.github.auspis.fluentsql4j.test.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.auspis.fluentsql4j.test.util.annotation.E2ETest;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,15 +65,16 @@ class TestDatabaseUtilPostgresE2ETest {
 
         TestDatabaseUtil.PostgreSQL.insertUser(
                 connection,
-                99L,
-                "Single User",
-                "single.user@example.com",
-                42,
-                true,
-                LocalDate.of(1982, 3, 14),
-                LocalDate.of(2024, 1, 2),
-                "{\"street\":\"Test Street\"}",
-                "{\"theme\":\"dark\"}");
+                new UserRecord(
+                        99L,
+                        "Single User",
+                        "single.user@example.com",
+                        42,
+                        true,
+                        "1982-03-14",
+                        "2024-01-02",
+                        "{\"street\":\"Test Street\"}",
+                        "{\"theme\":\"dark\"}"));
 
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT id, name, email, age, active FROM users WHERE id = 99")) {
