@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.test.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.auspis.fluentsql4j.test.util.annotation.E2ETest;
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -53,6 +54,36 @@ class TestDatabaseUtilMySqlE2ETest {
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt(1)).isZero();
+        }
+
+        TestDatabaseUtil.MySQL.dropUsersTable(connection);
+    }
+
+    @Test
+    void mysql_insertUserInsertsSingleRecord() throws SQLException {
+        TestDatabaseUtil.MySQL.createUsersTable(connection);
+
+        TestDatabaseUtil.MySQL.insertUser(
+                connection,
+                new UserRecord(
+                        99L,
+                        "Single User",
+                        "single.user@example.com",
+                        42,
+                        true,
+                        "1982-03-14",
+                        "2024-01-02",
+                        "{\"street\":\"Test Street\"}",
+                        "{\"theme\":\"dark\"}"));
+
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, name, email, age, active FROM users WHERE id = 99")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getLong("id")).isEqualTo(99L);
+            assertThat(rs.getString("name")).isEqualTo("Single User");
+            assertThat(rs.getString("email")).isEqualTo("single.user@example.com");
+            assertThat(rs.getInt("age")).isEqualTo(42);
+            assertThat(rs.getBoolean("active")).isTrue();
         }
 
         TestDatabaseUtil.MySQL.dropUsersTable(connection);
