@@ -1,9 +1,11 @@
 package io.github.auspis.fluentsql4j.test.util.database;
 
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -18,7 +20,6 @@ import java.util.UUID;
  * Adding a record to a shared list makes it available for all dialects automatically.
  */
 public final class TestDatabaseUtil {
-
     private TestDatabaseUtil() {}
 
     public static final class H2 {
@@ -89,10 +90,18 @@ public final class TestDatabaseUtil {
         }
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
+            insertUsers(connection, DataUtil.SAMPLE_USERS);
+        }
+
+        public static void insertUser(Connection connection, UserRecord user) throws SQLException {
+            insertUsers(connection, List.of(user));
+        }
+
+        private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
             StatementUtil.insertUsers(
                     connection,
                     "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), CAST(? AS JSON))",
-                    DataUtil.SAMPLE_USERS);
+                    records);
         }
 
         // products
@@ -261,8 +270,15 @@ public final class TestDatabaseUtil {
         }
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
-            StatementUtil.insertUsers(
-                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", DataUtil.SAMPLE_USERS);
+            insertUsers(connection, DataUtil.SAMPLE_USERS);
+        }
+
+        public static void insertUser(Connection connection, UserRecord user) throws SQLException {
+            insertUsers(connection, List.of(user));
+        }
+
+        private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
+            StatementUtil.insertUsers(connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", records);
         }
 
         // products
@@ -407,8 +423,15 @@ public final class TestDatabaseUtil {
         }
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
-            StatementUtil.insertUsers(
-                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", DataUtil.SAMPLE_USERS);
+            insertUsers(connection, DataUtil.SAMPLE_USERS);
+        }
+
+        public static void insertUser(Connection connection, UserRecord user) throws SQLException {
+            insertUsers(connection, List.of(user));
+        }
+
+        private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
+            StatementUtil.insertUsers(connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", records);
         }
 
         // products
