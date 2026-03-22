@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 
@@ -118,6 +121,40 @@ class TestDatabaseUtilTest {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getString("name")).isEqualTo("Frank");
                 assertThat(rs.getString("address")).contains("Via Roma 123");
+            }
+        }
+
+        TestDatabaseUtil.H2.closeConnection(connection);
+    }
+
+    @Test
+    void h2_insertUserInsertsSingleRecord() throws SQLException {
+        Connection connection = TestDatabaseUtil.H2.createConnection();
+        TestDatabaseUtil.H2.createUsersTable(connection);
+
+        TestDatabaseUtil.H2.insertUser(
+                connection,
+                new UserRecord(
+                        99L,
+                        "Single User",
+                        "single.user@example.com",
+                        42,
+                        true,
+                        "1982-03-14",
+                        "2024-01-02",
+                        "{\"street\":\"Test Street\"}",
+                        "{\"theme\":\"dark\"}"));
+
+        try (PreparedStatement ps =
+                connection.prepareStatement("SELECT id, name, email, age, active FROM users WHERE id = ?")) {
+            ps.setLong(1, 99L);
+            try (ResultSet rs = ps.executeQuery()) {
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getLong("id")).isEqualTo(99L);
+                assertThat(rs.getString("name")).isEqualTo("Single User");
+                assertThat(rs.getString("email")).isEqualTo("single.user@example.com");
+                assertThat(rs.getInt("age")).isEqualTo(42);
+                assertThat(rs.getBoolean("active")).isTrue();
             }
         }
 
