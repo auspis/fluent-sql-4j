@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class TestDatabaseUtilTest {
@@ -118,6 +119,39 @@ class TestDatabaseUtilTest {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getString("name")).isEqualTo("Frank");
                 assertThat(rs.getString("address")).contains("Via Roma 123");
+            }
+        }
+
+        TestDatabaseUtil.H2.closeConnection(connection);
+    }
+
+    @Test
+    void h2_insertUserInsertsSingleRecord() throws SQLException {
+        Connection connection = TestDatabaseUtil.H2.createConnection();
+        TestDatabaseUtil.H2.createUsersTable(connection);
+
+        TestDatabaseUtil.H2.insertUser(
+                connection,
+                99L,
+                "Single User",
+                "single.user@example.com",
+                42,
+                true,
+                LocalDate.of(1982, 3, 14),
+                LocalDate.of(2024, 1, 2),
+                "{\"street\":\"Test Street\"}",
+                "{\"theme\":\"dark\"}");
+
+        try (java.sql.PreparedStatement pstmt =
+                connection.prepareStatement("SELECT id, name, email, age, active FROM users WHERE id = ?")) {
+            pstmt.setLong(1, 99L);
+            try (java.sql.ResultSet rs = pstmt.executeQuery()) {
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getLong("id")).isEqualTo(99L);
+                assertThat(rs.getString("name")).isEqualTo("Single User");
+                assertThat(rs.getString("email")).isEqualTo("single.user@example.com");
+                assertThat(rs.getInt("age")).isEqualTo(42);
+                assertThat(rs.getBoolean("active")).isTrue();
             }
         }
 

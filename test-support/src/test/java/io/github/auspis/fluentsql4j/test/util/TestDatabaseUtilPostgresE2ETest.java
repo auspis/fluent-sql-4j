@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,35 @@ class TestDatabaseUtilPostgresE2ETest {
                 ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt(1)).isZero();
+        }
+
+        TestDatabaseUtil.PostgreSQL.dropUsersTable(connection);
+    }
+
+    @Test
+    void postgres_insertUserInsertsSingleRecord() throws SQLException {
+        TestDatabaseUtil.PostgreSQL.createUsersTable(connection);
+
+        TestDatabaseUtil.PostgreSQL.insertUser(
+                connection,
+                99L,
+                "Single User",
+                "single.user@example.com",
+                42,
+                true,
+                LocalDate.of(1982, 3, 14),
+                LocalDate.of(2024, 1, 2),
+                "{\"street\":\"Test Street\"}",
+                "{\"theme\":\"dark\"}");
+
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, name, email, age, active FROM users WHERE id = 99")) {
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getLong("id")).isEqualTo(99L);
+            assertThat(rs.getString("name")).isEqualTo("Single User");
+            assertThat(rs.getString("email")).isEqualTo("single.user@example.com");
+            assertThat(rs.getInt("age")).isEqualTo(42);
+            assertThat(rs.getBoolean("active")).isTrue();
         }
 
         TestDatabaseUtil.PostgreSQL.dropUsersTable(connection);

@@ -11,7 +11,7 @@ final class DataUtil {
     protected static final String CREATED_AT_2023 = "2023-01-01";
 
     protected record UserRecord(
-            int id,
+            long id,
             String name,
             String email,
             int age,

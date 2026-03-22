@@ -1,9 +1,13 @@
 package io.github.auspis.fluentsql4j.test.util.database;
 
+import io.github.auspis.fluentsql4j.test.util.database.DataUtil.UserRecord;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -18,6 +22,7 @@ import java.util.UUID;
  * Adding a record to a shared list makes it available for all dialects automatically.
  */
 public final class TestDatabaseUtil {
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
     private TestDatabaseUtil() {}
 
@@ -89,10 +94,40 @@ public final class TestDatabaseUtil {
         }
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
+            insertUsers(connection, DataUtil.SAMPLE_USERS);
+        }
+
+        public static void insertUser(
+                Connection connection,
+                long id,
+                String name,
+                String email,
+                int age,
+                boolean active,
+                LocalDate birthdate,
+                LocalDate createdAt,
+                String address,
+                String preferences)
+                throws SQLException {
+            insertUsers(
+                    connection,
+                    List.of(new UserRecord(
+                            id,
+                            name,
+                            email,
+                            age,
+                            active,
+                            birthdate.format(DATE_FORMATTER),
+                            createdAt.format(DATE_FORMATTER),
+                            address,
+                            preferences)));
+        }
+
+        private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
             StatementUtil.insertUsers(
                     connection,
                     "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, CAST(? AS JSON), CAST(? AS JSON))",
-                    DataUtil.SAMPLE_USERS);
+                    records);
         }
 
         // products
@@ -261,8 +296,37 @@ public final class TestDatabaseUtil {
         }
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
-            StatementUtil.insertUsers(
-                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", DataUtil.SAMPLE_USERS);
+            insertUsers(connection, DataUtil.SAMPLE_USERS);
+        }
+
+        public static void insertUser(
+                Connection connection,
+                long id,
+                String name,
+                String email,
+                int age,
+                boolean active,
+                LocalDate birthdate,
+                LocalDate createdAt,
+                String address,
+                String preferences)
+                throws SQLException {
+            insertUsers(
+                    connection,
+                    List.of(new UserRecord(
+                            id,
+                            name,
+                            email,
+                            age,
+                            active,
+                            birthdate.format(DATE_FORMATTER),
+                            createdAt.format(DATE_FORMATTER),
+                            address,
+                            preferences)));
+        }
+
+        private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
+            StatementUtil.insertUsers(connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", records);
         }
 
         // products
@@ -407,8 +471,38 @@ public final class TestDatabaseUtil {
         }
 
         public static void insertSampleUsers(Connection connection) throws SQLException {
-            StatementUtil.insertUsers(
-                    connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", DataUtil.SAMPLE_USERS);
+            List<UserRecord> records = DataUtil.SAMPLE_USERS;
+            insertUsers(connection, records);
+        }
+
+        public static void insertUser(
+                Connection connection,
+                long id,
+                String name,
+                String email,
+                int age,
+                boolean active,
+                LocalDate birthdate,
+                LocalDate createdAt,
+                String address,
+                String preferences)
+                throws SQLException {
+            insertUsers(
+                    connection,
+                    List.of(new UserRecord(
+                            id,
+                            name,
+                            email,
+                            age,
+                            active,
+                            birthdate.format(DATE_FORMATTER),
+                            createdAt.format(DATE_FORMATTER),
+                            address,
+                            preferences)));
+        }
+
+        private static void insertUsers(Connection connection, List<UserRecord> records) throws SQLException {
+            StatementUtil.insertUsers(connection, "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", records);
         }
 
         // products
