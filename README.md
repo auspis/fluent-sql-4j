@@ -1,4 +1,6 @@
-# Fluent SQL 4J
+<p align="center">
+  <img src="data/wiki/logo.png" alt="Fluent SQL 4J" width="350">
+</p>
 
 A type-safe SQL builder for Java with multi-dialect support through a plugin system. Build SQL statements programmatically using a fluent DSL with compile-time validation.
 
