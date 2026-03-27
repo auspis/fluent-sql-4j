@@ -10,6 +10,7 @@ import io.github.auspis.fluentsql4j.ast.dml.statement.UpdateStatement;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.StatementBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
 import io.github.auspis.fluentsql4j.dsl.clause.SupportsWhere;
 import io.github.auspis.fluentsql4j.dsl.util.LiteralUtil;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class UpdateBuilder implements SupportsWhere<UpdateBuilder> {
+public class UpdateBuilder implements SupportsWhere<UpdateBuilder>, StatementBuilder {
     private UpdateStatement.UpdateStatementBuilder statementBuilder = UpdateStatement.builder();
     private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier table;
