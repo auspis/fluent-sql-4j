@@ -7,6 +7,7 @@ import io.github.auspis.fluentsql4j.ast.dml.statement.DeleteStatement;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.StatementBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
 import io.github.auspis.fluentsql4j.dsl.clause.SupportsWhere;
 import java.sql.Connection;
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
+public class DeleteBuilder implements SupportsWhere<DeleteBuilder>, StatementBuilder {
     private DeleteStatement.DeleteStatementBuilder statementBuilder = DeleteStatement.builder();
     private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier table;
@@ -110,6 +111,7 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder> {
      * @return a PreparedStatement ready for execution
      * @throws SQLException if a database error occurs
      */
+    @Override
     public PreparedStatement build(Connection connection) throws SQLException {
         DeleteStatement statement = getCurrentStatement();
         PreparedStatementSpec result = specFactory.create(statement);
