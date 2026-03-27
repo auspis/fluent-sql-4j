@@ -24,6 +24,7 @@ import io.github.auspis.fluentsql4j.ast.dql.source.join.OnJoin;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.StatementBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.HavingBuilder;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
 import io.github.auspis.fluentsql4j.dsl.clause.SupportsWhere;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class SelectBuilder implements SupportsWhere<SelectBuilder> {
+public class SelectBuilder implements SupportsWhere<SelectBuilder>, StatementBuilder {
     private SelectStatement.SelectStatementBuilder statementBuilder = SelectStatement.builder();
     private final PreparedStatementSpecFactory specFactory;
     private FromSource currentFromSource;

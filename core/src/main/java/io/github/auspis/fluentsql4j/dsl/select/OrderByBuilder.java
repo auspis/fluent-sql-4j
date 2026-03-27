@@ -2,6 +2,7 @@ package io.github.auspis.fluentsql4j.dsl.select;
 
 import io.github.auspis.fluentsql4j.ast.dql.clause.OrderBy;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Sorting;
+import io.github.auspis.fluentsql4j.dsl.StatementBuilder;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,7 +31,7 @@ import java.util.List;
  *     .build(connection);
  * }</pre>
  */
-public class OrderByBuilder {
+public class OrderByBuilder implements StatementBuilder {
     private final SelectBuilder parent;
     private final List<Sorting> sortings;
 
@@ -160,5 +161,18 @@ public class OrderByBuilder {
      */
     public SelectBuilder offset(long offset) {
         return build().offset(offset);
+    }
+
+    /**
+     * Commits the ORDER BY clause and returns the parent {@link SelectBuilder}
+     * for further chaining (e.g. adding FETCH / OFFSET later, or building directly).
+     *
+     * <p>Use this method when you need to continue configuring the SELECT query
+     * after specifying ORDER BY columns, without immediately adding FETCH or OFFSET.
+     *
+     * @return the parent SelectBuilder with ORDER BY applied
+     */
+    public SelectBuilder done() {
+        return build();
     }
 }

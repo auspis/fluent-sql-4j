@@ -10,6 +10,7 @@ import io.github.auspis.fluentsql4j.ast.dml.component.InsertData.InsertValues;
 import io.github.auspis.fluentsql4j.ast.dml.statement.InsertStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.StatementBuilder;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import io.github.auspis.fluentsql4j.dsl.util.LiteralUtil;
 import java.sql.Connection;
@@ -21,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InsertBuilder {
+public class InsertBuilder implements StatementBuilder {
     private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier table;
     private final List<ColumnReference> columns = new ArrayList<>();
