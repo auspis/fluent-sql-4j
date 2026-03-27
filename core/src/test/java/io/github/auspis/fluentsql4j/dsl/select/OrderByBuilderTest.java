@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
 import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.stream.Stream;
@@ -130,7 +131,8 @@ class OrderByBuilderTest {
         OrderByBuilder builder =
                 new SelectBuilder(specFactory, "*").from("orders").orderBy();
 
-        assertThatThrownBy(builder::build)
+        Connection connection = sqlCaptureHelper.getConnection();
+        assertThatThrownBy(() -> builder.build(connection))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("ORDER BY must contain at least one sorting column");
     }
