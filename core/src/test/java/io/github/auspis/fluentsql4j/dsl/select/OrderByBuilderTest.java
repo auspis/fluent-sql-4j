@@ -130,7 +130,7 @@ class OrderByBuilderTest {
         OrderByBuilder builder =
                 new SelectBuilder(specFactory, "*").from("orders").orderBy();
 
-        assertThatThrownBy(() -> builder.build(sqlCaptureHelper.getConnection()))
+        assertThatThrownBy(builder::build)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("ORDER BY must contain at least one sorting column");
     }
