@@ -4,6 +4,7 @@ import io.github.auspis.fluentsql4j.ast.core.identifier.TableIdentifier;
 import io.github.auspis.fluentsql4j.ast.dml.statement.TruncateStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.StatementBuilder;
 import io.github.auspis.fluentsql4j.dsl.util.PsUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 /**
  * Builder for TRUNCATE TABLE statements.
  */
-public class TruncateBuilder {
+public class TruncateBuilder implements StatementBuilder {
 
     private final PreparedStatementSpecFactory specFactory;
     private final TableIdentifier table;

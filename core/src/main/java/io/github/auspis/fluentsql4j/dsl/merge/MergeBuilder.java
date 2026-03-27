@@ -21,6 +21,7 @@ import io.github.auspis.fluentsql4j.ast.dml.statement.MergeStatement;
 import io.github.auspis.fluentsql4j.ast.dql.statement.SelectStatement;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.dsl.StatementBuilder;
 import io.github.auspis.fluentsql4j.dsl.util.ColumnReferenceUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,7 +29,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MergeBuilder {
+public class MergeBuilder implements StatementBuilder {
     private final PreparedStatementSpecFactory specFactory;
     private TableIdentifier targetTable;
     private MergeUsing using;
