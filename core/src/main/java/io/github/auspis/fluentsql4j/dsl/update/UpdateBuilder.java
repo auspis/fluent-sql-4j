@@ -120,6 +120,9 @@ public class UpdateBuilder implements SupportsWhere<UpdateBuilder>, StatementBui
     }
 
     static Where combineConditions(Where currentWhere, Predicate newCondition, LogicalCombinator combinator) {
+        if (newCondition instanceof NullPredicate) {
+            return currentWhere != null ? currentWhere : Where.of(newCondition);
+        }
         return Optional.ofNullable(currentWhere)
                 .filter(UpdateBuilder::hasValidCondition)
                 .map(where -> combineWithExisting(where, newCondition, combinator))

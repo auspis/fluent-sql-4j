@@ -14,6 +14,7 @@ import io.github.auspis.fluentsql4j.ast.core.predicate.Predicate;
 import io.github.auspis.fluentsql4j.ast.dql.clause.Where;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.clause.LogicalCombinator;
+import io.github.auspis.fluentsql4j.dsl.clause.WhereBuilder;
 import io.github.auspis.fluentsql4j.plugin.util.StandardSqlUtil;
 import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.SQLException;
@@ -170,7 +171,8 @@ class DeleteBuilderTest {
 
     @Test
     void invalidColumnName() {
-        assertThatThrownBy(() -> new DeleteBuilder(specFactory, "users").where().column(""))
+        WhereBuilder<DeleteBuilder> whereBuilder = new DeleteBuilder(specFactory, "users").where();
+        assertThatThrownBy(() -> whereBuilder.column(""))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Column name cannot be null or empty");
     }

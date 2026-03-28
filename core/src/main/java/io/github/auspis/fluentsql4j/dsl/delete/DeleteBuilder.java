@@ -71,6 +71,9 @@ public class DeleteBuilder implements SupportsWhere<DeleteBuilder>, StatementBui
     }
 
     static Where combineConditions(Where currentWhere, Predicate newCondition, LogicalCombinator combinator) {
+        if (newCondition instanceof NullPredicate) {
+            return currentWhere != null ? currentWhere : Where.of(newCondition);
+        }
         return Optional.ofNullable(currentWhere)
                 .filter(DeleteBuilder::hasValidCondition)
                 .map(where -> combineWithExisting(where, newCondition, combinator))
