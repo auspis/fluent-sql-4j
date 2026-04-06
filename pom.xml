@@ -395,6 +395,10 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>${maven.exec.plugin.version}</version>
@@ -424,6 +428,7 @@
         <version>${maven.surefire.plugin.version}</version>
         <configuration>
           <excludedGroups>${test.groups.slow}</excludedGroups>
+          <argLine>${argLine} -javaagent:${project.build.directory}/agents/byte-buddy-agent-${dep.byte-buddy.version}.jar</argLine>
         </configuration>
       </plugin>
       <plugin>
@@ -437,6 +442,7 @@
             <include>**/*E2E.java</include>
           </includes>
           <groups>${test.groups.slow}</groups>
+          <argLine>${argLine} -javaagent:${project.build.directory}/agents/byte-buddy-agent-${dep.byte-buddy.version}.jar</argLine>
         </configuration>
         <executions>
           <execution>
