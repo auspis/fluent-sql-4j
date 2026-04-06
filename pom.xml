@@ -55,8 +55,8 @@
     <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.5.5</maven.surefire.plugin.version>
     <maven.failsafe.plugin.version>3.5.5</maven.failsafe.plugin.version>
-    <maven.spotless.plugin.version>3.2.1</maven.spotless.plugin.version>
-    <maven.resource.plugin.version>3.4.0</maven.resource.plugin.version>
+    <maven.spotless.plugin.version>3.4.0</maven.spotless.plugin.version>
+    <maven.resource.plugin.version>3.5.0</maven.resource.plugin.version>
     <maven.exec.plugin.version>3.6.3</maven.exec.plugin.version>
     <maven.versions.plugin.version>2.21.0</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
@@ -73,8 +73,8 @@
     <maven.gpg.plugin.version>3.2.8</maven.gpg.plugin.version>
     <nexus.staging.plugin.version>1.7.0</nexus.staging.plugin.version>
 
-    <dep.lombok.version>1.18.42</dep.lombok.version>
-    <dep.jackson-core.version>2.21.1</dep.jackson-core.version>
+    <dep.lombok.version>1.18.44</dep.lombok.version>
+    <dep.jackson-core.version>2.21.2</dep.jackson-core.version>
     <dep.semver4j.version>6.0.0</dep.semver4j.version>
     <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
@@ -82,11 +82,11 @@
     <dep.mysql-connector-java.version>9.6.0</dep.mysql-connector-java.version>
     <dep.postgresql.version>42.7.10</dep.postgresql.version>
 
-    <dep.testcontainer-core.version>2.0.3</dep.testcontainer-core.version>
+    <dep.testcontainer-core.version>2.0.4</dep.testcontainer-core.version>
     <dep.testcontainer.version>1.21.4</dep.testcontainer.version>
     <dep.junit-jupiter.version>6.0.1</dep.junit-jupiter.version>
     <dep.assertj-core.version>3.27.7</dep.assertj-core.version>
-    <dep.mockito-core.version>5.22.0</dep.mockito-core.version>
+    <dep.mockito-core.version>5.23.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.18.5</dep.byte-buddy.version>
 
     <!-- Run both integration and e2e by default during verify phase -->
@@ -395,6 +395,10 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>${maven.exec.plugin.version}</version>
@@ -424,6 +428,7 @@
         <version>${maven.surefire.plugin.version}</version>
         <configuration>
           <excludedGroups>${test.groups.slow}</excludedGroups>
+          <argLine>${argLine} -javaagent:${project.build.directory}/agents/byte-buddy-agent-${dep.byte-buddy.version}.jar</argLine>
         </configuration>
       </plugin>
       <plugin>
@@ -437,6 +442,7 @@
             <include>**/*E2E.java</include>
           </includes>
           <groups>${test.groups.slow}</groups>
+          <argLine>${argLine} -javaagent:${project.build.directory}/agents/byte-buddy-agent-${dep.byte-buddy.version}.jar</argLine>
         </configuration>
         <executions>
           <execution>
