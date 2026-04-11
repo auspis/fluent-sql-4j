@@ -2,6 +2,7 @@ package io.github.auspis.fluentsql4j.dsl;
 
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.functional.Result.Failure;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 import java.util.Map;
 import java.util.Objects;
@@ -61,14 +62,17 @@ public final class DSLRegistry {
 
     private final SqlDialectPluginRegistry pluginRegistry;
     private final Map<String, DSL> dslCache;
+    private final BuildHookFactory hookFactory;
 
     /**
      * Private constructor. Use factory methods to create instances.
      *
      * @param pluginRegistry the plugin registry to use for dialect resolution
+     * @param hookFactory optional hook factory override; {@code null} preserves the plugin's own factory
      */
-    private DSLRegistry(SqlDialectPluginRegistry pluginRegistry) {
+    private DSLRegistry(SqlDialectPluginRegistry pluginRegistry, BuildHookFactory hookFactory) {
         this.pluginRegistry = Objects.requireNonNull(pluginRegistry, "SqlDialectPluginRegistry must not be null");
+        this.hookFactory = hookFactory;
         dslCache = new ConcurrentHashMap<>();
     }
 
@@ -82,7 +86,7 @@ public final class DSLRegistry {
      * @return a new registry instance with all discovered plugins
      */
     public static DSLRegistry createWithServiceLoader() {
-        return new DSLRegistry(SqlDialectPluginRegistry.createWithServiceLoader());
+        return new DSLRegistry(SqlDialectPluginRegistry.createWithServiceLoader(), null);
     }
 
     /**
@@ -95,7 +99,32 @@ public final class DSLRegistry {
      * @throws NullPointerException if {@code pluginRegistry} is {@code null}
      */
     public static DSLRegistry of(SqlDialectPluginRegistry pluginRegistry) {
-        return new DSLRegistry(pluginRegistry);
+        return new DSLRegistry(pluginRegistry, null);
+    }
+
+    /**
+     * Creates a registry with plugins discovered via {@link java.util.ServiceLoader} and a
+     * programmatic hook factory that overrides the SPI-based hook factory embedded in each plugin.
+     *
+     * <p>Use this when you want to configure hooks from code rather than from system properties.
+     * To combine a programmatic hook with SPI-discovered hooks use
+     * {@link BuildHookFactory#composite(BuildHookFactory...)}:
+     *
+     * <pre>{@code
+     * BuildHookFactory combined = BuildHookFactory.composite(
+     *     new ServiceLoaderBuildHookFactory(),
+     *     () -> new MetricsCounterHook(registry)
+     * );
+     * DSLRegistry dslRegistry = DSLRegistry.create(combined);
+     * }</pre>
+     *
+     * @param hookFactory the hook factory to apply to every DSL produced by this registry;
+     *     must not be {@code null}
+     * @return a new registry instance
+     */
+    public static DSLRegistry create(BuildHookFactory hookFactory) {
+        Objects.requireNonNull(hookFactory, "BuildHookFactory must not be null");
+        return new DSLRegistry(SqlDialectPluginRegistry.createWithServiceLoader(), hookFactory);
     }
 
     /**
@@ -155,8 +184,9 @@ public final class DSLRegistry {
 
         // Not in cache, get DSL from plugin and cache it
         return pluginRegistry.getDsl(dialect, version).map(dsl -> {
-            dslCache.put(cacheKey, dsl);
-            return dsl;
+            DSL resolved = (hookFactory != null) ? dsl.withBuildHookFactory(hookFactory) : dsl;
+            dslCache.put(cacheKey, resolved);
+            return resolved;
         });
     }
 

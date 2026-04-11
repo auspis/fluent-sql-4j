@@ -86,14 +86,14 @@ Optional: run a build/verify in CI before creating the release tag.
 
 The release publishes these modules and attached artifacts:
 
+- `core`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `api`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `spi`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `test-support`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
-- `core`: main JAR, `-sources.jar`, `-javadoc.jar` (generated with Javadoc warnings due to Lombok-generated classes), module POM, and GPG signature (`.asc`).
 - `plugin-mysql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 - `plugin-postgresql`: main JAR, `-sources.jar`, `-javadoc.jar`, module POM, and GPG signature (`.asc`).
 
-Note: `core` is built and published but does not skip deployment. The Javadoc generation for `core` uses `doclint=none` and `failOnError=false` to handle Lombok-generated inner classes that cannot be resolved by Javadoc, resulting in warnings but a valid Javadoc JAR.
+`test-real-deps` is built in the reactor but excluded from the published bundle via `<excludeArtifacts>` in the `central-publishing-maven-plugin`. It is reserved for tests that require concrete runtime dependencies we do not want in the production module graph or published artifacts.
 
 **Why `packaging = pom` modules publish only a POM**
 

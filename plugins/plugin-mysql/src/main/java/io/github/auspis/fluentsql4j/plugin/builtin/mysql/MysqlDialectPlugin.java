@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlFetchPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlMergeStatementPsStrategy;
@@ -177,7 +178,7 @@ public final class MysqlDialectPlugin {
                 .mergeStatementStrategy(new MySqlMergeStatementPsStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor, new ServiceLoaderBuildHookFactory());
     }
 
     /**

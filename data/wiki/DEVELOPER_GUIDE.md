@@ -26,7 +26,7 @@ This guide covers the development workflow, testing strategies, code coverage, a
 
 ## Running Tests
 
-This project uses a structured approach to test execution with three distinct test categories organized within the `core` module.
+This project uses a structured approach to test execution with standard test categories organized within the `core` module. The only exception is `test-real-deps`, a test-only module reserved for tests that require concrete runtime dependencies intentionally excluded from the production module graph and published artifacts.
 
 ### Test Categories
 
@@ -41,7 +41,7 @@ The project uses a structured test pyramid with four main categories:
 
 ### Project Structure
 
-All tests are consolidated within the `core` module with the following organization:
+All standard tests are consolidated within the `core` module with the following organization:
 
 ```
 core/src/test/java/
@@ -50,6 +50,8 @@ core/src/test/java/
 ├── integration/                           # Integration tests (~20)
 └── e2e/system/                            # E2E tests (~3)
 ```
+
+`test-real-deps/` is reserved for realistic tests that need concrete runtime backends not wanted in published production modules.
 
 ### Basic Commands
 
@@ -62,6 +64,9 @@ core/src/test/java/
 
 # Run tests with dependencies
 ./mvnw clean verify -am -pl core
+
+# Run realistic backend tests kept outside core
+./mvnw test -pl test-real-deps -am
 ```
 
 ### Selective Test Execution

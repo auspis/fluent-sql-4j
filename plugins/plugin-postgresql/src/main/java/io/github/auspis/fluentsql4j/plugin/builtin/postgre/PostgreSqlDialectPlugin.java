@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.plugin.builtin.postgre;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.ast.visitor.ps.strategy.PostgreSqlCustomFunctionCallPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.dsl.PostgreSqlDSL;
@@ -118,7 +119,7 @@ public final class PostgreSqlDialectPlugin {
                 .customFunctionCallStrategy(new PostgreSqlCustomFunctionCallPsStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor, new ServiceLoaderBuildHookFactory());
     }
 
     /**

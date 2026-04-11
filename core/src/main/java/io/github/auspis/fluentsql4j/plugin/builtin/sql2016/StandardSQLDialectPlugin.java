@@ -2,6 +2,8 @@ package io.github.auspis.fluentsql4j.plugin.builtin.sql2016;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy.StandardSqlEscapeStrategy;
 
@@ -98,24 +100,24 @@ public final class StandardSQLDialectPlugin {
      *
      * @return a new PreparedStatementSpecFactory instance
      */
-    private static PreparedStatementSpecFactory standardSqlPsSpecFacory() {
+    private static PreparedStatementSpecFactory standardSqlPsSpecFactory() {
         AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor, new ServiceLoaderBuildHookFactory());
     }
 
     /**
      * Creates a DSL instance for Standard SQL:2008.
      * <p>
-     * Returns the base {@link io.github.auspis.fluentsql4j.dsl.DSL} class configured with
+     * Returns the base {@link DSL} class configured with
      * the Standard SQL:2008 PreparedStatement spec factory.
      *
-     * @return a new {@link io.github.auspis.fluentsql4j.dsl.DSL} instance, never {@code null}
+     * @return a new {@link DSL} instance, never {@code null}
      */
-    private static io.github.auspis.fluentsql4j.dsl.DSL createStandardSql2008DSL() {
-        return new io.github.auspis.fluentsql4j.dsl.DSL(standardSqlPsSpecFacory());
+    private static DSL createStandardSql2008DSL() {
+        return new DSL(standardSqlPsSpecFactory());
     }
 
     /**

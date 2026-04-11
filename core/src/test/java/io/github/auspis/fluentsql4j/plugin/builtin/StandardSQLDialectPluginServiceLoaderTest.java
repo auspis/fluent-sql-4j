@@ -1,12 +1,20 @@
 package io.github.auspis.fluentsql4j.plugin.builtin;
 
+import static io.github.auspis.fluentsql4j.test.SqlAssert.assertThatSql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.hook.build.BuildHook;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
+import io.github.auspis.fluentsql4j.hook.build.logging.LoggingBuildHookProvider;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
+import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.junit.jupiter.api.Test;
@@ -49,7 +57,9 @@ class StandardSQLDialectPluginServiceLoaderTest {
         Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("StandardSQL", "2008");
 
         assertThat(result).isInstanceOf(Result.Success.class);
-        assertThat(result.orElseThrow()).isNotNull();
+        PreparedStatementSpecFactory specFactory = result.orElseThrow();
+        assertThat(specFactory).isNotNull();
+        assertThat(specFactory.buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
     }
 
     @Test
@@ -87,6 +97,40 @@ class StandardSQLDialectPluginServiceLoaderTest {
         Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("StandardSQL");
 
         assertThat(result).isInstanceOf(Result.Success.class);
-        assertThat(result.orElseThrow()).isNotNull();
+        PreparedStatementSpecFactory specFactory = result.orElseThrow();
+        assertThat(specFactory).isNotNull();
+        assertThat(specFactory.buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
+    }
+
+    @Test
+    void shouldCreateEnabledBuildHookAndUseItDuringSqlBuild() throws SQLException {
+        String originalEnabled = System.getProperty(LoggingBuildHookProvider.ENABLED_PROPERTY);
+        System.setProperty(LoggingBuildHookProvider.ENABLED_PROPERTY, "true");
+
+        try {
+            DSL dsl = StandardSQLDialectPlugin.instance().createDSL();
+            PreparedStatementSpecFactory specFactory = dsl.getSpecFactory();
+
+            assertThat(specFactory.buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
+            assertThat(specFactory.buildHookFactory().create()).isNotSameAs(BuildHook.nullObject());
+
+            SqlCaptureHelper sqlCaptureHelper = new SqlCaptureHelper();
+            dsl.select("name").from("users").build(sqlCaptureHelper.getConnection());
+
+            assertThatSql(sqlCaptureHelper)
+                    .contains("SELECT")
+                    .contains("\"name\"")
+                    .contains("\"users\"");
+        } finally {
+            restoreProperty(LoggingBuildHookProvider.ENABLED_PROPERTY, originalEnabled);
+        }
+    }
+
+    private static void restoreProperty(String key, String originalValue) {
+        if (originalValue == null) {
+            System.clearProperty(key);
+            return;
+        }
+        System.setProperty(key, originalValue);
     }
 }

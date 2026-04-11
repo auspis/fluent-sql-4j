@@ -8,6 +8,8 @@ import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.functional.Result.Failure;
 import io.github.auspis.fluentsql4j.functional.Result.Success;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.util.SqlDialectPluginUtil;
 import io.github.auspis.fluentsql4j.plugin.util.TestDialectPlugin;
 import java.util.Collections;
@@ -255,6 +257,17 @@ class SqlDialectPluginRegistryTest {
         // Non-SemVer version should match non-SemVer plugin only
         assertThat(SqlDialectPluginRegistry.findMatchingPlugins(mixedPlugins, "2008"))
                 .containsExactly(nonSemVerPlugin);
+    }
+
+    @Test
+    void getSpecFactory_fromServiceLoaderRegistry_shouldUseServiceLoaderBuildHookFactory() {
+        SqlDialectPluginRegistry serviceLoaderRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
+
+        PreparedStatementSpecFactory factory = serviceLoaderRegistry
+                .getSpecFactory(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
+                .orElseThrow();
+
+        assertThat(factory.buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
     }
 
     @Test
