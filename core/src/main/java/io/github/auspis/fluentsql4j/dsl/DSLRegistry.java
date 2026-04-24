@@ -3,7 +3,9 @@ package io.github.auspis.fluentsql4j.dsl;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.functional.Result.Failure;
 import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -61,18 +63,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class DSLRegistry {
 
     private final SqlDialectPluginRegistry pluginRegistry;
+    private final SqlDialectResolver resolver;
     private final Map<String, DSL> dslCache;
-    private final BuildHookFactory hookFactory;
 
     /**
      * Private constructor. Use factory methods to create instances.
      *
      * @param pluginRegistry the plugin registry to use for dialect resolution
-     * @param hookFactory optional hook factory override; {@code null} preserves the plugin's own factory
+     * @param resolver the resolver that materializes DSL instances with hook policy
      */
-    private DSLRegistry(SqlDialectPluginRegistry pluginRegistry, BuildHookFactory hookFactory) {
+    private DSLRegistry(SqlDialectPluginRegistry pluginRegistry, SqlDialectResolver resolver) {
         this.pluginRegistry = Objects.requireNonNull(pluginRegistry, "SqlDialectPluginRegistry must not be null");
-        this.hookFactory = hookFactory;
+        this.resolver = Objects.requireNonNull(resolver, "SqlDialectResolver must not be null");
         dslCache = new ConcurrentHashMap<>();
     }
 
@@ -86,7 +88,9 @@ public final class DSLRegistry {
      * @return a new registry instance with all discovered plugins
      */
     public static DSLRegistry createWithServiceLoader() {
-        return new DSLRegistry(SqlDialectPluginRegistry.createWithServiceLoader(), null);
+        SqlDialectPluginRegistry pluginRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
+        SqlDialectResolver resolver = new SqlDialectResolver(pluginRegistry, new ServiceLoaderBuildHookFactory());
+        return new DSLRegistry(pluginRegistry, resolver);
     }
 
     /**
@@ -99,7 +103,8 @@ public final class DSLRegistry {
      * @throws NullPointerException if {@code pluginRegistry} is {@code null}
      */
     public static DSLRegistry of(SqlDialectPluginRegistry pluginRegistry) {
-        return new DSLRegistry(pluginRegistry, null);
+        SqlDialectResolver resolver = new SqlDialectResolver(pluginRegistry, new ServiceLoaderBuildHookFactory());
+        return new DSLRegistry(pluginRegistry, resolver);
     }
 
     /**
@@ -124,7 +129,9 @@ public final class DSLRegistry {
      */
     public static DSLRegistry create(BuildHookFactory hookFactory) {
         Objects.requireNonNull(hookFactory, "BuildHookFactory must not be null");
-        return new DSLRegistry(SqlDialectPluginRegistry.createWithServiceLoader(), hookFactory);
+        SqlDialectPluginRegistry pluginRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
+        SqlDialectResolver resolver = new SqlDialectResolver(pluginRegistry, hookFactory);
+        return new DSLRegistry(pluginRegistry, resolver);
     }
 
     /**
@@ -182,11 +189,10 @@ public final class DSLRegistry {
             return new Result.Success<>(cachedDsl);
         }
 
-        // Not in cache, get DSL from plugin and cache it
-        return pluginRegistry.getDsl(dialect, version).map(dsl -> {
-            DSL resolved = (hookFactory != null) ? dsl.withBuildHookFactory(hookFactory) : dsl;
-            dslCache.put(cacheKey, resolved);
-            return resolved;
+        // Not in cache, resolve DSL and cache it
+        return resolver.resolve(dialect, version).map(dsl -> {
+            dslCache.put(cacheKey, dsl);
+            return dsl;
         });
     }
 

@@ -78,9 +78,13 @@ class MysqlDialectPluginServiceLoaderTest {
                 .orElseThrow();
 
         // Verify the DSL can be created
-        assertThat(mysqlPlugin.createDSL()).isNotNull();
-        assertThat(mysqlPlugin.createDSL().getSpecFactory()).isNotNull();
-        assertThat(mysqlPlugin.createDSL().getSpecFactory().buildHookFactory())
+        assertThat(mysqlPlugin.createDSL(new ServiceLoaderBuildHookFactory())).isNotNull();
+        assertThat(mysqlPlugin.createDSL(new ServiceLoaderBuildHookFactory()).getSpecFactory())
+                .isNotNull();
+        assertThat(mysqlPlugin
+                        .createDSL(new ServiceLoaderBuildHookFactory())
+                        .getSpecFactory()
+                        .buildHookFactory())
                 .isInstanceOf(ServiceLoaderBuildHookFactory.class);
     }
 
@@ -90,7 +94,7 @@ class MysqlDialectPluginServiceLoaderTest {
         System.setProperty(LoggingBuildHookProvider.ENABLED_PROPERTY, "true");
 
         try {
-            DSL dsl = MysqlDialectPlugin.instance().createDSL();
+            DSL dsl = MysqlDialectPlugin.instance().createDSL(new ServiceLoaderBuildHookFactory());
 
             assertThat(dsl.getSpecFactory().buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
             assertThat(dsl.getSpecFactory().buildHookFactory().create()).isNotSameAs(BuildHook.nullObject());

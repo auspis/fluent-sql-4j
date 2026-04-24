@@ -1,8 +1,9 @@
 package io.github.auspis.fluentsql4j.plugin;
 
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * Immutable record representing a SQL dialect plugin.
@@ -51,7 +52,7 @@ import java.util.function.Supplier;
  *
  * @param dialectName the canonical name of the SQL dialect in lowercase (e.g., "mysql", "postgresql", "standardsql")
  * @param dialectVersion the version this plugin supports - either a SemVer range (e.g., "^8.0.0") or exact version string (e.g., "2008")
- * @param dslSupplier a supplier that creates new {@link DSL} instances for this dialect, may return the base DSL or a dialect-specific extension
+ * @param dslFactory a factory that creates new {@link DSL} instances for this dialect using the provided {@link BuildHookFactory}, may return the base DSL or a dialect-specific extension
  * @see SqlDialectPluginProvider
  * @see SqlDialectPluginRegistry
  * @see DSL
@@ -59,7 +60,7 @@ import java.util.function.Supplier;
  * @see <a href="https://github.com/npm/node-semver">NPM semver ranges</a>
  * @since 1.0
  */
-public record SqlDialectPlugin(String dialectName, String dialectVersion, Supplier<DSL> dslSupplier) {
+public record SqlDialectPlugin(String dialectName, String dialectVersion, Function<BuildHookFactory, DSL> dslFactory) {
 
     /**
      * Compact constructor with validation.
@@ -75,7 +76,7 @@ public record SqlDialectPlugin(String dialectName, String dialectVersion, Suppli
     public SqlDialectPlugin {
         Objects.requireNonNull(dialectName, "Dialect name must not be null");
         Objects.requireNonNull(dialectVersion, "Dialect version must not be null");
-        Objects.requireNonNull(dslSupplier, "DSL supplier must not be null");
+        Objects.requireNonNull(dslFactory, "DSL factory must not be null");
 
         if (dialectVersion.isBlank()) {
             throw new IllegalArgumentException("Dialect version must not be blank in plugin '" + dialectName + "'");
@@ -93,17 +94,19 @@ public record SqlDialectPlugin(String dialectName, String dialectVersion, Suppli
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = registry.getPlugin("mysql", "8.0.35").orElseThrow();
-     * DSL dsl = plugin.createDSL();
+     * DSL dsl = plugin.createDSL(hookFactory);
      * String sql = dsl.select("name").from("users").build();
      * }</pre>
      * <p>
      * <b>Thread Safety:</b> The thread safety of the returned DSL depends on the
-     * {@code dslSupplier} implementation. It is recommended that the supplier creates
+     * {@code dslFactory} implementation. It is recommended that the factory creates
      * a new instance on each invocation to ensure thread safety.
      *
+     * @param hookFactory the build hook factory to apply to the created DSL, must not be {@code null}
      * @return a {@link DSL} instance for this dialect, never {@code null}
      */
-    public DSL createDSL() {
-        return dslSupplier.get();
+    public DSL createDSL(BuildHookFactory hookFactory) {
+        Objects.requireNonNull(hookFactory, "BuildHookFactory must not be null");
+        return dslFactory.apply(hookFactory);
     }
 }

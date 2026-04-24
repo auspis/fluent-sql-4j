@@ -9,7 +9,6 @@ import io.github.auspis.fluentsql4j.dsl.select.SelectProjectionBuilder;
 import io.github.auspis.fluentsql4j.dsl.table.CreateTableBuilder;
 import io.github.auspis.fluentsql4j.dsl.truncate.TruncateBuilder;
 import io.github.auspis.fluentsql4j.dsl.update.UpdateBuilder;
-import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import java.util.Objects;
 
 /**
@@ -99,32 +98,5 @@ public class DSL {
 
     public MergeBuilder mergeInto(String targetTableName) {
         return new MergeBuilder(specFactory, targetTableName);
-    }
-
-    /**
-     * Returns a new DSL instance identical to this one but with the given hook factory.
-     *
-     * <p>The dialect visitor is preserved; only the hook factory is replaced. Subclasses
-     * maintain their specific type via {@link #newInstance(PreparedStatementSpecFactory)}.
-     *
-     * @param hookFactory the hook factory to use; must not be {@code null}
-     * @return a new DSL (or subclass) instance with the given hook factory
-     */
-    public DSL withBuildHookFactory(BuildHookFactory hookFactory) {
-        Objects.requireNonNull(hookFactory, "BuildHookFactory must not be null");
-        PreparedStatementSpecFactory newSpecFactory =
-                new PreparedStatementSpecFactory(specFactory.astVisitor(), hookFactory);
-        return newInstance(newSpecFactory);
-    }
-
-    /**
-     * Template method called by {@link #withBuildHookFactory} to produce a DSL instance of
-     * the correct subtype. Subclasses must override this to return their own type.
-     *
-     * @param newSpecFactory the spec factory for the new instance
-     * @return a new DSL or subclass instance
-     */
-    protected DSL newInstance(PreparedStatementSpecFactory newSpecFactory) {
-        return new DSL(newSpecFactory);
     }
 }

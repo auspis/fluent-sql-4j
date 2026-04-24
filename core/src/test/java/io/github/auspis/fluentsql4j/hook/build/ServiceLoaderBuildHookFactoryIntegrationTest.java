@@ -16,7 +16,7 @@ class ServiceLoaderBuildHookFactoryIntegrationTest {
     void setUp() {
         originalEnabledValue = System.getProperty(LoggingBuildHookProvider.ENABLED_PROPERTY);
         System.clearProperty(LoggingBuildHookProvider.ENABLED_PROPERTY);
-        factory = new ServiceLoaderBuildHookFactory();
+        factory = null;
     }
 
     @AfterEach
@@ -31,6 +31,7 @@ class ServiceLoaderBuildHookFactoryIntegrationTest {
     @Test
     void ok() {
         System.setProperty(LoggingBuildHookProvider.ENABLED_PROPERTY, "true");
+        factory = new ServiceLoaderBuildHookFactory();
         BuildHook result = factory.create();
         System.out.println(result.getClass());
 
@@ -39,6 +40,7 @@ class ServiceLoaderBuildHookFactoryIntegrationTest {
 
     @Test
     void returnsNullObjectWhenLoggingDisabled() {
+        factory = new ServiceLoaderBuildHookFactory();
         BuildHook result = factory.create();
         assertThat(result).isSameAs(BuildHook.nullObject()).isNotInstanceOf(CompositeBuildHook.class);
     }

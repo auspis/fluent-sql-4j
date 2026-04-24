@@ -12,35 +12,61 @@ class ServiceLoaderBuildHookFactoryTest {
     private static final String TEST_ENABLED_KEY = "test.provider.enabled";
 
     @Test
-    void propertiesSupplierNotCalledDuringConstruction() {
-        AtomicInteger callCount = new AtomicInteger(0);
+    void providersLoadedAndConfiguredDuringConstruction() {
+        AtomicInteger configureCallCount = new AtomicInteger(0);
+        TestBuildHookProvider provider = new TestBuildHookProvider() {
+            @Override
+            public BuildHookProvider configure(Properties properties) {
+                configureCallCount.incrementAndGet();
+                return super.configure(properties);
+            }
+        };
 
-        ServiceLoaderBuildHookFactory factory = new ServiceLoaderBuildHookFactory(
-                () -> {
-                    callCount.incrementAndGet();
-                    return new Properties();
-                },
-                List::of);
+        new ServiceLoaderBuildHookFactory(() -> new Properties(), () -> List.of(provider));
 
-        assertThat(callCount.get()).isZero();
-
-        factory.create();
-
-        assertThat(callCount.get()).isOne();
+        // configure() should be called during construction
+        assertThat(configureCallCount.get()).isOne();
     }
 
     @Test
-    void propertiesResolvedAtCreateTime() {
+    void providersNotReconfiguredOnCreate() {
+        AtomicInteger configureCallCount = new AtomicInteger(0);
+        TestBuildHookProvider provider = new TestBuildHookProvider() {
+            @Override
+            public BuildHookProvider configure(Properties properties) {
+                configureCallCount.incrementAndGet();
+                return super.configure(properties);
+            }
+        };
+        provider.enabled = true;
+
+        ServiceLoaderBuildHookFactory factory =
+                new ServiceLoaderBuildHookFactory(() -> new Properties(), () -> List.of(provider));
+
+        // After construction, configureCallCount = 1
+        assertThat(configureCallCount.get()).isOne();
+
+        // Calling create() multiple times should NOT increase configureCallCount
+        factory.create();
+        factory.create();
+
+        assertThat(configureCallCount.get()).isOne();
+    }
+
+    @Test
+    void propertiesMustBeSetBeforeConstruction() {
         Properties props = new Properties();
         TestBuildHookProvider provider = new TestBuildHookProvider();
         provider.useProperties = true;
 
-        ServiceLoaderBuildHookFactory factory = new ServiceLoaderBuildHookFactory(() -> props, () -> List.of(provider));
-
+        // Properties must be set BEFORE factory construction
         props.setProperty(TEST_ENABLED_KEY, "true");
+
+        ServiceLoaderBuildHookFactory factory = new ServiceLoaderBuildHookFactory(() -> props, () -> List.of(provider));
 
         BuildHook result = factory.create();
 
+        // Provider should be enabled because properties were set before construction
         assertThat(result).isNotSameAs(BuildHook.nullObject());
     }
 
@@ -67,15 +93,17 @@ class ServiceLoaderBuildHookFactoryTest {
     }
 
     @Test
-    void exception() {
+    void exceptionDuringConfigurationSkipsProvider() {
         TestBuildHookProvider failingProvider = new TestBuildHookProvider();
         failingProvider.throwsExceptionOnConfigure = true;
 
+        // Exception during construction is logged but doesn't propagate
         ServiceLoaderBuildHookFactory factory =
                 new ServiceLoaderBuildHookFactory(Properties::new, () -> List.of(failingProvider));
 
         BuildHook result = factory.create();
 
+        // Failing provider is skipped, so result is null object
         assertThat(result).isSameAs(BuildHook.nullObject());
     }
 

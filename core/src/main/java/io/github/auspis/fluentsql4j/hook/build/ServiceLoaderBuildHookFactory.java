@@ -13,27 +13,46 @@ public final class ServiceLoaderBuildHookFactory implements BuildHookFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceLoaderBuildHookFactory.class);
 
-    private final Supplier<List<BuildHookProvider>> providersSupplier;
     private final Supplier<Properties> propertiesSupplier;
+    private final List<BuildHookProvider> cachedProviders;
 
     public ServiceLoaderBuildHookFactory() {
-        this(System::getProperties, ServiceLoaderBuildHookFactory::loadProviders);
+        this(System::getProperties);
     }
 
+    ServiceLoaderBuildHookFactory(Supplier<Properties> propertiesSupplier) {
+        this.propertiesSupplier = propertiesSupplier;
+        // Load and configure providers ONCE in constructor
+        Properties initialProps = propertiesSupplier.get();
+        this.cachedProviders = loadAndConfigureProviders(initialProps);
+    }
+
+    // Package-private constructor for testing: inject providers instead of using ServiceLoader
     ServiceLoaderBuildHookFactory(
             Supplier<Properties> propertiesSupplier, Supplier<List<BuildHookProvider>> providersSupplier) {
         this.propertiesSupplier = propertiesSupplier;
-        this.providersSupplier = providersSupplier;
+        // Load and configure provided providers ONCE in constructor
+        Properties initialProps = propertiesSupplier.get();
+        List<BuildHookProvider> loaded = new ArrayList<>();
+        for (BuildHookProvider provider : providersSupplier.get()) {
+            try {
+                provider.configure(initialProps);
+                loaded.add(provider);
+            } catch (Throwable t) {
+                logger.warn("Skipping build hook provider '{}' due to error during configuration", provider.id(), t);
+            }
+        }
+        this.cachedProviders = loaded.stream()
+                .sorted(Comparator.comparingInt(BuildHookProvider::order))
+                .toList();
     }
 
     @Override
     public BuildHook create() {
         List<BuildHook> hooks = new ArrayList<>();
 
-        Properties properties = propertiesSupplier.get();
-        for (BuildHookProvider provider : providersSupplier.get()) {
+        for (BuildHookProvider provider : cachedProviders) {
             try {
-                provider.configure(properties);
                 if (!provider.isEnabled()) {
                     continue;
                 }
@@ -53,10 +72,18 @@ public final class ServiceLoaderBuildHookFactory implements BuildHookFactory {
         return new CompositeBuildHook(hooks);
     }
 
-    private static List<BuildHookProvider> loadProviders() {
+    private static List<BuildHookProvider> loadAndConfigureProviders(Properties properties) {
         ServiceLoader<BuildHookProvider> loader = ServiceLoader.load(BuildHookProvider.class);
-        return loader.stream()
-                .map(ServiceLoader.Provider::get)
+        List<BuildHookProvider> loaded = new ArrayList<>();
+        for (BuildHookProvider provider : loader) {
+            try {
+                provider.configure(properties);
+                loaded.add(provider);
+            } catch (Throwable t) {
+                logger.warn("Skipping build hook provider '{}' due to error during configuration", provider.id(), t);
+            }
+        }
+        return loaded.stream()
                 .sorted(Comparator.comparingInt(BuildHookProvider::order))
                 .toList();
     }

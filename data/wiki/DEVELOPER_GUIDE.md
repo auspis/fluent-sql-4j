@@ -26,6 +26,30 @@ This guide covers the development workflow, testing strategies, code coverage, a
 
 ## Running Tests
 
+## Dialect Resolution Architecture
+
+Dialect resolution is split into three focused components:
+
+- `SqlDialectPluginRegistry`: metadata lookup only (`getPlugin(...)`)
+- `SqlDialectResolver`: runtime DSL materialization with a `BuildHookFactory`
+- `DSLRegistry`: user-facing API with dialect/version cache
+
+Typical flow:
+
+```java
+SqlDialectPluginRegistry pluginRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
+SqlDialectResolver resolver = new SqlDialectResolver(pluginRegistry, new ServiceLoaderBuildHookFactory());
+
+Result<DSL> dsl = resolver.resolve("mysql", "8.0.35");
+```
+
+When using `DSLRegistry`, this flow is already wired internally:
+
+```java
+DSLRegistry registry = DSLRegistry.createWithServiceLoader();
+DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
+```
+
 This project uses a structured approach to test execution with standard test categories organized within the `core` module. The only exception is `test-real-deps`, a test-only module reserved for tests that require concrete runtime dependencies intentionally excluded from the production module graph and published artifacts.
 
 ### Test Categories

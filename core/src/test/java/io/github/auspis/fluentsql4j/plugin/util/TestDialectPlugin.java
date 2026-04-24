@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.plugin.util;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 
 public final class TestDialectPlugin {
@@ -21,12 +22,12 @@ public final class TestDialectPlugin {
         return INSTANCE;
     }
 
-    private static DSL createDSL() {
-        return new TestDialectDSL(createPreparedStatementSpecFactory());
+    private static DSL createDSL(BuildHookFactory hookFactory) {
+        return new TestDialectDSL(createPreparedStatementSpecFactory(hookFactory));
     }
 
-    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
+    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory(BuildHookFactory hookFactory) {
         return new PreparedStatementSpecFactory(
-                AstToPreparedStatementSpecVisitor.builder().build());
+                AstToPreparedStatementSpecVisitor.builder().build(), hookFactory);
     }
 }

@@ -12,6 +12,7 @@ import io.github.auspis.fluentsql4j.hook.build.logging.LoggingBuildHookProvider;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import io.github.auspis.fluentsql4j.test.helper.SqlCaptureHelper;
 import java.sql.SQLException;
@@ -20,6 +21,17 @@ import java.util.ServiceLoader;
 import org.junit.jupiter.api.Test;
 
 class StandardSQLDialectPluginServiceLoaderTest {
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(
+            SqlDialectPluginRegistry registry, String dialect, String version) {
+        return new SqlDialectResolver(registry, new ServiceLoaderBuildHookFactory())
+                .resolve(dialect, version)
+                .map(DSL::getSpecFactory);
+    }
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(SqlDialectPluginRegistry registry, String dialect) {
+        return resolveSpecFactory(registry, dialect, null);
+    }
 
     @Test
     void shouldBeDiscoverableViaServiceLoader() {
@@ -54,7 +66,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
     void shouldProvidePreparedStatementSpecFactoryViaRegistry() {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("StandardSQL", "2008");
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(registry, "StandardSQL", "2008");
 
         assertThat(result).isInstanceOf(Result.Success.class);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
@@ -67,9 +79,9 @@ class StandardSQLDialectPluginServiceLoaderTest {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Test various case combinations
-        Result<PreparedStatementSpecFactory> result1 = registry.getSpecFactory("standardsql", "2008");
-        Result<PreparedStatementSpecFactory> result2 = registry.getSpecFactory("STANDARDSQL", "2008");
-        Result<PreparedStatementSpecFactory> result3 = registry.getSpecFactory("StandardSQL", "2008");
+        Result<PreparedStatementSpecFactory> result1 = resolveSpecFactory(registry, "standardsql", "2008");
+        Result<PreparedStatementSpecFactory> result2 = resolveSpecFactory(registry, "STANDARDSQL", "2008");
+        Result<PreparedStatementSpecFactory> result3 = resolveSpecFactory(registry, "StandardSQL", "2008");
 
         assertThat(result1).isInstanceOf(Result.Success.class);
         assertThat(result2).isInstanceOf(Result.Success.class);
@@ -81,11 +93,11 @@ class StandardSQLDialectPluginServiceLoaderTest {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // Exact match should work
-        Result<PreparedStatementSpecFactory> exactMatch = registry.getSpecFactory("StandardSQL", "2008");
+        Result<PreparedStatementSpecFactory> exactMatch = resolveSpecFactory(registry, "StandardSQL", "2008");
         assertThat(exactMatch).isInstanceOf(Result.Success.class);
 
         // Different version should fail (non-SemVer uses exact matching)
-        Result<PreparedStatementSpecFactory> differentVersion = registry.getSpecFactory("StandardSQL", "2011");
+        Result<PreparedStatementSpecFactory> differentVersion = resolveSpecFactory(registry, "StandardSQL", "2011");
         assertThat(differentVersion).isInstanceOf(Result.Failure.class);
     }
 
@@ -94,7 +106,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
         SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
 
         // When version is not specified, should return the first available plugin
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("StandardSQL");
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(registry, "StandardSQL");
 
         assertThat(result).isInstanceOf(Result.Success.class);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
@@ -108,7 +120,7 @@ class StandardSQLDialectPluginServiceLoaderTest {
         System.setProperty(LoggingBuildHookProvider.ENABLED_PROPERTY, "true");
 
         try {
-            DSL dsl = StandardSQLDialectPlugin.instance().createDSL();
+            DSL dsl = StandardSQLDialectPlugin.instance().createDSL(new ServiceLoaderBuildHookFactory());
             PreparedStatementSpecFactory specFactory = dsl.getSpecFactory();
 
             assertThat(specFactory.buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);

@@ -3,9 +3,12 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +24,17 @@ import org.junit.jupiter.api.Test;
 class MysqlPluginRegistryComponentTest {
 
     private SqlDialectPluginRegistry pluginRegistry;
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(
+            SqlDialectPluginRegistry registry, String dialect, String version) {
+        return new SqlDialectResolver(registry, BuildHookFactory.nullObject())
+                .resolve(dialect, version)
+                .map(DSL::getSpecFactory);
+    }
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(SqlDialectPluginRegistry registry, String dialect) {
+        return resolveSpecFactory(registry, dialect, null);
+    }
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -52,14 +66,14 @@ class MysqlPluginRegistryComponentTest {
 
         assertThat(newRegistry.isSupported(MysqlDialectPlugin.DIALECT_NAME)).isTrue();
         Result<PreparedStatementSpecFactory> result =
-                newRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
+                resolveSpecFactory(newRegistry, MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
         assertThat(result).isInstanceOf(Result.Success.class);
     }
 
     @Test
     void getSpecFactory() {
         Result<PreparedStatementSpecFactory> result =
-                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
+                resolveSpecFactory(pluginRegistry, MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
 
         assertThat(result).isInstanceOf(Result.Success.class);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
@@ -70,31 +84,32 @@ class MysqlPluginRegistryComponentTest {
     void versionMatching() {
         // Should match MySQL 8.x versions (using ^8.0.0 range)
         Result<PreparedStatementSpecFactory> version800 =
-                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.0");
+                resolveSpecFactory(pluginRegistry, MysqlDialectPlugin.DIALECT_NAME, "8.0.0");
         assertThat(version800).isInstanceOf(Result.Success.class);
 
         Result<PreparedStatementSpecFactory> version8035 =
-                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
+                resolveSpecFactory(pluginRegistry, MysqlDialectPlugin.DIALECT_NAME, "8.0.35");
         assertThat(version8035).isInstanceOf(Result.Success.class);
 
         Result<PreparedStatementSpecFactory> version810 =
-                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "8.1.0");
+                resolveSpecFactory(pluginRegistry, MysqlDialectPlugin.DIALECT_NAME, "8.1.0");
         assertThat(version810).isInstanceOf(Result.Success.class);
 
         // Should NOT match MySQL 5.7 or 9.0
         Result<PreparedStatementSpecFactory> version57 =
-                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "5.7.42");
+                resolveSpecFactory(pluginRegistry, MysqlDialectPlugin.DIALECT_NAME, "5.7.42");
         assertThat(version57).isInstanceOf(Result.Failure.class);
 
         Result<PreparedStatementSpecFactory> version90 =
-                pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, "9.0.0");
+                resolveSpecFactory(pluginRegistry, MysqlDialectPlugin.DIALECT_NAME, "9.0.0");
         assertThat(version90).isInstanceOf(Result.Failure.class);
     }
 
     @Test
     void getSpecFactoryWithoutVersion() {
         // When version is not specified, should return available plugin
-        Result<PreparedStatementSpecFactory> result = pluginRegistry.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result =
+                resolveSpecFactory(pluginRegistry, MysqlDialectPlugin.DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();

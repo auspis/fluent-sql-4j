@@ -36,7 +36,7 @@ class StandardSQLDialectPluginTest {
     @Test
     void shouldCreateValidDSL() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         assertThat(dsl).isNotNull();
         assertThat(dsl.getSpecFactory()).isNotNull();
@@ -46,8 +46,8 @@ class StandardSQLDialectPluginTest {
     void shouldCreateNewDSLOnEachCall() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
 
-        DSL dsl1 = plugin.createDSL();
-        DSL dsl2 = plugin.createDSL();
+        DSL dsl1 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
+        DSL dsl2 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify that each call creates a new instance
         assertThat(dsl1).isNotSameAs(dsl2);
@@ -68,7 +68,7 @@ class StandardSQLDialectPluginTest {
     @Test
     void shouldCreateDSLCompatibleWithStandardSql2008() {
         SqlDialectPlugin plugin = StandardSQLDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify DSL is configured for standard SQL:2008
         assertThat(dsl).isNotNull();

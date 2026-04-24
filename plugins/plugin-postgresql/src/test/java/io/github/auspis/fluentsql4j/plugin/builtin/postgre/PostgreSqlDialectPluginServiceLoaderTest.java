@@ -78,9 +78,16 @@ class PostgreSqlDialectPluginServiceLoaderTest {
                 .orElseThrow();
 
         // Verify the DSL can be created
-        assertThat(postgresqlPlugin.createDSL()).isNotNull();
-        assertThat(postgresqlPlugin.createDSL().getSpecFactory()).isNotNull();
-        assertThat(postgresqlPlugin.createDSL().getSpecFactory().buildHookFactory())
+        assertThat(postgresqlPlugin.createDSL(new ServiceLoaderBuildHookFactory()))
+                .isNotNull();
+        assertThat(postgresqlPlugin
+                        .createDSL(new ServiceLoaderBuildHookFactory())
+                        .getSpecFactory())
+                .isNotNull();
+        assertThat(postgresqlPlugin
+                        .createDSL(new ServiceLoaderBuildHookFactory())
+                        .getSpecFactory()
+                        .buildHookFactory())
                 .isInstanceOf(ServiceLoaderBuildHookFactory.class);
     }
 
@@ -90,7 +97,7 @@ class PostgreSqlDialectPluginServiceLoaderTest {
         System.setProperty(LoggingBuildHookProvider.ENABLED_PROPERTY, "true");
 
         try {
-            DSL dsl = PostgreSqlDialectPlugin.instance().createDSL();
+            DSL dsl = PostgreSqlDialectPlugin.instance().createDSL(new ServiceLoaderBuildHookFactory());
 
             assertThat(dsl.getSpecFactory().buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
             assertThat(dsl.getSpecFactory().buildHookFactory().create()).isNotSameAs(BuildHook.nullObject());

@@ -63,7 +63,9 @@ DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
 ```
 
-Note: in the ServiceLoader path, providers are configured from `System.getProperties()` when `BuildHookFactory.create()` runs.
+Note: in the ServiceLoader path, providers are loaded and configured once when
+`ServiceLoaderBuildHookFactory` is created. Set system properties before creating
+the factory/registry.
 
 ### Option B: Programmatic configuration (no system properties)
 

@@ -48,11 +48,6 @@ public class MysqlDSL extends DSL {
         super(specFactory);
     }
 
-    @Override
-    protected DSL newInstance(PreparedStatementSpecFactory specFactory) {
-        return new MysqlDSL(specFactory);
-    }
-
     /**
      * Creates a new SELECT builder with MySQL-specific projection capabilities.
      * <p>

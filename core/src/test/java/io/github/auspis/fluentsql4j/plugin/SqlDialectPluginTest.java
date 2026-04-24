@@ -13,19 +13,22 @@ class SqlDialectPluginTest {
     @Test
     void shouldCreateValidPlugin() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", hookFactory -> new DSL(specFactory));
 
         assertThat(plugin.dialectName()).isEqualTo("mysql");
         assertThat(plugin.dialectVersion()).isEqualTo("^8.0.0");
-        assertThat(plugin.createDSL()).isNotNull();
-        assertThat(plugin.createDSL().getSpecFactory()).isEqualTo(specFactory);
+        assertThat(plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject()))
+                .isNotNull();
+        assertThat(plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject())
+                        .getSpecFactory())
+                .isEqualTo(specFactory);
     }
 
     @Test
     void shouldRejectNullDialectName() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        assertThatThrownBy(() -> new SqlDialectPlugin(null, "^8.0.0", () -> new DSL(specFactory)))
+        assertThatThrownBy(() -> new SqlDialectPlugin(null, "^8.0.0", hookFactory -> new DSL(specFactory)))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("Dialect name must not be null");
     }
@@ -34,7 +37,7 @@ class SqlDialectPluginTest {
     void shouldRejectNullDialectVersion() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", null, () -> new DSL(specFactory)))
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", null, hookFactory -> new DSL(specFactory)))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining("Dialect version must not be null");
     }
@@ -43,19 +46,19 @@ class SqlDialectPluginTest {
     void shouldRejectNullDslSupplier() {
         assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "^8.0.0", null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("DSL supplier must not be null");
+                .hasMessageContaining("DSL factory must not be null");
     }
 
     @Test
     void shouldRejectBlankVersionRange() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "", () -> new DSL(specFactory)))
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "", hookFactory -> new DSL(specFactory)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Dialect version must not be blank")
                 .hasMessageContaining("mysql");
 
-        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "   ", () -> new DSL(specFactory)))
+        assertThatThrownBy(() -> new SqlDialectPlugin("mysql", "   ", hookFactory -> new DSL(specFactory)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Dialect version must not be blank")
                 .hasMessageContaining("mysql");
@@ -66,11 +69,13 @@ class SqlDialectPluginTest {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
         // Non-SemVer versions like "2008" should be allowed for exact matching
-        SqlDialectPlugin plugin = new SqlDialectPlugin("standardsql", "2008", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("standardsql", "2008", hookFactory -> new DSL(specFactory));
 
         assertThat(plugin.dialectName()).isEqualTo("standardsql");
         assertThat(plugin.dialectVersion()).isEqualTo("2008");
-        assertThat(plugin.createDSL().getSpecFactory()).isEqualTo(specFactory);
+        assertThat(plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject())
+                        .getSpecFactory())
+                .isEqualTo(specFactory);
     }
 
     @Test
@@ -78,9 +83,9 @@ class SqlDialectPluginTest {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
         // Arbitrary version strings should be allowed
-        SqlDialectPlugin plugin1 = new SqlDialectPlugin("customdb", "2011", () -> new DSL(specFactory));
-        SqlDialectPlugin plugin2 = new SqlDialectPlugin("customdb", "v1", () -> new DSL(specFactory));
-        SqlDialectPlugin plugin3 = new SqlDialectPlugin("customdb", "latest", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin1 = new SqlDialectPlugin("customdb", "2011", hookFactory -> new DSL(specFactory));
+        SqlDialectPlugin plugin2 = new SqlDialectPlugin("customdb", "v1", hookFactory -> new DSL(specFactory));
+        SqlDialectPlugin plugin3 = new SqlDialectPlugin("customdb", "latest", hookFactory -> new DSL(specFactory));
 
         assertThat(plugin1.dialectVersion()).isEqualTo("2011");
         assertThat(plugin2.dialectVersion()).isEqualTo("v1");
@@ -90,7 +95,8 @@ class SqlDialectPluginTest {
     @Test
     void shouldHaveValueSemantics() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
-        java.util.function.Supplier<DSL> dslFactory = () -> new DSL(specFactory);
+        java.util.function.Function<io.github.auspis.fluentsql4j.hook.build.BuildHookFactory, DSL> dslFactory =
+                hookFactory -> new DSL(specFactory);
 
         SqlDialectPlugin plugin1 = new SqlDialectPlugin("mysql", "^8.0.0", dslFactory);
         SqlDialectPlugin plugin2 = new SqlDialectPlugin("mysql", "^8.0.0", dslFactory);
@@ -103,7 +109,7 @@ class SqlDialectPluginTest {
     @Test
     void shouldBeImmutable() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", hookFactory -> new DSL(specFactory));
 
         // All fields are final by record definition
         assertThat(plugin.dialectName()).isEqualTo("mysql");
@@ -118,10 +124,10 @@ class SqlDialectPluginTest {
         // Record works well with functional programming
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
 
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", hookFactory -> new DSL(specFactory));
 
-        DSL dsl1 = plugin.createDSL();
-        DSL dsl2 = plugin.createDSL();
+        DSL dsl1 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
+        DSL dsl2 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         assertThat(dsl1.getSpecFactory()).isEqualTo(specFactory);
         assertThat(dsl2.getSpecFactory()).isEqualTo(specFactory);
@@ -130,7 +136,7 @@ class SqlDialectPluginTest {
     @Test
     void shouldHaveToString() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", hookFactory -> new DSL(specFactory));
 
         String toString = plugin.toString();
 
@@ -142,9 +148,9 @@ class SqlDialectPluginTest {
     @Test
     void shouldCreateDSL() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", hookFactory -> new DSL(specFactory));
 
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         assertThat(dsl).isNotNull();
         assertThat(dsl.getSpecFactory()).isEqualTo(specFactory);
@@ -153,10 +159,10 @@ class SqlDialectPluginTest {
     @Test
     void shouldCreateNewDSLOnEachCall() {
         PreparedStatementSpecFactory specFactory = mock(PreparedStatementSpecFactory.class);
-        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", () -> new DSL(specFactory));
+        SqlDialectPlugin plugin = new SqlDialectPlugin("mysql", "^8.0.0", hookFactory -> new DSL(specFactory));
 
-        DSL dsl1 = plugin.createDSL();
-        DSL dsl2 = plugin.createDSL();
+        DSL dsl1 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
+        DSL dsl2 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         assertThat(dsl1).isNotSameAs(dsl2);
     }

@@ -13,8 +13,10 @@ import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.dsl.util.ResultSetUtil;
 import io.github.auspis.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import io.github.auspis.fluentsql4j.test.util.annotation.IntegrationTest;
 import io.github.auspis.fluentsql4j.test.util.database.TestDatabaseUtil;
@@ -37,6 +39,18 @@ class StandardSQLDialectPluginIntegrationTest {
 
     private SqlDialectPluginRegistry registry;
     private Connection connection;
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(
+            SqlDialectPluginRegistry targetRegistry, String dialect, String version) {
+        return new SqlDialectResolver(targetRegistry, BuildHookFactory.nullObject())
+                .resolve(dialect, version)
+                .map(DSL::getSpecFactory);
+    }
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(
+            SqlDialectPluginRegistry targetRegistry, String dialect) {
+        return resolveSpecFactory(targetRegistry, dialect, null);
+    }
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -63,7 +77,7 @@ class StandardSQLDialectPluginIntegrationTest {
 
     @Test
     void getSpecFactory() {
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(registry, DIALECT_NAME, DIALECT_VERSION);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
@@ -72,20 +86,20 @@ class StandardSQLDialectPluginIntegrationTest {
 
     @Test
     void versionMatching() {
-        Result<PreparedStatementSpecFactory> exactMatch = registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
+        Result<PreparedStatementSpecFactory> exactMatch = resolveSpecFactory(registry, DIALECT_NAME, DIALECT_VERSION);
         assertThat(exactMatch).isInstanceOf(Result.Success.class);
 
-        Result<PreparedStatementSpecFactory> wrongVersion = registry.getSpecFactory(DIALECT_NAME, "2011");
+        Result<PreparedStatementSpecFactory> wrongVersion = resolveSpecFactory(registry, DIALECT_NAME, "2011");
         assertThat(wrongVersion).isInstanceOf(Result.Failure.class);
 
-        Result<PreparedStatementSpecFactory> wrongVersion2 = registry.getSpecFactory(DIALECT_NAME, "2016");
+        Result<PreparedStatementSpecFactory> wrongVersion2 = resolveSpecFactory(registry, DIALECT_NAME, "2016");
         assertThat(wrongVersion2).isInstanceOf(Result.Failure.class);
     }
 
     @Test
     void getSpecFactoryWithoutVersion() {
         // When version is not specified, should return available plugin
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(registry, DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
@@ -94,7 +108,7 @@ class StandardSQLDialectPluginIntegrationTest {
     @Test
     void shouldProduceWorkingPreparedStatementSpecFactory() throws SQLException {
         // Get specFactory from registry
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(registry, DIALECT_NAME, DIALECT_VERSION);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
         DSL dsl = new DSL(specFactory);
 
@@ -117,7 +131,7 @@ class StandardSQLDialectPluginIntegrationTest {
         when(mockConnection.prepareStatement(sqlCaptor.capture())).thenReturn(mockPs);
 
         PreparedStatementSpecFactory specFactory =
-                registry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION).orElseThrow();
+                resolveSpecFactory(registry, DIALECT_NAME, DIALECT_VERSION).orElseThrow();
         DSL dsl = new DSL(specFactory);
 
         // Verify it generates standard SQL:2008 syntax for pagination using the DSL
@@ -142,7 +156,7 @@ class StandardSQLDialectPluginIntegrationTest {
         when(mockConnection.prepareStatement(sqlCaptor.capture(), anyInt())).thenReturn(mockPs);
 
         PreparedStatementSpecFactory specFactory =
-                registry.getSpecFactory("StandardSQL", "2008").orElseThrow();
+                resolveSpecFactory(registry, "StandardSQL", "2008").orElseThrow();
         DSL dsl = new DSL(specFactory);
 
         // Test SELECT with WHERE using the custom renderer
@@ -194,7 +208,7 @@ class StandardSQLDialectPluginIntegrationTest {
 
         // Verify it's now available
         assertThat(newRegistry.isSupported(DIALECT_NAME)).isTrue();
-        Result<PreparedStatementSpecFactory> result = newRegistry.getSpecFactory(DIALECT_NAME, DIALECT_VERSION);
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(newRegistry, DIALECT_NAME, DIALECT_VERSION);
         assertThat(result).isInstanceOf(Result.Success.class);
     }
 }

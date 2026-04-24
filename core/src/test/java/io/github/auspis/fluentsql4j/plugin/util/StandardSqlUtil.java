@@ -2,7 +2,9 @@ package io.github.auspis.fluentsql4j.plugin.util;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 
 /**
@@ -28,7 +30,9 @@ public final class StandardSqlUtil {
      * @throws IllegalArgumentException if the StandardSQL plugin is not available
      */
     public static PreparedStatementSpecFactory preparedStatementSpecFactory() {
-        return REGISTRY.getSpecFactory(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
+        return new SqlDialectResolver(REGISTRY, BuildHookFactory.nullObject())
+                .resolve(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
+                .map(DSL::getSpecFactory)
                 .orElseThrow();
     }
 
