@@ -47,7 +47,7 @@ class BuildHookInternalErrorLoggingTest {
 
         BuildHook hook = new BuildHook() {
             @Override
-            protected void doOnError(Throwable error) {
+            protected void doOnError(Exception error) {
                 throw new IllegalStateException("hook-internal-fail");
             }
         };

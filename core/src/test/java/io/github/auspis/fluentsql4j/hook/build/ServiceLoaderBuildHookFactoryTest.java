@@ -22,7 +22,7 @@ class ServiceLoaderBuildHookFactoryTest {
             }
         };
 
-        new ServiceLoaderBuildHookFactory(() -> new Properties(), () -> List.of(provider));
+        new ServiceLoaderBuildHookFactory(Properties::new, () -> List.of(provider));
 
         // configure() should be called during construction
         assertThat(configureCallCount.get()).isOne();
@@ -41,7 +41,7 @@ class ServiceLoaderBuildHookFactoryTest {
         provider.enabled = true;
 
         ServiceLoaderBuildHookFactory factory =
-                new ServiceLoaderBuildHookFactory(() -> new Properties(), () -> List.of(provider));
+                new ServiceLoaderBuildHookFactory(Properties::new, () -> List.of(provider));
 
         // After construction, configureCallCount = 1
         assertThat(configureCallCount.get()).isOne();

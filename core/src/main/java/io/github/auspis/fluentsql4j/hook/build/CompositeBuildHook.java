@@ -27,7 +27,7 @@ public final class CompositeBuildHook extends BuildHook {
     }
 
     @Override
-    protected void doOnError(Throwable error) {
+    protected void doOnError(Exception error) {
         for (BuildHook hook : hooks) {
             hook.onError(error);
         }

@@ -38,7 +38,7 @@ public final class LoggingBuildHook extends BuildHook {
     }
 
     @Override
-    protected void doOnError(Throwable error) {
+    protected void doOnError(Exception error) {
         logger.error("build-error type={} message={}", statementType, error.getMessage(), error);
     }
 

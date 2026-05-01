@@ -102,7 +102,7 @@ class PreparedStatementSpecFactoryBuildHookTest {
         }
 
         @Override
-        protected void doOnError(Throwable error) {
+        protected void doOnError(Exception error) {
             events.add("error");
         }
     }

@@ -160,8 +160,7 @@ class StandardSQLDialectPluginE2E {
                         .gt(25)
                         .build(connection),
                 r -> List.of(r.getString("name"), r.getInt("age")));
-        assertThat(selectResults).isNotEmpty();
-        assertThat(selectResults).allMatch(row -> ((Integer) row.get(1)) > 25);
+        assertThat(selectResults).isNotEmpty().allMatch(row -> ((Integer) row.get(1)) > 25);
 
         // Test UPDATE - execute and verify affected rows
         int updateCount = dsl.update("users")

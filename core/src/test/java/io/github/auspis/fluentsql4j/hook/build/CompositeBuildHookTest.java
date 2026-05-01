@@ -30,7 +30,7 @@ class CompositeBuildHookTest {
         }
 
         @Override
-        protected void doOnError(Throwable error) {
+        protected void doOnError(Exception error) {
             errorCalls.add(error);
         }
     }

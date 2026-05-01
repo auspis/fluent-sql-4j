@@ -13,7 +13,6 @@ public final class ServiceLoaderBuildHookFactory implements BuildHookFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceLoaderBuildHookFactory.class);
 
-    private final Supplier<Properties> propertiesSupplier;
     private final List<BuildHookProvider> cachedProviders;
 
     public ServiceLoaderBuildHookFactory() {
@@ -21,24 +20,19 @@ public final class ServiceLoaderBuildHookFactory implements BuildHookFactory {
     }
 
     ServiceLoaderBuildHookFactory(Supplier<Properties> propertiesSupplier) {
-        this.propertiesSupplier = propertiesSupplier;
-        // Load and configure providers ONCE in constructor
         Properties initialProps = propertiesSupplier.get();
         this.cachedProviders = loadAndConfigureProviders(initialProps);
     }
 
-    // Package-private constructor for testing: inject providers instead of using ServiceLoader
     ServiceLoaderBuildHookFactory(
             Supplier<Properties> propertiesSupplier, Supplier<List<BuildHookProvider>> providersSupplier) {
-        this.propertiesSupplier = propertiesSupplier;
-        // Load and configure provided providers ONCE in constructor
         Properties initialProps = propertiesSupplier.get();
         List<BuildHookProvider> loaded = new ArrayList<>();
         for (BuildHookProvider provider : providersSupplier.get()) {
             try {
                 provider.configure(initialProps);
                 loaded.add(provider);
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 logger.warn("Skipping build hook provider '{}' due to error during configuration", provider.id(), t);
             }
         }
@@ -79,7 +73,7 @@ public final class ServiceLoaderBuildHookFactory implements BuildHookFactory {
             try {
                 provider.configure(properties);
                 loaded.add(provider);
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 logger.warn("Skipping build hook provider '{}' due to error during configuration", provider.id(), t);
             }
         }

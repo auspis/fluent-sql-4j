@@ -69,7 +69,7 @@ public record PreparedStatementSpecFactory(
             PreparedStatementSpec result = statement.accept(astVisitor, enrichedCtx);
             hook.onSuccess(result);
             return result;
-        } catch (Throwable t) {
+        } catch (Exception t) {
             hook.onError(t);
             throw t;
         }

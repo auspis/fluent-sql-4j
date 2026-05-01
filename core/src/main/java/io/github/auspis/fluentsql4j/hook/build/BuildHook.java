@@ -40,7 +40,7 @@ public abstract class BuildHook {
         }
     }
 
-    public final void onError(Throwable error) {
+    public final void onError(Exception error) {
         try {
             doOnError(error);
         } catch (Exception ignored) {
@@ -52,7 +52,7 @@ public abstract class BuildHook {
 
     protected void doOnSuccess(PreparedStatementSpec spec) {}
 
-    protected void doOnError(Throwable error) {}
+    protected void doOnError(Exception error) {}
 
     static boolean isInternalErrorsLoggingEnabled() {
         return Boolean.parseBoolean(System.getProperty(INTERNAL_ERRORS_ENABLED_PROPERTY, "false"));
