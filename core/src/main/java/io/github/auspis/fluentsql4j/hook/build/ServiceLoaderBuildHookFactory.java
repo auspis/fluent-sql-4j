@@ -57,7 +57,7 @@ public final class ServiceLoaderBuildHookFactory implements BuildHookFactory {
                     continue;
                 }
                 BuildHook hook = provider.create();
-                if (hook != null) {
+                if (!BuildHook.isNull(hook)) {
                     hooks.add(hook);
                 }
             } catch (Throwable t) {

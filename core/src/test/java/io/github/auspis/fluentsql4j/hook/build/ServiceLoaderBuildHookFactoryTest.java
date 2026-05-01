@@ -88,7 +88,6 @@ class ServiceLoaderBuildHookFactoryTest {
                 new ServiceLoaderBuildHookFactory(Properties::new, () -> List.of(provider));
 
         BuildHook result = factory.create();
-
         assertThat(result).isNotSameAs(BuildHook.nullObject());
     }
 
@@ -110,7 +109,22 @@ class ServiceLoaderBuildHookFactoryTest {
     @Test
     void providerThatReturnsNullHookIsIgnored() {
         TestBuildHookProvider provider = new TestBuildHookProvider();
+        provider.enabled = true;
         provider.buildHook = null;
+
+        ServiceLoaderBuildHookFactory factory =
+                new ServiceLoaderBuildHookFactory(Properties::new, () -> List.of(provider));
+
+        BuildHook result = factory.create();
+
+        assertThat(result).isSameAs(BuildHook.nullObject());
+    }
+
+    @Test
+    void providerThatReturnsNullObjectHookIsIgnored() {
+        TestBuildHookProvider provider = new TestBuildHookProvider();
+        provider.enabled = true;
+        provider.buildHook = BuildHook.nullObject();
 
         ServiceLoaderBuildHookFactory factory =
                 new ServiceLoaderBuildHookFactory(Properties::new, () -> List.of(provider));
@@ -126,7 +140,7 @@ class ServiceLoaderBuildHookFactoryTest {
         private int order = 0;
         private boolean useProperties = false;
         private boolean throwsExceptionOnConfigure = false;
-        private BuildHook buildHook = BuildHook.nullObject();
+        private BuildHook buildHook = new TestBuildHook();
 
         @Override
         public String id() {
@@ -159,4 +173,6 @@ class ServiceLoaderBuildHookFactoryTest {
             return buildHook;
         }
     }
+
+    private static final class TestBuildHook extends BuildHook {}
 }

@@ -18,8 +18,7 @@ public interface BuildHookFactory {
     /**
      * Returns a factory that composes the results of all provided factories.
      *
-     * <p>Null factories and factories that produce the null-object hook are silently ignored.
-     * If only one real hook remains, it is returned directly (no composite wrapper).
+     * <p>Null factories and factories that produce the null-object hook are ignored.
      *
      * @param factories the factories to compose; must not be {@code null}
      * @return a composing factory, never {@code null}
@@ -30,9 +29,7 @@ public interface BuildHookFactory {
             List<BuildHook> hooks = Arrays.stream(factories)
                     .filter(Objects::nonNull)
                     .map(BuildHookFactory::create)
-                    .peek(e -> System.out.println("before: " + e)) // Debug: print each created hook
-                    .filter(hook -> hook != null && hook != BuildHook.nullObject())
-                    .peek(e -> System.out.println("after: " + e)) // Debug: print each created hook
+                    .filter(hook -> !BuildHook.isNull(hook))
                     .toList();
             return hooks.isEmpty() ? BuildHook.nullObject() : new CompositeBuildHook(hooks);
         };

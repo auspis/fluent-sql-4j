@@ -33,7 +33,6 @@ class ServiceLoaderBuildHookFactoryIntegrationTest {
         System.setProperty(LoggingBuildHookProvider.ENABLED_PROPERTY, "true");
         factory = new ServiceLoaderBuildHookFactory();
         BuildHook result = factory.create();
-        System.out.println(result.getClass());
 
         assertThat(result).isNotSameAs(BuildHook.nullObject()).isInstanceOf(CompositeBuildHook.class);
     }

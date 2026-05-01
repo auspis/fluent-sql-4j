@@ -41,13 +41,17 @@ Supported properties:
 - `fluentsql.hooks.build.logging.enabled` (default: `false`)
 - `fluentsql.hooks.build.logging.level` (default: `DEBUG`)
 - `fluentsql.hooks.build.logging.includeParams` (default: `false`)
+- `fluentsql.hooks.build.internal-errors.enabled` (default: `false`)
+  - When `true`, internal exceptions thrown by hook callbacks are logged at `ERROR`
+    from the `BuildHook` template base class.
 
 ### Example (JVM args)
 
 ```bash
 -Dfluentsql.hooks.build.logging.enabled=true \
 -Dfluentsql.hooks.build.logging.level=INFO \
--Dfluentsql.hooks.build.logging.includeParams=true
+-Dfluentsql.hooks.build.logging.includeParams=true \
+-Dfluentsql.hooks.build.internal-errors.enabled=true
 ```
 
 Example with `System.setProperty(...)`:
@@ -58,6 +62,7 @@ Set properties before creating DSL/registry instances:
 System.setProperty("fluentsql.hooks.build.logging.enabled", "true");
 System.setProperty("fluentsql.hooks.build.logging.level", "INFO");
 System.setProperty("fluentsql.hooks.build.logging.includeParams", "true");
+System.setProperty("fluentsql.hooks.build.internal-errors.enabled", "true");
 
 DSLRegistry registry = DSLRegistry.createWithServiceLoader();
 DSL dsl = registry.dslFor("mysql", "8.0.35").orElseThrow();
