@@ -1,8 +1,5 @@
 package io.github.auspis.fluentsql4j.plugin;
 
-import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
-import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
-import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.functional.Result.Failure;
 import io.github.auspis.fluentsql4j.functional.Result.Success;
@@ -44,16 +41,12 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>Using the registry:</b>
  * <pre>{@code
- * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("mysql", "8.0.35");
+ * Result<SqlDialectPlugin> result = registry.getPlugin("mysql", "8.0.35");
  *
  * switch (result) {
- *     case Success<PreparedStatementSpecFactory>(PreparedStatementSpecFactory specFactory) -> // use specFactory
- *     case Failure<PreparedStatementSpecFactory>(String error) -> logger.error("Could not resolve dialect: {}", error);
+ *     case Success<SqlDialectPlugin>(SqlDialectPlugin plugin) -> // use plugin metadata
+ *     case Failure<SqlDialectPlugin>(String error) -> logger.error("Could not resolve dialect: {}", error);
  * }
- *
- * // Or use helper methods
- * PreparedStatementSpecFactory specFactory = registry.getSpecFactory("mysql", "8.0.35").orElseThrow();
- * DSL dsl = new DSL(specFactory);
  * }</pre>
  * <p>
  * <b>Registering plugins:</b>
@@ -182,53 +175,17 @@ public final class SqlDialectPluginRegistry {
     }
 
     /**
-     * Retrieves a {@link PreparedStatementSpecFactory} for the specified SQL dialect without version matching.
-     * <p>
-     * This method returns the first available plugin for the given dialect, regardless of version.
-     * If you need version-specific rendering, use {@link #getSpecFactory(String, String)} instead.
-     * <p>
-     * The dialect name is matched case-insensitively.
+     * Retrieves the plugin descriptor for the specified SQL dialect and version.
      *
-     * @param dialect the name of the SQL dialect, must not be {@code null}
-     * @return a result containing the renderer, or a failure if the dialect is not supported
-     */
-    public Result<PreparedStatementSpecFactory> getSpecFactory(String dialect) {
-        return getSpecFactory(dialect, null);
-    }
-
-    /**
-     * Retrieves a {@link PreparedStatementSpecFactory} for the specified SQL dialect and version.
-     * <p>
-     * The renderer encapsulates both SQL and PreparedStatement rendering,
-     * ensuring consistency between SQL generation and prepared statement creation.
-     * <p>
-     * The dialect name is matched case-insensitively. The registry finds all plugins
-     * registered for the given dialect and filters them by version compatibility.
-     * <p>
-     * Version matching strategy:
-     * <ul>
-     *   <li>If the requested version is SemVer-compatible, uses SemVer range matching</li>
-     *   <li>If the requested version is not SemVer-compatible, uses exact string matching</li>
-     * </ul>
-     * <p>
-     * If multiple plugins match the requested version, the first match is used and a warning
-     * is logged. This typically indicates overlapping version ranges in plugin configuration.
-     * <p>
-     * <b>Example with SemVer:</b>
-     * <pre>{@code
-     * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("mysql", "8.0.35");
-     * }</pre>
-     * <p>
-     * <b>Example with non-SemVer:</b>
-     * <pre>{@code
-     * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("standardsql", "2008");
-     * }</pre>
+     * <p>This registry is intentionally metadata-focused. It performs only lookup and
+     * matching. Runtime materialization (creating DSL/spec factory instances) belongs to
+     * {@link SqlDialectResolver}.
      *
      * @param dialect the name of the SQL dialect, must not be {@code null}
      * @param version the database version, may be {@code null} to match any version
-     * @return a result containing the renderer, or a failure if no matching plugin is found
+     * @return a result containing the matching plugin, or a failure if no matching plugin is found
      */
-    public Result<PreparedStatementSpecFactory> getSpecFactory(String dialect, String version) {
+    public Result<SqlDialectPlugin> getPlugin(String dialect, String version) {
         if (dialect == null) {
             return new Failure<>("Dialect name must not be null");
         }
@@ -248,72 +205,7 @@ public final class SqlDialectPluginRegistry {
             logMultipleMatches(dialect, version, matchingPlugins);
         }
 
-        return new Success<>(matchingPlugins.get(0).createDSL().getSpecFactory());
-    }
-
-    /**
-     * Gets a {@link AstToPreparedStatementSpecVisitor} for the specified dialect and version.
-     * <p>
-     * This is a convenience method that extracts the PS renderer from the dialect renderer.
-     *
-     * @param dialect the dialect name
-     * @param version the version to match
-     * @return a {@link io.github.auspis.fluentsql4j.functional.Result} containing either the PS renderer or an error message
-     */
-    public Result<AstToPreparedStatementSpecVisitor> getPreparedStatementSpecFactory(String dialect, String version) {
-        return getSpecFactory(dialect, version).map(PreparedStatementSpecFactory::astVisitor);
-    }
-
-    /**
-     * Retrieves a {@link io.github.auspis.fluentsql4j.dsl.DSL} instance for the specified SQL dialect and version.
-     * <p>
-     * This method returns the DSL instance created by the plugin's {@code createDSL()} method.
-     * This allows dialect-specific DSL extensions (like {@link io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MySQLDSL})
-     * to be properly returned to callers.
-     * <p>
-     * The dialect name is matched case-insensitively. The registry finds all plugins
-     * registered for the given dialect and filters them by version compatibility.
-     * <p>
-     * Version matching strategy:
-     * <ul>
-     *   <li>If the requested version is SemVer-compatible, uses SemVer range matching</li>
-     *   <li>If the requested version is not SemVer-compatible, uses exact string matching</li>
-     * </ul>
-     * <p>
-     * If multiple plugins match the requested version, the first match is used and a warning
-     * is logged.
-     * <p>
-     * <b>Example:</b>
-     * <pre>{@code
-     * Result<DSL> result = registry.getDialect("mysql", "8.0.35");
-     * // Returns a MySQLDSL instance, not a base DSL
-     * }</pre>
-     *
-     * @param dialect the name of the SQL dialect, must not be {@code null}
-     * @param version the database version, may be {@code null} to match any version
-     * @return a result containing the DSL instance, or a failure if no matching plugin is found
-     */
-    public Result<DSL> getDsl(String dialect, String version) {
-        if (dialect == null) {
-            return new Failure<>("Dialect name must not be null");
-        }
-
-        List<SqlDialectPlugin> dialectPlugins =
-                plugins.getOrDefault(getNormalizedDialect(dialect), Collections.emptyList());
-
-        List<SqlDialectPlugin> matchingPlugins = findMatchingPlugins(dialectPlugins, version);
-
-        if (matchingPlugins.isEmpty()) {
-            String versionInfo = version != null ? " version '" + version + "'" : "";
-            return new Failure<>("No plugin found for dialect '" + dialect + "'" + versionInfo
-                    + ". Supported dialects: " + getSupportedDialects());
-        }
-
-        if (matchingPlugins.size() > 1) {
-            logMultipleMatches(dialect, version, matchingPlugins);
-        }
-
-        return new Success<>(matchingPlugins.get(0).createDSL());
+        return new Success<>(matchingPlugins.get(0));
     }
 
     /**

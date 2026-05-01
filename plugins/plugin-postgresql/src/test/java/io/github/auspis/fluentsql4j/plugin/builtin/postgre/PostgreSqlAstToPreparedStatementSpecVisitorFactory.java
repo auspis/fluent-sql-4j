@@ -3,7 +3,9 @@ package io.github.auspis.fluentsql4j.plugin.builtin.postgre;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 
 /**
  * Test utility factory for creating PostgreSQL AstToPreparedStatementSpecVisitor instances.
@@ -28,7 +30,9 @@ public final class PostgreSqlAstToPreparedStatementSpecVisitorFactory {
      * @throws IllegalStateException if the PostgreSQL plugin is not available
      */
     public static AstToPreparedStatementSpecVisitor create() {
-        return REGISTRY.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, PostgreSqlDialectPlugin.DIALECT_VERSION)
+        return new SqlDialectResolver(REGISTRY, BuildHookFactory.nullObject())
+                .resolve(PostgreSqlDialectPlugin.DIALECT_NAME, PostgreSqlDialectPlugin.DIALECT_VERSION)
+                .map(DSL::getSpecFactory)
                 .orElseThrow()
                 .astVisitor();
     }
@@ -40,7 +44,9 @@ public final class PostgreSqlAstToPreparedStatementSpecVisitorFactory {
      * @throws IllegalArgumentException if the PostgreSQL plugin is not available
      */
     public static PreparedStatementSpecFactory dialectRendererPostgreSql() {
-        return REGISTRY.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, PostgreSqlDialectPlugin.DIALECT_VERSION)
+        return new SqlDialectResolver(REGISTRY, BuildHookFactory.nullObject())
+                .resolve(PostgreSqlDialectPlugin.DIALECT_NAME, PostgreSqlDialectPlugin.DIALECT_VERSION)
+                .map(DSL::getSpecFactory)
                 .orElseThrow();
     }
 

@@ -17,7 +17,7 @@ public final class SqlDialectPluginUtil {
      */
     public static SqlDialectPlugin create(
             String dialectName, String dialectVersion, PreparedStatementSpecFactory specFactory) {
-        return new SqlDialectPlugin(dialectName, dialectVersion, () -> new DSL(specFactory));
+        return new SqlDialectPlugin(dialectName, dialectVersion, hookFactory -> new DSL(specFactory));
     }
 
     /**

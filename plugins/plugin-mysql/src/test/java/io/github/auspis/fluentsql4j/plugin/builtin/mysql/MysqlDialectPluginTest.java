@@ -35,7 +35,7 @@ class MysqlDialectPluginTest {
     @Test
     void shouldCreateValidDSL() {
         SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         assertThat(dsl).isNotNull();
         assertThat(dsl.getSpecFactory()).isNotNull();
@@ -45,8 +45,8 @@ class MysqlDialectPluginTest {
     void shouldCreateNewDSLOnEachCall() {
         SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
 
-        DSL dsl1 = plugin.createDSL();
-        DSL dsl2 = plugin.createDSL();
+        DSL dsl1 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
+        DSL dsl2 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify that each call creates a new instance
         assertThat(dsl1).isNotSameAs(dsl2);
@@ -67,7 +67,7 @@ class MysqlDialectPluginTest {
     @Test
     void shouldCreateDSLCompatibleWithMySQL() {
         SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify DSL is configured for MySQL
         assertThat(dsl).isNotNull();
@@ -117,7 +117,7 @@ class MysqlDialectPluginTest {
     @Test
     void shouldCreateMySQLDSL() {
         SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify it returns MySQLDSL, not base DSL
         assertThat(dsl).isInstanceOf(io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL.class);

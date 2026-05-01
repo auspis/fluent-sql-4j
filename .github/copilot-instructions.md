@@ -144,23 +144,25 @@ For more details: https://www.baeldung.com/java-helper-vs-utility-classes
 2. Add a `pom.xml` for the module
 3. Register the module in the root `pom.xml` under `<modules>`
 
-**Note**: All tests (unit, integration, E2E) are now consolidated in the `core/` module. Do not create separate test modules.
+**Note**: All standard tests (unit, integration, E2E) are consolidated in the `core/` module. The only exception is `test-real-deps`, reserved for tests that require concrete runtime dependencies intentionally excluded from production modules and published artifacts. Do not create additional test modules.
 
 ## How to Run Tests
 
 - make sure you are in the root folder or `cd` to it
 - Use `./mvnw clean test -am -pl core` to run unit and component tests (fast feedback, no database)
 - Use `./mvnw clean verify -am -pl core` to run all tests (unit + component + integration + E2E)
+- Use `./mvnw test -am -pl test-real-deps` to run realistic backend tests kept outside `core`
 - Use `./mvnw test -am -pl core -Dgroups=component` to run only component tests
 - Use `./mvnw verify -am -pl core -Dgroups=integration` to run only integration tests
 - Use `./mvnw verify -am -pl core -Dgroups=e2e` to run only E2E tests
 - The project is a multi module maven project, so in some cases you may need to add -am to compile dependencies
 - When you need to run integration tests try to run only the needed ones
-- All tests are now consolidated in the `core/` module with the following structure:
+- All standard tests are consolidated in the `core/` module with the following structure:
   - `core/src/test/java/io/github/auspis/fluentsql4j/`: Unit tests (fast, isolated, single class)
   - `core/src/test/java/io/github/auspis/fluentsql4j/dsl/*ComponentTest.java`: Component tests (fast, multiple classes, mocked JDBC)
   - `core/src/test/java/integration/`: Integration tests (medium speed, with H2/Testcontainers)
   - `core/src/test/java/e2e/system/`: E2E tests (slow, with real databases)
+- `test-real-deps/src/test/java/`: Realistic tests that require concrete runtime dependencies intentionally excluded from production modules and published artifacts
 
 ## Test Categories (Test Pyramid)
 
@@ -211,6 +213,7 @@ The project uses a structured test pyramid with four main categories:
 - **Component tests**: Place in `core/src/test/java/io/github/auspis/fluentsql4j/dsl/` with `@ComponentTest` annotation and suffix `*ComponentTest.java`
 - **Integration tests**: Place in `core/src/test/java/integration/` with `@IntegrationTest` annotation and descriptive comments
 - **E2E tests**: Place in `core/src/test/java/e2e/system/` with `@E2ETest` annotation
+- **Concrete runtime dependency tests**: Place in `test-real-deps/src/test/java/` only when the test requires realistic backends that should not be introduced into the production module graph or published artifacts
 
 ## Test Helper and Assertion Utilities
 

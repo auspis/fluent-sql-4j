@@ -2,7 +2,10 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
+import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 
 /**
  * Test utility factory for creating MySQL AstToPreparedStatementSpecVisitor instances.
@@ -27,7 +30,9 @@ public final class MysqlAstToPreparedStatementSpecVisitorFactory {
      * @throws IllegalStateException if the MySQL plugin is not available
      */
     public static AstToPreparedStatementSpecVisitor create() {
-        return REGISTRY.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
+        return new SqlDialectResolver(REGISTRY, BuildHookFactory.nullObject())
+                .resolve(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
+                .map(DSL::getSpecFactory)
                 .orElseThrow()
                 .astVisitor();
     }
@@ -39,7 +44,9 @@ public final class MysqlAstToPreparedStatementSpecVisitorFactory {
      * @throws IllegalArgumentException if the MySQL plugin is not available
      */
     public static PreparedStatementSpecFactory preparedStatementSpecFactory() {
-        return REGISTRY.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
+        return new SqlDialectResolver(REGISTRY, BuildHookFactory.nullObject())
+                .resolve(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
+                .map(DSL::getSpecFactory)
                 .orElseThrow();
     }
 }
