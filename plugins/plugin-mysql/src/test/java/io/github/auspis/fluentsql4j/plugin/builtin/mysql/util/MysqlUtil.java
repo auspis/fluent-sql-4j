@@ -2,7 +2,9 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql.util;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.MysqlDialectPlugin;
 
 /**
@@ -28,7 +30,9 @@ public final class MysqlUtil {
      * @throws IllegalArgumentException if the MySQL plugin is not available
      */
     public static PreparedStatementSpecFactory preparedStatementSpecFactory() {
-        return REGISTRY.getSpecFactory(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
+        return new SqlDialectResolver(REGISTRY, BuildHookFactory.nullObject())
+                .resolve(MysqlDialectPlugin.DIALECT_NAME, MysqlDialectPlugin.DIALECT_VERSION)
+                .map(DSL::getSpecFactory)
                 .orElseThrow();
     }
 

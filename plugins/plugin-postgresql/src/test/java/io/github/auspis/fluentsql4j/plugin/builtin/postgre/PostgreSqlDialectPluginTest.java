@@ -35,7 +35,7 @@ class PostgreSqlDialectPluginTest {
     @Test
     void shouldCreateValidDSL() {
         SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         assertThat(dsl).isNotNull();
         assertThat(dsl.getSpecFactory()).isNotNull();
@@ -45,8 +45,8 @@ class PostgreSqlDialectPluginTest {
     void shouldCreateNewDSLOnEachCall() {
         SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
 
-        DSL dsl1 = plugin.createDSL();
-        DSL dsl2 = plugin.createDSL();
+        DSL dsl1 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
+        DSL dsl2 = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify that each call creates a new instance
         assertThat(dsl1).isNotSameAs(dsl2);
@@ -67,7 +67,7 @@ class PostgreSqlDialectPluginTest {
     @Test
     void shouldCreateDSLCompatibleWithPostgreSQL() {
         SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify DSL is configured for PostgreSQL
         assertThat(dsl).isNotNull();
@@ -117,7 +117,7 @@ class PostgreSqlDialectPluginTest {
     @Test
     void shouldCreatePostgreSQLDSL() {
         SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
-        DSL dsl = plugin.createDSL();
+        DSL dsl = plugin.createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
 
         // Verify it returns PostgreSqlDSL, not base DSL
         assertThat(dsl).isInstanceOf(io.github.auspis.fluentsql4j.plugin.builtin.postgre.dsl.PostgreSqlDSL.class);

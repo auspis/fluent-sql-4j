@@ -9,10 +9,6 @@
   <artifactId>core</artifactId>
   <name>fluent-sql-4j core</name>
 
-  <properties>
-    <maven.deploy.skip>true</maven.deploy.skip>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>io.github.auspis.fluentsql4j</groupId>

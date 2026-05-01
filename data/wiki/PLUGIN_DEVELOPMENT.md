@@ -344,9 +344,12 @@ class PostgreSqlDialectPluginIntegrationTest {
     void shouldProvideRenderer() {
         SqlDialectPluginRegistry registry = 
             SqlDialectPluginRegistry.createWithServiceLoader();
+        SqlDialectResolver resolver =
+            new SqlDialectResolver(registry, BuildHookFactory.nullObject());
 
         Result<PreparedStatementSpecFactory> result = 
-            registry.getSpecFactory("postgresql", "15.0.0");
+            resolver.resolve("postgresql", "15.0.0")
+                .map(DSL::getSpecFactory);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();
@@ -454,7 +457,10 @@ options.put(FunctionCallNames.Options.ORDER_BY, orderBy); // Can be modified ext
 
 ```java
 // ✅ GOOD: Clear error handling
-Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("unknown", "1.0");
+Result<PreparedStatementSpecFactory> result =
+    new SqlDialectResolver(registry, BuildHookFactory.nullObject())
+        .resolve("unknown", "1.0")
+        .map(DSL::getSpecFactory);
 if (result instanceof Result.Failure<PreparedStatementSpecFactory> failure) {
     System.err.println("Error: " + failure.error());
     System.err.println("Supported dialects: " + registry.supportedDialects());
@@ -462,7 +468,11 @@ if (result instanceof Result.Failure<PreparedStatementSpecFactory> failure) {
 
 // ❌ BAD: Throwing generic exceptions
 try {
-    PreparedStatementSpecFactory renderer = registry.getSpecFactory("unknown", "1.0").orElseThrow();
+    PreparedStatementSpecFactory renderer =
+        new SqlDialectResolver(registry, BuildHookFactory.nullObject())
+            .resolve("unknown", "1.0")
+            .map(DSL::getSpecFactory)
+            .orElseThrow();
 } catch (Exception e) {
     // Generic error, no context
 }

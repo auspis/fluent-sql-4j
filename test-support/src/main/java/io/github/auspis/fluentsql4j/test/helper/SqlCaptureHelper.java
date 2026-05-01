@@ -32,7 +32,9 @@ import org.mockito.ArgumentCaptor;
  *     &#64;BeforeEach
  *     void setUp() throws SQLException {
  *         mockHelper = new SqlCaptureHelper();
- *         specFactory = StandardSQLDialectPlugin.instance().createDSL().getSpecFactory();
+ *         specFactory = StandardSQLDialectPlugin.instance()
+ *             .createDSL(new ServiceLoaderBuildHookFactory())
+ *             .getSpecFactory();
  *     }
  *
  *     &#64;Test

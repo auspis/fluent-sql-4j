@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.github.auspis.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
 import java.sql.Connection;
@@ -188,5 +189,13 @@ class DSLRegistryComponentTest {
 
         assertThat(result.isFailure()).isTrue();
         assertThat(((Result.Failure<DSL>) result).message()).contains("No plugin found");
+    }
+
+    @Test
+    void dslFor_shouldUseServiceLoaderBuildHookFactory() {
+        DSL dsl = registry.dslFor(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
+                .orElseThrow();
+
+        assertThat(dsl.getSpecFactory().buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
     }
 }

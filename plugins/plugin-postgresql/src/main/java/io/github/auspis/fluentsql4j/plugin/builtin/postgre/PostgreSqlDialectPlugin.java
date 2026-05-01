@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.plugin.builtin.postgre;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.ast.visitor.ps.strategy.PostgreSqlCustomFunctionCallPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.postgre.dsl.PostgreSqlDSL;
@@ -47,11 +48,14 @@ import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strate
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
- * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("postgresql", "15.0.0");
+ * SqlDialectResolver resolver = new SqlDialectResolver(registry, new ServiceLoaderBuildHookFactory());
+ * Result<PreparedStatementSpecFactory> result =
+ *     resolver.resolve("postgresql", "15.0.0").map(DSL::getSpecFactory);
  *
  * // Or created directly
  * SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
- * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
+ * PreparedStatementSpecFactory specFactory =
+ *     plugin.createDSL(new ServiceLoaderBuildHookFactory()).getSpecFactory();
  * }</pre>
  * <p>
  * <b>ServiceLoader Discovery:</b>
@@ -112,13 +116,13 @@ public final class PostgreSqlDialectPlugin {
      *
      * @return a new {@link PreparedStatementSpecFactory} instance configured for PostgreSQL, never {@code null}
      */
-    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
+    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory(BuildHookFactory hookFactory) {
         AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new StandardSqlEscapeStrategy())
                 .customFunctionCallStrategy(new PostgreSqlCustomFunctionCallPsStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor, hookFactory);
     }
 
     /**
@@ -130,7 +134,8 @@ public final class PostgreSqlDialectPlugin {
      * <p>
      * <b>Example usage:</b>
      * <pre>{@code
-     * PostgreSqlDSL dsl = (PostgreSqlDSL) PostgreSqlDialectPlugin.instance().createDSL();
+     * PostgreSqlDSL dsl =
+     *     (PostgreSqlDSL) PostgreSqlDialectPlugin.instance().createDSL(new ServiceLoaderBuildHookFactory());
      * PreparedStatement ps = dsl.select(
      *     dsl.stringAgg("name")
      *         .separator(", ")
@@ -142,8 +147,8 @@ public final class PostgreSqlDialectPlugin {
      *
      * @return a new {@link PostgreSqlDSL} instance configured for PostgreSQL, never {@code null}
      */
-    private static DSL dsl() {
-        return new PostgreSqlDSL(createPreparedStatementSpecFactory());
+    private static DSL dsl(BuildHookFactory hookFactory) {
+        return new PostgreSqlDSL(createPreparedStatementSpecFactory(hookFactory));
     }
 
     /**
@@ -155,7 +160,8 @@ public final class PostgreSqlDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = PostgreSqlDialectPlugin.instance();
-     * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
+     * PreparedStatementSpecFactory specFactory =
+     *     plugin.createDSL(new ServiceLoaderBuildHookFactory()).getSpecFactory();
      * }</pre>
      *
      * @return the singleton PostgreSQL dialect plugin instance, never {@code null}
