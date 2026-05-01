@@ -15,7 +15,7 @@ public final class CompositeBuildHook extends BuildHook {
     @Override
     protected void doBefore(Statement statement) {
         for (BuildHook hook : hooks) {
-            hook.before(statement);
+            hook.onStart(statement);
         }
     }
 

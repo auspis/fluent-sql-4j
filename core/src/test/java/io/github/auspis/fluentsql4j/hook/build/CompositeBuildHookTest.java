@@ -45,7 +45,7 @@ class CompositeBuildHookTest {
         CompositeBuildHook composite = new CompositeBuildHook(List.of(first, second, third));
         Statement statement = Mockito.mock(Statement.class);
 
-        composite.before(statement);
+        composite.onStart(statement);
 
         assertThat(first.beforeCalls).containsExactly(statement);
         assertThat(second.beforeCalls).containsExactly(statement);
@@ -87,7 +87,7 @@ class CompositeBuildHookTest {
         PreparedStatementSpec spec = new PreparedStatementSpec("SELECT 1", List.of());
         RuntimeException error = new RuntimeException("boom");
 
-        assertThatCode(() -> composite.before(statement)).doesNotThrowAnyException();
+        assertThatCode(() -> composite.onStart(statement)).doesNotThrowAnyException();
         assertThatCode(() -> composite.onSuccess(spec)).doesNotThrowAnyException();
         assertThatCode(() -> composite.onError(error)).doesNotThrowAnyException();
     }
@@ -101,7 +101,7 @@ class CompositeBuildHookTest {
         mutableList.add(new RecordingHook());
         Statement statement = Mockito.mock(Statement.class);
 
-        composite.before(statement);
+        composite.onStart(statement);
 
         assertThat(original.beforeCalls).hasSize(1);
     }

@@ -57,7 +57,7 @@ class LoggingBuildHookTest {
         PreparedStatementSpec spec = preparedStatementSpecFactory.create(statement);
         LoggingBuildHook hook = new LoggingBuildHook(attachInMemoryLogger(), Level.DEBUG, false);
 
-        hook.before(statement);
+        hook.onStart(statement);
         hook.onSuccess(spec);
 
         assertThat(appender.list).hasSize(2);
@@ -80,7 +80,7 @@ class LoggingBuildHookTest {
         PreparedStatementSpec spec = preparedStatementSpecFactory.create(statement);
         LoggingBuildHook hook = new LoggingBuildHook(attachInMemoryLogger(), Level.DEBUG, true);
 
-        hook.before(statement);
+        hook.onStart(statement);
         hook.onSuccess(spec);
 
         assertThat(appender.list).hasSize(2);
@@ -97,7 +97,7 @@ class LoggingBuildHookTest {
         LoggingBuildHook hook = new LoggingBuildHook(attachInMemoryLogger(), Level.DEBUG, false);
         RuntimeException error = new RuntimeException("boom");
 
-        hook.before(selectStatementBuilder.build());
+        hook.onStart(selectStatementBuilder.build());
         hook.onError(error);
 
         assertThat(appender.list).hasSize(2);
@@ -117,7 +117,7 @@ class LoggingBuildHookTest {
                 .debug(anyString(), org.mockito.ArgumentMatchers.<Object[]>any());
         LoggingBuildHook hook = new LoggingBuildHook(slf4jLogger, Level.DEBUG, false);
 
-        assertThatCode(() -> hook.before(selectStatementBuilder.build())).doesNotThrowAnyException();
+        assertThatCode(() -> hook.onStart(selectStatementBuilder.build())).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
@@ -126,7 +126,7 @@ class LoggingBuildHookTest {
         SelectStatement statement = selectStatementBuilder.build();
         LoggingBuildHook hook = new LoggingBuildHook(attachInMemoryLogger(), level, false);
 
-        hook.before(statement);
+        hook.onStart(statement);
 
         assertThat(appender.list).hasSize(1);
         ch.qos.logback.classic.Level expectedLogbackLevel = ch.qos.logback.classic.Level.toLevel(level.name());

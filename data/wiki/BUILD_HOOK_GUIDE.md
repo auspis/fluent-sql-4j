@@ -13,7 +13,7 @@ Build hooks run during `PreparedStatementSpecFactory.create(...)`, around AST re
 
 Lifecycle callbacks:
 
-- `before(statement)`
+- `onStart(statement)`
 - `onSuccess(spec)`
 - `onError(error)`
 

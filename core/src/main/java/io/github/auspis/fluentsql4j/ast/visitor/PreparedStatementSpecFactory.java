@@ -64,7 +64,7 @@ public record PreparedStatementSpecFactory(
         BuildHook hook = BuildHook.nullObject();
         try {
             hook = buildHookFactory.create();
-            hook.before(statement);
+            hook.onStart(statement);
             AstContext enrichedCtx = statement.accept(CONTEXT_ANALYZER, new AstContext());
             PreparedStatementSpec result = statement.accept(astVisitor, enrichedCtx);
             hook.onSuccess(result);

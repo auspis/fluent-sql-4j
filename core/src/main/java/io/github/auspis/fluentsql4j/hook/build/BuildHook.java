@@ -14,7 +14,7 @@ public abstract class BuildHook {
         return NULL_OBJECT_INSTANCE;
     }
 
-    public final void before(Statement statement) {
+    public final void onStart(Statement statement) {
         try {
             doBefore(statement);
         } catch (Exception ignored) {

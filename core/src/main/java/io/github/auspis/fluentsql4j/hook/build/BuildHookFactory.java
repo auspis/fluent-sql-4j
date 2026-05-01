@@ -30,15 +30,11 @@ public interface BuildHookFactory {
             List<BuildHook> hooks = Arrays.stream(factories)
                     .filter(Objects::nonNull)
                     .map(BuildHookFactory::create)
+                    .peek(e -> System.out.println("before: " + e)) // Debug: print each created hook
                     .filter(hook -> hook != null && hook != BuildHook.nullObject())
+                    .peek(e -> System.out.println("after: " + e)) // Debug: print each created hook
                     .toList();
-            if (hooks.isEmpty()) {
-                return BuildHook.nullObject();
-            }
-            if (hooks.size() == 1) {
-                return hooks.get(0);
-            }
-            return new CompositeBuildHook(hooks);
+            return hooks.isEmpty() ? BuildHook.nullObject() : new CompositeBuildHook(hooks);
         };
     }
 }

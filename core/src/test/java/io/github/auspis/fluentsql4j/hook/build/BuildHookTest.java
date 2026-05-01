@@ -21,7 +21,7 @@ class BuildHookTest {
 
         Statement statement = Mockito.mock(Statement.class);
 
-        assertThatCode(() -> hook.before(statement)).doesNotThrowAnyException();
+        assertThatCode(() -> hook.onStart(statement)).doesNotThrowAnyException();
     }
 
     @Test
