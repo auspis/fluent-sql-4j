@@ -21,6 +21,8 @@ module io.github.auspis.fluentsql4j.core {
     exports io.github.auspis.fluentsql4j.plugin.builtin.sql2016.data;
     exports io.github.auspis.fluentsql4j.plugin.builtin.sql2016.ast.visitor.ps.strategy;
     exports io.github.auspis.fluentsql4j.ast.visitor;
+    exports io.github.auspis.fluentsql4j.hook.build;
+    exports io.github.auspis.fluentsql4j.hook.build.logging;
     exports io.github.auspis.fluentsql4j.ast.visitor.ps;
     exports io.github.auspis.fluentsql4j.ast.visitor.ps.strategy;
     exports io.github.auspis.fluentsql4j.ast.core.clause;
@@ -50,7 +52,10 @@ module io.github.auspis.fluentsql4j.core {
 
     // ServiceLoader support for plugin discovery
     uses io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider;
+    uses io.github.auspis.fluentsql4j.hook.build.BuildHookProvider;
 
     provides io.github.auspis.fluentsql4j.plugin.SqlDialectPluginProvider with
             io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPluginProvider;
+    provides io.github.auspis.fluentsql4j.hook.build.BuildHookProvider with
+            io.github.auspis.fluentsql4j.hook.build.logging.LoggingBuildHookProvider;
 }

@@ -3,6 +3,8 @@ package io.github.auspis.fluentsql4j.ast.visitor;
 import io.github.auspis.fluentsql4j.ast.core.statement.Statement;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.PreparedStatementSpec;
+import io.github.auspis.fluentsql4j.hook.build.BuildHook;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import java.util.Objects;
 
 /**
@@ -30,14 +32,26 @@ import java.util.Objects;
  * }</pre>
  *
  * @param astVisitor the AstToPreparedStatementSpecVisitor astVisitor for this dialect
+ * @param buildHookFactory factory that creates a build hook for each create invocation
  * @since 1.0
  */
-public record PreparedStatementSpecFactory(AstToPreparedStatementSpecVisitor astVisitor) {
+public record PreparedStatementSpecFactory(
+        AstToPreparedStatementSpecVisitor astVisitor, BuildHookFactory buildHookFactory) {
 
     private static final ContextPreparationVisitor CONTEXT_ANALYZER = new ContextPreparationVisitor();
 
     public PreparedStatementSpecFactory {
         Objects.requireNonNull(astVisitor, "AstToPreparedStatementSpecVisitor must not be null");
+        buildHookFactory = (buildHookFactory == null) ? BuildHookFactory.nullObject() : buildHookFactory;
+    }
+
+    /**
+     * Backward-compatible constructor using a no-op hook factory.
+     *
+     * @param astVisitor the AstToPreparedStatementSpecVisitor astVisitor for this dialect
+     */
+    public PreparedStatementSpecFactory(AstToPreparedStatementSpecVisitor astVisitor) {
+        this(astVisitor, BuildHookFactory.nullObject());
     }
 
     /**
@@ -47,7 +61,17 @@ public record PreparedStatementSpecFactory(AstToPreparedStatementSpecVisitor ast
      * @return the PreparedStatementSpec with SQL and parameters
      */
     public PreparedStatementSpec create(Statement statement) {
-        AstContext enrichedCtx = statement.accept(CONTEXT_ANALYZER, new AstContext());
-        return statement.accept(astVisitor, enrichedCtx);
+        BuildHook hook = BuildHook.nullObject();
+        try {
+            hook = buildHookFactory.create();
+            hook.onStart(statement);
+            AstContext enrichedCtx = statement.accept(CONTEXT_ANALYZER, new AstContext());
+            PreparedStatementSpec result = statement.accept(astVisitor, enrichedCtx);
+            hook.onSuccess(result);
+            return result;
+        } catch (Exception t) {
+            hook.onError(t);
+            throw t;
+        }
     }
 }

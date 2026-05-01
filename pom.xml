@@ -28,6 +28,7 @@
 
   <modules>
     <module>test-support</module>
+    <module>test-real-deps</module>
     <module>core</module>
     <module>api</module>
     <module>spi</module>
@@ -88,7 +89,7 @@
     <dep.assertj-core.version>3.27.7</dep.assertj-core.version>
     <dep.mockito-core.version>5.23.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.18.5</dep.byte-buddy.version>
-
+    <dep.logback-classic.version>1.5.18</dep.logback-classic.version>
     <!-- Run both integration and e2e by default during verify phase -->
     <test.groups.slow>integration,e2e</test.groups.slow>
   </properties>
@@ -218,6 +219,12 @@
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy-agent</artifactId>
         <version>${dep.byte-buddy.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${dep.logback-classic.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -580,6 +587,7 @@
               <publishingServerId>central</publishingServerId>
               <autoPublish>false</autoPublish>
               <waitUntil>validated</waitUntil>
+              <excludeArtifacts>test-real-deps</excludeArtifacts>
             </configuration>
           </plugin>
         </plugins>

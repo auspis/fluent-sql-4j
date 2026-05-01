@@ -3,11 +3,13 @@ package io.github.auspis.fluentsql4j.plugin.builtin.postgre;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.functional.Result;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
+import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
-import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +24,19 @@ class PostgreSqlPluginRegistryComponentTest {
 
     private SqlDialectPluginRegistry pluginRegistry;
 
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(
+            SqlDialectPluginRegistry registry, String dialect, String version) {
+        return new SqlDialectResolver(registry, BuildHookFactory.nullObject())
+                .resolve(dialect, version)
+                .map(DSL::getSpecFactory);
+    }
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(SqlDialectPluginRegistry registry, String dialect) {
+        return resolveSpecFactory(registry, dialect, null);
+    }
+
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() {
         pluginRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
     }
 
@@ -55,14 +68,14 @@ class PostgreSqlPluginRegistryComponentTest {
         assertThat(newRegistry.isSupported(PostgreSqlDialectPlugin.DIALECT_NAME))
                 .isTrue();
         Result<PreparedStatementSpecFactory> result =
-                newRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "15.2.0");
+                resolveSpecFactory(newRegistry, PostgreSqlDialectPlugin.DIALECT_NAME, "15.2.0");
         assertThat(result).isInstanceOf(Result.Success.class);
     }
 
     @Test
     void getSpecFactory() {
         Result<PreparedStatementSpecFactory> result =
-                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "15.2.0");
+                resolveSpecFactory(pluginRegistry, PostgreSqlDialectPlugin.DIALECT_NAME, "15.2.0");
 
         assertThat(result).isInstanceOf(Result.Success.class);
         PreparedStatementSpecFactory specFactory = result.orElseThrow();
@@ -73,24 +86,24 @@ class PostgreSqlPluginRegistryComponentTest {
     void versionMatching() {
         // Should match PostgreSQL 15.x versions (using ^15.0.0 range)
         Result<PreparedStatementSpecFactory> version1500 =
-                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "15.0.0");
+                resolveSpecFactory(pluginRegistry, PostgreSqlDialectPlugin.DIALECT_NAME, "15.0.0");
         assertThat(version1500).isInstanceOf(Result.Success.class);
 
         Result<PreparedStatementSpecFactory> version1520 =
-                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "15.2.0");
+                resolveSpecFactory(pluginRegistry, PostgreSqlDialectPlugin.DIALECT_NAME, "15.2.0");
         assertThat(version1520).isInstanceOf(Result.Success.class);
 
         Result<PreparedStatementSpecFactory> version1590 =
-                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "15.9.0");
+                resolveSpecFactory(pluginRegistry, PostgreSqlDialectPlugin.DIALECT_NAME, "15.9.0");
         assertThat(version1590).isInstanceOf(Result.Success.class);
 
         // Should NOT match PostgreSQL 14 or 16
         Result<PreparedStatementSpecFactory> version1400 =
-                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "14.10.0");
+                resolveSpecFactory(pluginRegistry, PostgreSqlDialectPlugin.DIALECT_NAME, "14.10.0");
         assertThat(version1400).isInstanceOf(Result.Failure.class);
 
         Result<PreparedStatementSpecFactory> version1600 =
-                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME, "16.0.0");
+                resolveSpecFactory(pluginRegistry, PostgreSqlDialectPlugin.DIALECT_NAME, "16.0.0");
         assertThat(version1600).isInstanceOf(Result.Failure.class);
     }
 
@@ -98,7 +111,7 @@ class PostgreSqlPluginRegistryComponentTest {
     void getSpecFactoryWithoutVersion() {
         // When version is not specified, should return available plugin
         Result<PreparedStatementSpecFactory> result =
-                pluginRegistry.getSpecFactory(PostgreSqlDialectPlugin.DIALECT_NAME);
+                resolveSpecFactory(pluginRegistry, PostgreSqlDialectPlugin.DIALECT_NAME);
 
         assertThat(result).isInstanceOf(Result.Success.class);
         assertThat(result.orElseThrow()).isNotNull();

@@ -4,12 +4,17 @@
 
 A type-safe SQL builder for Java with multi-dialect support through a plugin system. Build SQL statements programmatically using a fluent DSL with compile-time validation.
 
-[![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3ACI)
-[![Release](https://github.com/auspis/fluent-sql-4j/actions/workflows/release.yml/badge.svg)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3A"Release+to+Maven+Central")
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j)
 [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j)
 [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=auspis_fluent-sql-4j&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=auspis_fluent-sql-4j)
+
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.auspis.fluentsql4j/api)](https://central.sonatype.com/artifact/io.github.auspis.fluentsql4j/api)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/auspis/fluent-sql-4j/blob/main/LICENSE)
+
+[![CI](https://github.com/auspis/fluent-sql-4j/actions/workflows/ci.yml/badge.svg)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3ACI)
+[![Release](https://github.com/auspis/fluent-sql-4j/actions/workflows/release.yml/badge.svg)](https://github.com/auspis/fluent-sql-4j/actions?query=workflow%3A"Release+to+Maven+Central")
+
+![Java 21](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
 
 ## Features
 
@@ -111,6 +116,9 @@ The project is organized as a multi-module Maven project with two main artifacts
   - **[`plugins/plugin-mysql/`](plugins/plugin-mysql/)**: MySQL dialect plugin
   - **[`plugins/plugin-postgresql/`](plugins/plugin-postgresql/)**: PostgreSQL dialect plugin
 - **[`test-support/`](test-support/)**: Shared test utilities and helpers
+- **[`test-real-deps/`](test-real-deps/)**: Test-only module for tests that require concrete runtime dependencies we do not want in the production module graph or published artifacts
+
+Use `test-real-deps` only for tests whose realism requires concrete runtime dependencies intentionally excluded from production modules.
 
 ### Usage Patterns
 
@@ -171,4 +179,5 @@ To run all tests including integration and E2E tests:
 - **[DSL Usage Guide](data/wiki/DSL_USAGE_GUIDE.md)**: Comprehensive examples for all DSL operations (SELECT, INSERT, UPDATE, DELETE, MERGE, TRUNCATE, CREATE TABLE)
 - **[Developer Guide](data/wiki/DEVELOPER_GUIDE.md)**: Testing strategies, code coverage, formatting guidelines
 - **[Plugin Development Guide](data/wiki/PLUGIN_DEVELOPMENT.md)**: How to create custom dialect plugins
+- **[Build Hook Guide](data/wiki/BUILD_HOOK_GUIDE.md)**: How to enable build logging (property-based or programmatic), compose hook factories, and create custom BuildHook providers
 

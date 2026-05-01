@@ -23,7 +23,8 @@ class CreateTableBuilderNegativeBranchesTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        dsl = StandardSQLDialectPlugin.instance().createDSL();
+        dsl = StandardSQLDialectPlugin.instance()
+                .createDSL(io.github.auspis.fluentsql4j.hook.build.BuildHookFactory.nullObject());
         sqlCaptureHelper = new SqlCaptureHelper();
     }
 

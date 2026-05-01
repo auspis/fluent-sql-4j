@@ -5,9 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
+import io.github.auspis.fluentsql4j.dsl.DSL;
 import io.github.auspis.fluentsql4j.functional.Result;
 import io.github.auspis.fluentsql4j.functional.Result.Failure;
 import io.github.auspis.fluentsql4j.functional.Result.Success;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
+import io.github.auspis.fluentsql4j.hook.build.ServiceLoaderBuildHookFactory;
+import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.util.SqlDialectPluginUtil;
 import io.github.auspis.fluentsql4j.plugin.util.TestDialectPlugin;
 import java.util.Collections;
@@ -30,6 +34,21 @@ class SqlDialectPluginRegistryTest {
         plugin_1_7_0 = SqlDialectPluginUtil.create("^1.7.0", specFactory);
         plugins = List.of(plugin_3_0_0, plugin_1_7_0);
         registry = SqlDialectPluginRegistry.of(plugins);
+    }
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(
+            SqlDialectPluginRegistry targetRegistry, String dialect) {
+        return resolveSpecFactory(targetRegistry, dialect, null);
+    }
+
+    private Result<PreparedStatementSpecFactory> resolveSpecFactory(
+            SqlDialectPluginRegistry targetRegistry, String dialect, String version) {
+        if (dialect == null) {
+            return new Failure<>("Dialect name must not be null");
+        }
+        return new SqlDialectResolver(targetRegistry, BuildHookFactory.nullObject())
+                .resolve(dialect, version)
+                .map(DSL::getSpecFactory);
     }
 
     @Test
@@ -55,7 +74,7 @@ class SqlDialectPluginRegistryTest {
     @Test
     void getSpecFactory_returnsSuccessWhenDialectSupported() {
         assertThat(registry.isSupported(TestDialectPlugin.DIALECT_NAME)).isTrue();
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(TestDialectPlugin.DIALECT_NAME);
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(registry, TestDialectPlugin.DIALECT_NAME);
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isEqualTo(specFactory);
     }
@@ -63,25 +82,27 @@ class SqlDialectPluginRegistryTest {
     @Test
     void getSpecFactory_shouldMatchVersionWithinRange() {
         Result<PreparedStatementSpecFactory> result1 =
-                registry.getSpecFactory(TestDialectPlugin.DIALECT_NAME, TestDialectPlugin.DIALECT_VERSION);
+                resolveSpecFactory(registry, TestDialectPlugin.DIALECT_NAME, TestDialectPlugin.DIALECT_VERSION);
         assertThat(result1).isInstanceOf(Success.class);
         assertThat(result1.orElseThrow()).isEqualTo(specFactory);
 
-        Result<PreparedStatementSpecFactory> result2 = registry.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "3.5.0");
+        Result<PreparedStatementSpecFactory> result2 =
+                resolveSpecFactory(registry, TestDialectPlugin.DIALECT_NAME, "3.5.0");
         assertThat(result2).isInstanceOf(Success.class);
         assertThat(result2.orElseThrow()).isEqualTo(specFactory);
     }
 
     @Test
     void getSpecFactory_returnsFailureForVersionOutsideRange() {
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2.7.0");
+        Result<PreparedStatementSpecFactory> result =
+                resolveSpecFactory(registry, TestDialectPlugin.DIALECT_NAME, "2.7.0");
         assertThat(result).isInstanceOf(Failure.class);
         assertThat(((Failure<PreparedStatementSpecFactory>) result).message()).contains("No plugin found");
     }
 
     @Test
     void getSpecFactory_returnsFailureForNullDialect() {
-        Result<PreparedStatementSpecFactory> result = registry.getSpecFactory(null);
+        Result<PreparedStatementSpecFactory> result = resolveSpecFactory(registry, null);
         assertThat(result).isInstanceOf(Failure.class);
         assertThat(((Failure<PreparedStatementSpecFactory>) result).message())
                 .contains("Dialect name must not be null");
@@ -96,13 +117,13 @@ class SqlDialectPluginRegistryTest {
 
         // Exact match should work
         Result<PreparedStatementSpecFactory> result =
-                registryWithNonSemVer.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2008");
+                resolveSpecFactory(registryWithNonSemVer, TestDialectPlugin.DIALECT_NAME, "2008");
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isEqualTo(nonSemVerPreparedStatementSpecFactory);
 
         // Non-matching version should fail
         Result<PreparedStatementSpecFactory> result2 =
-                registryWithNonSemVer.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2011");
+                resolveSpecFactory(registryWithNonSemVer, TestDialectPlugin.DIALECT_NAME, "2011");
         assertThat(result2).isInstanceOf(Failure.class);
     }
 
@@ -123,22 +144,19 @@ class SqlDialectPluginRegistryTest {
                 SqlDialectPluginRegistry.of(List.of(plugin2008, plugin2011, plugin2016));
 
         // Each version should match its corresponding plugin
-        assertThat(registryWithMultipleVersions
-                        .getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2008")
+        assertThat(resolveSpecFactory(registryWithMultipleVersions, TestDialectPlugin.DIALECT_NAME, "2008")
                         .orElseThrow())
                 .isEqualTo(specFactory2008);
-        assertThat(registryWithMultipleVersions
-                        .getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2011")
+        assertThat(resolveSpecFactory(registryWithMultipleVersions, TestDialectPlugin.DIALECT_NAME, "2011")
                         .orElseThrow())
                 .isEqualTo(specFactory2011);
-        assertThat(registryWithMultipleVersions
-                        .getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2016")
+        assertThat(resolveSpecFactory(registryWithMultipleVersions, TestDialectPlugin.DIALECT_NAME, "2016")
                         .orElseThrow())
                 .isEqualTo(specFactory2016);
 
         // Non-matching version should fail
         Result<PreparedStatementSpecFactory> result =
-                registryWithMultipleVersions.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2019");
+                resolveSpecFactory(registryWithMultipleVersions, TestDialectPlugin.DIALECT_NAME, "2019");
         assertThat(result).isInstanceOf(Failure.class);
     }
 
@@ -151,13 +169,13 @@ class SqlDialectPluginRegistryTest {
 
         // Exact case match should work
         Result<PreparedStatementSpecFactory> result =
-                registryWithVersion.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "v1");
+                resolveSpecFactory(registryWithVersion, TestDialectPlugin.DIALECT_NAME, "v1");
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isEqualTo(specFactoryLower);
 
         // Different case should not match
         Result<PreparedStatementSpecFactory> result2 =
-                registryWithVersion.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "V1");
+                resolveSpecFactory(registryWithVersion, TestDialectPlugin.DIALECT_NAME, "V1");
         assertThat(result2).isInstanceOf(Failure.class);
     }
 
@@ -175,13 +193,13 @@ class SqlDialectPluginRegistryTest {
 
         // SemVer version should match SemVer plugin
         Result<PreparedStatementSpecFactory> semVerResult =
-                mixedRegistry.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "8.0.35");
+                resolveSpecFactory(mixedRegistry, TestDialectPlugin.DIALECT_NAME, "8.0.35");
         assertThat(semVerResult).isInstanceOf(Success.class);
         assertThat(semVerResult.orElseThrow()).isEqualTo(semVerPreparedStatementSpecFactory);
 
         // Non-SemVer version should match non-SemVer plugin
         Result<PreparedStatementSpecFactory> nonSemVerResult =
-                mixedRegistry.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "2008");
+                resolveSpecFactory(mixedRegistry, TestDialectPlugin.DIALECT_NAME, "2008");
         assertThat(nonSemVerResult).isInstanceOf(Success.class);
         assertThat(nonSemVerResult.orElseThrow()).isEqualTo(nonSemVerPreparedStatementSpecFactory);
     }
@@ -255,6 +273,19 @@ class SqlDialectPluginRegistryTest {
         // Non-SemVer version should match non-SemVer plugin only
         assertThat(SqlDialectPluginRegistry.findMatchingPlugins(mixedPlugins, "2008"))
                 .containsExactly(nonSemVerPlugin);
+    }
+
+    @Test
+    void getSpecFactory_fromServiceLoaderRegistry_shouldUseServiceLoaderBuildHookFactory() {
+        SqlDialectPluginRegistry serviceLoaderRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
+
+        PreparedStatementSpecFactory factory = new SqlDialectResolver(
+                        serviceLoaderRegistry, new ServiceLoaderBuildHookFactory())
+                .resolve(StandardSQLDialectPlugin.DIALECT_NAME, StandardSQLDialectPlugin.DIALECT_VERSION)
+                .map(DSL::getSpecFactory)
+                .orElseThrow();
+
+        assertThat(factory.buildHookFactory()).isInstanceOf(ServiceLoaderBuildHookFactory.class);
     }
 
     @Test
@@ -351,7 +382,8 @@ class SqlDialectPluginRegistryTest {
                 .register(plugin2)
                 .register(plugin3);
 
-        Result<PreparedStatementSpecFactory> result = ordered.getSpecFactory(TestDialectPlugin.DIALECT_NAME, "8.0.35");
+        Result<PreparedStatementSpecFactory> result =
+                resolveSpecFactory(ordered, TestDialectPlugin.DIALECT_NAME, "8.0.35");
 
         assertThat(result).isInstanceOf(Success.class);
         assertThat(result.orElseThrow()).isSameAs(specFactory1);

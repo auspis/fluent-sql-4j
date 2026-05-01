@@ -3,6 +3,7 @@ package io.github.auspis.fluentsql4j.plugin.builtin.mysql;
 import io.github.auspis.fluentsql4j.ast.visitor.PreparedStatementSpecFactory;
 import io.github.auspis.fluentsql4j.ast.visitor.ps.AstToPreparedStatementSpecVisitor;
 import io.github.auspis.fluentsql4j.dsl.DSL;
+import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlFetchPsStrategy;
 import io.github.auspis.fluentsql4j.plugin.builtin.mysql.ast.visitor.ps.strategy.MySqlMergeStatementPsStrategy;
@@ -62,11 +63,14 @@ import io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL;
  * <pre>{@code
  * // Automatically discovered via ServiceLoader
  * SqlDialectPluginRegistry registry = SqlDialectPluginRegistry.createWithServiceLoader();
- * Result<PreparedStatementSpecFactory> result = registry.getSpecFactory("mysql", "8.0.35");
+ * SqlDialectResolver resolver = new SqlDialectResolver(registry, new ServiceLoaderBuildHookFactory());
+ * Result<PreparedStatementSpecFactory> result =
+ *     resolver.resolve("mysql", "8.0.35").map(DSL::getSpecFactory);
  *
  * // Or created directly
  * SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
- * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
+ * PreparedStatementSpecFactory specFactory =
+ *     plugin.createDSL(new ServiceLoaderBuildHookFactory()).getSpecFactory();
  * }</pre>
  * <p>
  * <b>Version Matching:</b>
@@ -163,7 +167,7 @@ public final class MysqlDialectPlugin {
      *
      * @return a new {@link PreparedStatementSpecFactory} instance configured for MySQL, never {@code null}
      */
-    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory() {
+    private static PreparedStatementSpecFactory createPreparedStatementSpecFactory(BuildHookFactory hookFactory) {
         AstToPreparedStatementSpecVisitor astToPsSpecVisitor = AstToPreparedStatementSpecVisitor.builder()
                 .escapeStrategy(new MysqlEscapeStrategy())
                 .currentDateStrategy(new MysqlCurrentDatePsStrategy())
@@ -177,7 +181,7 @@ public final class MysqlDialectPlugin {
                 .mergeStatementStrategy(new MySqlMergeStatementPsStrategy())
                 .build();
 
-        return new PreparedStatementSpecFactory(astToPsSpecVisitor);
+        return new PreparedStatementSpecFactory(astToPsSpecVisitor, hookFactory);
     }
 
     /**
@@ -189,7 +193,8 @@ public final class MysqlDialectPlugin {
      * <p>
      * <b>Example usage:</b>
      * <pre>{@code
-     * MysqlDSL dsl = (MysqlDSL) MysqlDialectPlugin.instance().createDSL();
+     * MysqlDSL dsl =
+     *     (MysqlDSL) MysqlDialectPlugin.instance().createDSL(new ServiceLoaderBuildHookFactory());
      * PreparedStatement ps = dsl.select(
      *     dsl.groupConcat("name", ", ").as("names")
      * ).from("users").build(connection);
@@ -197,8 +202,8 @@ public final class MysqlDialectPlugin {
      *
      * @return a new {@link io.github.auspis.fluentsql4j.plugin.builtin.mysql.dsl.MysqlDSL} instance configured for MySQL, never {@code null}
      */
-    private static DSL createDSL() {
-        return new MysqlDSL(createPreparedStatementSpecFactory());
+    private static DSL createDSL(BuildHookFactory hookFactory) {
+        return new MysqlDSL(createPreparedStatementSpecFactory(hookFactory));
     }
 
     /**
@@ -210,7 +215,8 @@ public final class MysqlDialectPlugin {
      * <b>Example usage:</b>
      * <pre>{@code
      * SqlDialectPlugin plugin = MysqlDialectPlugin.instance();
-     * PreparedStatementSpecFactory specFactory = plugin.createDSL().getSpecFactory();
+     * PreparedStatementSpecFactory specFactory =
+     *     plugin.createDSL(new ServiceLoaderBuildHookFactory()).getSpecFactory();
      * }</pre>
      *
      * @return the singleton MySQL dialect plugin instance, never {@code null}
