@@ -73,7 +73,7 @@
     <maven.gpg.plugin.version>3.2.8</maven.gpg.plugin.version>
     <nexus.staging.plugin.version>1.7.0</nexus.staging.plugin.version>
 
-    <dep.lombok.version>1.18.44</dep.lombok.version>
+    <dep.lombok.version>1.18.46</dep.lombok.version>
     <dep.jackson-core.version>2.21.2</dep.jackson-core.version>
     <dep.semver4j.version>6.0.0</dep.semver4j.version>
     <dep.slf4j.version>2.0.17</dep.slf4j.version>
