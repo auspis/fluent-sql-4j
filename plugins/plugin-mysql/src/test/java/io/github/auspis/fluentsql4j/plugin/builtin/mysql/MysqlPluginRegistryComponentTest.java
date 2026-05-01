@@ -10,7 +10,6 @@ import io.github.auspis.fluentsql4j.plugin.SqlDialectPlugin;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectPluginRegistry;
 import io.github.auspis.fluentsql4j.plugin.SqlDialectResolver;
 import io.github.auspis.fluentsql4j.test.util.annotation.ComponentTest;
-import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +36,7 @@ class MysqlPluginRegistryComponentTest {
     }
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() {
         pluginRegistry = SqlDialectPluginRegistry.createWithServiceLoader();
     }
 

@@ -54,7 +54,7 @@ public final class ServiceLoaderBuildHookFactory implements BuildHookFactory {
                 if (!BuildHook.isNull(hook)) {
                     hooks.add(hook);
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 logger.warn("Skipping build hook provider '{}' due to error", provider.id(), t);
             }
         }

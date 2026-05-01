@@ -5,10 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.auspis.fluentsql4j.hook.build.BuildHook;
 import io.github.auspis.fluentsql4j.hook.build.BuildHookFactory;
-import io.github.auspis.fluentsql4j.hook.build.logging.LoggingBuildHookProvider;
 import io.github.auspis.fluentsql4j.plugin.builtin.sql2016.StandardSQLDialectPlugin;
 import org.junit.jupiter.api.Test;
-import org.slf4j.event.Level;
 
 class DSLRegistryCreateWithHookFactoryTest {
 
@@ -45,9 +43,6 @@ class DSLRegistryCreateWithHookFactoryTest {
 
     @Test
     void createWithServiceLoader_doesNotApplyHookOverride() {
-        LoggingBuildHookProvider provider =
-                new LoggingBuildHookProvider(org.slf4j.LoggerFactory.getLogger("test"), Level.DEBUG, false, false);
-
         DSLRegistry registry = DSLRegistry.createWithServiceLoader();
         DSL dsl = registry.dslFor(StandardSQLDialectPlugin.DIALECT_NAME).orElseThrow();
 

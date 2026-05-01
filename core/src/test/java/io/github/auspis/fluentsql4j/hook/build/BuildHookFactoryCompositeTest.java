@@ -72,7 +72,7 @@ class BuildHookFactoryCompositeTest {
 
     @Test
     void whenFactoriesReturnNullObject() {
-        BuildHookFactory factory = BuildHookFactory.composite(() -> BuildHook.nullObject());
+        BuildHookFactory factory = BuildHookFactory.composite(BuildHook::nullObject);
         assertThat(factory.create()).isSameAs(BuildHook.nullObject());
     }
 
