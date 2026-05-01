@@ -62,7 +62,7 @@
     <maven.versions.plugin.version>2.21.0</maven.versions.plugin.version>
     <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
     <maven.jacoco.plugin.version>0.8.14</maven.jacoco.plugin.version>
-    <maven.sonar-scanner.plugin.version>5.5.0.6356</maven.sonar-scanner.plugin.version>
+    <maven.sonar-scanner.plugin.version>5.6.0.6792</maven.sonar-scanner.plugin.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>auspis</sonar.organization>
     <sonar.projectKey>auspis_fluent-sql-4j</sonar.projectKey>
