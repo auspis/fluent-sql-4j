@@ -75,7 +75,7 @@
     <nexus.staging.plugin.version>1.7.0</nexus.staging.plugin.version>
 
     <dep.lombok.version>1.18.46</dep.lombok.version>
-    <dep.jackson-core.version>2.21.3</dep.jackson-core.version>
+    <dep.jackson-core.version>2.22.0</dep.jackson-core.version>
     <dep.semver4j.version>6.0.0</dep.semver4j.version>
     <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
@@ -85,11 +85,11 @@
 
     <dep.testcontainer-core.version>2.0.5</dep.testcontainer-core.version>
     <dep.testcontainer.version>1.21.4</dep.testcontainer.version>
-    <dep.junit-jupiter.version>6.0.1</dep.junit-jupiter.version>
+    <dep.junit-jupiter.version>6.1.0</dep.junit-jupiter.version>
     <dep.assertj-core.version>3.27.7</dep.assertj-core.version>
     <dep.mockito-core.version>5.23.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.18.8</dep.byte-buddy.version>
-    <dep.logback-classic.version>1.5.32</dep.logback-classic.version>
+    <dep.logback-classic.version>1.5.34</dep.logback-classic.version>
     <!-- Run both integration and e2e by default during verify phase -->
     <test.groups.slow>integration,e2e</test.groups.slow>
   </properties>
