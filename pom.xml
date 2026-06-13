@@ -52,17 +52,17 @@
   <properties>
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.dependency.plugin.version>3.10.0</maven.dependency.plugin.version>
+    <maven.dependency.plugin.version>3.11.0</maven.dependency.plugin.version>
     <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.5.5</maven.surefire.plugin.version>
     <maven.failsafe.plugin.version>3.5.5</maven.failsafe.plugin.version>
-    <maven.spotless.plugin.version>3.4.0</maven.spotless.plugin.version>
+    <maven.spotless.plugin.version>3.6.0</maven.spotless.plugin.version>
     <maven.resource.plugin.version>3.5.0</maven.resource.plugin.version>
     <maven.exec.plugin.version>3.6.3</maven.exec.plugin.version>
     <maven.versions.plugin.version>2.21.0</maven.versions.plugin.version>
-    <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
-    <maven.jacoco.plugin.version>0.8.14</maven.jacoco.plugin.version>
-    <maven.sonar-scanner.plugin.version>5.6.0.6792</maven.sonar-scanner.plugin.version>
+    <maven.enforcer.plugin.version>3.6.3</maven.enforcer.plugin.version>
+    <maven.jacoco.plugin.version>0.8.15</maven.jacoco.plugin.version>
+    <maven.sonar-scanner.plugin.version>5.7.0.6970</maven.sonar-scanner.plugin.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.organization>auspis</sonar.organization>
     <sonar.projectKey>auspis_fluent-sql-4j</sonar.projectKey>
@@ -75,7 +75,7 @@
     <nexus.staging.plugin.version>1.7.0</nexus.staging.plugin.version>
 
     <dep.lombok.version>1.18.46</dep.lombok.version>
-    <dep.jackson-core.version>2.21.3</dep.jackson-core.version>
+    <dep.jackson-core.version>2.22.0</dep.jackson-core.version>
     <dep.semver4j.version>6.0.0</dep.semver4j.version>
     <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
@@ -85,11 +85,11 @@
 
     <dep.testcontainer-core.version>2.0.5</dep.testcontainer-core.version>
     <dep.testcontainer.version>1.21.4</dep.testcontainer.version>
-    <dep.junit-jupiter.version>6.0.1</dep.junit-jupiter.version>
+    <dep.junit-jupiter.version>6.1.0</dep.junit-jupiter.version>
     <dep.assertj-core.version>3.27.7</dep.assertj-core.version>
     <dep.mockito-core.version>5.23.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.18.8</dep.byte-buddy.version>
-    <dep.logback-classic.version>1.5.32</dep.logback-classic.version>
+    <dep.logback-classic.version>1.5.34</dep.logback-classic.version>
     <!-- Run both integration and e2e by default during verify phase -->
     <test.groups.slow>integration,e2e</test.groups.slow>
   </properties>
