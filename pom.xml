@@ -80,7 +80,7 @@
     <dep.slf4j.version>2.0.17</dep.slf4j.version>
 
     <dep.h2.version>2.4.240</dep.h2.version>
-    <dep.mysql-connector-java.version>9.7.0</dep.mysql-connector-java.version>
+    <dep.mysql-connector-java.version>26.7.0</dep.mysql-connector-java.version>
     <dep.postgresql.version>42.7.13</dep.postgresql.version>
 
     <dep.testcontainer-core.version>2.0.5</dep.testcontainer-core.version>
