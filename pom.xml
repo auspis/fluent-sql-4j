@@ -89,7 +89,7 @@
     <dep.assertj-core.version>3.27.7</dep.assertj-core.version>
     <dep.mockito-core.version>5.23.0</dep.mockito-core.version>
     <dep.byte-buddy.version>1.18.11</dep.byte-buddy.version>
-    <dep.logback-classic.version>1.5.38</dep.logback-classic.version>
+    <dep.logback-classic.version>1.6.3</dep.logback-classic.version>
     <!-- Run both integration and e2e by default during verify phase -->
     <test.groups.slow>integration,e2e</test.groups.slow>
   </properties>
