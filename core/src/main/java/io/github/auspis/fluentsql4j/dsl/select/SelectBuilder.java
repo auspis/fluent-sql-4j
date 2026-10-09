@@ -170,12 +170,11 @@ public class SelectBuilder implements SupportsWhere<SelectBuilder>, StatementBui
 
         List<Projection> updatedProjections = new ArrayList<>();
         for (var projection : currentSelect.projections()) {
-            Projection updated =
-                    switch (projection) {
-                        case ScalarExpressionProjection scalarProj -> updateScalarProjection(scalarProj, table);
-                        case AggregateCallProjection aggProj -> updateAggregateProjection(aggProj, table);
-                        default -> projection;
-                    };
+            Projection updated = switch (projection) {
+                case ScalarExpressionProjection scalarProj -> updateScalarProjection(scalarProj, table);
+                case AggregateCallProjection aggProj -> updateAggregateProjection(aggProj, table);
+                default -> projection;
+            };
             updatedProjections.add(updated);
         }
 

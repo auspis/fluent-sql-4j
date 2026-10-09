@@ -319,15 +319,14 @@ public class WhereConditionBuilder<T extends SupportsWhere<T>> {
          */
         public R column(String alias, String column) {
             ColumnReference rightColumn = ColumnReferenceUtil.createValidated(alias, column);
-            Predicate condition =
-                    switch (operator) {
-                        case EQUALS -> Comparison.eq(parent.getColumnRef(), rightColumn);
-                        case NOT_EQUALS -> Comparison.ne(parent.getColumnRef(), rightColumn);
-                        case GREATER_THAN -> Comparison.gt(parent.getColumnRef(), rightColumn);
-                        case LESS_THAN -> Comparison.lt(parent.getColumnRef(), rightColumn);
-                        case GREATER_THAN_OR_EQUALS -> Comparison.gte(parent.getColumnRef(), rightColumn);
-                        case LESS_THAN_OR_EQUALS -> Comparison.lte(parent.getColumnRef(), rightColumn);
-                    };
+            Predicate condition = switch (operator) {
+                case EQUALS -> Comparison.eq(parent.getColumnRef(), rightColumn);
+                case NOT_EQUALS -> Comparison.ne(parent.getColumnRef(), rightColumn);
+                case GREATER_THAN -> Comparison.gt(parent.getColumnRef(), rightColumn);
+                case LESS_THAN -> Comparison.lt(parent.getColumnRef(), rightColumn);
+                case GREATER_THAN_OR_EQUALS -> Comparison.gte(parent.getColumnRef(), rightColumn);
+                case LESS_THAN_OR_EQUALS -> Comparison.lte(parent.getColumnRef(), rightColumn);
+            };
 
             return parent.addCondition(condition);
         }

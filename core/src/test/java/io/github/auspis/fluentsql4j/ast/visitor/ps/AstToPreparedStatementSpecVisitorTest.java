@@ -1013,8 +1013,8 @@ class AstToPreparedStatementSpecVisitorTest {
                 .select(Select.of(new AggregateCallProjection(AggregateCall.count(ColumnReference.of("User", "id")))))
                 .from(From.of(new TableIdentifier("User")))
                 .groupBy(GroupBy.of(ColumnReference.of("User", "email")))
-                .having(io.github.auspis.fluentsql4j.ast.dql.clause.Having.of(
-                        new Not(io.github.auspis.fluentsql4j.ast.core.predicate.AndOr.or(
+                .having(io.github.auspis.fluentsql4j.ast.dql.clause.Having.of(new Not(
+                        io.github.auspis.fluentsql4j.ast.core.predicate.AndOr.or(
                                 Comparison.lt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(5)),
                                 Comparison.gt(AggregateCall.count(ColumnReference.of("User", "id")), Literal.of(50))))))
                 .build();
